@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="http://maven.apache.org/POM/4.0.0"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <parent>
+    <artifactId>annot8-components</artifactId>
+    <groupId>io.annot8</groupId>
+    <version>0.4.0-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>annot8-components-base</artifactId>
+  <name>Annot8 Base Components</name>
+  <description>Concrete fundamental components and support for building new components</description>
+
+  <dependencies>
+    <dependency>
+      <groupId>io.annot8</groupId>
+      <artifactId>annot8-common-data</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>io.annot8</groupId>
+      <artifactId>annot8-conventions</artifactId>
+      <version>[0.4.0-SNAPSHOT,)</version>
+    </dependency>
+    <dependency>
+      <groupId>io.annot8</groupId>
+      <artifactId>annot8-components-monitor</artifactId>
+      <version>0.4.0-SNAPSHOT</version>
+    </dependency>
+        
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>28.1-jre</version>
+    </dependency>
+  </dependencies>
+</project>
