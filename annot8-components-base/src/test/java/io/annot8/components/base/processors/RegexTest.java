@@ -52,7 +52,7 @@ public class RegexTest {
   private void assertProcessorCorrectness(Processor processor) throws Annot8Exception {
     Item item = new TestItem();
     Text content =
-        item.create(TestStringContent.class).withName("test").withData("x + 12 = 42").save();
+        item.create(TestStringContent.class).withDescription("test").withData("x + 12 = 42").save();
 
     processor.process(item);
 
