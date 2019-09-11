@@ -275,6 +275,23 @@
         <version>${slf4j.version}</version>
       </dependency>
 
+
+      <dependency>
+        <groupId>io.annot8</groupId>
+        <artifactId>annot8-conventions</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.annot8</groupId>
+        <artifactId>annot8-components-base</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.annot8</groupId>
+        <artifactId>annot8-components-monitor</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
       <!-- Testing -->
       <dependency>
         <groupId>org.junit.jupiter</groupId>
