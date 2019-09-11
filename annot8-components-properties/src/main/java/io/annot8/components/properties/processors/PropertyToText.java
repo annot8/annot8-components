@@ -54,7 +54,7 @@ public class PropertyToText extends AbstractComponent implements Processor {
         .forEach(
             e -> {
               try {
-                item.create(Text.class)
+                item.createContent(Text.class)
                     .withDescription("Text from property from " + e.getKey())
                     .withData(e.getValue().toString())
                     .save();

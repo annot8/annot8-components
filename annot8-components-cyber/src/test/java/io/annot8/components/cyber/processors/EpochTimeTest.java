@@ -36,7 +36,7 @@ public class EpochTimeTest {
       p.configure(context);
 
       Text content =
-          item.create(TestStringContent.class)
+          item.createContent(TestStringContent.class)
               .withData("It happened at 1507725753567")
               .save();
 
@@ -72,7 +72,7 @@ public class EpochTimeTest {
       p.configure(context);
 
       Text content =
-          item.create(TestStringContent.class)
+          item.createContent(TestStringContent.class)
               .withData("It happened at 1507725753")
               .save();
 
@@ -108,7 +108,7 @@ public class EpochTimeTest {
       p.configure(context);
 
       Text content =
-          item.create(TestStringContent.class)
+          item.createContent(TestStringContent.class)
               .withData("It happened at 1507725753")
               .save();
 
@@ -135,7 +135,7 @@ public class EpochTimeTest {
       p.configure(context);
 
       Text content =
-          item.create(TestStringContent.class)
+          item.createContent(TestStringContent.class)
               .withData("It happened at 1507725753")
               .save();
 

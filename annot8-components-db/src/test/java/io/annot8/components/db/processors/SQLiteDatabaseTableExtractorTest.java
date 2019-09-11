@@ -9,7 +9,6 @@ import io.annot8.core.components.responses.ProcessorResponse;
 import io.annot8.core.components.responses.ProcessorResponse.Status;
 import io.annot8.core.data.Content;
 import io.annot8.core.data.Item;
-import io.annot8.core.exceptions.Annot8Exception;
 import io.annot8.testing.testimpl.TestItem;
 import org.junit.jupiter.api.Test;
 
@@ -31,7 +30,7 @@ public class SQLiteDatabaseTableExtractorTest extends AbstractSQLiteDataTest {
     ProcessorResponse response = null;
     try {
       response = extractor.process(item);
-    } catch (Annot8Exception e) {
+    } catch (Exception e) {
       fail("Test should not throw an exception here", e);
     }
 
@@ -48,7 +47,7 @@ public class SQLiteDatabaseTableExtractorTest extends AbstractSQLiteDataTest {
     String[] expectedTables = new String[] {"test", "test2"};
 
     List<String> tableNames =
-        item.getContents(TableContent.class).map(c -> c.getProperties().getProperty(SQLiteDatabaseTableExtractor.PROPERTY_NAME, String.class).orElse(null)).collect(Collectors.toList());
+        item.getContents(TableContent.class).map(c -> c.getProperties().get(SQLiteDatabaseTableExtractor.PROPERTY_NAME, String.class).orElse(null)).collect(Collectors.toList());
 
     assertThat(tableNames).containsExactlyInAnyOrder(expectedTables);
 

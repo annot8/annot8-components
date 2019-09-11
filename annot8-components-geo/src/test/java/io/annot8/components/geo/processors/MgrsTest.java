@@ -31,7 +31,7 @@ public class MgrsTest {
       p.configure(context);
 
       Text content =
-          item.create(TestStringContent.class)
+          item.createContent(TestStringContent.class)
               .withData("Honolulu is in the 10 km square that is called 4QFJ 1 5.")
               .save();
 
@@ -73,7 +73,7 @@ public class MgrsTest {
       p.configure(context);
 
       Text content =
-          item.create(TestStringContent.class)
+          item.createContent(TestStringContent.class)
               .withData("Bob WAS BORN ON 19 MAR 1968")
               .save();
 
@@ -97,7 +97,7 @@ public class MgrsTest {
       p.configure(context);
 
       Text content =
-          item.create(TestStringContent.class)
+          item.createContent(TestStringContent.class)
               .withData("Bob WAS BORN ON 19 MAR 1968")
               .save();
 

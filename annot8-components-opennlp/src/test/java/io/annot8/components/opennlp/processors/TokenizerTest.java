@@ -27,7 +27,7 @@ public class TokenizerTest {
 
     Item item = new TestItem();
     Text content =
-        item.create(TestStringContent.class)
+        item.createContent(TestStringContent.class)
             .withData("Hello Mr. Bond. I've been expecting you.")
             .save();
 

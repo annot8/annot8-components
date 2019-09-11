@@ -31,7 +31,7 @@ public class PlusCodeTest {
       p.configure(context);
 
       Text content =
-          item.create(TestStringContent.class)
+          item.createContent(TestStringContent.class)
               .withData("Laguna Uspaycocha can be found at 57R9C4F6+WQ.")
               .save();
 
@@ -70,7 +70,7 @@ public class PlusCodeTest {
       p.configure(context);
 
       Text content =
-          item.create(TestStringContent.class)
+          item.createContent(TestStringContent.class)
               .withData("Laguna Uspaycocha can not be found at 57R9C4F+WQ.")
               .save();
 

@@ -31,7 +31,7 @@ public class UrlTest {
       p.configure(context);
 
       Text content =
-          item.create(TestStringContent.class)
+          item.createContent(TestStringContent.class)
               .withData(
                   "UK Government's website is http://www.gov.uk/. An example FTP directory is ftp://foo.example.com/this/is/a/path.txt. Here's a secure URL https://www.example.com/index.php?test=true . Some naughty person hasn't specified a schema here... www.example.com/path/to/page.html.")
               .save();

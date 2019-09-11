@@ -31,7 +31,7 @@ public class IPv4Test {
 
       //    Item item = new SimpleItem(itemFactory, contentBuilderFactoryRegistry);
       Text content =
-          item.create(TestStringContent.class)
+          item.createContent(TestStringContent.class)
               .withData("The attack came from 127.0.0.1")
               .save();
 

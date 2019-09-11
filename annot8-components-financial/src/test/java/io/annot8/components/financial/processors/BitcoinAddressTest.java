@@ -40,7 +40,7 @@ public class BitcoinAddressTest {
       p.configure(context);
 
       Text content =
-          item.create(TestStringContent.class)
+          item.createContent(TestStringContent.class)
               .withData(
                   "These are valid addresses: 17VZNX1SN5NtKa8UQFxwQbFeFc3iqRYhem and 3EktnHQD7RiAE6uzMj2ZifT9YgRrkSgzQX; "
                       + "whereas the following are not: 17VZNX1SN5Ntja8UQFxwQbFeFc3iqRYhem (bad checksum), 17VZNX1SN5NtKa8 (too short), 5Hwgr3u458GLafKBgxtssHSPqJnYoGrSzgQsPwLFhLNYskDPyyA (wrong prefix)")

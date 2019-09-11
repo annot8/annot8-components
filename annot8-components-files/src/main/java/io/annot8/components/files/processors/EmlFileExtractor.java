@@ -59,7 +59,7 @@ public class EmlFileExtractor extends AbstractComponent implements Processor {
                 }
 
                 // Remove the original *.eml content to avoid reprocessing
-                item.remove(f);
+                item.removeContent(f);
               } catch (IOException e) {
                 log()
                     .error(
@@ -103,7 +103,7 @@ public class EmlFileExtractor extends AbstractComponent implements Processor {
         TextBody textBody = (TextBody) body;
         String text = CharStreams.toString(textBody.getReader());
 
-        Builder<Text, String> builder = item.create(Text.class).withData(text).withDescription("Email " + name).withProperty(PROPERTY_PART_NAME, name);
+        Builder<Text, String> builder = item.createContent(Text.class).withData(text).withDescription("Email " + name).withProperty(PROPERTY_PART_NAME, name);
 
         for (String key : headers.keySet()) {
           builder.withProperty(key, unlist(headers.get(key)));
@@ -114,7 +114,7 @@ public class EmlFileExtractor extends AbstractComponent implements Processor {
         BinaryBody binaryBody = (BinaryBody) body;
 
         Builder<InputStreamContent, InputStream> builder =
-            item.create(InputStreamContent.class)
+            item.createContent(InputStreamContent.class)
                 .withData(createSupplier(binaryBody.getInputStream()))
                 .withDescription("Email " + name)
                 .withProperty(PROPERTY_PART_NAME, name);
@@ -148,8 +148,7 @@ public class EmlFileExtractor extends AbstractComponent implements Processor {
       }
 
       Builder<InputStreamContent, InputStream> builder =
-          item.create()
-              .create(InputStreamContent.class)
+          item.createContent(InputStreamContent.class)
               .withData(createSupplier(inputStream))
               .withDescription("Email " + name)
               .withProperty(PROPERTY_PART_NAME, name);

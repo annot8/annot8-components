@@ -1,21 +1,18 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.translation.processors;
 
-import java.util.Optional;
-
-import uk.gov.nca.remedi4j.client.RemediClient;
-
 import io.annot8.common.data.content.Text;
 import io.annot8.components.base.processors.AbstractTextProcessor;
 import io.annot8.conventions.PropertyKeys;
 import io.annot8.core.capabilities.CreatesContent;
 import io.annot8.core.context.Context;
-import io.annot8.core.data.Item;
-import io.annot8.core.exceptions.Annot8Exception;
 import io.annot8.core.exceptions.BadConfigurationException;
 import io.annot8.core.exceptions.MissingResourceException;
 import io.annot8.core.exceptions.ProcessingException;
 import io.annot8.core.settings.SettingsClass;
+import uk.gov.nca.remedi4j.client.RemediClient;
+
+import java.util.Optional;
 
 /**
  * Use the REMEDI machine translation platform (see
@@ -58,7 +55,7 @@ public class RemediTranslation extends AbstractTextProcessor {
       String trans = client.translateText(source, target, content.getData()).get();
 
       content.getItem()
-          .create(Text.class)
+          .createContent(Text.class)
           .withDescription(String.format("Translated content[%s] from %s into %s", content.getId(), source, target))
           .withData(trans)
           .withProperty(PropertyKeys.PROPERTY_KEY_LANGUAGE, target)

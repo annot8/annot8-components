@@ -31,7 +31,7 @@ public class HashTagTest {
     p.configure(context);
 
     Text content =
-        item.create(TestStringContent.class)
+        item.createContent(TestStringContent.class)
             .withData("Prime Minister making a speech #latestnews")
             .save();
 

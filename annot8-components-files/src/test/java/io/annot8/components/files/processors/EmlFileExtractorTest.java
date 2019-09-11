@@ -41,7 +41,7 @@ public class EmlFileExtractorTest {
       // https://www.phpclasses.org/browse/file/14672.html
       File f = Paths.get(resource.toURI()).toFile();
 
-      item.create(FileContent.class).withDescription("test_sample_message.eml").withData(f).save();
+      item.createContent(FileContent.class).withDescription("test_sample_message.eml").withData(f).save();
 
       p.process(item);
 
@@ -97,7 +97,7 @@ public class EmlFileExtractorTest {
   private <T extends Content<?>> T findContentByName(Item item, String name, Class<T> clazz) {
     return (T)item
             .getContents(clazz)
-            .filter(c -> c.getProperties().getProperty(EmlFileExtractor.PROPERTY_PART_NAME, String.class)
+            .filter(c -> c.getProperties().get(EmlFileExtractor.PROPERTY_PART_NAME, String.class)
                       .map(s -> s.equals(name))
                       .orElse(false)
             )

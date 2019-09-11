@@ -16,7 +16,7 @@ public abstract class AbstractSinkTest {
   protected Content addContent(Item item, String desc, String data) {
     Content content = null;
     try {
-      content = item.create(Text.class).withDescription(desc).withData(data).save();
+      content = item.createContent(Text.class).withDescription(desc).withData(data).save();
     } catch (UnsupportedContentException | IncompleteException e) {
       fail("Test should not fail creating content", e);
     }

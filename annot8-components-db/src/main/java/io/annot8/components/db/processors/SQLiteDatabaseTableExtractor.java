@@ -12,7 +12,6 @@ import io.annot8.core.capabilities.ProcessesContent;
 import io.annot8.core.components.Processor;
 import io.annot8.core.components.responses.ProcessorResponse;
 import io.annot8.core.data.Item;
-import io.annot8.core.exceptions.Annot8Exception;
 import io.annot8.core.exceptions.IncompleteException;
 import io.annot8.core.exceptions.UnsupportedContentException;
 
@@ -32,7 +31,7 @@ public class SQLiteDatabaseTableExtractor extends AbstractComponent implements P
   private static final String TABLE_SIZE_PREFIX = "SELECT count(*) FROM ";
 
   @Override
-  public ProcessorResponse process(Item item) throws Annot8Exception {
+  public ProcessorResponse process(Item item) {
     boolean withoutError =
         item.getContents(FileContent.class)
             .filter(this::isSQLite)
@@ -55,7 +54,7 @@ public class SQLiteDatabaseTableExtractor extends AbstractComponent implements P
   private boolean createDatabaseTable(
       Item item, TableMetadata tableMetadata, JDBCSettings settings) {
     try {
-      item.create(TableContent.class)
+      item.createContent(TableContent.class)
           .withDescription(String.format("Extracted from SQL table[%s]", tableMetadata.getName()))
           .withData(new DatabaseTable(tableMetadata, settings))
           .withProperty(PROPERTY_NAME, tableMetadata.getName())

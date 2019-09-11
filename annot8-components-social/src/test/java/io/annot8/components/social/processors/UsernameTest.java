@@ -31,7 +31,7 @@ public class UsernameTest {
     p.configure(context);
 
     Text content =
-        item.create(TestStringContent.class)
+        item.createContent(TestStringContent.class)
             .withData("@my-username logged in")
             .save();
 

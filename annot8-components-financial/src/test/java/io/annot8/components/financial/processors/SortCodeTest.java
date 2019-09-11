@@ -37,7 +37,7 @@ public class SortCodeTest {
       p.configure(context);
 
       Text content =
-          item.create(TestStringContent.class)
+          item.createContent(TestStringContent.class)
               .withData("The sort code was 77-49-09")
               .save();
 

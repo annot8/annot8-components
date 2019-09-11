@@ -56,7 +56,7 @@ public class MongoSource extends AbstractMongoComponent implements Source {
       item.getProperties()
           .set(PropertyKeys.PROPERTY_KEY_ACCESSEDAT, Instant.now().getEpochSecond());
 
-      item.create(MongoDocument.class).withDescription("Mongo document").withData(doc).save();
+      item.createContent(MongoDocument.class).withDescription("Mongo document").withData(doc).save();
     } catch (UnsupportedContentException | IncompleteException e) {
       log().warn("Couldn't create item", e);
       item.discard();

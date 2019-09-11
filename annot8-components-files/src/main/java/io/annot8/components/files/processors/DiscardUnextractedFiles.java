@@ -6,7 +6,6 @@ import io.annot8.components.base.components.AbstractComponent;
 import io.annot8.core.capabilities.ProcessesContent;
 import io.annot8.core.components.Processor;
 import io.annot8.core.components.responses.ProcessorResponse;
-import io.annot8.core.data.Content;
 import io.annot8.core.data.Item;
 
 // This is more like premature optimisation... really but I guess it's sensible to clean up
@@ -17,7 +16,7 @@ public class DiscardUnextractedFiles extends AbstractComponent implements Proces
   @Override
   public ProcessorResponse process(Item item) {
 
-    item.getContents(FileContent.class).forEach(item::remove);
+    item.getContents(FileContent.class).forEach(item::removeContent);
 
     boolean noOtherContent = item.getContents().count() == 0;
 

@@ -28,7 +28,7 @@ public class IPv6Test {
 
       p.configure(context);
 
-      Text c = item.create(TestStringContent.class).withData(content).save();
+      Text c = item.createContent(TestStringContent.class).withData(content).save();
 
       p.process(item);
 

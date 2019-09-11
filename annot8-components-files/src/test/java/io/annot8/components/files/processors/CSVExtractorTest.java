@@ -46,6 +46,6 @@ public class CSVExtractorTest extends AbstractCSVDataTest {
     assertEquals(1, tables.size());
 
     TableContent tableContent = tables.get(0);
-    assertEquals("test.csv", tableContent.getProperties().getProperty(CSVExtractor.PROPERTY_FILE, String.class).orElse(null));
+    assertEquals("test.csv", tableContent.getProperties().get(CSVExtractor.PROPERTY_FILE, String.class).orElse(null));
   }
 }

@@ -29,7 +29,7 @@ public class EmailTest {
       p.configure(context);
 
       Text content =
-          item.create(TestStringContent.class)
+          item.createContent(TestStringContent.class)
               .withData("Her e-mail address was sally@example.com")
               .save();
 

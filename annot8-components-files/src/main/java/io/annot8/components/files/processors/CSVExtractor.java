@@ -38,7 +38,7 @@ public class CSVExtractor extends AbstractComponent implements Processor {
   }
 
   @Override
-  public ProcessorResponse process(Item item) throws Annot8Exception {
+  public ProcessorResponse process(Item item) {
     item.getContents(FileContent.class)
         .filter(c -> c.getData().getAbsolutePath().endsWith(".csv"))
         .forEach(c -> createContent(item, c.getData()));
@@ -47,7 +47,7 @@ public class CSVExtractor extends AbstractComponent implements Processor {
 
   private void createContent(Item item, File file) {
     try {
-      item.create(TableContent.class)
+      item.createContent(TableContent.class)
           .withDescription(String.format("From CSV file[%s]", file.getName()))
           .withData(new CSVTable(file, settings.hasHeaders()))
           .withProperty(PROPERTY_FILE, file.getName())

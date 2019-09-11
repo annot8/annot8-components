@@ -41,7 +41,7 @@ public class IBANTest {
       p.configure(context);
 
       Text content =
-          item.create(TestStringContent.class)
+          item.createContent(TestStringContent.class)
               .withData(
                   "These are not valid IBANs: DE45 5001 0517 5407 3249 31 or GB29NWBK60161331926818")
               .save();
@@ -64,7 +64,7 @@ public class IBANTest {
       p.configure(context);
 
       Text content =
-          item.create(TestStringContent.class)
+          item.createContent(TestStringContent.class)
               .withData(
                   "Some valid IBANs given by Wikipedia are: DE44 5001 0517 5407 3249 31, gr 16 0110 1250 0000 0001 2300 695, GB29NWBK60161331926819 and SA03 8000 0000 6080 1016 7519.")
               .save();

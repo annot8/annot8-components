@@ -35,7 +35,7 @@ public abstract class AbstractQuantityTest {
 
       p.configure(context);
 
-      Text content = item.create(TestStringContent.class).withData(text).save();
+      Text content = item.createContent(TestStringContent.class).withData(text).save();
 
       p.process(item);
 

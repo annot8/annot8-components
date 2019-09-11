@@ -47,7 +47,7 @@ public class MacAddressTest {
       p.configure(context);
 
       Text content =
-          item.create(TestStringContent.class)
+          item.createContent(TestStringContent.class)
               .withData("The machine's MAC address was " + macAddress)
               .save();
 
