@@ -30,17 +30,19 @@ public class Capitalise extends AbstractTextProcessor {
   }
 
   @Override
-  protected void process(Item item, Text content) throws Annot8Exception {
+  protected void process(Text content)  {
+    Item item = content.getItem();
+
     switch (settings.getTextCase()) {
       case UPPERCASE:
         item.create(Text.class)
-            .withName(content.getName() + "_upper")
+            .withDescription(String.format("Upper cased content[%s]", content.getId()))
             .withData(content.getData().toUpperCase())
             .save();
         break;
       case LOWERCASE:
         item.create(Text.class)
-            .withName(content.getName() + "_lower")
+                .withDescription(String.format("Lower cased content[%s]", content.getId()))
             .withData(content.getData().toLowerCase())
             .save();
         break;

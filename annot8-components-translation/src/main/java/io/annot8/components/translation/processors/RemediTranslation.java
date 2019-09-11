@@ -53,12 +53,13 @@ public class RemediTranslation extends AbstractTextProcessor {
   }
 
   @Override
-  protected void process(Item item, Text content) throws Annot8Exception {
+  protected void process(Text content) {
     try {
       String trans = client.translateText(source, target, content.getData()).get();
 
-      item.create(Text.class)
-          .withName(content.getName() + "_" + target)
+      content.getItem()
+          .create(Text.class)
+          .withDescription(String.format("Translated content[%s] from %s into %s", content.getId(), source, target))
           .withData(trans)
           .withProperty(PropertyKeys.PROPERTY_KEY_LANGUAGE, target)
           .save();

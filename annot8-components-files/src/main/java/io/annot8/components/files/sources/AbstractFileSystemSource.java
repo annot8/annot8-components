@@ -71,7 +71,7 @@ public abstract class AbstractFileSystemSource extends AbstractComponent impleme
         item.getProperties()
             .set(PropertyKeys.PROPERTY_KEY_ACCESSEDAT, Instant.now().getEpochSecond());
 
-        item.create(FileContent.class).withName("file").withData(path.toFile()).save();
+        item.create(FileContent.class).withDescription("File "+path.toString()).withData(path.toFile()).save();
 
         return true;
       } catch (Throwable t) {

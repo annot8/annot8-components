@@ -27,12 +27,11 @@ public class NaiveParagraphTest {
     Item item = new TestItem();
     Text content =
         item.create(TestStringContent.class)
-            .withName("test")
             .withData(
                 "Hello world!\n\nWhat is the square root of 64?\r\nWhy, it's 8 of course!  \nAh, right you are!\n\nHooray!")
             .save();
 
-    processor.process(item, content);
+    processor.process(item);
 
     AnnotationStore store = content.getAnnotations();
 

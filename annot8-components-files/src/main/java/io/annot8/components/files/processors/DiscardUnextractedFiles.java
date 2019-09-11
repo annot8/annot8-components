@@ -17,7 +17,7 @@ public class DiscardUnextractedFiles extends AbstractComponent implements Proces
   @Override
   public ProcessorResponse process(Item item) {
 
-    item.getContents(FileContent.class).map(Content::getName).forEach(item::removeContent);
+    item.getContents(FileContent.class).forEach(item::remove);
 
     boolean noOtherContent = item.getContents().count() == 0;
 

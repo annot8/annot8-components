@@ -20,7 +20,7 @@ public class NaiveParagraph extends AbstractTextProcessor {
       Pattern.compile("[^\\r\\n]+((\\r|\\n|\\r\\n)[^\\r\\n]+)*");
 
   @Override
-  protected void process(Item item, Text content) {
+  protected void process(Text content) {
     Matcher m = PARAGRAPH_REGEX.matcher(content.getData());
     while (m.find()) {
       content

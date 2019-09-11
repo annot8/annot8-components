@@ -37,7 +37,6 @@ public class ChangeTypeTest {
         item.create(Text.class)
             .withData("James went to London")
             .withId("1")
-            .withName("test-content")
             .save();
 
     content
@@ -86,7 +85,6 @@ public class ChangeTypeTest {
         item.create(Text.class)
             .withData("James went to London")
             .withId("1")
-            .withName("test-content")
             .save();
 
     content

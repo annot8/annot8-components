@@ -50,7 +50,7 @@ public class CSVExtractor extends AbstractComponent implements Processor {
   private void createContent(Item item, File file) {
     try {
       item.create(TableContent.class)
-          .withName(file.getName())
+          .withDescription(String.format("From CSV file[%s]", file.getName()))
           .withData(new CSVTable(file, settings.hasHeaders()))
           .save();
     } catch (UnsupportedContentException | IncompleteException e) {

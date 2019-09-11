@@ -69,13 +69,13 @@ public class EmlFileExtractor extends AbstractComponent implements Processor {
                 }
 
                 // Remove the original *.eml content to avoid reprocessing
-                item.removeContent(f.getName());
+                item.remove(f);
               } catch (IOException e) {
                 log()
                     .error(
                         "Could not read file {} in content {}",
                         f.getData().getName(),
-                        f.getName(),
+                        f.getId(),
                         e);
               }
             });
@@ -113,7 +113,7 @@ public class EmlFileExtractor extends AbstractComponent implements Processor {
         TextBody textBody = (TextBody) body;
         String text = CharStreams.toString(textBody.getReader());
 
-        Builder<Text, String> builder = item.create(Text.class).withData(text).withName(name);
+        Builder<Text, String> builder = item.create(Text.class).withData(text).withDescription("Email " + name);
 
         for (String key : headers.keySet()) {
           builder.withProperty(key, unlist(headers.get(key)));
@@ -126,7 +126,7 @@ public class EmlFileExtractor extends AbstractComponent implements Processor {
         Builder<InputStreamContent, InputStream> builder =
             item.create(InputStreamContent.class)
                 .withData(createSupplier(binaryBody.getInputStream()))
-                .withName(name);
+                .withDescription("Email " + name);
 
         for (String key : headers.keySet()) {
           builder.withProperty(key, unlist(headers.get(key)));
@@ -160,7 +160,7 @@ public class EmlFileExtractor extends AbstractComponent implements Processor {
           item.create()
               .create(InputStreamContent.class)
               .withData(createSupplier(inputStream))
-              .withName(name);
+              .withDescription("Email " + name);
 
       for (String key : headers.keySet()) {
         builder.withProperty(key, unlist(headers.get(key)));

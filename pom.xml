@@ -363,9 +363,9 @@
     <module>annot8-components-properties</module>
     <module>annot8-components-quantities</module>
     <module>annot8-components-social</module>
-    <module>annot8-components-tesseract</module>
+<!--    <module>annot8-components-tesseract</module>-->
     <module>annot8-components-text</module>
-    <module>annot8-components-tika</module>
+<!--    <module>annot8-components-tika</module>-->
     <module>annot8-components-translation</module>
     <module>annot8-components-types</module>
   </modules>

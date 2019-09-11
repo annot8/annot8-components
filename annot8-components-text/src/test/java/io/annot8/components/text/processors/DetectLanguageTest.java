@@ -54,7 +54,7 @@ public class DetectLanguageTest {
       p.configure(context);
 
       Text content =
-          item.create(TestStringContent.class).withName("test").withData(sourceText).save();
+          item.create(TestStringContent.class).withData(sourceText).save();
 
       p.process(item);
 

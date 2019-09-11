@@ -1,17 +1,15 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.quantities.processors;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import io.annot8.common.data.bounds.SpanBounds;
 import io.annot8.common.data.content.Text;
 import io.annot8.components.base.processors.AbstractTextProcessor;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
 import io.annot8.core.annotations.Annotation.Builder;
-import io.annot8.core.data.Item;
-import io.annot8.core.exceptions.Annot8Exception;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Frequency extends AbstractTextProcessor {
 
@@ -19,7 +17,7 @@ public class Frequency extends AbstractTextProcessor {
       Pattern.compile("\\b(\\d+(\\.\\d+)?)\\s*([mkMGT])?Hz\\b");
 
   @Override
-  protected void process(Item item, Text content) throws Annot8Exception {
+  protected void process(Text content)  {
     Matcher m = frequencyPattern.matcher(content.getData());
     while (m.find()) {
 

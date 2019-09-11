@@ -29,11 +29,11 @@ public class TxtFileExtractor extends AbstractComponent implements Processor {
                 File file = f.getData();
                 String data =
                     new String(Files.readAllBytes(file.toPath()), Charset.defaultCharset());
-                item.create(Text.class).withName("text").withData(data).save();
+                item.create(Text.class).withDescription("Text from "+f.getId()).withData(data).save();
 
                 // If we processed it ... lets remove it from our item
                 // so it doesn't get reprocessed
-                item.removeContent(f.getName());
+                item.remove(f);
 
               } catch (Exception e) {
                 log().warn("Unable to process file {}", f.getData().getAbsolutePath());
