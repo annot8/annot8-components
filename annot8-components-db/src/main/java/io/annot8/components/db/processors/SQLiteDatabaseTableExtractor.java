@@ -1,28 +1,31 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.db.processors;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
+
+import javax.annotation.processing.AbstractProcessor;
 
 import io.annot8.common.data.content.ColumnMetadata;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.TableContent;
 import io.annot8.common.data.content.TableMetadata;
-import io.annot8.components.base.components.AbstractComponent;
 import io.annot8.components.db.content.DatabaseTable;
-import io.annot8.core.capabilities.CreatesContent;
-import io.annot8.core.capabilities.ProcessesContent;
-import io.annot8.core.components.Processor;
+import io.annot8.core.capabilities.ContentCapability;
 import io.annot8.core.components.responses.ProcessorResponse;
 import io.annot8.core.data.Item;
 import io.annot8.core.exceptions.IncompleteException;
 import io.annot8.core.exceptions.UnsupportedContentException;
 
-@ProcessesContent(FileContent.class)
-@CreatesContent(TableContent.class)
-public class SQLiteDatabaseTableExtractor extends AbstractComponent implements Processor {
+public class SQLiteDatabaseTableExtractor extends AbstractProcessor<JDBCSettings> {
 
   public static final String PROPERTY_NAME = "TABLE_NAME";
 
@@ -138,5 +141,15 @@ public class SQLiteDatabaseTableExtractor extends AbstractComponent implements P
       log().error("Failed to fetch table size for " + tableName, e);
       return -1;
     }
+  }
+
+  @Override
+  public Stream<ContentCapability> processesContent() {
+    return Stream.of(new ContentCapability(FileContent.class));
+  }
+
+  @Override
+  public Stream<ContentCapability> createsContent() {
+    return Stream.of(new ContentCapability(TableContent.class));
   }
 }

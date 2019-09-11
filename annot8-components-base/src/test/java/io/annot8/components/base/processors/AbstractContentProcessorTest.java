@@ -7,20 +7,17 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.MissingResourceException;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mockito.stubbing.Answer;
+import org.w3c.dom.Text;
 
-import io.annot8.common.data.content.Text;
-import io.annot8.core.context.Context;
-import io.annot8.core.data.Content;
 import io.annot8.core.data.Item;
 import io.annot8.core.exceptions.BadConfigurationException;
-import io.annot8.core.exceptions.MissingResourceException;
 import io.annot8.core.exceptions.ProcessingException;
-import io.annot8.testing.testimpl.TestContext;
 
 public class AbstractContentProcessorTest {
 
@@ -29,12 +26,11 @@ public class AbstractContentProcessorTest {
 
   @Test
   public void testProcessItem() {
-    Context context = new TestContext();
     Item item = getMockedItem();
 
     TestContentProcessor processor = new TestContentProcessor();
     try {
-      processor.configure(context);
+      processor.configure(NoSettings.getInstance());
     } catch (MissingResourceException | BadConfigurationException e) {
       fail("Test should not error here");
     }
@@ -79,7 +75,7 @@ public class AbstractContentProcessorTest {
     return invocation -> Stream.of(content);
   }
 
-  private class TestContentProcessor extends AbstractContentProcessor<Text> {
+  private class TestContentProcessor extends AbstractContentProcessor<Text, NoSettings> {
 
     private final List<String> observedContent = new ArrayList<>();
 
@@ -104,7 +100,7 @@ public class AbstractContentProcessorTest {
     }
   }
 
-  private class ErrorContentProcessor extends AbstractContentProcessor<Text> {
+  private class ErrorContentProcessor extends AbstractContentProcessor<Text, NoSettings> {
 
     public ErrorContentProcessor() {
       super(Text.class);

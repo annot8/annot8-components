@@ -1,31 +1,31 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.files.processors;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
-import org.apache.james.mime4j.dom.*;
+import javax.annotation.processing.AbstractProcessor;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.io.CharStreams;
 
+import org.apache.james.mime4j.dom.*;
+import org.w3c.dom.Text;
+
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.InputStreamContent;
-import io.annot8.common.data.content.Text;
-import io.annot8.components.base.components.AbstractComponent;
-import io.annot8.core.capabilities.CreatesContent;
-import io.annot8.core.capabilities.ProcessesContent;
-import io.annot8.core.components.Processor;
+import io.annot8.core.capabilities.ContentCapability;
 import io.annot8.core.components.responses.ProcessorResponse;
-import io.annot8.core.data.Content.Builder;
 import io.annot8.core.data.Item;
 
-@ProcessesContent(FileContent.class)
-@CreatesContent(Text.class)
-@CreatesContent(InputStreamContent.class)
-public class EmlFileExtractor extends AbstractComponent implements Processor {
+public class EmlFileExtractor extends AbstractProcessor {
 
   public static final String PROPERTY_PART_NAME = "name";
 
@@ -74,6 +74,16 @@ public class EmlFileExtractor extends AbstractComponent implements Processor {
 
     return ProcessorResponse
         .ok(); // TODO: If we weren't able to process successfully, should return an error!
+  }
+
+  @Override
+  public Stream<ContentCapability> processesContent() {
+    return Stream.of(new ContentCapability(FileContent.class));
+  }
+
+  @Override
+  public Stream<ContentCapability> createsContent() {
+    return Stream.of(new ContentCapability(Text.class), new ContentCapability(InputStreamContent.class));
   }
 
   private void processMultipart(Item item, Multipart multipart, String baseName) {
