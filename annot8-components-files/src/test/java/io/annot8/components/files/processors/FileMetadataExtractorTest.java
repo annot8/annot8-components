@@ -1,27 +1,6 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.files.processors;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.when;
-
-import java.io.File;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-
 import io.annot8.common.data.content.FileContent;
 import io.annot8.conventions.FileMetadataKeys;
 import io.annot8.core.annotations.Annotation;
@@ -30,15 +9,31 @@ import io.annot8.core.components.responses.ProcessorResponse.Status;
 import io.annot8.core.data.Item;
 import io.annot8.core.stores.AnnotationStore;
 import io.annot8.testing.testimpl.TestAnnotationStore;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+
+import java.io.File;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.when;
 
 public class FileMetadataExtractorTest {
 
   @Test
   public void testProcess() {
     Item item = Mockito.mock(Item.class);
-    AnnotationStore store = new TestAnnotationStore();
-
     FileContent fileContent = getFileContent("testfilemetadata.txt");
+    AnnotationStore store = fileContent.getAnnotations();
+
     File file = fileContent.getData();
 
     doAnswer(getStreamAnswer(fileContent)).when(item).getContents(eq(FileContent.class));
@@ -115,8 +110,9 @@ public class FileMetadataExtractorTest {
   }
 
   private FileContent getFileContent(String fileName) {
-    AnnotationStore store = new TestAnnotationStore();
     FileContent fileContent = Mockito.mock(FileContent.class);
+    AnnotationStore store = new TestAnnotationStore(fileContent);
+
     URL resource = FileMetadataExtractorTest.class.getResource(fileName);
     File file = null;
     try {

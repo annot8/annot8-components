@@ -1,19 +1,17 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.grouping.processors;
 
-import java.util.Optional;
-
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
-
 import io.annot8.common.data.content.Text;
 import io.annot8.components.base.processors.AbstractTextProcessor;
 import io.annot8.core.annotations.Annotation;
 import io.annot8.core.annotations.Group;
 import io.annot8.core.capabilities.CreatesGroup;
-import io.annot8.core.data.Item;
 import io.annot8.core.exceptions.IncompleteException;
 import io.annot8.core.stores.GroupStore;
+
+import java.util.Optional;
 
 @CreatesGroup(GroupByTypeAndValueAnnotator.TYPE)
 public class GroupByTypeAndValueAnnotator extends AbstractTextProcessor {
@@ -22,7 +20,7 @@ public class GroupByTypeAndValueAnnotator extends AbstractTextProcessor {
   private static final String ROLE = "as";
 
   @Override
-  protected void process(Item item, Text content) {
+  protected void process(Text content) {
 
     SetMultimap<String, Annotation> map = HashMultimap.create();
 
@@ -43,7 +41,7 @@ public class GroupByTypeAndValueAnnotator extends AbstractTextProcessor {
             });
 
     // Create a group for things which are the same
-    GroupStore groupStore = item.getGroups();
+    GroupStore groupStore = content.getItem().getGroups();
     map.asMap()
         .values()
         .forEach(

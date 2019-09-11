@@ -24,13 +24,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class PropertyToTextTest {
 
-  private static final String EXPECTED_KEY = "Text from property from test";
+  private static final String KEY = "Text from property from test";
+  private static final String EXPECTED_DESC = "Text from property from "+KEY;
+
   private static final String EXPECTED_VALUE = "Hello World!";
 
   @Test
   public void testNoSettings() throws Annot8Exception {
     Map<String, Object> properties = new HashMap<>();
-    properties.put(EXPECTED_KEY, EXPECTED_VALUE);
+    properties.put(KEY, EXPECTED_VALUE);
 
     Settings settings = EmptySettings.getInstance();
 
@@ -40,11 +42,11 @@ public class PropertyToTextTest {
   @Test
   public void testWhitelist() throws Annot8Exception {
     Map<String, Object> properties = new HashMap<>();
-    properties.put(EXPECTED_KEY, EXPECTED_VALUE);
+    properties.put(KEY, EXPECTED_VALUE);
     properties.put("foo", "bar");
 
     PropertyToTextSettings settings = new PropertyToTextSettings();
-    settings.setWhitelist(new HashSet<>(Collections.singletonList(EXPECTED_KEY)));
+    settings.setWhitelist(new HashSet<>(Collections.singletonList(KEY)));
 
     doTest(properties, settings);
   }
@@ -52,7 +54,7 @@ public class PropertyToTextTest {
   @Test
   public void testBlacklist() throws Annot8Exception {
     Map<String, Object> properties = new HashMap<>();
-    properties.put(EXPECTED_KEY, EXPECTED_VALUE);
+    properties.put(KEY, EXPECTED_VALUE);
     properties.put("foo", "bar");
 
     PropertyToTextSettings settings = new PropertyToTextSettings();
@@ -85,7 +87,7 @@ public class PropertyToTextTest {
           .forEach(
               c -> {
                 count.getAndIncrement();
-                assertEquals(EXPECTED_KEY, c.getDescription());
+                assertEquals(EXPECTED_DESC, c.getDescription());
                 assertEquals(EXPECTED_VALUE, c.getData());
               });
 

@@ -1,22 +1,19 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.financial.processors;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.bitcoinj.core.AddressFormatException;
-import org.bitcoinj.core.Base58;
-
 import io.annot8.common.data.bounds.SpanBounds;
 import io.annot8.common.data.content.Text;
 import io.annot8.components.base.processors.AbstractTextProcessor;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
-import io.annot8.core.data.Item;
-import io.annot8.core.exceptions.Annot8Exception;
 import io.annot8.core.settings.EmptySettings;
 import io.annot8.core.settings.SettingsClass;
 import io.annot8.core.stores.AnnotationStore;
+import org.bitcoinj.core.AddressFormatException;
+import org.bitcoinj.core.Base58;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @SettingsClass(EmptySettings.class)
 public class BitcoinAddress extends AbstractTextProcessor {
@@ -24,7 +21,7 @@ public class BitcoinAddress extends AbstractTextProcessor {
   public static final Pattern BITCOIN_PATTERN = Pattern.compile("\\b[13][a-zA-Z0-9]{25,34}\\b");
 
   @Override
-  protected void process(Item item, Text content) throws Annot8Exception {
+  protected void process(Text content)  {
     Matcher m = BITCOIN_PATTERN.matcher(content.getData());
     AnnotationStore annotationStore = content.getAnnotations();
 

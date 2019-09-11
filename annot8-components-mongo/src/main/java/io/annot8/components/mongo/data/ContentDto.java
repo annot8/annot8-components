@@ -8,7 +8,7 @@ public class ContentDto {
 
   private String id;
   private String itemId;
-  private String name;
+  private String description;
   private String type;
   private Object data;
   private Map<String, Object> properties;
@@ -16,14 +16,14 @@ public class ContentDto {
 
   public ContentDto(
       String id,
-      String name,
+      String description,
       Object data,
       Map<String, Object> properties,
       Collection<AnnotationDto> annotations,
       String itemId,
       String type) {
     this.id = id;
-    this.name = name;
+    this.description = description;
     this.data = data;
     this.properties = properties;
     this.annotations = annotations;
@@ -35,8 +35,8 @@ public class ContentDto {
     return id;
   }
 
-  public String getName() {
-    return name;
+  public String getDescription() {
+    return description;
   }
 
   public Object getData() {

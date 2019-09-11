@@ -1,26 +1,9 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.files.processors;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
-import java.util.function.Supplier;
-
-import org.apache.james.mime4j.dom.BinaryBody;
-import org.apache.james.mime4j.dom.Body;
-import org.apache.james.mime4j.dom.Entity;
-import org.apache.james.mime4j.dom.Message;
-import org.apache.james.mime4j.dom.Multipart;
-import org.apache.james.mime4j.dom.SingleBody;
-import org.apache.james.mime4j.dom.TextBody;
-
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.io.CharStreams;
-
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.InputStreamContent;
 import io.annot8.common.data.content.Text;
@@ -31,11 +14,18 @@ import io.annot8.core.components.Processor;
 import io.annot8.core.components.responses.ProcessorResponse;
 import io.annot8.core.data.Content.Builder;
 import io.annot8.core.data.Item;
+import org.apache.james.mime4j.dom.*;
+
+import java.io.*;
+import java.util.List;
+import java.util.function.Supplier;
 
 @ProcessesContent(FileContent.class)
 @CreatesContent(Text.class)
 @CreatesContent(InputStreamContent.class)
 public class EmlFileExtractor extends AbstractComponent implements Processor {
+
+  public static final String PROPERTY_PART_NAME =  "name";
 
   @Override
   public ProcessorResponse process(Item item) {
@@ -113,7 +103,7 @@ public class EmlFileExtractor extends AbstractComponent implements Processor {
         TextBody textBody = (TextBody) body;
         String text = CharStreams.toString(textBody.getReader());
 
-        Builder<Text, String> builder = item.create(Text.class).withData(text).withDescription("Email " + name);
+        Builder<Text, String> builder = item.create(Text.class).withData(text).withDescription("Email " + name).withProperty(PROPERTY_PART_NAME, name);
 
         for (String key : headers.keySet()) {
           builder.withProperty(key, unlist(headers.get(key)));
@@ -126,7 +116,8 @@ public class EmlFileExtractor extends AbstractComponent implements Processor {
         Builder<InputStreamContent, InputStream> builder =
             item.create(InputStreamContent.class)
                 .withData(createSupplier(binaryBody.getInputStream()))
-                .withDescription("Email " + name);
+                .withDescription("Email " + name)
+                .withProperty(PROPERTY_PART_NAME, name);
 
         for (String key : headers.keySet()) {
           builder.withProperty(key, unlist(headers.get(key)));
@@ -160,7 +151,8 @@ public class EmlFileExtractor extends AbstractComponent implements Processor {
           item.create()
               .create(InputStreamContent.class)
               .withData(createSupplier(inputStream))
-              .withDescription("Email " + name);
+              .withDescription("Email " + name)
+              .withProperty(PROPERTY_PART_NAME, name);
 
       for (String key : headers.keySet()) {
         builder.withProperty(key, unlist(headers.get(key)));

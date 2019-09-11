@@ -1,12 +1,7 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.mongo.sources;
 
-import java.time.Instant;
-
-import org.bson.Document;
-
 import com.mongodb.client.MongoCursor;
-
 import io.annot8.components.mongo.AbstractMongoComponent;
 import io.annot8.components.mongo.data.MongoDocument;
 import io.annot8.components.mongo.resources.MongoConnection;
@@ -19,6 +14,9 @@ import io.annot8.core.data.Item;
 import io.annot8.core.data.ItemFactory;
 import io.annot8.core.exceptions.IncompleteException;
 import io.annot8.core.exceptions.UnsupportedContentException;
+import org.bson.Document;
+
+import java.time.Instant;
 
 /**
  * Reads the contents of a Mongo collection into items.
@@ -58,7 +56,7 @@ public class MongoSource extends AbstractMongoComponent implements Source {
       item.getProperties()
           .set(PropertyKeys.PROPERTY_KEY_ACCESSEDAT, Instant.now().getEpochSecond());
 
-      item.create(MongoDocument.class).withName("document").withData(doc).save();
+      item.create(MongoDocument.class).withDescription("Mongo document").withData(doc).save();
     } catch (UnsupportedContentException | IncompleteException e) {
       log().warn("Couldn't create item", e);
       item.discard();

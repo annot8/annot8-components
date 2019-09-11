@@ -1,12 +1,18 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.image.processors;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.when;
+import com.drew.lang.GeoLocation;
+import io.annot8.common.data.content.FileContent;
+import io.annot8.core.annotations.Annotation;
+import io.annot8.core.components.responses.ProcessorResponse;
+import io.annot8.core.components.responses.ProcessorResponse.Status;
+import io.annot8.core.data.Item;
+import io.annot8.core.stores.AnnotationStore;
+import io.annot8.testing.testimpl.TestAnnotationStore;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 import java.io.File;
 import java.net.URISyntaxException;
@@ -16,20 +22,9 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-
-import com.drew.lang.GeoLocation;
-
-import io.annot8.common.data.content.FileContent;
-import io.annot8.core.annotations.Annotation;
-import io.annot8.core.components.responses.ProcessorResponse;
-import io.annot8.core.components.responses.ProcessorResponse.Status;
-import io.annot8.core.data.Item;
-import io.annot8.core.stores.AnnotationStore;
-import io.annot8.testing.testimpl.TestAnnotationStore;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.when;
 
 public class ExifMetadataProcessorTest {
 
@@ -37,7 +32,7 @@ public class ExifMetadataProcessorTest {
   public void testProcess() {
     Item item = Mockito.mock(Item.class);
     FileContent fileContent = Mockito.mock(FileContent.class);
-    AnnotationStore store = new TestAnnotationStore();
+    AnnotationStore store = new TestAnnotationStore(fileContent);
 
     URL resource = ExifMetadataProcessorTest.class.getClassLoader().getResource("testimage.jpg");
     File file = null;

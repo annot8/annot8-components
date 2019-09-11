@@ -1,17 +1,6 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.db.processors;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.junit.jupiter.api.Test;
-
 import io.annot8.common.data.content.ColumnMetadata;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.TableContent;
@@ -22,6 +11,14 @@ import io.annot8.core.data.Content;
 import io.annot8.core.data.Item;
 import io.annot8.core.exceptions.Annot8Exception;
 import io.annot8.testing.testimpl.TestItem;
+import org.junit.jupiter.api.Test;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class SQLiteDatabaseTableExtractorTest extends AbstractSQLiteDataTest {
 
@@ -51,7 +48,7 @@ public class SQLiteDatabaseTableExtractorTest extends AbstractSQLiteDataTest {
     String[] expectedTables = new String[] {"test", "test2"};
 
     List<String> tableNames =
-        item.getContents(TableContent.class).map(Content::getName).collect(Collectors.toList());
+        item.getContents(TableContent.class).map(c -> c.getProperties().getProperty(SQLiteDatabaseTableExtractor.PROPERTY_NAME, String.class).orElse(null)).collect(Collectors.toList());
 
     assertThat(tableNames).containsExactlyInAnyOrder(expectedTables);
 
