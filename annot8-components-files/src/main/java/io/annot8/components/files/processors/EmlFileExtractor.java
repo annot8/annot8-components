@@ -148,7 +148,8 @@ public class EmlFileExtractor extends AbstractComponent implements Processor {
       }
 
       Builder<InputStreamContent, InputStream> builder =
-          item.createContent(InputStreamContent.class)
+          item.createChild()
+              .createContent(InputStreamContent.class)
               .withData(createSupplier(inputStream))
               .withDescription("Email " + name)
               .withProperty(PROPERTY_PART_NAME, name);
