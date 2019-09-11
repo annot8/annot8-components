@@ -1,13 +1,6 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.text.processors;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
 import io.annot8.common.data.bounds.SpanBounds;
 import io.annot8.common.data.content.Text;
 import io.annot8.conventions.AnnotationTypes;
@@ -17,6 +10,12 @@ import io.annot8.core.exceptions.Annot8Exception;
 import io.annot8.core.stores.AnnotationStore;
 import io.annot8.testing.testimpl.TestItem;
 import io.annot8.testing.testimpl.content.TestStringContent;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class NaiveParagraphTest {
 
@@ -26,13 +25,12 @@ public class NaiveParagraphTest {
 
     Item item = new TestItem();
     Text content =
-        item.create(TestStringContent.class)
-            .withName("test")
+        item.createContent(TestStringContent.class)
             .withData(
                 "Hello world!\n\nWhat is the square root of 64?\r\nWhy, it's 8 of course!  \nAh, right you are!\n\nHooray!")
             .save();
 
-    processor.process(item, content);
+    processor.process(item);
 
     AnnotationStore store = content.getAnnotations();
 

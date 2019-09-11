@@ -1,15 +1,8 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.mongo.sinks;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.bson.Document;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import io.annot8.common.serialisation.jackson.Annot8ObjectMapperFactory;
 import io.annot8.components.mongo.AbstractMongoComponent;
 import io.annot8.components.mongo.resources.MongoConnection;
 import io.annot8.components.mongo.resources.MongoFactory;
@@ -20,6 +13,10 @@ import io.annot8.core.context.Context;
 import io.annot8.core.data.Item;
 import io.annot8.core.exceptions.Annot8Exception;
 import io.annot8.core.properties.ImmutableProperties;
+import org.bson.Document;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @UsesResource(MongoFactory.class)
 public abstract class AbstractMongoSink extends AbstractMongoComponent implements Processor {
@@ -33,9 +30,8 @@ public abstract class AbstractMongoSink extends AbstractMongoComponent implement
   @Override
   protected void configure(Context context, MongoConnection connection) {
     mapper = new ObjectMapper();
-    Annot8ObjectMapperFactory factory = new Annot8ObjectMapperFactory();
-    factory.scan();
-    factory.configure(mapper);
+    // TODO: This used to configure Annot8's Jackson modules but since we don't depend on Jackson any more
+    // any Mongo specific configuration should go here.
     this.configureMongo(connection);
   }
 

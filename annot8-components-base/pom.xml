@@ -22,12 +22,10 @@
     <dependency>
       <groupId>io.annot8</groupId>
       <artifactId>annot8-conventions</artifactId>
-      <version>[0.4.0-SNAPSHOT,)</version>
     </dependency>
     <dependency>
       <groupId>io.annot8</groupId>
       <artifactId>annot8-components-monitor</artifactId>
-      <version>0.4.0-SNAPSHOT</version>
     </dependency>
         
     <dependency>

@@ -14,9 +14,7 @@ import io.annot8.core.settings.SettingsClass;
 
 /** Base class for regex annotators */
 @SettingsClass(RegexSettings.class)
-public class Regex
-    extends AbstractRegex { // TODO: Are there functions in AbstractTextProcessor we ought to be
-  // implementing?
+public class Regex extends AbstractRegex {
 
   public Regex() {
     // Do nothing

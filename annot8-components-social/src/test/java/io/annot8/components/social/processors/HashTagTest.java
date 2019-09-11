@@ -1,13 +1,6 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.social.processors;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.junit.jupiter.api.Test;
-
 import io.annot8.common.data.content.Text;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.core.annotations.Annotation;
@@ -19,6 +12,12 @@ import io.annot8.core.stores.AnnotationStore;
 import io.annot8.testing.testimpl.TestContext;
 import io.annot8.testing.testimpl.TestItem;
 import io.annot8.testing.testimpl.content.TestStringContent;
+import org.junit.jupiter.api.Test;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class HashTagTest {
 
@@ -32,8 +31,7 @@ public class HashTagTest {
     p.configure(context);
 
     Text content =
-        item.create(TestStringContent.class)
-            .withName("test")
+        item.createContent(TestStringContent.class)
             .withData("Prime Minister making a speech #latestnews")
             .save();
 

@@ -1,19 +1,17 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.quantities.processors;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import io.annot8.common.data.bounds.SpanBounds;
 import io.annot8.common.data.content.Text;
 import io.annot8.components.base.processors.AbstractTextProcessor;
 import io.annot8.conventions.PropertyKeys;
 import io.annot8.core.annotations.Annotation.Builder;
 import io.annot8.core.capabilities.Capabilities;
-import io.annot8.core.data.Item;
-import io.annot8.core.exceptions.Annot8Exception;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public abstract class AbstractQuantityProcessor extends AbstractTextProcessor {
 
@@ -34,7 +32,7 @@ public abstract class AbstractQuantityProcessor extends AbstractTextProcessor {
   }
 
   @Override
-  protected void process(Item item, Text content) throws Annot8Exception {
+  protected void process(Text content)  {
     for (int i = 0; i < patterns.size(); i++) {
       process(content, patterns.get(i), normalizationConstants.get(i));
     }
@@ -48,8 +46,7 @@ public abstract class AbstractQuantityProcessor extends AbstractTextProcessor {
    *     (e.g. million)
    * @param normalization The normalization factor to multiply the extracted value by
    */
-  protected void process(Text content, Pattern pattern, double normalization)
-      throws Annot8Exception {
+  protected void process(Text content, Pattern pattern, double normalization) {
     Matcher m = pattern.matcher(content.getData());
     while (m.find()) {
       Builder builder =

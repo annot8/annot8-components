@@ -1,9 +1,6 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.files.processors;
 
-import java.io.File;
-import java.util.Optional;
-
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.TableContent;
 import io.annot8.components.base.components.AbstractComponent;
@@ -14,17 +11,18 @@ import io.annot8.core.components.Processor;
 import io.annot8.core.components.responses.ProcessorResponse;
 import io.annot8.core.context.Context;
 import io.annot8.core.data.Item;
-import io.annot8.core.exceptions.Annot8Exception;
-import io.annot8.core.exceptions.BadConfigurationException;
-import io.annot8.core.exceptions.IncompleteException;
-import io.annot8.core.exceptions.MissingResourceException;
-import io.annot8.core.exceptions.UnsupportedContentException;
+import io.annot8.core.exceptions.*;
+
+import java.io.File;
+import java.util.Optional;
 
 @ProcessesContent(FileContent.class)
 @CreatesContent(TableContent.class)
 public class CSVExtractor extends AbstractComponent implements Processor {
 
   public static final String CSV_TABLE = "CSV_TABLE";
+  public static final String PROPERTY_FILE = "file";
+
   private CSVExtractorSettings settings;
 
   @Override
@@ -40,7 +38,7 @@ public class CSVExtractor extends AbstractComponent implements Processor {
   }
 
   @Override
-  public ProcessorResponse process(Item item) throws Annot8Exception {
+  public ProcessorResponse process(Item item) {
     item.getContents(FileContent.class)
         .filter(c -> c.getData().getAbsolutePath().endsWith(".csv"))
         .forEach(c -> createContent(item, c.getData()));
@@ -49,9 +47,10 @@ public class CSVExtractor extends AbstractComponent implements Processor {
 
   private void createContent(Item item, File file) {
     try {
-      item.create(TableContent.class)
-          .withName(file.getName())
+      item.createContent(TableContent.class)
+          .withDescription(String.format("From CSV file[%s]", file.getName()))
           .withData(new CSVTable(file, settings.hasHeaders()))
+          .withProperty(PROPERTY_FILE, file.getName())
           .save();
     } catch (UnsupportedContentException | IncompleteException e) {
       log().error("Failed to create CSV content", e);

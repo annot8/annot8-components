@@ -1,14 +1,6 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.financial.processors;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
 import io.annot8.common.data.content.Text;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
@@ -24,6 +16,13 @@ import io.annot8.core.stores.AnnotationStore;
 import io.annot8.testing.testimpl.TestContext;
 import io.annot8.testing.testimpl.TestItem;
 import io.annot8.testing.testimpl.content.TestStringContent;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class IBANTest {
 
@@ -42,8 +41,7 @@ public class IBANTest {
       p.configure(context);
 
       Text content =
-          item.create(TestStringContent.class)
-              .withName("test")
+          item.createContent(TestStringContent.class)
               .withData(
                   "These are not valid IBANs: DE45 5001 0517 5407 3249 31 or GB29NWBK60161331926818")
               .save();
@@ -66,8 +64,7 @@ public class IBANTest {
       p.configure(context);
 
       Text content =
-          item.create(TestStringContent.class)
-              .withName("test")
+          item.createContent(TestStringContent.class)
               .withData(
                   "Some valid IBANs given by Wikipedia are: DE44 5001 0517 5407 3249 31, gr 16 0110 1250 0000 0001 2300 695, GB29NWBK60161331926819 and SA03 8000 0000 6080 1016 7519.")
               .save();

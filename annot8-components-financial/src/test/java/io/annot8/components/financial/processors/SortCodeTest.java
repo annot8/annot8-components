@@ -1,12 +1,6 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.financial.processors;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
 import io.annot8.common.data.content.Text;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
@@ -21,6 +15,11 @@ import io.annot8.core.stores.AnnotationStore;
 import io.annot8.testing.testimpl.TestContext;
 import io.annot8.testing.testimpl.TestItem;
 import io.annot8.testing.testimpl.content.TestStringContent;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class SortCodeTest {
   @Test
@@ -38,8 +37,7 @@ public class SortCodeTest {
       p.configure(context);
 
       Text content =
-          item.create(TestStringContent.class)
-              .withName("test")
+          item.createContent(TestStringContent.class)
               .withData("The sort code was 77-49-09")
               .save();
 

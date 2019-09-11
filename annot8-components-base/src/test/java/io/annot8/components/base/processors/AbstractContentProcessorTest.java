@@ -12,6 +12,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import io.annot8.common.data.content.Text;
+import io.annot8.core.exceptions.ProcessingException;
+import io.annot8.testing.testimpl.TestContext;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
@@ -30,104 +33,70 @@ public class AbstractContentProcessorTest {
   private static final String NOT_PROCESS = "NOT_PROCESS";
 
   @Test
-  public void testProcessItemWithSettings() {
-    AbstractContentProcessor.ContentAnnotatorSettings settings =
-        Mockito.mock(AbstractContentProcessor.ContentAnnotatorSettings.class);
-    when(settings.validate()).thenReturn(true);
-    Context context = Mockito.mock(Context.class);
-    doReturn(Optional.of(settings)).when(context).getSettings(Mockito.any());
-    when(settings.getContent()).thenReturn(Collections.singleton(SHOULD_PROCESS));
+  public void testProcessItem() {
+    Context context = new TestContext();
     Item item = getMockedItem();
 
-    TestcontentProcessor processor = new TestcontentProcessor();
+    TestContentProcessor processor = new TestContentProcessor();
     try {
       processor.configure(context);
     } catch (MissingResourceException | BadConfigurationException e) {
       fail("Test should not error here");
     }
 
-    processor.processItem(item);
-    assertEquals(1, processor.getObservedContent().size());
+    processor.process(item);
+    assertEquals(2, processor.getObservedContent().size());
     assertEquals(SHOULD_PROCESS, processor.getObservedContent().get(0));
+    assertEquals(NOT_PROCESS, processor.getObservedContent().get(1));
+
   }
 
-  public void testProcessItemWithAcceptsContent() {
+  @Test
+  public void testAcceptsContent() {
     AcceptingContentProcessor processor = new AcceptingContentProcessor();
     Item item = getMockedItem();
-    processor.processItem(item);
+    processor.process(item);
     List<String> observedContent = processor.getObservedContent();
     assertEquals(1, observedContent.size());
     assertEquals(SHOULD_PROCESS, observedContent.get(0));
   }
 
-  @Test
-  public void testConfigureWithNonValidSettings() {
-    AbstractContentProcessor.ContentAnnotatorSettings settings =
-        Mockito.mock(AbstractContentProcessor.ContentAnnotatorSettings.class);
-    when(settings.validate()).thenReturn(false);
-    Context context = Mockito.mock(Context.class);
-    doReturn(Optional.of(settings)).when(context).getSettings(Mockito.any());
-
-    TestcontentProcessor processor = new TestcontentProcessor();
-    assertThrows(BadConfigurationException.class, () -> processor.configure(context));
-  }
 
   @Test
   public void testProcessingError() {
-    Item item = Mockito.mock(Item.class);
+    Item item = getMockedItem();
     Content content = Mockito.mock(Content.class);
     doReturn(Stream.of(content)).when(item).getContents();
     AbstractContentProcessor processor = new ErrorContentProcessor();
-    assertTrue(processor.processItem(item));
-  }
-
-  @Test
-  public void testContentAnnotatorSettings() {
-    AbstractContentProcessor.ContentAnnotatorSettings settings =
-        new AbstractContentProcessor.ContentAnnotatorSettings(
-            Collections.singleton(SHOULD_PROCESS));
-
-    assertEquals(1, settings.getContent().size());
-    assertTrue(settings.getContent().contains(SHOULD_PROCESS));
-    assertTrue(settings.validate());
-  }
-
-  @Test
-  public void testEmptyContentAnnotatorSettings() {
-    AbstractContentProcessor.ContentAnnotatorSettings settings =
-        new AbstractContentProcessor.ContentAnnotatorSettings(null);
-
-    assertTrue(settings.getContent().isEmpty());
+    assertTrue(processor.process(item).hasExceptions());
   }
 
   private Item getMockedItem() {
     Item item = Mockito.mock(Item.class);
-    Content toProcess = Mockito.mock(Content.class);
-    Content notProcess = Mockito.mock(Content.class);
-    when(toProcess.getName()).thenReturn(SHOULD_PROCESS);
-    when(notProcess.getName()).thenReturn(NOT_PROCESS);
-    doAnswer(getAnswer(toProcess)).when(item).getContentByName(Mockito.eq(SHOULD_PROCESS));
-    doAnswer(getAnswer(notProcess)).when(item).getContentByName(Mockito.eq(NOT_PROCESS));
+    Text toProcess = Mockito.mock(Text.class);
+    Text notProcess = Mockito.mock(Text.class);
+    when(toProcess.getData()).thenReturn(SHOULD_PROCESS);
+    when(notProcess.getData()).thenReturn(NOT_PROCESS);
+    when(item.getContents(Text.class)).thenReturn(Stream.of(toProcess, notProcess));
+
     return item;
   }
 
-  @SafeVarargs
   private <T> Answer<Stream<T>> getAnswer(T... content) {
-    return new Answer<>() {
-      @Override
-      public Stream<T> answer(InvocationOnMock invocation) {
-        return Stream.of(content);
-      }
-    };
+    return invocation -> Stream.of(content);
   }
 
-  private class TestcontentProcessor extends AbstractContentProcessor {
+  private class TestContentProcessor extends AbstractContentProcessor<Text> {
 
     private final List<String> observedContent = new ArrayList<>();
 
+    public TestContentProcessor() {
+      super(Text.class);
+    }
+
     @Override
-    protected void processContent(Item item, Content<?> content) {
-      observedContent.add(content.getName());
+    protected void process(Text content) {
+      observedContent.add(content.getData());
     }
 
     public List<String> getObservedContent() {
@@ -135,17 +104,22 @@ public class AbstractContentProcessorTest {
     }
   }
 
-  private class AcceptingContentProcessor extends TestcontentProcessor {
+  private class AcceptingContentProcessor extends TestContentProcessor {
     @Override
-    protected boolean acceptsContent(Content<?> content) {
-      return content.getName().equals(SHOULD_PROCESS);
+    protected boolean accept(Text content) {
+      return content.getData().equals(SHOULD_PROCESS);
     }
   }
 
-  private class ErrorContentProcessor extends AbstractContentProcessor {
+  private class ErrorContentProcessor extends AbstractContentProcessor<Text> {
+
+    public ErrorContentProcessor() {
+      super(Text.class);
+    }
+
     @Override
-    protected void processContent(Item item, Content<?> content) throws Annot8Exception {
-      throw new Annot8Exception("Test throws error");
+    protected void process(Text content)  {
+      throw new ProcessingException("Test throws error");
     }
   }
 }

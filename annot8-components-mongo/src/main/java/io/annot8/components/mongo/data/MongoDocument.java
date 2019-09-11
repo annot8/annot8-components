@@ -1,37 +1,48 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.mongo.data;
 
-import java.util.function.Supplier;
-
-import org.bson.Document;
-
 import io.annot8.common.implementations.content.AbstractContentBuilder;
 import io.annot8.common.implementations.content.AbstractContentBuilderFactory;
 import io.annot8.common.implementations.stores.AnnotationStoreFactory;
-import io.annot8.core.data.BaseItem;
 import io.annot8.core.data.Content;
+import io.annot8.core.data.Item;
 import io.annot8.core.properties.ImmutableProperties;
 import io.annot8.core.stores.AnnotationStore;
+import org.bson.Document;
+
+import java.util.function.Supplier;
 
 public class MongoDocument implements Content<Document> {
 
+  private Item item;
   private final String id;
-  private final String name;
+  private final String description;
   private final AnnotationStore annotations;
   private final ImmutableProperties properties;
   private final Document document;
 
-  public MongoDocument(
+  public MongoDocument(Item item,
       String id,
-      String name,
+      String description,
       AnnotationStoreFactory annotationStoreFactory,
       ImmutableProperties properties,
       Document document) {
+    this.item = item;
     this.id = id;
-    this.name = name;
+    this.description = description;
     this.annotations = annotationStoreFactory.create(this);
     this.properties = properties;
     this.document = document;
+  }
+
+  @Override
+  public Item getItem() {
+    return item;
+  }
+
+  @Override
+  public String getDescription() {
+    return description;
   }
 
   @Override
@@ -54,10 +65,7 @@ public class MongoDocument implements Content<Document> {
     return annotations;
   }
 
-  @Override
-  public String getName() {
-    return name;
-  }
+
 
   @Override
   public String getId() {
@@ -73,14 +81,15 @@ public class MongoDocument implements Content<Document> {
 
     private AnnotationStoreFactory factory;
 
-    public Builder(AnnotationStoreFactory annotationStoreFactory) {
+    public Builder(Item item, AnnotationStoreFactory annotationStoreFactory) {
+      super(item);
       this.factory = annotationStoreFactory;
     }
 
     @Override
     protected MongoDocument create(
-        String id, String name, ImmutableProperties properties, Supplier<Document> data) {
-      return new MongoDocument(id, name, factory, properties, data.get());
+        String id, String description, ImmutableProperties properties, Supplier<Document> data) {
+      return new MongoDocument(getItem(), id, description, factory, properties, data.get());
     }
   }
 
@@ -95,8 +104,8 @@ public class MongoDocument implements Content<Document> {
     }
 
     @Override
-    public Content.Builder<MongoDocument, Document> create(BaseItem item) {
-      return new Builder(annotationStoreFactory);
+    public Content.Builder<MongoDocument, Document> create(Item item) {
+      return new Builder(item, annotationStoreFactory);
     }
   }
 }

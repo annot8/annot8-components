@@ -39,7 +39,7 @@ public abstract class AbstractRegex extends AbstractTextProcessor {
   }
 
   @Override
-  protected void process(Item item, Text content) throws Annot8Exception {
+  protected void process(Text content) {
     if (pattern == null) {
       throw new BadConfigurationException("Parameter 'pattern' must not be null");
     }

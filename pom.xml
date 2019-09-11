@@ -275,6 +275,23 @@
         <version>${slf4j.version}</version>
       </dependency>
 
+
+      <dependency>
+        <groupId>io.annot8</groupId>
+        <artifactId>annot8-conventions</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.annot8</groupId>
+        <artifactId>annot8-components-base</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.annot8</groupId>
+        <artifactId>annot8-components-monitor</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
       <!-- Testing -->
       <dependency>
         <groupId>org.junit.jupiter</groupId>
@@ -346,9 +363,9 @@
     <module>annot8-components-properties</module>
     <module>annot8-components-quantities</module>
     <module>annot8-components-social</module>
-    <module>annot8-components-tesseract</module>
+<!--    <module>annot8-components-tesseract</module>-->
     <module>annot8-components-text</module>
-    <module>annot8-components-tika</module>
+<!--    <module>annot8-components-tika</module>-->
     <module>annot8-components-translation</module>
     <module>annot8-components-types</module>
   </modules>

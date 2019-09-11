@@ -1,16 +1,6 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.db.processors;
 
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import io.annot8.common.data.content.ColumnMetadata;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.TableContent;
@@ -22,20 +12,26 @@ import io.annot8.core.capabilities.ProcessesContent;
 import io.annot8.core.components.Processor;
 import io.annot8.core.components.responses.ProcessorResponse;
 import io.annot8.core.data.Item;
-import io.annot8.core.exceptions.Annot8Exception;
 import io.annot8.core.exceptions.IncompleteException;
 import io.annot8.core.exceptions.UnsupportedContentException;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 @ProcessesContent(FileContent.class)
 @CreatesContent(TableContent.class)
 public class SQLiteDatabaseTableExtractor extends AbstractComponent implements Processor {
+
+  public static final String PROPERTY_NAME = "TABLE_NAME";
 
   public static final String PROPERTY_TYPE = "TABLE_METADATA";
   private static final String SCHEMA_QUERY = "pragma schema_version";
   private static final String TABLE_SIZE_PREFIX = "SELECT count(*) FROM ";
 
   @Override
-  public ProcessorResponse process(Item item) throws Annot8Exception {
+  public ProcessorResponse process(Item item) {
     boolean withoutError =
         item.getContents(FileContent.class)
             .filter(this::isSQLite)
@@ -58,9 +54,10 @@ public class SQLiteDatabaseTableExtractor extends AbstractComponent implements P
   private boolean createDatabaseTable(
       Item item, TableMetadata tableMetadata, JDBCSettings settings) {
     try {
-      item.create(TableContent.class)
-          .withName(tableMetadata.getName())
+      item.createContent(TableContent.class)
+          .withDescription(String.format("Extracted from SQL table[%s]", tableMetadata.getName()))
           .withData(new DatabaseTable(tableMetadata, settings))
+          .withProperty(PROPERTY_NAME, tableMetadata.getName())
           .withProperty(PROPERTY_TYPE, tableMetadata)
           .save();
       return true;

@@ -25,7 +25,7 @@ public class CreateContentFromMongoDocument extends AbstractComponent implements
               for (String key : doc.keySet()) {
                 Object o = doc.get(key);
                 if (o instanceof String) {
-                  item.create(Text.class).withName(key).withData(o.toString()).save();
+                  item.createContent(Text.class).withDescription("From Mongo key " + key).withData(o.toString()).save();
                 }
 
                 // TODO: Handle other types - e.g. nested objects, numbers, booleans, etc.

@@ -1,15 +1,7 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.geo.processors;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
 import com.google.openlocationcode.OpenLocationCode.CodeArea;
-
 import io.annot8.common.data.content.Text;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
@@ -22,6 +14,12 @@ import io.annot8.core.stores.AnnotationStore;
 import io.annot8.testing.testimpl.TestContext;
 import io.annot8.testing.testimpl.TestItem;
 import io.annot8.testing.testimpl.content.TestStringContent;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class PlusCodeTest {
   @Test
@@ -33,8 +31,7 @@ public class PlusCodeTest {
       p.configure(context);
 
       Text content =
-          item.create(TestStringContent.class)
-              .withName("test")
+          item.createContent(TestStringContent.class)
               .withData("Laguna Uspaycocha can be found at 57R9C4F6+WQ.")
               .save();
 
@@ -73,8 +70,7 @@ public class PlusCodeTest {
       p.configure(context);
 
       Text content =
-          item.create(TestStringContent.class)
-              .withName("test")
+          item.createContent(TestStringContent.class)
               .withData("Laguna Uspaycocha can not be found at 57R9C4F+WQ.")
               .save();
 
