@@ -3,20 +3,17 @@ package io.annot8.components.files.processors;
 
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.Text;
-import io.annot8.components.base.components.AbstractComponent;
-import io.annot8.core.capabilities.CreatesContent;
-import io.annot8.core.capabilities.ProcessesContent;
-import io.annot8.core.components.Processor;
+import io.annot8.components.base.components.AbstractProcessor;
+import io.annot8.core.capabilities.ContentCapability;
 import io.annot8.core.components.responses.ProcessorResponse;
 import io.annot8.core.data.Item;
 
 import java.io.File;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.util.stream.Stream;
 
-@ProcessesContent(FileContent.class)
-@CreatesContent(Text.class)
-public class TxtFileExtractor extends AbstractComponent implements Processor {
+public class TxtFileExtractor extends AbstractProcessor {
 
   @Override
   public ProcessorResponse process(Item item) {
@@ -43,5 +40,15 @@ public class TxtFileExtractor extends AbstractComponent implements Processor {
 
     // Always carry on it
     return ProcessorResponse.ok();
+  }
+
+  @Override
+  public Stream<ContentCapability> processesContent() {
+    return Stream.of(new ContentCapability(FileContent.class));
+  }
+
+  @Override
+  public Stream<ContentCapability> createsContent() {
+    return Stream.of(new ContentCapability(Text.class));
   }
 }

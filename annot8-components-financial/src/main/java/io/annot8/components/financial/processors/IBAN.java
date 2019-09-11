@@ -6,16 +6,16 @@ import io.annot8.common.data.content.Text;
 import io.annot8.components.base.processors.AbstractTextProcessor;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
-import io.annot8.core.settings.EmptySettings;
-import io.annot8.core.settings.SettingsClass;
+import io.annot8.core.capabilities.AnnotationCapability;
+import io.annot8.core.settings.NoSettings;
 import io.annot8.core.stores.AnnotationStore;
 import org.iban4j.Iban4jException;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
-@SettingsClass(EmptySettings.class)
-public class IBAN extends AbstractTextProcessor {
+public class IBAN extends AbstractTextProcessor<NoSettings> {
 
   private static final Pattern IBAN_PATTERN =
       Pattern.compile(
@@ -47,5 +47,10 @@ public class IBAN extends AbstractTextProcessor {
         // Not a valid IBAN, so continue
       }
     }
+  }
+
+  @Override
+  public Stream<AnnotationCapability> createsAnnotations() {
+    return Stream.of(new AnnotationCapability(AnnotationTypes.ANNOTATION_TYPE_FINANCIALACCOUNT, SpanBounds.class));
   }
 }

@@ -8,7 +8,7 @@ import io.annot8.core.components.Resource;
 import io.annot8.core.context.Context;
 import io.annot8.core.data.Item;
 import io.annot8.core.exceptions.Annot8Exception;
-import io.annot8.core.settings.EmptySettings;
+import io.annot8.core.settings.NoSettings;
 import io.annot8.core.settings.Settings;
 import io.annot8.testing.testimpl.TestContext;
 import io.annot8.testing.testimpl.TestItem;
@@ -34,7 +34,7 @@ public class PropertyToTextTest {
     Map<String, Object> properties = new HashMap<>();
     properties.put(KEY, EXPECTED_VALUE);
 
-    Settings settings = EmptySettings.getInstance();
+    Settings settings = NoSettings.getInstance();
 
     doTest(properties, settings);
   }

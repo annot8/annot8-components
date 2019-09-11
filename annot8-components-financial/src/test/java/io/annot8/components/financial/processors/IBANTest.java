@@ -10,7 +10,7 @@ import io.annot8.core.context.Context;
 import io.annot8.core.data.Item;
 import io.annot8.core.exceptions.Annot8Exception;
 import io.annot8.core.properties.Properties;
-import io.annot8.core.settings.EmptySettings;
+import io.annot8.core.settings.NoSettings;
 import io.annot8.core.settings.SettingsClass;
 import io.annot8.core.stores.AnnotationStore;
 import io.annot8.testing.testimpl.TestContext;
@@ -29,7 +29,7 @@ public class IBANTest {
   @Test
   public void testSettings() {
     SettingsClass annotation = IBAN.class.getAnnotation(SettingsClass.class);
-    Assertions.assertEquals(EmptySettings.class, annotation.value());
+    Assertions.assertEquals(NoSettings.class, annotation.value());
   }
 
   @Test

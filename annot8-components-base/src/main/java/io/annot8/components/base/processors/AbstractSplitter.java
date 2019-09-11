@@ -48,4 +48,9 @@ public abstract class AbstractSplitter extends AbstractComponent implements Proc
    * @return true is the original item should now be discarded
    */
   protected abstract boolean split(final Item item);
+
+  @Override
+  public boolean createsItems() {
+    return true;
+  }
 }

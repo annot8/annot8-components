@@ -1,9 +1,6 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.image.processors;
 
-import java.io.IOException;
-import java.util.Date;
-
 import com.drew.imaging.ImageMetadataReader;
 import com.drew.imaging.ImageProcessingException;
 import com.drew.lang.Rational;
@@ -12,20 +9,27 @@ import com.drew.metadata.StringValue;
 import com.drew.metadata.Tag;
 import com.drew.metadata.exif.ExifDirectoryBase;
 import com.drew.metadata.exif.GpsDirectory;
-
 import io.annot8.common.data.bounds.NoBounds;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.components.base.components.AbstractComponent;
-import io.annot8.core.capabilities.CreatesAnnotation;
-import io.annot8.core.capabilities.ProcessesContent;
+import io.annot8.core.capabilities.AnnotationCapability;
+import io.annot8.core.capabilities.ContentCapability;
 import io.annot8.core.components.Processor;
+import io.annot8.core.components.annotations.ComponentDescription;
+import io.annot8.core.components.annotations.ComponentName;
 import io.annot8.core.components.responses.ProcessorResponse;
 import io.annot8.core.data.Item;
 import io.annot8.core.exceptions.IncompleteException;
+import io.annot8.core.settings.NoSettings;
 
-@ProcessesContent(FileContent.class)
-@CreatesAnnotation(value = "ExifMetadata", bounds = NoBounds.class)
-public class ExifMetadataProcessor extends AbstractComponent implements Processor {
+import java.io.IOException;
+import java.util.Date;
+import java.util.stream.Stream;
+
+//TODO: Could move to extending AbstractContentProcessor?
+@ComponentName("EXIF Metadata")
+@ComponentDescription("Extract EXIF Metadata from images")
+public class ExifMetadataProcessor extends AbstractComponent<NoSettings> implements Processor<NoSettings> {
 
   @Override
   public ProcessorResponse process(Item item) {
@@ -100,5 +104,15 @@ public class ExifMetadataProcessor extends AbstractComponent implements Processo
         .withType("EXIF_METADATA")
         .withBounds(NoBounds.getInstance())
         .save();
+  }
+
+  @Override
+  public Stream<AnnotationCapability> createsAnnotations() {
+    return Stream.of(new AnnotationCapability("EXIF_METADATA", NoBounds.class));
+  }
+
+  @Override
+  public Stream<ContentCapability> processesContent() {
+    return Stream.of(new ContentCapability(FileContent.class));
   }
 }

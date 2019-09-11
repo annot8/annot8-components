@@ -3,18 +3,21 @@ package io.annot8.components.grouping.processors;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
+import io.annot8.common.data.bounds.SpanBounds;
 import io.annot8.common.data.content.Text;
 import io.annot8.components.base.processors.AbstractTextProcessor;
 import io.annot8.core.annotations.Annotation;
 import io.annot8.core.annotations.Group;
-import io.annot8.core.capabilities.CreatesGroup;
+import io.annot8.core.capabilities.AnnotationCapability;
+import io.annot8.core.capabilities.GroupCapability;
 import io.annot8.core.exceptions.IncompleteException;
+import io.annot8.core.settings.NoSettings;
 import io.annot8.core.stores.GroupStore;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 
-@CreatesGroup(GroupByTypeAndValueAnnotator.TYPE)
-public class GroupByTypeAndValueAnnotator extends AbstractTextProcessor {
+public class GroupByTypeAndValueAnnotator extends AbstractTextProcessor<NoSettings> {
 
   public static final String TYPE = "exactMatches";
   private static final String ROLE = "as";
@@ -60,5 +63,15 @@ public class GroupByTypeAndValueAnnotator extends AbstractTextProcessor {
 
   private String toKey(String type, String covered) {
     return type + ":" + covered;
+  }
+
+  @Override
+  public Stream<AnnotationCapability> processesAnnotations() {
+    return Stream.of(new AnnotationCapability(AnnotationCapability.ANY_TYPE, SpanBounds.class));
+  }
+
+  @Override
+  public Stream<GroupCapability> createsGroups() {
+    return Stream.of(new GroupCapability(GroupByTypeAndValueAnnotator.TYPE));
   }
 }

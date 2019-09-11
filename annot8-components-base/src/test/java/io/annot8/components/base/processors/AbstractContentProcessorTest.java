@@ -1,31 +1,24 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.base.processors;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.when;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Stream;
-
 import io.annot8.common.data.content.Text;
-import io.annot8.core.exceptions.ProcessingException;
-import io.annot8.testing.testimpl.TestContext;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-
-import io.annot8.core.context.Context;
 import io.annot8.core.data.Content;
 import io.annot8.core.data.Item;
-import io.annot8.core.exceptions.Annot8Exception;
 import io.annot8.core.exceptions.BadConfigurationException;
 import io.annot8.core.exceptions.MissingResourceException;
+import io.annot8.core.exceptions.ProcessingException;
+import io.annot8.core.settings.NoSettings;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.mockito.stubbing.Answer;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.when;
 
 public class AbstractContentProcessorTest {
 
@@ -34,12 +27,11 @@ public class AbstractContentProcessorTest {
 
   @Test
   public void testProcessItem() {
-    Context context = new TestContext();
     Item item = getMockedItem();
 
     TestContentProcessor processor = new TestContentProcessor();
     try {
-      processor.configure(context);
+      processor.configure(NoSettings.getInstance());
     } catch (MissingResourceException | BadConfigurationException e) {
       fail("Test should not error here");
     }
@@ -86,7 +78,7 @@ public class AbstractContentProcessorTest {
     return invocation -> Stream.of(content);
   }
 
-  private class TestContentProcessor extends AbstractContentProcessor<Text> {
+  private class TestContentProcessor extends AbstractContentProcessor<Text, NoSettings> {
 
     private final List<String> observedContent = new ArrayList<>();
 
@@ -111,7 +103,7 @@ public class AbstractContentProcessorTest {
     }
   }
 
-  private class ErrorContentProcessor extends AbstractContentProcessor<Text> {
+  private class ErrorContentProcessor extends AbstractContentProcessor<Text, NoSettings> {
 
     public ErrorContentProcessor() {
       super(Text.class);

@@ -1,20 +1,18 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.base.processors;
 
-import java.util.regex.Pattern;
-
 import com.google.common.base.Strings;
-
 import io.annot8.components.base.processors.Regex.RegexSettings;
-import io.annot8.core.context.Context;
+import io.annot8.core.components.Resource;
 import io.annot8.core.exceptions.BadConfigurationException;
 import io.annot8.core.exceptions.MissingResourceException;
 import io.annot8.core.settings.Settings;
-import io.annot8.core.settings.SettingsClass;
+
+import java.util.Map;
+import java.util.regex.Pattern;
 
 /** Base class for regex annotators */
-@SettingsClass(RegexSettings.class)
-public class Regex extends AbstractRegex {
+public class Regex extends AbstractRegex<RegexSettings> {
 
   public Regex() {
     // Do nothing
@@ -27,15 +25,7 @@ public class Regex extends AbstractRegex {
   }
 
   @Override
-  public void configure(Context context)
-      throws BadConfigurationException, MissingResourceException {
-    super.configure(context);
-
-    RegexSettings settings =
-        context
-            .getSettings(RegexSettings.class)
-            .orElseThrow(() -> new BadConfigurationException("Regex settings are required"));
-
+  public void configure(RegexSettings settings, Map<String, Resource> resources) throws BadConfigurationException, MissingResourceException {
     if (!settings.validate()) {
       throw new BadConfigurationException("Regex settings are invalid");
     }

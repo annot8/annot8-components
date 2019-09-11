@@ -1,29 +1,29 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.base.processors;
 
-import io.annot8.components.base.components.AbstractComponent;
-import io.annot8.core.capabilities.Capabilities;
-import io.annot8.core.components.Processor;
+import io.annot8.components.base.components.AbstractProcessor;
+import io.annot8.core.capabilities.ContentCapability;
 import io.annot8.core.components.responses.ProcessorResponse;
 import io.annot8.core.data.Content;
 import io.annot8.core.data.Item;
-import io.annot8.core.exceptions.Annot8Exception;
+import io.annot8.core.settings.Settings;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * A base class for building processors which act on a specific class of content
  *
- * <p>This is likely to be the base class for many processors which will function and requrie on
+ * <p>This is likely to be the base class for many processors which will function and require on
  * specific content types
  *
  * <p>All content is processed if it has the correct class. Any exceptions thrown are collated and returned together (after other content has been processed).</p>
  *
  * @param <T> the content class processed
  */
-public abstract class AbstractContentProcessor<T extends Content<?>>
-    extends AbstractComponent implements Processor {
+public abstract class AbstractContentProcessor<T extends Content<?>, S extends Settings>
+    extends AbstractProcessor<S> {
 
   private final Class<T> contentClazz;
 
@@ -73,9 +73,7 @@ public abstract class AbstractContentProcessor<T extends Content<?>>
   protected abstract void process(final T content);
 
   @Override
-  public void buildCapabilities(Capabilities.Builder builder) {
-    super.buildCapabilities(builder);
-
-    builder.processesContent(contentClazz, false);
+  public Stream<ContentCapability> processesContent() {
+    return Stream.of(new ContentCapability(contentClazz));
   }
 }

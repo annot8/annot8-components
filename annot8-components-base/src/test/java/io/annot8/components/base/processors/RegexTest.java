@@ -6,11 +6,9 @@ import io.annot8.common.data.content.Text;
 import io.annot8.components.base.processors.Regex.RegexSettings;
 import io.annot8.core.annotations.Annotation;
 import io.annot8.core.components.Processor;
-import io.annot8.core.context.Context;
 import io.annot8.core.data.Item;
 import io.annot8.core.exceptions.Annot8Exception;
 import io.annot8.core.stores.AnnotationStore;
-import io.annot8.testing.testimpl.TestContext;
 import io.annot8.testing.testimpl.TestItem;
 import io.annot8.testing.testimpl.content.TestStringContent;
 import org.junit.jupiter.api.Assertions;
@@ -38,10 +36,9 @@ public class RegexTest {
   public void testRegexFromSettings() {
     Processor p = new Regex();
     RegexSettings rs = new RegexSettings(Pattern.compile("[0-9]+"), 0, "number");
-    Context context = new TestContext(rs);
 
     try {
-      p.configure(context);
+      p.configure(rs);
       assertProcessorCorrectness(p);
     } catch (Annot8Exception e) {
       fail("Error not expected in this test", e);

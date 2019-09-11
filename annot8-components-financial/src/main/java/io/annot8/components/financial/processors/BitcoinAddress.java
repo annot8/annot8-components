@@ -6,17 +6,17 @@ import io.annot8.common.data.content.Text;
 import io.annot8.components.base.processors.AbstractTextProcessor;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
-import io.annot8.core.settings.EmptySettings;
-import io.annot8.core.settings.SettingsClass;
+import io.annot8.core.capabilities.AnnotationCapability;
+import io.annot8.core.settings.NoSettings;
 import io.annot8.core.stores.AnnotationStore;
 import org.bitcoinj.core.AddressFormatException;
 import org.bitcoinj.core.Base58;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
-@SettingsClass(EmptySettings.class)
-public class BitcoinAddress extends AbstractTextProcessor {
+public class BitcoinAddress extends AbstractTextProcessor<NoSettings> {
 
   public static final Pattern BITCOIN_PATTERN = Pattern.compile("\\b[13][a-zA-Z0-9]{25,34}\\b");
 
@@ -51,5 +51,10 @@ public class BitcoinAddress extends AbstractTextProcessor {
           .withProperty(PropertyKeys.PROPERTY_KEY_ACCOUNTTYPE, accountType)
           .save();
     }
+  }
+
+  @Override
+  public Stream<AnnotationCapability> createsAnnotations() {
+    return Stream.of(new AnnotationCapability(AnnotationTypes.ANNOTATION_TYPE_FINANCIALACCOUNT, SpanBounds.class));
   }
 }

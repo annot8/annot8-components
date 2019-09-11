@@ -3,25 +3,29 @@ package io.annot8.components.geo.processors;
 
 import io.annot8.common.data.bounds.SpanBounds;
 import io.annot8.common.data.content.Text;
+import io.annot8.common.utils.java.StreamUtils;
 import io.annot8.components.base.processors.AbstractTextProcessor;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
-import io.annot8.core.capabilities.CreatesAnnotation;
-import io.annot8.core.context.Context;
-import io.annot8.core.exceptions.BadConfigurationException;
-import io.annot8.core.exceptions.MissingResourceException;
+import io.annot8.core.capabilities.AnnotationCapability;
+import io.annot8.core.components.Resource;
+import io.annot8.core.components.annotations.ComponentDescription;
+import io.annot8.core.components.annotations.ComponentName;
+import io.annot8.core.components.annotations.SettingsClass;
 import io.annot8.core.settings.Settings;
-import io.annot8.core.settings.SettingsClass;
 import org.opensextant.geodesy.MGRS;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 /** Extract MGRS coordinates, optionally ignoring MGRS coordinates that could be dates */
-@CreatesAnnotation(value = AnnotationTypes.ANNOTATION_TYPE_COORDINATE, bounds = SpanBounds.class)
+@ComponentName("MGRS")
+@ComponentDescription("Extract MGRS coordinates, optionally ignoring MGRS coordinates that could be dates")
 @SettingsClass(Mgrs.MgrsSettings.class)
-public class Mgrs extends AbstractTextProcessor {
+public class Mgrs extends AbstractTextProcessor<Mgrs.MgrsSettings> {
   private static final Pattern mgrsPattern =
       Pattern.compile(
           "\\b(([1-9]|[1-5][0-9]|60)\\h*([C-HJ-NP-X])\\h*[A-HJ-NP-Z][A-HJ-NP-V]\\h*(([0-9]{5}\\h*[0-9]{5})|([0-9]{4}\\h*[0-9]{4})|([0-9]{3}\\h*[0-9]{3})|([0-9]{2}\\h*[0-9]{2})|([0-9]\\h*[0-9])))\\b");
@@ -32,11 +36,8 @@ public class Mgrs extends AbstractTextProcessor {
   private MgrsSettings settings;
 
   @Override
-  public void configure(Context context)
-      throws BadConfigurationException, MissingResourceException {
-    super.configure(context);
-
-    settings = context.getSettings(MgrsSettings.class, new MgrsSettings(false));
+  public void configure(MgrsSettings settings, Map<String, Resource> resources) {
+    this.settings = settings;
   }
 
   @Override
@@ -121,5 +122,11 @@ public class Mgrs extends AbstractTextProcessor {
     public boolean validate() {
       return true;
     }
+  }
+
+  @Override
+  public Stream<AnnotationCapability> createsAnnotations() {
+    return StreamUtils.append(super.createsAnnotations(),
+        new AnnotationCapability(AnnotationTypes.ANNOTATION_TYPE_COORDINATE, SpanBounds.class));
   }
 }
