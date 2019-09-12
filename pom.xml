@@ -224,7 +224,7 @@
 
                   java_files=$(git diff --cached --name-only --diff-filter=ACMR | grep -Ei "\.java$" | paste -sd "," -)
                   if [ ! -z "${java_files}" ]; then
-                  mvn spotless:apply -DspotlessFiles=${java_files}
+                  mvn spotless:apply
                   git add "$java_files"
                   fi
                 </pre-commit>
