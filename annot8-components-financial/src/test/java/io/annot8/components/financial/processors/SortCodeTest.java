@@ -12,20 +12,13 @@ import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
 import io.annot8.core.annotations.Annotation;
 import io.annot8.core.components.Processor;
-import io.annot8.core.components.annotations.SettingsClass;
 import io.annot8.core.data.Item;
 import io.annot8.core.exceptions.Annot8Exception;
-import io.annot8.core.settings.NoSettings;
 import io.annot8.core.stores.AnnotationStore;
 import io.annot8.testing.testimpl.TestItem;
 import io.annot8.testing.testimpl.content.TestStringContent;
 
 public class SortCodeTest {
-  @Test
-  public void testSettings() {
-    SettingsClass annotation = SortCode.class.getAnnotation(SettingsClass.class);
-    Assertions.assertEquals(NoSettings.class, annotation.value());
-  }
 
   @Test
   public void testSortCode() throws Annot8Exception {
