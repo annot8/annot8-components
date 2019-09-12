@@ -18,6 +18,7 @@ import io.annot8.components.mongo.data.AnnotationDto;
 import io.annot8.components.mongo.data.ContentDto;
 import io.annot8.components.mongo.data.ItemDto;
 import io.annot8.components.mongo.resources.MongoConnection;
+import io.annot8.components.mongo.resources.MongoConnectionSettings;
 import io.annot8.core.annotations.Annotation;
 import io.annot8.core.data.Content;
 import io.annot8.core.data.Item;
@@ -31,6 +32,14 @@ public class FlatMongoSink extends AbstractMongoSink {
   private MongoCollection<Document> itemCollection;
   private MongoCollection<Document> contentsCollection;
   private MongoCollection<Document> annotationsCollection;
+
+  public FlatMongoSink(MongoConnection connection) {
+    super(connection);
+  }
+
+  public FlatMongoSink(MongoConnectionSettings settings) {
+    super(settings);
+  }
 
   @Override
   public void storeItem(Item item) throws Annot8Exception {

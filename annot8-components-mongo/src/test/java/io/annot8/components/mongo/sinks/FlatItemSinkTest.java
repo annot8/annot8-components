@@ -23,7 +23,6 @@ import io.annot8.core.components.responses.ProcessorResponse.Status;
 import io.annot8.core.data.Content;
 import io.annot8.core.data.Item;
 import io.annot8.testing.testimpl.TestAnnotationStore;
-import io.annot8.testing.testimpl.TestContext;
 import io.annot8.testing.testimpl.TestItem;
 import io.annot8.testing.testimpl.TestProperties;
 
@@ -56,8 +55,7 @@ public class FlatItemSinkTest extends AbstractSinkTest {
     when(database.getCollection(eq("content"))).thenReturn(contentStore);
     when(database.getCollection(eq("annotation"))).thenReturn(annotationStore);
 
-    FlatMongoSink store = new FlatMongoSink();
-    store.configure(new TestContext(), connection);
+    FlatMongoSink store = new FlatMongoSink(connection);
     Item item = new TestItem();
     Content content = addContent(item, "test", "testing");
     Annotation ann1 = addAnnotation(content, "test", 0, 1);
@@ -78,8 +76,7 @@ public class FlatItemSinkTest extends AbstractSinkTest {
     when(database.getCollection(eq("content"))).thenReturn(contentStore);
     when(database.getCollection(eq("annotation"))).thenReturn(annotationStore);
 
-    FlatMongoSink store = new FlatMongoSink();
-    store.configure(new TestContext(), connection);
+    FlatMongoSink store = new FlatMongoSink(connection);
 
     TestItem item = new TestItem();
     Content content = mock(Content.class);
@@ -105,8 +102,7 @@ public class FlatItemSinkTest extends AbstractSinkTest {
     when(database.getCollection(eq("content"))).thenReturn(contentStore);
     when(database.getCollection(eq("annotation"))).thenReturn(annotationStore);
 
-    FlatMongoSink store = new FlatMongoSink();
-    store.configure(new TestContext(), connection);
+    FlatMongoSink store = new FlatMongoSink(connection);
 
     TestItem item = new TestItem();
     ProcessorResponse processorResponse = store.process(item);

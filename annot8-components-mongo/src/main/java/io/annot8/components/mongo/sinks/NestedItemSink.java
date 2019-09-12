@@ -14,6 +14,7 @@ import io.annot8.components.mongo.data.AnnotationDto;
 import io.annot8.components.mongo.data.ContentDto;
 import io.annot8.components.mongo.data.ItemDto;
 import io.annot8.components.mongo.resources.MongoConnection;
+import io.annot8.components.mongo.resources.MongoConnectionSettings;
 import io.annot8.core.annotations.Annotation;
 import io.annot8.core.data.Content;
 import io.annot8.core.data.Item;
@@ -22,6 +23,14 @@ import io.annot8.core.exceptions.Annot8Exception;
 public class NestedItemSink extends AbstractMongoSink {
 
   private MongoCollection<Document> itemCollection;
+
+  public NestedItemSink(MongoConnection connection) {
+    super(connection);
+  }
+
+  public NestedItemSink(MongoConnectionSettings settings) {
+    super(settings);
+  }
 
   @Override
   public void storeItem(Item item) throws Annot8Exception {

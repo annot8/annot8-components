@@ -4,36 +4,32 @@ package io.annot8.components.mongo.processors;
 import org.bson.Document;
 
 import io.annot8.common.data.content.Text;
+import io.annot8.components.base.processors.AbstractContentProcessor;
 import io.annot8.components.mongo.data.MongoDocument;
-import io.annot8.core.capabilities.CreatesContent;
-import io.annot8.core.capabilities.ProcessesContent;
-import io.annot8.core.components.Processor;
-import io.annot8.core.components.responses.ProcessorResponse;
-import io.annot8.core.data.Item;
 
-@CreatesContent(Text.class)
-@ProcessesContent(MongoDocument.class)
-public class CreateContentFromMongoDocument extends AbstractComponent implements Processor {
+// @CreatesContent(Text.class)
+// @ProcessesContent(MongoDocument.class)
+public class CreateContentFromMongoDocument extends AbstractContentProcessor<MongoDocument> {
+
+  public CreateContentFromMongoDocument() {
+    super(MongoDocument.class);
+  }
 
   @Override
-  public ProcessorResponse process(Item item) {
-    item.getContents(MongoDocument.class)
-        .forEach(
-            d -> {
-              Document doc = d.getData();
-              for (String key : doc.keySet()) {
-                Object o = doc.get(key);
-                if (o instanceof String) {
-                  item.createContent(Text.class)
-                      .withDescription("From Mongo key " + key)
-                      .withData(o.toString())
-                      .save();
-                }
+  public void process(MongoDocument d) {
 
-                // TODO: Handle other types - e.g. nested objects, numbers, booleans, etc.
-              }
-            });
+    Document doc = d.getData();
+    for (String key : doc.keySet()) {
+      Object o = doc.get(key);
+      if (o instanceof String) {
+        d.getItem()
+            .createContent(Text.class)
+            .withDescription("From Mongo key " + key)
+            .withData(o.toString())
+            .save();
+      }
 
-    return ProcessorResponse.ok();
+      // TODO: Handle other types - e.g. nested objects, numbers, booleans, etc.
+    }
   }
 }

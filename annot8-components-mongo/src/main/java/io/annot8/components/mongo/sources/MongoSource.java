@@ -9,12 +9,10 @@ import com.mongodb.client.MongoCursor;
 
 import io.annot8.components.mongo.AbstractMongoComponent;
 import io.annot8.components.mongo.data.MongoDocument;
-import io.annot8.components.mongo.resources.MongoConnection;
+import io.annot8.components.mongo.resources.MongoConnectionSettings;
 import io.annot8.conventions.PropertyKeys;
-import io.annot8.core.capabilities.CreatesContent;
 import io.annot8.core.components.Source;
 import io.annot8.core.components.responses.SourceResponse;
-import io.annot8.core.context.Context;
 import io.annot8.core.data.Item;
 import io.annot8.core.data.ItemFactory;
 import io.annot8.core.exceptions.IncompleteException;
@@ -26,21 +24,19 @@ import io.annot8.core.exceptions.UnsupportedContentException;
  * <p>Note that this source will only run the query once, and once it has exhausted those results it
  * will return SourceResponse.done().
  */
-@CreatesContent(MongoDocument.class)
+// @CreatesContent(MongoDocument.class)
 public class MongoSource extends AbstractMongoComponent implements Source {
 
   private MongoCursor<Document> cursor = null;
 
-  @Override
-  public void configure(Context context, MongoConnection connection) {
-    cursor = connection.getCollection().find().iterator();
-    // TODO: Use change streams (collection.watch()) to pick up new documents
+  public MongoSource(MongoConnectionSettings settings) {
+    super(settings);
   }
 
   @Override
   public SourceResponse read(ItemFactory itemFactory) {
     if (cursor == null) {
-      log().warn("Cursor is null, has configure been called?");
+      cursor = getConnection().getCollection().find().iterator();
       return SourceResponse.sourceError();
     }
 
