@@ -16,7 +16,7 @@ import java.util.Map;
 
 @ResourceKey(key = AbstractComponent.RESOURCE_KEY_LOGGING, type = Logging.class, optional = true)
 @ResourceKey(key = AbstractComponent.RESOURCE_KEY_METERING, type = Metering.class, optional = true)
-public abstract class AbstractComponent<S extends Settings> implements Annot8Component<S> {
+public abstract class AbstractComponent implements Annot8Component {
 
   public static final String RESOURCE_KEY_LOGGING = "LOGGING";
   public static final String RESOURCE_KEY_METERING = "METERING";

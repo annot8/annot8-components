@@ -1,7 +1,7 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.cyber.processors;
 
-import io.annot8.components.base.processors.AbstractRegex;
+import io.annot8.components.base.processors.AbstractRegexProcessor;
 import io.annot8.components.cyber.processors.EpochTime.EpochTimeSettings;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
@@ -14,7 +14,7 @@ import java.time.Instant;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class EpochTime extends AbstractRegex<EpochTimeSettings> {
+public class EpochTime extends AbstractRegexProcessor<EpochTimeSettings> {
 
   private EpochTimeSettings settings = new EpochTimeSettings();
 

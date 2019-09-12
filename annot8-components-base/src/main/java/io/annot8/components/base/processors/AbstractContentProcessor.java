@@ -2,15 +2,12 @@
 package io.annot8.components.base.processors;
 
 import io.annot8.components.base.components.AbstractProcessor;
-import io.annot8.core.capabilities.ContentCapability;
 import io.annot8.core.components.responses.ProcessorResponse;
 import io.annot8.core.data.Content;
 import io.annot8.core.data.Item;
-import io.annot8.core.settings.Settings;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Stream;
 
 /**
  * A base class for building processors which act on a specific class of content
@@ -22,8 +19,8 @@ import java.util.stream.Stream;
  *
  * @param <T> the content class processed
  */
-public abstract class AbstractContentProcessor<T extends Content<?>, S extends Settings>
-    extends AbstractProcessor<S> {
+public abstract class AbstractContentProcessor<T extends Content<?>>
+    extends AbstractProcessor {
 
   private final Class<T> contentClazz;
 
@@ -72,8 +69,4 @@ public abstract class AbstractContentProcessor<T extends Content<?>, S extends S
    */
   protected abstract void process(final T content);
 
-  @Override
-  public Stream<ContentCapability> processesContent() {
-    return Stream.of(new ContentCapability(contentClazz));
-  }
 }

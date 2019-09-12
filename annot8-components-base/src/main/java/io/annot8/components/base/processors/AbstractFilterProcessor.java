@@ -7,7 +7,7 @@ import io.annot8.core.components.responses.ProcessorResponse;
 import io.annot8.core.data.Item;
 
 /** Base class for building filters which discard files based on some criteria */
-public abstract class AbstractFilter extends AbstractComponent implements Processor {
+public abstract class AbstractFilterProcessor extends AbstractComponent implements Processor {
 
   @Override
   public final ProcessorResponse process(final Item item) {

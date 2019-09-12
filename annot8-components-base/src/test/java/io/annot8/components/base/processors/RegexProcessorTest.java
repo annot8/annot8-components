@@ -3,7 +3,7 @@ package io.annot8.components.base.processors;
 
 import io.annot8.common.data.bounds.SpanBounds;
 import io.annot8.common.data.content.Text;
-import io.annot8.components.base.processors.Regex.RegexSettings;
+import io.annot8.components.base.processors.RegexProcessor.RegexSettings;
 import io.annot8.core.annotations.Annotation;
 import io.annot8.core.components.Processor;
 import io.annot8.core.data.Item;
@@ -20,11 +20,11 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class RegexTest {
+public class RegexProcessorTest {
 
   @Test
   public void testRegexFromConstructor() {
-    Processor p = new Regex(Pattern.compile("[0-9]+"), 0, "number");
+    Processor p = new RegexProcessor(Pattern.compile("[0-9]+"), 0, "number");
     try {
       assertProcessorCorrectness(p);
     } catch (Annot8Exception e) {
@@ -34,7 +34,7 @@ public class RegexTest {
 
   @Test
   public void testRegexFromSettings() {
-    Processor p = new Regex();
+    Processor p = new RegexProcessor();
     RegexSettings rs = new RegexSettings(Pattern.compile("[0-9]+"), 0, "number");
 
     try {

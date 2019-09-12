@@ -3,30 +3,26 @@ package io.annot8.components.base.processors;
 
 import io.annot8.common.data.bounds.SpanBounds;
 import io.annot8.common.data.content.Text;
-import io.annot8.common.utils.java.StreamUtils;
 import io.annot8.core.annotations.Annotation;
-import io.annot8.core.capabilities.AnnotationCapability;
 import io.annot8.core.exceptions.BadConfigurationException;
 import io.annot8.core.exceptions.ProcessingException;
-import io.annot8.core.settings.Settings;
 import io.annot8.core.stores.AnnotationStore;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Stream;
 
 /** Base class for regex annotators */
-public abstract class AbstractRegex<S extends Settings> extends AbstractTextProcessor<S> {
+public abstract class AbstractRegexProcessor extends AbstractTextProcessor {
 
   protected Pattern pattern = null; // TODO: Should we provide a default Pattern to avoid NPEs?
   protected int group = 0;
   protected String type = "";
 
-  public AbstractRegex() {
+  public AbstractRegexProcessor() {
     // Do nothing
   }
 
-  public AbstractRegex(Pattern pattern, int group, String type) {
+  public AbstractRegexProcessor(Pattern pattern, int group, String type) {
     this.pattern = pattern;
     this.group = group;
     this.type = type;
@@ -64,11 +60,5 @@ public abstract class AbstractRegex<S extends Settings> extends AbstractTextProc
 
   protected boolean acceptMatch(final Matcher m) {
     return true;
-  }
-
-  @Override
-  public Stream<AnnotationCapability> createsAnnotations() {
-    return StreamUtils.append(super.createsAnnotations(),
-        new AnnotationCapability(type, SpanBounds.class));
   }
 }
