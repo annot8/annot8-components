@@ -1,6 +1,8 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.properties.processors;
 
+import java.util.Optional;
+
 import io.annot8.components.base.components.AbstractComponent;
 import io.annot8.core.components.Processor;
 import io.annot8.core.components.responses.ProcessorResponse;
@@ -9,8 +11,6 @@ import io.annot8.core.data.Item;
 import io.annot8.core.exceptions.BadConfigurationException;
 import io.annot8.core.exceptions.MissingResourceException;
 import io.annot8.core.settings.Settings;
-
-import java.util.Optional;
 
 /** Set a property on an item to a specified value, overwriting any existing value */
 public class Property extends AbstractComponent implements Processor {

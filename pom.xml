@@ -79,7 +79,7 @@
     <maven-source-plugin.version>3.1.0</maven-source-plugin.version>
     <maven-javadoc-plugin.version>3.1.0</maven-javadoc-plugin.version>
     <maven-shade-plugin.version>3.2.1</maven-shade-plugin.version>
-
+    <githook-maven-plugin.version>1.0.4</githook-maven-plugin.version>
     <!-- Logging -->
     <slf4j.version>1.7.28</slf4j.version>
   </properties>
@@ -204,6 +204,35 @@
         </configuration>
       </plugin>
 
+      <plugin>
+        <groupId>io.github.phillipuniverse</groupId>
+        <artifactId>githook-maven-plugin</artifactId>
+        <version>${githook-maven-plugin.version}</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>install</goal>
+            </goals>
+            <configuration>
+              <hooks>
+                <pre-commit>
+                  source ~/.bash_profile
+                  set -e
+
+                  REPO_ROOT_DIR="$(git rev-parse --show-toplevel)"
+                  cd $REPO_ROOT_DIR
+
+                  java_files=$(git diff --cached --name-only --diff-filter=ACMR | grep -Ei "\.java$" | paste -sd "," -)
+                  if [ ! -z "${java_files}" ]; then
+                  mvn spotless:apply -DspotlessFiles=${java_files}
+                  git add "$java_files"
+                  fi
+                </pre-commit>
+              </hooks>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
 
     <pluginManagement>
@@ -375,10 +404,12 @@
     <module>annot8-components-properties</module>
     <module>annot8-components-quantities</module>
     <module>annot8-components-social</module>
-<!--    <module>annot8-components-tesseract</module>-->
+    <module>annot8-components-tesseract</module>
     <module>annot8-components-text</module>
 <!--    <module>annot8-components-tika</module>-->
     <module>annot8-components-translation</module>
     <module>annot8-components-types</module>
   </modules>
+
+
 </project>

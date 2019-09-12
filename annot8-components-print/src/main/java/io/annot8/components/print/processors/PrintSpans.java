@@ -1,11 +1,11 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.print.processors;
 
+import java.util.Optional;
+
 import io.annot8.common.data.bounds.SpanBounds;
 import io.annot8.common.data.content.Text;
 import io.annot8.components.base.processors.AbstractTextProcessor;
-
-import java.util.Optional;
 
 public class PrintSpans extends AbstractTextProcessor {
 

@@ -22,7 +22,6 @@ public abstract class AbstractFilter extends AbstractComponent implements Proces
       return ProcessorResponse.ok();
     } catch (final Exception e) {
       metrics().counter("items.errors").increment();
-
       return ProcessorResponse.itemError();
     }
   }

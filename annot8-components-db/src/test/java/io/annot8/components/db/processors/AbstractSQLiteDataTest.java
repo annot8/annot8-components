@@ -1,20 +1,21 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.db.processors;
 
-import io.annot8.common.data.content.ColumnMetadata;
-import io.annot8.common.data.content.FileContent;
-import io.annot8.common.data.content.TableMetadata;
-import io.annot8.core.stores.AnnotationStore;
-import io.annot8.testing.testimpl.TestAnnotationStore;
-import org.mockito.Mockito;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
 
-import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.Mockito.when;
+import org.mockito.Mockito;
+
+import io.annot8.common.data.content.ColumnMetadata;
+import io.annot8.common.data.content.FileContent;
+import io.annot8.common.data.content.TableMetadata;
+import io.annot8.core.stores.AnnotationStore;
+import io.annot8.testing.testimpl.TestAnnotationStore;
 
 public abstract class AbstractSQLiteDataTest {
 

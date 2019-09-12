@@ -1,6 +1,9 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.files.processors;
 
+import java.io.File;
+import java.util.Optional;
+
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.TableContent;
 import io.annot8.components.base.components.AbstractComponent;
@@ -12,9 +15,6 @@ import io.annot8.core.components.responses.ProcessorResponse;
 import io.annot8.core.context.Context;
 import io.annot8.core.data.Item;
 import io.annot8.core.exceptions.*;
-
-import java.io.File;
-import java.util.Optional;
 
 @ProcessesContent(FileContent.class)
 @CreatesContent(TableContent.class)

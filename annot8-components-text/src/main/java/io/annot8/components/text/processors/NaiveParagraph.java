@@ -8,7 +8,6 @@ import io.annot8.common.data.bounds.SpanBounds;
 import io.annot8.common.data.content.Text;
 import io.annot8.components.base.processors.AbstractTextProcessor;
 import io.annot8.conventions.AnnotationTypes;
-import io.annot8.core.data.Item;
 
 /**
  * Naively extract paragraphs by looking for multiple new line characters between lines using a

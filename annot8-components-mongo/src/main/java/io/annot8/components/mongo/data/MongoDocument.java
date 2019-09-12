@@ -1,6 +1,10 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.mongo.data;
 
+import java.util.function.Supplier;
+
+import org.bson.Document;
+
 import io.annot8.common.implementations.content.AbstractContentBuilder;
 import io.annot8.common.implementations.content.AbstractContentBuilderFactory;
 import io.annot8.common.implementations.stores.AnnotationStoreFactory;
@@ -8,9 +12,6 @@ import io.annot8.core.data.Content;
 import io.annot8.core.data.Item;
 import io.annot8.core.properties.ImmutableProperties;
 import io.annot8.core.stores.AnnotationStore;
-import org.bson.Document;
-
-import java.util.function.Supplier;
 
 public class MongoDocument implements Content<Document> {
 
@@ -21,7 +22,8 @@ public class MongoDocument implements Content<Document> {
   private final ImmutableProperties properties;
   private final Document document;
 
-  public MongoDocument(Item item,
+  public MongoDocument(
+      Item item,
       String id,
       String description,
       AnnotationStoreFactory annotationStoreFactory,
@@ -64,8 +66,6 @@ public class MongoDocument implements Content<Document> {
   public AnnotationStore getAnnotations() {
     return annotations;
   }
-
-
 
   @Override
   public String getId() {
