@@ -16,11 +16,9 @@ import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
 import io.annot8.core.annotations.Annotation;
 import io.annot8.core.components.Processor;
-import io.annot8.core.context.Context;
 import io.annot8.core.data.Item;
 import io.annot8.core.exceptions.Annot8Exception;
 import io.annot8.core.stores.AnnotationStore;
-import io.annot8.testing.testimpl.TestContext;
 import io.annot8.testing.testimpl.TestItem;
 import io.annot8.testing.testimpl.content.TestStringContent;
 
@@ -44,9 +42,6 @@ public class MacAddressTest {
   private void test(String macAddress) throws Annot8Exception {
     try (Processor p = new MacAddress()) {
       Item item = new TestItem();
-      Context context = new TestContext();
-
-      p.configure(context);
 
       Text content =
           item.createContent(TestStringContent.class)

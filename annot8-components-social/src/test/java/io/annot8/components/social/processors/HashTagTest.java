@@ -12,11 +12,9 @@ import io.annot8.common.data.content.Text;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.core.annotations.Annotation;
 import io.annot8.core.components.Processor;
-import io.annot8.core.context.Context;
 import io.annot8.core.data.Item;
 import io.annot8.core.exceptions.Annot8Exception;
 import io.annot8.core.stores.AnnotationStore;
-import io.annot8.testing.testimpl.TestContext;
 import io.annot8.testing.testimpl.TestItem;
 import io.annot8.testing.testimpl.content.TestStringContent;
 
@@ -27,9 +25,6 @@ public class HashTagTest {
     Processor p = new HashTag();
 
     Item item = new TestItem();
-    Context context = new TestContext();
-
-    p.configure(context);
 
     Text content =
         item.createContent(TestStringContent.class)

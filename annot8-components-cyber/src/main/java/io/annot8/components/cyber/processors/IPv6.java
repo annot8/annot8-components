@@ -6,12 +6,12 @@ import java.util.regex.Pattern;
 
 import com.google.common.net.InetAddresses;
 
-import io.annot8.components.base.processors.AbstractRegex;
+import io.annot8.components.base.processors.AbstractRegexProcessor;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
 import io.annot8.core.annotations.Annotation.Builder;
 
-public class IPv6 extends AbstractRegex {
+public class IPv6 extends AbstractRegexProcessor {
 
   public IPv6() {
     super(

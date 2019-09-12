@@ -3,10 +3,10 @@ package io.annot8.components.social.processors;
 
 import java.util.regex.Pattern;
 
-import io.annot8.components.base.processors.AbstractRegex;
+import io.annot8.components.base.processors.AbstractRegexProcessor;
 import io.annot8.conventions.AnnotationTypes;
 
-public class Username extends AbstractRegex {
+public class Username extends AbstractRegexProcessor {
 
   public Username() {
     super(

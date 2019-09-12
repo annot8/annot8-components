@@ -13,24 +13,20 @@ import io.annot8.common.data.bounds.SpanBounds;
 import io.annot8.common.data.content.Text;
 import io.annot8.core.annotations.Annotation;
 import io.annot8.core.components.Processor;
-import io.annot8.core.context.Context;
 import io.annot8.core.data.Item;
 import io.annot8.core.exceptions.Annot8Exception;
 import io.annot8.core.stores.AnnotationStore;
-import io.annot8.testing.testimpl.TestContext;
 import io.annot8.testing.testimpl.TestItem;
 
 public class ChangeTypeTest {
 
   @Test
   public void testChangeTypeRetain() throws Annot8Exception {
-    Processor p = new ChangeType();
 
     ChangeType.ChangeTypeSettings cts =
         new ChangeType.ChangeTypeSettings("my.person", "Person", true);
     assertTrue(cts.validate());
-    Context c = new TestContext(cts);
-    p.configure(c);
+    Processor p = new ChangeType(cts);
 
     Item item = new TestItem();
     Text content =
@@ -70,12 +66,10 @@ public class ChangeTypeTest {
 
   @Test
   public void testChangeTypeNoRetain() throws Annot8Exception {
-    Processor p = new ChangeType();
 
     ChangeType.ChangeTypeSettings cts = new ChangeType.ChangeTypeSettings("my.person", "Person");
     assertTrue(cts.validate());
-    Context c = new TestContext(cts);
-    p.configure(c);
+    Processor p = new ChangeType(cts);
 
     Item item = new TestItem();
     Text content =

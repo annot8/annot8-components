@@ -6,23 +6,18 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import io.annot8.common.components.AbstractProcessor;
 import io.annot8.common.data.content.ColumnMetadata;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.TableContent;
 import io.annot8.common.data.content.TableMetadata;
-import io.annot8.components.base.components.AbstractComponent;
 import io.annot8.components.db.content.DatabaseTable;
-import io.annot8.core.capabilities.CreatesContent;
-import io.annot8.core.capabilities.ProcessesContent;
-import io.annot8.core.components.Processor;
 import io.annot8.core.components.responses.ProcessorResponse;
 import io.annot8.core.data.Item;
 import io.annot8.core.exceptions.IncompleteException;
 import io.annot8.core.exceptions.UnsupportedContentException;
 
-@ProcessesContent(FileContent.class)
-@CreatesContent(TableContent.class)
-public class SQLiteDatabaseTableExtractor extends AbstractComponent implements Processor {
+public class SQLiteDatabaseTableExtractor extends AbstractProcessor {
 
   public static final String PROPERTY_NAME = "TABLE_NAME";
 
@@ -139,4 +134,14 @@ public class SQLiteDatabaseTableExtractor extends AbstractComponent implements P
       return -1;
     }
   }
+  //
+  //  @Override
+  //  public Stream<ContentCapability> processesContent() {
+  //    return Stream.of(new ContentCapability(FileContent.class));
+  //  }
+  //
+  //  @Override
+  //  public Stream<ContentCapability> createsContent() {
+  //    return Stream.of(new ContentCapability(TableContent.class));
+  //  }
 }

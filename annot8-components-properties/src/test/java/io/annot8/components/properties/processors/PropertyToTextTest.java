@@ -11,16 +11,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.jupiter.api.Test;
 
-import io.annot8.components.monitor.resources.Logging;
 import io.annot8.components.properties.processors.PropertyToText.PropertyToTextSettings;
 import io.annot8.core.components.Processor;
-import io.annot8.core.components.Resource;
-import io.annot8.core.context.Context;
 import io.annot8.core.data.Item;
 import io.annot8.core.exceptions.Annot8Exception;
-import io.annot8.core.settings.EmptySettings;
-import io.annot8.core.settings.Settings;
-import io.annot8.testing.testimpl.TestContext;
 import io.annot8.testing.testimpl.TestItem;
 
 public class PropertyToTextTest {
@@ -29,16 +23,6 @@ public class PropertyToTextTest {
   private static final String EXPECTED_DESC = "Text from property from " + KEY;
 
   private static final String EXPECTED_VALUE = "Hello World!";
-
-  @Test
-  public void testNoSettings() throws Annot8Exception {
-    Map<String, Object> properties = new HashMap<>();
-    properties.put(KEY, EXPECTED_VALUE);
-
-    Settings settings = EmptySettings.getInstance();
-
-    doTest(properties, settings);
-  }
 
   @Test
   public void testWhitelist() throws Annot8Exception {
@@ -64,17 +48,9 @@ public class PropertyToTextTest {
     doTest(properties, settings);
   }
 
-  private void doTest(Map<String, Object> properties, Settings settings) throws Annot8Exception {
+  private void doTest(Map<String, Object> properties, PropertyToTextSettings settings) {
 
-    Logging logging = Logging.useLoggerFactory();
-    Map<String, Resource> resources = new HashMap<>();
-    resources.put("logging", logging);
-
-    Context context = new TestContext(settings, resources);
-
-    try (Processor p = new PropertyToText()) {
-
-      p.configure(context);
+    try (Processor p = new PropertyToText(settings)) {
 
       Item item = new TestItem();
 

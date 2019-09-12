@@ -11,7 +11,6 @@ import io.annot8.common.data.content.Text;
 import io.annot8.components.base.processors.AbstractTextProcessor;
 import io.annot8.conventions.PropertyKeys;
 import io.annot8.core.annotations.Annotation.Builder;
-import io.annot8.core.capabilities.Capabilities;
 
 public abstract class AbstractQuantityProcessor extends AbstractTextProcessor {
 
@@ -93,12 +92,5 @@ public abstract class AbstractQuantityProcessor extends AbstractTextProcessor {
     }
 
     return n * m * normalization;
-  }
-
-  @Override
-  public void buildCapabilities(Capabilities.Builder builder) {
-    super.buildCapabilities(builder);
-
-    builder.createsAnnotation(annotationType, SpanBounds.class);
   }
 }

@@ -21,7 +21,6 @@ import io.annot8.core.components.responses.ProcessorResponse.Status;
 import io.annot8.core.data.Content;
 import io.annot8.core.data.Item;
 import io.annot8.testing.testimpl.TestAnnotationStore;
-import io.annot8.testing.testimpl.TestContext;
 import io.annot8.testing.testimpl.TestItem;
 import io.annot8.testing.testimpl.TestProperties;
 
@@ -39,8 +38,7 @@ public class NestedItemSinkTest extends AbstractSinkTest {
 
   @Test
   public void testStore() {
-    NestedItemSink store = new NestedItemSink();
-    store.configure(new TestContext(), connection);
+    NestedItemSink store = new NestedItemSink(connection);
     Mockito.reset(collection);
 
     Item item = new TestItem();
@@ -54,8 +52,7 @@ public class NestedItemSinkTest extends AbstractSinkTest {
 
   @Test
   public void testStoreNonSerializableItem() {
-    NestedItemSink store = new NestedItemSink();
-    store.configure(new TestContext(), connection);
+    NestedItemSink store = new NestedItemSink(connection);
 
     TestItem item = new TestItem();
     Content content = mock(Content.class);

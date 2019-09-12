@@ -11,11 +11,8 @@ import io.annot8.common.data.content.Text;
 import io.annot8.components.base.processors.AbstractTextProcessor;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
-import io.annot8.core.settings.EmptySettings;
-import io.annot8.core.settings.SettingsClass;
 import io.annot8.core.stores.AnnotationStore;
 
-@SettingsClass(EmptySettings.class)
 public class IBAN extends AbstractTextProcessor {
 
   private static final Pattern IBAN_PATTERN =
@@ -49,4 +46,11 @@ public class IBAN extends AbstractTextProcessor {
       }
     }
   }
+
+  //  @Override
+  //  public Stream<AnnotationCapability> createsAnnotations() {
+  //    return Stream.of(
+  //        new AnnotationCapability(
+  //            AnnotationTypes.ANNOTATION_TYPE_FINANCIALACCOUNT, SpanBounds.class));
+  //  }
 }

@@ -7,33 +7,25 @@ import java.util.regex.Pattern;
 import io.annot8.common.data.bounds.SpanBounds;
 import io.annot8.common.data.content.Text;
 import io.annot8.core.annotations.Annotation;
-import io.annot8.core.capabilities.Capabilities.Builder;
 import io.annot8.core.exceptions.BadConfigurationException;
 import io.annot8.core.exceptions.ProcessingException;
 import io.annot8.core.stores.AnnotationStore;
 
 /** Base class for regex annotators */
-public abstract class AbstractRegex extends AbstractTextProcessor {
+public abstract class AbstractRegexProcessor extends AbstractTextProcessor {
 
   protected Pattern pattern = null; // TODO: Should we provide a default Pattern to avoid NPEs?
   protected int group = 0;
   protected String type = "";
 
-  public AbstractRegex() {
+  public AbstractRegexProcessor() {
     // Do nothing
   }
 
-  public AbstractRegex(Pattern pattern, int group, String type) {
+  public AbstractRegexProcessor(Pattern pattern, int group, String type) {
     this.pattern = pattern;
     this.group = group;
     this.type = type;
-  }
-
-  @Override
-  public void buildCapabilities(Builder builder) {
-    super.buildCapabilities(builder);
-
-    builder.createsAnnotation(type, SpanBounds.class);
   }
 
   @Override

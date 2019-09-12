@@ -1,16 +1,15 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.print.processors;
 
-import io.annot8.components.base.components.AbstractComponent;
+import io.annot8.common.components.AbstractProcessor;
 import io.annot8.core.annotations.Annotation;
-import io.annot8.core.components.Processor;
 import io.annot8.core.components.responses.ProcessorResponse;
 import io.annot8.core.data.Content;
 import io.annot8.core.data.Item;
 import io.annot8.core.properties.Properties;
 import io.annot8.core.stores.AnnotationStore;
 
-public class PrintItem extends AbstractComponent implements Processor {
+public class PrintItem extends AbstractProcessor {
 
   @Override
   public ProcessorResponse process(Item item) {

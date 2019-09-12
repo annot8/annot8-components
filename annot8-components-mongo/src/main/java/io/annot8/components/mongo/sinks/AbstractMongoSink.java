@@ -11,32 +11,31 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.annot8.components.mongo.AbstractMongoComponent;
 import io.annot8.components.mongo.resources.MongoConnection;
-import io.annot8.components.mongo.resources.MongoFactory;
-import io.annot8.core.capabilities.UsesResource;
+import io.annot8.components.mongo.resources.MongoConnectionSettings;
 import io.annot8.core.components.Processor;
 import io.annot8.core.components.responses.ProcessorResponse;
-import io.annot8.core.context.Context;
 import io.annot8.core.data.Item;
 import io.annot8.core.exceptions.Annot8Exception;
 import io.annot8.core.properties.ImmutableProperties;
 
-@UsesResource(MongoFactory.class)
 public abstract class AbstractMongoSink extends AbstractMongoComponent implements Processor {
 
-  private ObjectMapper mapper;
+  private ObjectMapper mapper = new ObjectMapper();
+
+  AbstractMongoSink(MongoConnectionSettings settings) {
+    super(settings);
+
+    configureMongo(getConnection());
+  }
+
+  public AbstractMongoSink(MongoConnection connection) {
+    super(connection);
+    configureMongo(getConnection());
+  }
 
   protected abstract void storeItem(Item item) throws Annot8Exception;
 
   protected abstract void configureMongo(MongoConnection connection);
-
-  @Override
-  protected void configure(Context context, MongoConnection connection) {
-    mapper = new ObjectMapper();
-    // TODO: This used to configure Annot8's Jackson modules but since we don't depend on Jackson
-    // any more
-    // any Mongo specific configuration should go here.
-    this.configureMongo(connection);
-  }
 
   @Override
   public ProcessorResponse process(Item item) {

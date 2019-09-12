@@ -10,11 +10,9 @@ import io.annot8.common.data.content.Text;
 import io.annot8.components.base.processors.AbstractTextProcessor;
 import io.annot8.core.annotations.Annotation;
 import io.annot8.core.annotations.Group;
-import io.annot8.core.capabilities.CreatesGroup;
 import io.annot8.core.exceptions.IncompleteException;
 import io.annot8.core.stores.GroupStore;
 
-@CreatesGroup(GroupByTypeAndValueAnnotator.TYPE)
 public class GroupByTypeAndValueAnnotator extends AbstractTextProcessor {
 
   public static final String TYPE = "exactMatches";
@@ -62,4 +60,14 @@ public class GroupByTypeAndValueAnnotator extends AbstractTextProcessor {
   private String toKey(String type, String covered) {
     return type + ":" + covered;
   }
+
+  //  @Override
+  //  public Stream<AnnotationCapability> processesAnnotations() {
+  //    return Stream.of(new AnnotationCapability(AnnotationCapability.ANY_TYPE, SpanBounds.class));
+  //  }
+  //
+  //  @Override
+  //  public Stream<GroupCapability> createsGroups() {
+  //    return Stream.of(new GroupCapability(GroupByTypeAndValueAnnotator.TYPE));
+  //  }
 }

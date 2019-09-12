@@ -15,7 +15,6 @@ import io.annot8.core.annotations.Annotation;
 import io.annot8.core.data.Item;
 import io.annot8.core.exceptions.Annot8Exception;
 import io.annot8.core.stores.AnnotationStore;
-import io.annot8.testing.testimpl.TestContext;
 import io.annot8.testing.testimpl.TestItem;
 import io.annot8.testing.testimpl.content.TestStringContent;
 
@@ -24,7 +23,6 @@ public class TokenizerTest {
   @Test
   public void test() throws Annot8Exception {
     Tokenizer tokenizer = new Tokenizer();
-    tokenizer.configure(new TestContext());
 
     Item item = new TestItem();
     Text content =

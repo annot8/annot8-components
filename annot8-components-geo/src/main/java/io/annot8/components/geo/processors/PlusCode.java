@@ -7,13 +7,16 @@ import java.util.regex.Pattern;
 import com.google.openlocationcode.OpenLocationCode;
 import com.google.openlocationcode.OpenLocationCode.CodeArea;
 
-import io.annot8.components.base.processors.AbstractRegex;
+import io.annot8.components.base.processors.AbstractRegexProcessor;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
 import io.annot8.core.annotations.Annotation.Builder;
+import io.annot8.core.components.annotations.ComponentDescription;
 
 /** Extracts full global Plus Codes (also known as Open Location Codes) from text */
-public class PlusCode extends AbstractRegex {
+@ComponentDescription(
+    "Extracts full global Plus Codes (also known as Open Location Codes) from text")
+public class PlusCode extends AbstractRegexProcessor {
 
   public PlusCode() {
     super(

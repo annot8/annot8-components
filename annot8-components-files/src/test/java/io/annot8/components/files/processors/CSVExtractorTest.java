@@ -17,7 +17,6 @@ import io.annot8.common.data.content.TableContent;
 import io.annot8.components.files.AbstractCSVDataTest;
 import io.annot8.core.components.responses.ProcessorResponse;
 import io.annot8.core.components.responses.ProcessorResponse.Status;
-import io.annot8.testing.testimpl.TestContext;
 import io.annot8.testing.testimpl.TestItem;
 
 public class CSVExtractorTest extends AbstractCSVDataTest {
@@ -31,11 +30,9 @@ public class CSVExtractorTest extends AbstractCSVDataTest {
     doReturn(FileContent.class).when(content).getContentClass();
     item.save(content);
 
-    CSVExtractor extractor = new CSVExtractor();
-    TestContext context = new TestContext(new CSVExtractorSettings(true));
+    CSVExtractor extractor = new CSVExtractor(new CSVExtractorSettings(false));
     ProcessorResponse response = null;
     try {
-      extractor.configure(context);
       response = extractor.process(item);
     } catch (Exception e) {
       fail("No error expected during test", e);

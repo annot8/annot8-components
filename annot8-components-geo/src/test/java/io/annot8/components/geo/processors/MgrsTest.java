@@ -9,27 +9,24 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import io.annot8.common.data.content.Text;
-import io.annot8.components.geo.processors.Mgrs.MgrsSettings;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
 import io.annot8.core.annotations.Annotation;
 import io.annot8.core.components.Processor;
-import io.annot8.core.context.Context;
 import io.annot8.core.data.Item;
 import io.annot8.core.exceptions.Annot8Exception;
 import io.annot8.core.stores.AnnotationStore;
-import io.annot8.testing.testimpl.TestContext;
 import io.annot8.testing.testimpl.TestItem;
 import io.annot8.testing.testimpl.content.TestStringContent;
 
 public class MgrsTest {
   @Test
   public void testMgrs() throws Annot8Exception {
-    try (Processor p = new Mgrs()) {
-      Item item = new TestItem();
-      Context context = new TestContext();
 
-      p.configure(context);
+    MgrsSettings settings = new MgrsSettings(true);
+
+    try (Processor p = new MgrsProcessor(settings)) {
+      Item item = new TestItem();
 
       Text content =
           item.createContent(TestStringContent.class)
@@ -65,13 +62,10 @@ public class MgrsTest {
 
   @Test
   public void testMgrsDates() throws Annot8Exception {
-    try (Processor p = new Mgrs()) {
+    MgrsSettings settings = new MgrsSettings(true);
+
+    try (Processor p = new MgrsProcessor(settings)) {
       Item item = new TestItem();
-
-      MgrsSettings settings = new MgrsSettings(true);
-
-      Context context = new TestContext(settings);
-      p.configure(context);
 
       Text content =
           item.createContent(TestStringContent.class)
@@ -89,13 +83,10 @@ public class MgrsTest {
 
   @Test
   public void testMgrsAllowDates() throws Annot8Exception {
-    try (Processor p = new Mgrs()) {
+    MgrsSettings settings = new MgrsSettings(false);
+
+    try (Processor p = new MgrsProcessor(settings)) {
       Item item = new TestItem();
-
-      MgrsSettings settings = new MgrsSettings(false);
-
-      Context context = new TestContext(settings);
-      p.configure(context);
 
       Text content =
           item.createContent(TestStringContent.class)

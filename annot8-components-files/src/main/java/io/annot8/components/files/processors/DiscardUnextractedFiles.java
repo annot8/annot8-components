@@ -1,17 +1,12 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.files.processors;
 
+import io.annot8.common.components.AbstractProcessor;
 import io.annot8.common.data.content.FileContent;
-import io.annot8.components.base.components.AbstractComponent;
-import io.annot8.core.capabilities.ProcessesContent;
-import io.annot8.core.components.Processor;
 import io.annot8.core.components.responses.ProcessorResponse;
 import io.annot8.core.data.Item;
 
-// This is more like premature optimisation... really but I guess it's sensible to clean up
-// the pipeline as we go.
-@ProcessesContent(FileContent.class)
-public class DiscardUnextractedFiles extends AbstractComponent implements Processor {
+public class DiscardUnextractedFiles extends AbstractProcessor {
 
   @Override
   public ProcessorResponse process(Item item) {
@@ -26,4 +21,14 @@ public class DiscardUnextractedFiles extends AbstractComponent implements Proces
 
     return ProcessorResponse.ok();
   }
+
+  //  @Override
+  //  public Stream<ContentCapability> processesContent() {
+  //    return Stream.of(new ContentCapability(FileContent.class));
+  //  }
+  //
+  //  @Override
+  //  public Stream<ContentCapability> deletesContent() {
+  //    return Stream.of(new ContentCapability(FileContent.class));
+  //  }
 }

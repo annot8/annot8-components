@@ -1,21 +1,20 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.tika.processors;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import io.annot8.common.data.content.FileContent;
+import io.annot8.common.data.content.InputStreamContent;
+import io.annot8.common.data.content.Text;
+import io.annot8.core.data.Item;
+import io.annot8.testing.testimpl.TestItem;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import org.junit.jupiter.api.Test;
-
-import io.annot8.common.data.content.FileContent;
-import io.annot8.common.data.content.InputStreamContent;
-import io.annot8.common.data.content.Text;
-import io.annot8.core.data.Item;
-import io.annot8.testing.testimpl.TestItem;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class TikaExtractorTest {
 
@@ -24,8 +23,7 @@ public class TikaExtractorTest {
     TikaExtractor extractor = new TikaExtractor();
 
     Item item = new TestItem();
-    item.create(InputStreamContent.class)
-        .withName("test")
+    item.createContent(InputStreamContent.class)
         .withData(TikaExtractorTest.class.getResourceAsStream("test.pdf"))
         .save();
 
@@ -47,7 +45,7 @@ public class TikaExtractorTest {
     TikaExtractor extractor = new TikaExtractor();
 
     Item item = new TestItem();
-    item.create(FileContent.class).withName("test").withData(p.toFile()).save();
+    item.createContent(FileContent.class).withData(p.toFile()).save();
 
     assertEquals(0, item.getContents(Text.class).count());
 
@@ -65,7 +63,7 @@ public class TikaExtractorTest {
     assertFalse(f.exists());
 
     Item item = new TestItem();
-    item.create(FileContent.class).withName("test").withData(f).save();
+    item.createContent(FileContent.class).withData(f).save();
 
     assertEquals(0, item.getContents(Text.class).count());
 

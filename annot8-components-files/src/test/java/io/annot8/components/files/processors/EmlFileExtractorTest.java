@@ -19,10 +19,8 @@ import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.InputStreamContent;
 import io.annot8.common.data.content.Text;
 import io.annot8.core.components.Processor;
-import io.annot8.core.context.Context;
 import io.annot8.core.data.Content;
 import io.annot8.core.data.Item;
-import io.annot8.testing.testimpl.TestContext;
 import io.annot8.testing.testimpl.TestItem;
 import io.annot8.testing.testimpl.TestItemFactory;
 
@@ -32,9 +30,6 @@ public class EmlFileExtractorTest {
   public void test() throws Exception {
 
     try (Processor p = new EmlFileExtractor()) {
-
-      Context context = new TestContext();
-      p.configure(context);
 
       TestItem item = new TestItem();
       TestItemFactory itemFactory = (TestItemFactory) item.getItemFactory();

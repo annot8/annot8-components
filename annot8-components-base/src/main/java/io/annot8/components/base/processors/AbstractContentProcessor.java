@@ -4,9 +4,7 @@ package io.annot8.components.base.processors;
 import java.util.LinkedList;
 import java.util.List;
 
-import io.annot8.components.base.components.AbstractComponent;
-import io.annot8.core.capabilities.Capabilities;
-import io.annot8.core.components.Processor;
+import io.annot8.common.components.AbstractProcessor;
 import io.annot8.core.components.responses.ProcessorResponse;
 import io.annot8.core.data.Content;
 import io.annot8.core.data.Item;
@@ -14,7 +12,7 @@ import io.annot8.core.data.Item;
 /**
  * A base class for building processors which act on a specific class of content
  *
- * <p>This is likely to be the base class for many processors which will function and requrie on
+ * <p>This is likely to be the base class for many processors which will function and require on
  * specific content types
  *
  * <p>All content is processed if it has the correct class. Any exceptions thrown are collated and
@@ -22,8 +20,7 @@ import io.annot8.core.data.Item;
  *
  * @param <T> the content class processed
  */
-public abstract class AbstractContentProcessor<T extends Content<?>> extends AbstractComponent
-    implements Processor {
+public abstract class AbstractContentProcessor<T extends Content<?>> extends AbstractProcessor {
 
   private final Class<T> contentClazz;
 
@@ -72,11 +69,4 @@ public abstract class AbstractContentProcessor<T extends Content<?>> extends Abs
    * @param content the content to process
    */
   protected abstract void process(final T content);
-
-  @Override
-  public void buildCapabilities(Capabilities.Builder builder) {
-    super.buildCapabilities(builder);
-
-    builder.processesContent(contentClazz, false);
-  }
 }

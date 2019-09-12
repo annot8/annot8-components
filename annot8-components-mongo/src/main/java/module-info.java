@@ -7,6 +7,7 @@ module io.annot8.components.mongo {
   requires com.fasterxml.jackson.databind;
   requires com.fasterxml.jackson.core;
   requires io.annot8.common.implementations;
+  requires io.annot8.common.components;
 
   exports io.annot8.components.mongo;
   exports io.annot8.components.mongo.data;

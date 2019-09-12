@@ -13,21 +13,17 @@ import io.annot8.common.data.bounds.SpanBounds;
 import io.annot8.common.data.content.Text;
 import io.annot8.components.base.processors.AbstractTextProcessor;
 import io.annot8.conventions.AnnotationTypes;
-import io.annot8.core.context.Context;
+import io.annot8.core.components.annotations.ComponentDescription;
 import io.annot8.core.exceptions.BadConfigurationException;
-import io.annot8.core.exceptions.MissingResourceException;
 
 /** Tokenizes words and sentences using OpenNLP tokenization models */
+@ComponentDescription("Tokenizes words and sentences using OpenNLP tokenization models")
 public class Tokenizer extends AbstractTextProcessor {
 
   private SentenceDetectorME sentenceDetector;
   private TokenizerME wordTokenizer;
 
-  @Override
-  public void configure(Context context)
-      throws BadConfigurationException, MissingResourceException {
-    super.configure(context);
-
+  public Tokenizer() {
     // TODO: Allow users to provide their own models
     SentenceModel sentenceModel;
     try {
@@ -79,4 +75,12 @@ public class Tokenizer extends AbstractTextProcessor {
     sentenceDetector = null;
     wordTokenizer = null;
   }
+
+  //  @Override
+  //  public Stream<AnnotationCapability> createsAnnotations() {
+  //    return StreamUtils.append(
+  //        super.createsAnnotations(),
+  //        new AnnotationCapability(AnnotationTypes.ANNOTATION_TYPE_SENTENCE, SpanBounds.class),
+  //        new AnnotationCapability(AnnotationTypes.ANNOTATION_TYPE_WORDTOKEN, SpanBounds.class));
+  //  }
 }

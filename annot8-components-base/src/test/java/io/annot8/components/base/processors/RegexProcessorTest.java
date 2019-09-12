@@ -12,22 +12,19 @@ import org.junit.jupiter.api.Test;
 
 import io.annot8.common.data.bounds.SpanBounds;
 import io.annot8.common.data.content.Text;
-import io.annot8.components.base.processors.Regex.RegexSettings;
 import io.annot8.core.annotations.Annotation;
 import io.annot8.core.components.Processor;
-import io.annot8.core.context.Context;
 import io.annot8.core.data.Item;
 import io.annot8.core.exceptions.Annot8Exception;
 import io.annot8.core.stores.AnnotationStore;
-import io.annot8.testing.testimpl.TestContext;
 import io.annot8.testing.testimpl.TestItem;
 import io.annot8.testing.testimpl.content.TestStringContent;
 
-public class RegexTest {
+public class RegexProcessorTest {
 
   @Test
   public void testRegexFromConstructor() {
-    Processor p = new Regex(Pattern.compile("[0-9]+"), 0, "number");
+    Processor p = new RegexProcessor(Pattern.compile("[0-9]+"), 0, "number");
     try {
       assertProcessorCorrectness(p);
     } catch (Annot8Exception e) {
@@ -37,12 +34,10 @@ public class RegexTest {
 
   @Test
   public void testRegexFromSettings() {
-    Processor p = new Regex();
     RegexSettings rs = new RegexSettings(Pattern.compile("[0-9]+"), 0, "number");
-    Context context = new TestContext(rs);
+    Processor p = new RegexProcessor(rs);
 
     try {
-      p.configure(context);
       assertProcessorCorrectness(p);
     } catch (Annot8Exception e) {
       fail("Error not expected in this test", e);

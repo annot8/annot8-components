@@ -12,37 +12,34 @@ import org.apache.tika.parser.ParseContext;
 import org.apache.tika.sax.BodyContentHandler;
 import org.xml.sax.SAXException;
 
+import io.annot8.common.components.AbstractProcessor;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.InputStreamContent;
 import io.annot8.common.data.content.Text;
-import io.annot8.components.base.components.AbstractComponent;
-import io.annot8.core.capabilities.CreatesContent;
-import io.annot8.core.capabilities.ProcessesContent;
-import io.annot8.core.components.Processor;
 import io.annot8.core.components.responses.ProcessorResponse;
 import io.annot8.core.data.Content;
 import io.annot8.core.data.Item;
 
-@ProcessesContent(FileContent.class)
-@ProcessesContent(InputStreamContent.class)
-@CreatesContent(Text.class)
-public class TikaExtractor extends AbstractComponent implements Processor {
+// @ProcessesContent(FileContent.class)
+// @ProcessesContent(InputStreamContent.class)
+// @CreatesContent(Text.class)
+public class TikaExtractor extends AbstractProcessor {
 
   public static final String CONTENT_SUFFIX = "_tika";
 
   public ProcessorResponse process(Item item) {
     // Process InputStream
     item.getContents(InputStreamContent.class)
-        .forEach(c -> this.createText(item, c.getName(), c.getData()));
+        .forEach(c -> this.createText(item, c.getId(), c.getData()));
 
     // Process Files
     item.getContents(FileContent.class)
         .forEach(
             c -> {
               try {
-                this.createText(item, c.getName(), new FileInputStream(c.getData()));
+                this.createText(item, c.getId(), new FileInputStream(c.getData()));
               } catch (IOException e) {
-                this.log().error("Unable to read File Content {}", c.getName(), e);
+                this.log().error("Unable to read File Content {}", c.getId(), e);
               }
             });
 
@@ -62,9 +59,9 @@ public class TikaExtractor extends AbstractComponent implements Processor {
 
       // Create Text content
       Content.Builder<Text, String> builder =
-          item.create(Text.class)
+          item.createContent(Text.class)
               .withData(textHandler.toString())
-              .withName(originalContentName + CONTENT_SUFFIX);
+              .withDescription(originalContentName + CONTENT_SUFFIX);
 
       // Add metadata to content
       for (String name : metadata.names()) {
@@ -78,7 +75,7 @@ public class TikaExtractor extends AbstractComponent implements Processor {
       // Save content
       builder.save();
     } catch (SAXException | IOException | TikaException e) {
-      this.log().error("Unable to extract text from Content {}", originalContentName, e);
+      log().error("Unable to extract text from Content {}", originalContentName, e);
     }
   }
 }

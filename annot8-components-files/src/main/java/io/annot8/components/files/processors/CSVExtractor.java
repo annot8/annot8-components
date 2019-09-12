@@ -2,39 +2,25 @@
 package io.annot8.components.files.processors;
 
 import java.io.File;
-import java.util.Optional;
 
+import io.annot8.common.components.AbstractProcessor;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.TableContent;
-import io.annot8.components.base.components.AbstractComponent;
 import io.annot8.components.files.content.CSVTable;
-import io.annot8.core.capabilities.CreatesContent;
-import io.annot8.core.capabilities.ProcessesContent;
-import io.annot8.core.components.Processor;
 import io.annot8.core.components.responses.ProcessorResponse;
-import io.annot8.core.context.Context;
 import io.annot8.core.data.Item;
-import io.annot8.core.exceptions.*;
+import io.annot8.core.exceptions.IncompleteException;
+import io.annot8.core.exceptions.UnsupportedContentException;
 
-@ProcessesContent(FileContent.class)
-@CreatesContent(TableContent.class)
-public class CSVExtractor extends AbstractComponent implements Processor {
+public class CSVExtractor extends AbstractProcessor {
 
   public static final String CSV_TABLE = "CSV_TABLE";
   public static final String PROPERTY_FILE = "file";
 
-  private CSVExtractorSettings settings;
+  private final CSVExtractorSettings settings;
 
-  @Override
-  public void configure(Context context)
-      throws BadConfigurationException, MissingResourceException {
-    super.configure(context);
-    Optional<CSVExtractorSettings> optional = context.getSettings(CSVExtractorSettings.class);
-    if (optional.isPresent()) {
-      settings = optional.get();
-    } else {
-      settings = new CSVExtractorSettings(false);
-    }
+  public CSVExtractor(CSVExtractorSettings settings) {
+    this.settings = settings;
   }
 
   @Override
@@ -56,4 +42,14 @@ public class CSVExtractor extends AbstractComponent implements Processor {
       log().error("Failed to create CSV content", e);
     }
   }
+
+  //  @Override
+  //  public Stream<ContentCapability> processesContent() {
+  //    return Stream.of(new ContentCapability(FileContent.class));
+  //  }
+  //
+  //  @Override
+  //  public Stream<ContentCapability> createsContent() {
+  //    return Stream.of(new ContentCapability(TableContent.class));
+  //  }
 }

@@ -1,7 +1,8 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.base.processors;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
@@ -14,13 +15,9 @@ import org.mockito.Mockito;
 import org.mockito.stubbing.Answer;
 
 import io.annot8.common.data.content.Text;
-import io.annot8.core.context.Context;
 import io.annot8.core.data.Content;
 import io.annot8.core.data.Item;
-import io.annot8.core.exceptions.BadConfigurationException;
-import io.annot8.core.exceptions.MissingResourceException;
 import io.annot8.core.exceptions.ProcessingException;
-import io.annot8.testing.testimpl.TestContext;
 
 public class AbstractContentProcessorTest {
 
@@ -29,15 +26,9 @@ public class AbstractContentProcessorTest {
 
   @Test
   public void testProcessItem() {
-    Context context = new TestContext();
     Item item = getMockedItem();
 
     TestContentProcessor processor = new TestContentProcessor();
-    try {
-      processor.configure(context);
-    } catch (MissingResourceException | BadConfigurationException e) {
-      fail("Test should not error here");
-    }
 
     processor.process(item);
     assertEquals(2, processor.getObservedContent().size());

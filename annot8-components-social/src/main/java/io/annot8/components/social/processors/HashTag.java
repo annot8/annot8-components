@@ -3,10 +3,10 @@ package io.annot8.components.social.processors;
 
 import java.util.regex.Pattern;
 
-import io.annot8.components.base.processors.AbstractRegex;
+import io.annot8.components.base.processors.AbstractRegexProcessor;
 import io.annot8.conventions.AnnotationTypes;
 
-public class HashTag extends AbstractRegex {
+public class HashTag extends AbstractRegexProcessor {
 
   public HashTag() {
     super(

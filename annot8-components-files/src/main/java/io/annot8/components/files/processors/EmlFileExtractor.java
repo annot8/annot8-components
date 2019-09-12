@@ -11,21 +11,15 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.io.CharStreams;
 
+import io.annot8.common.components.AbstractProcessor;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.InputStreamContent;
 import io.annot8.common.data.content.Text;
-import io.annot8.components.base.components.AbstractComponent;
-import io.annot8.core.capabilities.CreatesContent;
-import io.annot8.core.capabilities.ProcessesContent;
-import io.annot8.core.components.Processor;
 import io.annot8.core.components.responses.ProcessorResponse;
-import io.annot8.core.data.Content.Builder;
+import io.annot8.core.data.Content;
 import io.annot8.core.data.Item;
 
-@ProcessesContent(FileContent.class)
-@CreatesContent(Text.class)
-@CreatesContent(InputStreamContent.class)
-public class EmlFileExtractor extends AbstractComponent implements Processor {
+public class EmlFileExtractor extends AbstractProcessor {
 
   public static final String PROPERTY_PART_NAME = "name";
 
@@ -105,7 +99,7 @@ public class EmlFileExtractor extends AbstractComponent implements Processor {
         TextBody textBody = (TextBody) body;
         String text = CharStreams.toString(textBody.getReader());
 
-        Builder<Text, String> builder =
+        Content.Builder<Text, String> builder =
             item.createContent(Text.class)
                 .withData(text)
                 .withDescription("Email " + name)
@@ -119,7 +113,7 @@ public class EmlFileExtractor extends AbstractComponent implements Processor {
       } else if (body instanceof BinaryBody) {
         BinaryBody binaryBody = (BinaryBody) body;
 
-        Builder<InputStreamContent, InputStream> builder =
+        Content.Builder<InputStreamContent, InputStream> builder =
             item.createContent(InputStreamContent.class)
                 .withData(createSupplier(binaryBody.getInputStream()))
                 .withDescription("Email " + name)
@@ -153,7 +147,7 @@ public class EmlFileExtractor extends AbstractComponent implements Processor {
         return;
       }
 
-      Builder<InputStreamContent, InputStream> builder =
+      Content.Builder<InputStreamContent, InputStream> builder =
           item.createChild()
               .createContent(InputStreamContent.class)
               .withData(createSupplier(inputStream))
@@ -192,4 +186,15 @@ public class EmlFileExtractor extends AbstractComponent implements Processor {
 
     return () -> new ByteArrayInputStream(buffer.toByteArray());
   }
+
+  //  @Override
+  //  public Stream<ContentCapability> processesContent() {
+  //    return Stream.of(new ContentCapability(FileContent.class));
+  //  }
+  //
+  //  @Override
+  //  public Stream<ContentCapability> createsContent() {
+  //    return Stream.of(
+  //            new ContentCapability(Text.class), new ContentCapability(InputStreamContent.class));
+  //  }
 }
