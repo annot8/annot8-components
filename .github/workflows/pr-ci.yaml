@@ -13,8 +13,8 @@ jobs:
       - uses: actions/setup-java@v1
         with:
           java-version: '11'
-#       - run: mvn spotless:check
+      - run: mvn spotless:check
       - run: mvn -B clean org.jacoco:jacoco-maven-plugin:prepare-agent test
       - run: mvn -B jacoco:report 
-      - run: mvn -B sonar:sonar -Dsonar.projectKey=annot8_annot8-merged-components -Dsonar.organization=annot8 -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+      - run: mvn -B sonar:sonar -Dsonar.projectKey=annot8_annot8-components-merged -Dsonar.organization=annot8 -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }}
   
