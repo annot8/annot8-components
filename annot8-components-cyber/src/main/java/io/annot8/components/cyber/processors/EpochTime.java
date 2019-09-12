@@ -2,33 +2,32 @@
 package io.annot8.components.cyber.processors;
 
 import io.annot8.components.base.processors.AbstractRegexProcessor;
-import io.annot8.components.cyber.processors.EpochTime.EpochTimeSettings;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
 import io.annot8.core.annotations.Annotation.Builder;
-import io.annot8.core.exceptions.BadConfigurationException;
-import io.annot8.core.exceptions.MissingResourceException;
 import io.annot8.core.settings.Settings;
 
 import java.time.Instant;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class EpochTime extends AbstractRegexProcessor<EpochTimeSettings> {
+public class EpochTime extends AbstractRegexProcessor {
 
-  private EpochTimeSettings settings = new EpochTimeSettings();
+  private EpochTimeSettings settings;
 
   public EpochTime() {
+    this(new EpochTimeSettings());
+  }
+
+
+  public EpochTime(EpochTimeSettings settings) {
     super(
         Pattern.compile("\\b\\d+\\b", Pattern.CASE_INSENSITIVE),
         0,
         AnnotationTypes.ANNOTATION_TYPE_TIMESTAMP);
-  }
-
-  @Override
-  public void configure(EpochTimeSettings settings) throws BadConfigurationException, MissingResourceException {
     this.settings = settings;
   }
+
 
   @Override
   protected boolean acceptMatch(Matcher m) {

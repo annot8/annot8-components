@@ -215,19 +215,19 @@
             </goals>
             <configuration>
               <hooks>
-                <pre-commit>
-                  source ~/.bash_profile
-                  set -e
+<!--                <pre-commit>-->
+<!--                  source ~/.bash_profile-->
+<!--                  set -e-->
 
-                  REPO_ROOT_DIR="$(git rev-parse --show-toplevel)"
-                  cd $REPO_ROOT_DIR
+<!--                  REPO_ROOT_DIR="$(git rev-parse &#45;&#45;show-toplevel)"-->
+<!--                  cd $REPO_ROOT_DIR-->
 
-                  java_files=$(git diff --cached --name-only --diff-filter=ACMR | grep -Ei "\.java$" | paste -sd "," -)
-                  if [ ! -z "${java_files}" ]; then
-                  mvn spotless:apply
-                  git add "$java_files"
-                  fi
-                </pre-commit>
+<!--                  java_files=$(git diff &#45;&#45;cached &#45;&#45;name-only &#45;&#45;diff-filter=ACMR | grep -Ei "\.java$" | paste -sd "," -)-->
+<!--                  if [ ! -z "${java_files}" ]; then-->
+<!--                  mvn spotless:apply-->
+<!--                  git add "$java_files"-->
+<!--                  fi-->
+<!--                </pre-commit>-->
               </hooks>
             </configuration>
           </execution>
@@ -274,6 +274,11 @@
       <dependency>
         <groupId>io.annot8</groupId>
         <artifactId>annot8-common-pipelines</artifactId>
+        <version>${annot8.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.annot8</groupId>
+        <artifactId>annot8-common-components</artifactId>
         <version>${annot8.version}</version>
       </dependency>
       <dependency>
@@ -397,14 +402,14 @@
     <module>annot8-components-geo</module>
     <module>annot8-components-grouping</module>
     <module>annot8-components-image</module>
-    <module>annot8-components-mongo</module>
+<!--    <module>annot8-components-mongo</module>-->
     <module>annot8-components-monitor</module>
     <module>annot8-components-opennlp</module>
     <module>annot8-components-print</module>
     <module>annot8-components-properties</module>
     <module>annot8-components-quantities</module>
     <module>annot8-components-social</module>
-    <module>annot8-components-tesseract</module>
+<!--    <module>annot8-components-tesseract</module>-->
     <module>annot8-components-text</module>
 <!--    <module>annot8-components-tika</module>-->
     <module>annot8-components-translation</module>

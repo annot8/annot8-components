@@ -1,33 +1,20 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.properties.processors;
 
-import java.util.Optional;
-
-import io.annot8.components.base.components.AbstractComponent;
-import io.annot8.core.components.Processor;
+import io.annot8.common.components.AbstractComponent;
+import io.annot8.common.components.AbstractProcessor;
 import io.annot8.core.components.responses.ProcessorResponse;
-import io.annot8.core.context.Context;
 import io.annot8.core.data.Item;
 import io.annot8.core.exceptions.BadConfigurationException;
-import io.annot8.core.exceptions.MissingResourceException;
 import io.annot8.core.settings.Settings;
 
 /** Set a property on an item to a specified value, overwriting any existing value */
-public class Property extends AbstractComponent implements Processor {
+public class Property extends AbstractProcessor {
 
-  private PropertySettings propertySettings = null;
+  private final PropertySettings propertySettings ;
 
-  @Override
-  public void configure(Context context)
-      throws BadConfigurationException, MissingResourceException {
-    super.configure(context);
-
-    Optional<PropertySettings> opt = context.getSettings(PropertySettings.class);
-    if (!opt.isPresent()) {
-      throw new BadConfigurationException("Must provide a PropertySettings object");
-    }
-
-    this.propertySettings = opt.get();
+  public Property(PropertySettings propertySettings) {
+    this.propertySettings = propertySettings;
   }
 
   @Override

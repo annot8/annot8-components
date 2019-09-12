@@ -1,19 +1,15 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.files.processors;
 
+import io.annot8.common.components.AbstractProcessor;
+import io.annot8.common.data.content.FileContent;
+import io.annot8.common.data.content.Text;
+import io.annot8.core.components.responses.ProcessorResponse;
+import io.annot8.core.data.Item;
+
 import java.io.File;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.util.stream.Stream;
-
-import javax.annotation.processing.AbstractProcessor;
-
-import org.w3c.dom.Text;
-
-import io.annot8.common.data.content.FileContent;
-import io.annot8.core.capabilities.ContentCapability;
-import io.annot8.core.components.responses.ProcessorResponse;
-import io.annot8.core.data.Item;
 
 public class TxtFileExtractor extends AbstractProcessor {
 
@@ -47,13 +43,13 @@ public class TxtFileExtractor extends AbstractProcessor {
     return ProcessorResponse.ok();
   }
 
-  @Override
-  public Stream<ContentCapability> processesContent() {
-    return Stream.of(new ContentCapability(FileContent.class));
-  }
-
-  @Override
-  public Stream<ContentCapability> createsContent() {
-    return Stream.of(new ContentCapability(Text.class));
-  }
+//  @Override
+//  public Stream<ContentCapability> processesContent() {
+//    return Stream.of(new ContentCapability(FileContent.class));
+//  }
+//
+//  @Override
+//  public Stream<ContentCapability> createsContent() {
+//    return Stream.of(new ContentCapability(Text.class));
+//  }
 }

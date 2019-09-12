@@ -5,7 +5,6 @@ import java.util.Optional;
 
 import com.google.common.base.Strings;
 
-import io.annot8.components.base.components.AbstractComponent;
 import io.annot8.components.mongo.resources.Mongo;
 import io.annot8.components.mongo.resources.MongoConnection;
 import io.annot8.components.mongo.resources.MongoConnectionSettings;
@@ -25,10 +24,9 @@ import io.annot8.core.settings.SettingsClass;
  *
  * <p>Implement configure(context, connection) to set up using the best connection.
  */
-@SettingsClass(value = MongoSettings.class, optional = true)
-@SettingsClass(value = MongoConnectionSettings.class, optional = true)
-@UsesResource(value = Mongo.class, optional = true)
-@UsesResource(value = MongoFactory.class, optional = true)
+//@SettingsClass(value = MongoSettings.class, optional = true)
+//@SettingsClass(value = MongoConnectionSettings.class, optional = true)
+//@UsesResource(value = Mongo.class, optional = true)
 public abstract class AbstractMongoComponent extends AbstractComponent {
 
   private MongoConnection connection = null;

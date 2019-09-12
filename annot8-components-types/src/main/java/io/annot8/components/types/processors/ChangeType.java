@@ -1,41 +1,25 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.types.processors;
 
-import java.util.Optional;
-
-import io.annot8.components.base.components.AbstractComponent;
-import io.annot8.components.types.processors.ChangeType.ChangeTypeSettings;
+import io.annot8.common.components.AbstractComponent;
 import io.annot8.core.components.Processor;
 import io.annot8.core.components.responses.ProcessorResponse;
-import io.annot8.core.context.Context;
 import io.annot8.core.data.Item;
-import io.annot8.core.exceptions.BadConfigurationException;
 import io.annot8.core.exceptions.IncompleteException;
-import io.annot8.core.exceptions.MissingResourceException;
 import io.annot8.core.settings.Settings;
-import io.annot8.core.settings.SettingsClass;
 
 /**
  * Create a duplicate annotation but with a different type. The original annotation can optionally
  * be deleted or retained.
  */
-@SettingsClass(ChangeTypeSettings.class)
 public class ChangeType extends AbstractComponent implements Processor {
 
-  private ChangeTypeSettings changeTypeSettings = null;
+  private ChangeTypeSettings changeTypeSettings;
 
-  @Override
-  public void configure(Context context)
-      throws BadConfigurationException, MissingResourceException {
-    super.configure(context);
-
-    Optional<ChangeTypeSettings> opt = context.getSettings(ChangeTypeSettings.class);
-    if (!opt.isPresent()) {
-      throw new BadConfigurationException("Must provide a ChangeTypeSettings object");
-    }
-
-    this.changeTypeSettings = opt.get();
+  public ChangeType(ChangeTypeSettings settings) {
+    this.changeTypeSettings = settings;
   }
+
 
   @Override
   public ProcessorResponse process(Item item) {

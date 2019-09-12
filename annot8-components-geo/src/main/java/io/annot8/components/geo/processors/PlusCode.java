@@ -8,14 +8,14 @@ import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
 import io.annot8.core.annotations.Annotation.Builder;
 import io.annot8.core.components.annotations.ComponentDescription;
-import io.annot8.core.settings.NoSettings;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /** Extracts full global Plus Codes (also known as Open Location Codes) from text */
-@ComponentDescription("Extracts full global Plus Codes (also known as Open Location Codes) from text")
-public class PlusCode extends AbstractRegexProcessor<NoSettings> {
+@ComponentDescription(
+    "Extracts full global Plus Codes (also known as Open Location Codes) from text")
+public class PlusCode extends AbstractRegexProcessor {
 
   public PlusCode() {
     super(

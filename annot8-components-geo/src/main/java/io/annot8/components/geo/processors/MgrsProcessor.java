@@ -1,3 +1,4 @@
+/* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.geo.processors;
 
 import io.annot8.common.data.bounds.SpanBounds;
@@ -22,7 +23,7 @@ public class MgrsProcessor extends AbstractTextProcessor {
 
   private final MgrsSettings settings;
 
-  public MgrsProcessor(MgrsSettings settings){
+  public MgrsProcessor(MgrsSettings settings) {
     this.settings = settings;
   }
 

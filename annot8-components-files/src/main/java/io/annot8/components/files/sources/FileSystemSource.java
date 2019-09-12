@@ -1,8 +1,10 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.files.sources;
 
-import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
-import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
+import io.annot8.core.components.responses.SourceResponse;
+import io.annot8.core.data.ItemFactory;
+import io.annot8.core.exceptions.Annot8RuntimeException;
+import io.annot8.core.exceptions.BadConfigurationException;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,12 +15,8 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import io.annot8.core.components.responses.SourceResponse;
-import io.annot8.core.context.Context;
-import io.annot8.core.data.ItemFactory;
-import io.annot8.core.exceptions.Annot8RuntimeException;
-import io.annot8.core.exceptions.BadConfigurationException;
-import io.annot8.core.exceptions.MissingResourceException;
+import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
+import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 
 public class FileSystemSource extends AbstractFileSystemSource {
 
@@ -28,18 +26,16 @@ public class FileSystemSource extends AbstractFileSystemSource {
 
   private final Set<Path> initialFiles = new HashSet<>();
 
-  public FileSystemSource() {
+  public FileSystemSource(FileSystemSourceSettings settings) {
+    super(settings);
+
     try {
       watchService = FileSystems.getDefault().newWatchService();
     } catch (IOException e) {
       throw new Annot8RuntimeException("Unable to initialize WatchService", e);
     }
-  }
 
-  @Override
-  public void configure(final Context context)
-      throws BadConfigurationException, MissingResourceException {
-    super.configure(context);
+    // TODO: This probably shouldnt' happen in the constructor bu ton the first read()
 
     // Unregister existing watchers
     watchKeys.forEach(WatchKey::cancel);

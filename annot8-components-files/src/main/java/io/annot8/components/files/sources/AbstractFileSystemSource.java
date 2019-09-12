@@ -1,51 +1,37 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.files.sources;
 
+import io.annot8.common.components.AbstractComponent;
+import io.annot8.common.data.content.FileContent;
+import io.annot8.conventions.PropertyKeys;
+import io.annot8.core.components.Source;
+import io.annot8.core.data.Item;
+import io.annot8.core.data.ItemFactory;
+
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.Collections;
-import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import io.annot8.common.data.content.FileContent;
-import io.annot8.components.base.components.AbstractComponent;
-import io.annot8.conventions.PropertyKeys;
-import io.annot8.core.capabilities.CreatesContent;
-import io.annot8.core.components.Source;
-import io.annot8.core.context.Context;
-import io.annot8.core.data.Item;
-import io.annot8.core.data.ItemFactory;
-import io.annot8.core.exceptions.BadConfigurationException;
-import io.annot8.core.exceptions.MissingResourceException;
-
-@CreatesContent(FileContent.class)
+//@CreatesContent(FileContent.class)
 public abstract class AbstractFileSystemSource extends AbstractComponent implements Source {
 
   private Set<Pattern> acceptedFilePatterns = Collections.emptySet();
-
   private FileSystemSourceSettings settings;
 
-  @Override
-  public void configure(Context context)
-      throws BadConfigurationException, MissingResourceException {
-    final Optional<FileSystemSourceSettings> optional =
-        context.getSettings(FileSystemSourceSettings.class);
 
-    if (!optional.isPresent()) {
-      throw new BadConfigurationException("File system settings are invalid");
-    }
-
-    settings = optional.get();
+  AbstractFileSystemSource(FileSystemSourceSettings settings) {
     acceptedFilePatterns = settings.getAcceptedFileNamePatterns();
+    this.settings = settings;
   }
 
-  public FileSystemSourceSettings getSettings() {
+  protected FileSystemSourceSettings getSettings() {
     return settings;
   }
 
-  public Set<Pattern> getAcceptedFilePatterns() {
+  protected Set<Pattern> getAcceptedFilePatterns() {
     return acceptedFilePatterns;
   }
 

@@ -1,9 +1,11 @@
+/* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.base.processors;
 
-import com.google.common.base.Strings;
-import io.annot8.core.settings.Settings;
-
 import java.util.regex.Pattern;
+
+import com.google.common.base.Strings;
+
+import io.annot8.core.settings.Settings;
 
 public class RegexSettings implements Settings {
   private final Pattern regex;

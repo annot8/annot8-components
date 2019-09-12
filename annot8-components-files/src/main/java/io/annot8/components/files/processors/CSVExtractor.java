@@ -1,39 +1,28 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.files.processors;
 
-import java.io.File;
-import java.util.MissingResourceException;
-import java.util.stream.Stream;
-
-import javax.annotation.processing.AbstractProcessor;
-
+import io.annot8.common.components.AbstractProcessor;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.TableContent;
 import io.annot8.components.files.content.CSVTable;
-import io.annot8.core.capabilities.ContentCapability;
 import io.annot8.core.components.responses.ProcessorResponse;
 import io.annot8.core.data.Item;
-import io.annot8.core.exceptions.BadConfigurationException;
 import io.annot8.core.exceptions.IncompleteException;
 import io.annot8.core.exceptions.UnsupportedContentException;
 
-public class CSVExtractor extends AbstractProcessor<CSVExtractorSettings> {
+import java.io.File;
+
+public class CSVExtractor extends AbstractProcessor {
 
   public static final String CSV_TABLE = "CSV_TABLE";
   public static final String PROPERTY_FILE = "file";
 
-  private CSVExtractorSettings settings;
+  private final CSVExtractorSettings settings;
 
-  @Override
-  public void configure(CSVExtractorSettings settings)
-      throws BadConfigurationException, MissingResourceException {
-
-    if(settings == null){
-      this.settings = new CSVExtractorSettings(false);
-    }else{
-      this.settings = settings;
-    }
+  public CSVExtractor(CSVExtractorSettings settings) {
+    this.settings = settings;
   }
+
 
   @Override
   public ProcessorResponse process(Item item) {
@@ -55,13 +44,13 @@ public class CSVExtractor extends AbstractProcessor<CSVExtractorSettings> {
     }
   }
 
-  @Override
-  public Stream<ContentCapability> processesContent() {
-    return Stream.of(new ContentCapability(FileContent.class));
-  }
-
-  @Override
-  public Stream<ContentCapability> createsContent() {
-    return Stream.of(new ContentCapability(TableContent.class));
-  }
+//  @Override
+//  public Stream<ContentCapability> processesContent() {
+//    return Stream.of(new ContentCapability(FileContent.class));
+//  }
+//
+//  @Override
+//  public Stream<ContentCapability> createsContent() {
+//    return Stream.of(new ContentCapability(TableContent.class));
+//  }
 }

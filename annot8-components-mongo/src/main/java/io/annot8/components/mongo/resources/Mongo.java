@@ -9,12 +9,12 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
-import io.annot8.components.base.components.AbstractResource;
+import io.annot8.common.components.AbstractComponent;
 import io.annot8.core.context.Context;
 import io.annot8.core.exceptions.BadConfigurationException;
 import io.annot8.core.exceptions.MissingResourceException;
 
-public class Mongo extends AbstractResource implements MongoConnection {
+public class Mongo extends AbstractComponent implements MongoConnection, Resource {
 
   private MongoClient client;
   private MongoDatabase database;

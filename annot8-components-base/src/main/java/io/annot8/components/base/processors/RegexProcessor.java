@@ -5,10 +5,6 @@ import java.util.regex.Pattern;
 
 public class RegexProcessor extends AbstractRegexProcessor {
 
-  public RegexProcessor() {
-    // Do nothing
-  }
-
   public RegexProcessor(Pattern pattern, int group, String type) {
     this.pattern = pattern;
     this.group = group;

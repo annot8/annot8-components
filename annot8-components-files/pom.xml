@@ -19,6 +19,11 @@
       <artifactId>annot8-components-base</artifactId>
       <version>0.4.0-SNAPSHOT</version>
     </dependency>
+    <dependency>
+      <groupId>io.annot8</groupId>
+      <artifactId>annot8-common-components</artifactId>
+      <version>0.4.0-SNAPSHOT</version>
+    </dependency>
 
     <dependency>
       <groupId>com.google.guava</groupId>

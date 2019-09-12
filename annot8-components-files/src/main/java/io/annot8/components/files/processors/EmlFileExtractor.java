@@ -1,29 +1,21 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.files.processors;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
-import java.util.function.Supplier;
-import java.util.stream.Stream;
-
-import javax.annotation.processing.AbstractProcessor;
-
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.io.CharStreams;
-
-import org.apache.james.mime4j.dom.*;
-import org.w3c.dom.Text;
-
+import io.annot8.common.components.AbstractProcessor;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.InputStreamContent;
-import io.annot8.core.capabilities.ContentCapability;
+import io.annot8.common.data.content.Text;
 import io.annot8.core.components.responses.ProcessorResponse;
+import io.annot8.core.data.Content;
 import io.annot8.core.data.Item;
+import org.apache.james.mime4j.dom.*;
+
+import java.io.*;
+import java.util.List;
+import java.util.function.Supplier;
 
 public class EmlFileExtractor extends AbstractProcessor {
 
@@ -76,15 +68,7 @@ public class EmlFileExtractor extends AbstractProcessor {
         .ok(); // TODO: If we weren't able to process successfully, should return an error!
   }
 
-  @Override
-  public Stream<ContentCapability> processesContent() {
-    return Stream.of(new ContentCapability(FileContent.class));
-  }
 
-  @Override
-  public Stream<ContentCapability> createsContent() {
-    return Stream.of(new ContentCapability(Text.class), new ContentCapability(InputStreamContent.class));
-  }
 
   private void processMultipart(Item item, Multipart multipart, String baseName) {
     int bodyCount = 0;
@@ -115,7 +99,7 @@ public class EmlFileExtractor extends AbstractProcessor {
         TextBody textBody = (TextBody) body;
         String text = CharStreams.toString(textBody.getReader());
 
-        Builder<Text, String> builder =
+        Content.Builder<Text, String> builder =
             item.createContent(Text.class)
                 .withData(text)
                 .withDescription("Email " + name)
@@ -129,7 +113,7 @@ public class EmlFileExtractor extends AbstractProcessor {
       } else if (body instanceof BinaryBody) {
         BinaryBody binaryBody = (BinaryBody) body;
 
-        Builder<InputStreamContent, InputStream> builder =
+        Content.Builder<InputStreamContent, InputStream> builder =
             item.createContent(InputStreamContent.class)
                 .withData(createSupplier(binaryBody.getInputStream()))
                 .withDescription("Email " + name)
@@ -163,7 +147,7 @@ public class EmlFileExtractor extends AbstractProcessor {
         return;
       }
 
-      Builder<InputStreamContent, InputStream> builder =
+      Content.Builder<InputStreamContent, InputStream> builder =
           item.createChild()
               .createContent(InputStreamContent.class)
               .withData(createSupplier(inputStream))
@@ -202,4 +186,15 @@ public class EmlFileExtractor extends AbstractProcessor {
 
     return () -> new ByteArrayInputStream(buffer.toByteArray());
   }
+
+//  @Override
+//  public Stream<ContentCapability> processesContent() {
+//    return Stream.of(new ContentCapability(FileContent.class));
+//  }
+//
+//  @Override
+//  public Stream<ContentCapability> createsContent() {
+//    return Stream.of(
+//            new ContentCapability(Text.class), new ContentCapability(InputStreamContent.class));
+//  }
 }

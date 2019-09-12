@@ -1,38 +1,28 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.opennlp.processors;
 
-import java.io.IOException;
-import java.util.Map;
-import java.util.MissingResourceException;
-import java.util.stream.Stream;
-
-import org.w3c.dom.Text;
-
 import io.annot8.common.data.bounds.SpanBounds;
-import io.annot8.common.utils.java.StreamUtils;
+import io.annot8.common.data.content.Text;
 import io.annot8.components.base.processors.AbstractTextProcessor;
 import io.annot8.conventions.AnnotationTypes;
-import io.annot8.core.capabilities.AnnotationCapability;
 import io.annot8.core.components.annotations.ComponentDescription;
 import io.annot8.core.exceptions.BadConfigurationException;
-import jdk.internal.loader.Resource;
 import opennlp.tools.sentdetect.SentenceDetectorME;
 import opennlp.tools.sentdetect.SentenceModel;
 import opennlp.tools.tokenize.TokenizerME;
 import opennlp.tools.tokenize.TokenizerModel;
 import opennlp.tools.util.Span;
 
+import java.io.IOException;
+
 /** Tokenizes words and sentences using OpenNLP tokenization models */
 @ComponentDescription("Tokenizes words and sentences using OpenNLP tokenization models")
-public class Tokenizer extends AbstractTextProcessor<NoSettings> {
+public class Tokenizer extends AbstractTextProcessor {
 
   private SentenceDetectorME sentenceDetector;
   private TokenizerME wordTokenizer;
 
-  @Override
-  public void configure(NoSettings settings, Map<String, Resource> resources)
-      throws BadConfigurationException, MissingResourceException {
-
+  public Tokenizer() {
     // TODO: Allow users to provide their own models
     SentenceModel sentenceModel;
     try {
@@ -85,11 +75,11 @@ public class Tokenizer extends AbstractTextProcessor<NoSettings> {
     wordTokenizer = null;
   }
 
-  @Override
-  public Stream<AnnotationCapability> createsAnnotations() {
-    return StreamUtils.append(super.createsAnnotations(),
-        new AnnotationCapability(AnnotationTypes.ANNOTATION_TYPE_SENTENCE, SpanBounds.class),
-        new AnnotationCapability(AnnotationTypes.ANNOTATION_TYPE_WORDTOKEN, SpanBounds.class));
-  }
-
+//  @Override
+//  public Stream<AnnotationCapability> createsAnnotations() {
+//    return StreamUtils.append(
+//        super.createsAnnotations(),
+//        new AnnotationCapability(AnnotationTypes.ANNOTATION_TYPE_SENTENCE, SpanBounds.class),
+//        new AnnotationCapability(AnnotationTypes.ANNOTATION_TYPE_WORDTOKEN, SpanBounds.class));
+//  }
 }

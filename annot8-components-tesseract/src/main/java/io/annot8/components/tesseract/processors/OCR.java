@@ -12,7 +12,6 @@ import org.apache.commons.io.FilenameUtils;
 
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.Text;
-import io.annot8.components.base.components.AbstractComponent;
 import io.annot8.components.tesseract.processors.settings.TesseractSettings;
 import io.annot8.core.capabilities.CreatesContent;
 import io.annot8.core.capabilities.ProcessesContent;

@@ -1,20 +1,16 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.grouping.processors;
 
-import java.util.Optional;
-import java.util.stream.Stream;
-
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
-
-import org.w3c.dom.Text;
-
-import io.annot8.common.data.bounds.SpanBounds;
+import io.annot8.common.data.content.Text;
 import io.annot8.components.base.processors.AbstractTextProcessor;
-import io.annot8.core.capabilities.AnnotationCapability;
-import io.annot8.core.capabilities.GroupCapability;
+import io.annot8.core.annotations.Annotation;
+import io.annot8.core.annotations.Group;
 import io.annot8.core.exceptions.IncompleteException;
 import io.annot8.core.stores.GroupStore;
+
+import java.util.Optional;
 
 public class GroupByTypeAndValueAnnotator extends AbstractTextProcessor {
 
@@ -64,13 +60,13 @@ public class GroupByTypeAndValueAnnotator extends AbstractTextProcessor {
     return type + ":" + covered;
   }
 
-  @Override
-  public Stream<AnnotationCapability> processesAnnotations() {
-    return Stream.of(new AnnotationCapability(AnnotationCapability.ANY_TYPE, SpanBounds.class));
-  }
-
-  @Override
-  public Stream<GroupCapability> createsGroups() {
-    return Stream.of(new GroupCapability(GroupByTypeAndValueAnnotator.TYPE));
-  }
+//  @Override
+//  public Stream<AnnotationCapability> processesAnnotations() {
+//    return Stream.of(new AnnotationCapability(AnnotationCapability.ANY_TYPE, SpanBounds.class));
+//  }
+//
+//  @Override
+//  public Stream<GroupCapability> createsGroups() {
+//    return Stream.of(new GroupCapability(GroupByTypeAndValueAnnotator.TYPE));
+//  }
 }

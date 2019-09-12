@@ -1,22 +1,22 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.base.processors;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.MissingResourceException;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mockito.stubbing.Answer;
-import org.w3c.dom.Text;
 
+import io.annot8.common.data.content.Text;
+import io.annot8.core.data.Content;
 import io.annot8.core.data.Item;
-import io.annot8.core.exceptions.BadConfigurationException;
 import io.annot8.core.exceptions.ProcessingException;
 
 public class AbstractContentProcessorTest {
@@ -29,11 +29,6 @@ public class AbstractContentProcessorTest {
     Item item = getMockedItem();
 
     TestContentProcessor processor = new TestContentProcessor();
-    try {
-      processor.configure(NoSettings.getInstance());
-    } catch (MissingResourceException | BadConfigurationException e) {
-      fail("Test should not error here");
-    }
 
     processor.process(item);
     assertEquals(2, processor.getObservedContent().size());
@@ -75,7 +70,7 @@ public class AbstractContentProcessorTest {
     return invocation -> Stream.of(content);
   }
 
-  private class TestContentProcessor extends AbstractContentProcessor<Text, NoSettings> {
+  private class TestContentProcessor extends AbstractContentProcessor<Text> {
 
     private final List<String> observedContent = new ArrayList<>();
 
@@ -100,7 +95,7 @@ public class AbstractContentProcessorTest {
     }
   }
 
-  private class ErrorContentProcessor extends AbstractContentProcessor<Text, NoSettings> {
+  private class ErrorContentProcessor extends AbstractContentProcessor<Text> {
 
     public ErrorContentProcessor() {
       super(Text.class);
