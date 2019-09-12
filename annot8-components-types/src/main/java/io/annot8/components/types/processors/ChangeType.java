@@ -1,6 +1,8 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.types.processors;
 
+import java.util.Optional;
+
 import io.annot8.components.base.components.AbstractComponent;
 import io.annot8.components.types.processors.ChangeType.ChangeTypeSettings;
 import io.annot8.core.components.Processor;
@@ -12,8 +14,6 @@ import io.annot8.core.exceptions.IncompleteException;
 import io.annot8.core.exceptions.MissingResourceException;
 import io.annot8.core.settings.Settings;
 import io.annot8.core.settings.SettingsClass;
-
-import java.util.Optional;
 
 /**
  * Create a duplicate annotation but with a different type. The original annotation can optionally
@@ -38,7 +38,7 @@ public class ChangeType extends AbstractComponent implements Processor {
   }
 
   @Override
-  public ProcessorResponse process(Item item)  {
+  public ProcessorResponse process(Item item) {
     item.getContents()
         .forEach(
             c -> {

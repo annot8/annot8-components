@@ -1,6 +1,12 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.geo.processors;
 
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.opensextant.geodesy.MGRS;
+
 import io.annot8.common.data.bounds.SpanBounds;
 import io.annot8.common.data.content.Text;
 import io.annot8.components.base.processors.AbstractTextProcessor;
@@ -12,11 +18,6 @@ import io.annot8.core.exceptions.BadConfigurationException;
 import io.annot8.core.exceptions.MissingResourceException;
 import io.annot8.core.settings.Settings;
 import io.annot8.core.settings.SettingsClass;
-import org.opensextant.geodesy.MGRS;
-
-import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /** Extract MGRS coordinates, optionally ignoring MGRS coordinates that could be dates */
 @CreatesAnnotation(value = AnnotationTypes.ANNOTATION_TYPE_COORDINATE, bounds = SpanBounds.class)

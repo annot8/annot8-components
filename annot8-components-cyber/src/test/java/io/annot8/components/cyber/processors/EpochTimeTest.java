@@ -1,6 +1,13 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.cyber.processors;
 
+import java.time.Instant;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
 import io.annot8.common.data.content.Text;
 import io.annot8.components.cyber.processors.EpochTime.EpochTimeSettings;
 import io.annot8.conventions.AnnotationTypes;
@@ -14,12 +21,6 @@ import io.annot8.core.stores.AnnotationStore;
 import io.annot8.testing.testimpl.TestContext;
 import io.annot8.testing.testimpl.TestItem;
 import io.annot8.testing.testimpl.content.TestStringContent;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
-import java.time.Instant;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class EpochTimeTest {
 
@@ -72,9 +73,7 @@ public class EpochTimeTest {
       p.configure(context);
 
       Text content =
-          item.createContent(TestStringContent.class)
-              .withData("It happened at 1507725753")
-              .save();
+          item.createContent(TestStringContent.class).withData("It happened at 1507725753").save();
 
       p.process(item);
 
@@ -108,9 +107,7 @@ public class EpochTimeTest {
       p.configure(context);
 
       Text content =
-          item.createContent(TestStringContent.class)
-              .withData("It happened at 1507725753")
-              .save();
+          item.createContent(TestStringContent.class).withData("It happened at 1507725753").save();
 
       p.process(item);
 
@@ -135,9 +132,7 @@ public class EpochTimeTest {
       p.configure(context);
 
       Text content =
-          item.createContent(TestStringContent.class)
-              .withData("It happened at 1507725753")
-              .save();
+          item.createContent(TestStringContent.class).withData("It happened at 1507725753").save();
 
       p.process(item);
 

@@ -1,7 +1,18 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.mongo.sinks;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.*;
+
+import java.util.Collections;
+
+import org.bson.Document;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+
 import com.mongodb.client.MongoCollection;
+
 import io.annot8.common.data.content.Text;
 import io.annot8.components.mongo.resources.MongoConnection;
 import io.annot8.core.annotations.Annotation;
@@ -13,15 +24,6 @@ import io.annot8.testing.testimpl.TestAnnotationStore;
 import io.annot8.testing.testimpl.TestContext;
 import io.annot8.testing.testimpl.TestItem;
 import io.annot8.testing.testimpl.TestProperties;
-import org.bson.Document;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
-import java.util.Collections;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.*;
 
 public class NestedItemSinkTest extends AbstractSinkTest {
 
@@ -69,6 +71,4 @@ public class NestedItemSinkTest extends AbstractSinkTest {
     assertEquals(Status.ITEM_ERROR, processResponse.getStatus());
     Mockito.verify(collection, times(0)).insertOne(Mockito.any());
   }
-
-
 }

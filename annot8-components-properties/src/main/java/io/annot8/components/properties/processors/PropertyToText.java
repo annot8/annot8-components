@@ -1,6 +1,9 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.properties.processors;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import io.annot8.common.data.content.Text;
 import io.annot8.components.base.components.AbstractComponent;
 import io.annot8.components.properties.processors.PropertyToText.PropertyToTextSettings;
@@ -15,9 +18,6 @@ import io.annot8.core.exceptions.MissingResourceException;
 import io.annot8.core.exceptions.UnsupportedContentException;
 import io.annot8.core.settings.Settings;
 import io.annot8.core.settings.SettingsClass;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Convert properties on an item to separate Text content so they can be processed. The toString()
@@ -40,10 +40,7 @@ public class PropertyToText extends AbstractComponent implements Processor {
 
   @Override
   public ProcessorResponse process(Item item) {
-    item.getProperties()
-        .getAll()
-        .entrySet()
-        .stream()
+    item.getProperties().getAll().entrySet().stream()
         .filter(e -> !settings.getBlacklist().contains(e.getKey())) // Key must not be on blacklist
         .filter(
             e ->

@@ -73,9 +73,7 @@ public class DatabaseTable implements Table {
   @Override
   public Optional<List<String>> getColumnNames() {
     List<String> names =
-        tableMetadata
-            .getColumns()
-            .stream()
+        tableMetadata.getColumns().stream()
             .map(ColumnMetadata::getName)
             .collect(Collectors.toList());
 

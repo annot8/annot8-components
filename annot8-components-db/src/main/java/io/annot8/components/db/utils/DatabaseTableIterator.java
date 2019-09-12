@@ -27,9 +27,7 @@ public class DatabaseTableIterator implements Iterator<Row> {
     this.resultSet = set;
     this.metadata = metadata;
     columnNames =
-        this.metadata
-            .getColumns()
-            .stream()
+        this.metadata.getColumns().stream()
             .map(ColumnMetadata::getName)
             .collect(Collectors.toList());
   }

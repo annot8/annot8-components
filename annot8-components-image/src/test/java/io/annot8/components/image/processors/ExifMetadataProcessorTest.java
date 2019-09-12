@@ -1,18 +1,9 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.image.processors;
 
-import com.drew.lang.GeoLocation;
-import io.annot8.common.data.content.FileContent;
-import io.annot8.core.annotations.Annotation;
-import io.annot8.core.components.responses.ProcessorResponse;
-import io.annot8.core.components.responses.ProcessorResponse.Status;
-import io.annot8.core.data.Item;
-import io.annot8.core.stores.AnnotationStore;
-import io.annot8.testing.testimpl.TestAnnotationStore;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.net.URISyntaxException;
@@ -22,9 +13,20 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.when;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+
+import com.drew.lang.GeoLocation;
+
+import io.annot8.common.data.content.FileContent;
+import io.annot8.core.annotations.Annotation;
+import io.annot8.core.components.responses.ProcessorResponse;
+import io.annot8.core.components.responses.ProcessorResponse.Status;
+import io.annot8.core.data.Item;
+import io.annot8.core.stores.AnnotationStore;
+import io.annot8.testing.testimpl.TestAnnotationStore;
 
 public class ExifMetadataProcessorTest {
 

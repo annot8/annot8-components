@@ -1,6 +1,8 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.text.processors;
 
+import static io.annot8.components.text.processors.Capitalise.TextCase.UPPERCASE;
+
 import io.annot8.common.data.content.Text;
 import io.annot8.components.base.processors.AbstractTextProcessor;
 import io.annot8.components.text.processors.Capitalise.CapitaliseSettings;
@@ -11,8 +13,6 @@ import io.annot8.core.exceptions.BadConfigurationException;
 import io.annot8.core.exceptions.MissingResourceException;
 import io.annot8.core.settings.Settings;
 import io.annot8.core.settings.SettingsClass;
-
-import static io.annot8.components.text.processors.Capitalise.TextCase.UPPERCASE;
 
 @CreatesContent(Text.class)
 @SettingsClass(CapitaliseSettings.class)
@@ -29,7 +29,7 @@ public class Capitalise extends AbstractTextProcessor {
   }
 
   @Override
-  protected void process(Text content)  {
+  protected void process(Text content) {
     Item item = content.getItem();
 
     switch (settings.getTextCase()) {
@@ -41,7 +41,7 @@ public class Capitalise extends AbstractTextProcessor {
         break;
       case LOWERCASE:
         item.createContent(Text.class)
-                .withDescription(String.format("Lower cased content[%s]", content.getId()))
+            .withDescription(String.format("Lower cased content[%s]", content.getId()))
             .withData(content.getData().toLowerCase())
             .save();
         break;

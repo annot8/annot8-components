@@ -2,30 +2,25 @@
 package io.annot8.components.base.processors;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Stream;
 
-import io.annot8.common.data.content.Text;
-import io.annot8.core.exceptions.ProcessingException;
-import io.annot8.testing.testimpl.TestContext;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
+import io.annot8.common.data.content.Text;
 import io.annot8.core.context.Context;
 import io.annot8.core.data.Content;
 import io.annot8.core.data.Item;
-import io.annot8.core.exceptions.Annot8Exception;
 import io.annot8.core.exceptions.BadConfigurationException;
 import io.annot8.core.exceptions.MissingResourceException;
+import io.annot8.core.exceptions.ProcessingException;
+import io.annot8.testing.testimpl.TestContext;
 
 public class AbstractContentProcessorTest {
 
@@ -48,7 +43,6 @@ public class AbstractContentProcessorTest {
     assertEquals(2, processor.getObservedContent().size());
     assertEquals(SHOULD_PROCESS, processor.getObservedContent().get(0));
     assertEquals(NOT_PROCESS, processor.getObservedContent().get(1));
-
   }
 
   @Test
@@ -60,7 +54,6 @@ public class AbstractContentProcessorTest {
     assertEquals(1, observedContent.size());
     assertEquals(SHOULD_PROCESS, observedContent.get(0));
   }
-
 
   @Test
   public void testProcessingError() {
@@ -118,7 +111,7 @@ public class AbstractContentProcessorTest {
     }
 
     @Override
-    protected void process(Text content)  {
+    protected void process(Text content) {
       throw new ProcessingException("Test throws error");
     }
   }

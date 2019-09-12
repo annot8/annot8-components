@@ -1,8 +1,15 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.mongo.sinks;
 
+import java.util.Collection;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.bson.Document;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mongodb.client.MongoCollection;
+
 import io.annot8.components.mongo.data.AnnotationDto;
 import io.annot8.components.mongo.data.ContentDto;
 import io.annot8.components.mongo.data.ItemDto;
@@ -11,11 +18,6 @@ import io.annot8.core.annotations.Annotation;
 import io.annot8.core.data.Content;
 import io.annot8.core.data.Item;
 import io.annot8.core.exceptions.Annot8Exception;
-import org.bson.Document;
-
-import java.util.Collection;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class NestedItemSink extends AbstractMongoSink {
 

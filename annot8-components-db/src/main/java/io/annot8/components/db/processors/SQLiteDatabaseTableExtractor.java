@@ -1,6 +1,11 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.db.processors;
 
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import io.annot8.common.data.content.ColumnMetadata;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.TableContent;
@@ -14,11 +19,6 @@ import io.annot8.core.components.responses.ProcessorResponse;
 import io.annot8.core.data.Item;
 import io.annot8.core.exceptions.IncompleteException;
 import io.annot8.core.exceptions.UnsupportedContentException;
-
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 @ProcessesContent(FileContent.class)
 @CreatesContent(TableContent.class)
@@ -45,8 +45,7 @@ public class SQLiteDatabaseTableExtractor extends AbstractComponent implements P
     JDBCSettings settings = getConnectionSettings(sqliteFile);
     List<TableMetadata> tables = getTables(settings);
 
-    return tables
-        .stream()
+    return tables.stream()
         .map(t -> createDatabaseTable(item, t, settings))
         .reduce(true, (a, b) -> a && b);
   }

@@ -1,6 +1,10 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.text.processors;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import org.junit.jupiter.api.Test;
+
 import io.annot8.common.data.content.Text;
 import io.annot8.components.text.processors.Capitalise.CapitaliseSettings;
 import io.annot8.components.text.processors.Capitalise.TextCase;
@@ -10,9 +14,6 @@ import io.annot8.core.settings.Settings;
 import io.annot8.testing.testimpl.TestContext;
 import io.annot8.testing.testimpl.TestItem;
 import io.annot8.testing.testimpl.content.TestStringContent;
-import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class CapitaliseTest {
 
@@ -25,8 +26,7 @@ public class CapitaliseTest {
 
     capitalise.process(item);
 
-    assertThat(item.getContents(Text.class).map(Text::getData))
-            .anyMatch(s -> s.equals("TEST"));
+    assertThat(item.getContents(Text.class).map(Text::getData)).anyMatch(s -> s.equals("TEST"));
   }
 
   @Test
@@ -44,8 +44,6 @@ public class CapitaliseTest {
 
     capitalise.process(item);
 
-    assertThat(item.getContents(Text.class)
-            .map(Text::getData))
-            .anyMatch(s -> s.equals("test"));
+    assertThat(item.getContents(Text.class).map(Text::getData)).anyMatch(s -> s.equals("test"));
   }
 }
