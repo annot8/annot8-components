@@ -3,7 +3,7 @@ package io.annot8.components.geo.processors;
 
 import com.google.openlocationcode.OpenLocationCode;
 import com.google.openlocationcode.OpenLocationCode.CodeArea;
-import io.annot8.components.base.processors.AbstractRegex;
+import io.annot8.components.base.processors.AbstractRegexProcessor;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
 import io.annot8.core.annotations.Annotation.Builder;
@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 
 /** Extracts full global Plus Codes (also known as Open Location Codes) from text */
 @ComponentDescription("Extracts full global Plus Codes (also known as Open Location Codes) from text")
-public class PlusCode extends AbstractRegex<NoSettings> {
+public class PlusCode extends AbstractRegexProcessor<NoSettings> {
 
   public PlusCode() {
     super(

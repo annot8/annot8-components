@@ -11,7 +11,7 @@ import io.annot8.core.components.responses.ProcessorResponse.Status;
 import io.annot8.core.data.Item;
 import io.annot8.core.exceptions.Annot8RuntimeException;
 
-public class AbstractFilterTest {
+public class AbstractFilterProcessorTest {
 
   @Test
   public void testFilterItems() {
@@ -29,7 +29,7 @@ public class AbstractFilterTest {
     assertEquals(ProcessorResponse.Status.ITEM_ERROR, response.getStatus());
   }
 
-  private class FilterAll extends AbstractFilter {
+  private class FilterAll extends AbstractFilterProcessor {
 
     @Override
     protected boolean filter(Item item) {
@@ -37,7 +37,7 @@ public class AbstractFilterTest {
     }
   }
 
-  private class FilterError extends AbstractFilter {
+  private class FilterError extends AbstractFilterProcessor {
 
     @Override
     protected boolean filter(Item item) {

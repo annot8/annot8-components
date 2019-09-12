@@ -5,7 +5,7 @@ import io.annot8.common.data.content.Text;
 import io.annot8.core.settings.Settings;
 
 /** Base class for Text processors */
-public abstract class AbstractTextProcessor<S extends Settings> extends AbstractContentProcessor<Text, S> {
+public abstract class AbstractTextProcessor extends AbstractContentProcessor<Text> {
 
   protected AbstractTextProcessor() {
     super(Text.class);

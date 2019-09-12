@@ -6,6 +6,7 @@ open module io.annot8.components.geo {
   requires openlocationcode;
   requires geodesy;
   requires io.annot8.common.utils;
+  requires java.json.bind;
 
   exports io.annot8.components.geo.processors;
 }

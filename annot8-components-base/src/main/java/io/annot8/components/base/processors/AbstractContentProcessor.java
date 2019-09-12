@@ -3,7 +3,6 @@ package io.annot8.components.base.processors;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Stream;
 
 import io.annot8.components.base.components.AbstractComponent;
 import io.annot8.core.components.responses.ProcessorResponse;
@@ -71,8 +70,4 @@ public abstract class AbstractContentProcessor<T extends Content<?>> extends Abs
    */
   protected abstract void process(final T content);
 
-  @Override
-  public Stream<ContentCapability> processesContent() {
-    return Stream.of(new ContentCapability(contentClazz));
-  }
 }
