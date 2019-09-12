@@ -11,7 +11,7 @@ import io.annot8.core.settings.Settings;
 /** Set a property on an item to a specified value, overwriting any existing value */
 public class Property extends AbstractProcessor {
 
-  private final PropertySettings propertySettings ;
+  private final PropertySettings propertySettings;
 
   public Property(PropertySettings propertySettings) {
     this.propertySettings = propertySettings;

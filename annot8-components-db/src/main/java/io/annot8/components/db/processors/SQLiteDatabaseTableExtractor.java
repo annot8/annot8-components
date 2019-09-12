@@ -1,6 +1,11 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.db.processors;
 
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import io.annot8.common.components.AbstractProcessor;
 import io.annot8.common.data.content.ColumnMetadata;
 import io.annot8.common.data.content.FileContent;
@@ -11,11 +16,6 @@ import io.annot8.core.components.responses.ProcessorResponse;
 import io.annot8.core.data.Item;
 import io.annot8.core.exceptions.IncompleteException;
 import io.annot8.core.exceptions.UnsupportedContentException;
-
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 public class SQLiteDatabaseTableExtractor extends AbstractProcessor {
 
@@ -134,14 +134,14 @@ public class SQLiteDatabaseTableExtractor extends AbstractProcessor {
       return -1;
     }
   }
-//
-//  @Override
-//  public Stream<ContentCapability> processesContent() {
-//    return Stream.of(new ContentCapability(FileContent.class));
-//  }
-//
-//  @Override
-//  public Stream<ContentCapability> createsContent() {
-//    return Stream.of(new ContentCapability(TableContent.class));
-//  }
+  //
+  //  @Override
+  //  public Stream<ContentCapability> processesContent() {
+  //    return Stream.of(new ContentCapability(FileContent.class));
+  //  }
+  //
+  //  @Override
+  //  public Stream<ContentCapability> createsContent() {
+  //    return Stream.of(new ContentCapability(TableContent.class));
+  //  }
 }

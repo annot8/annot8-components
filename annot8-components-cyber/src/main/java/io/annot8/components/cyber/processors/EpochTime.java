@@ -1,15 +1,15 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.cyber.processors;
 
+import java.time.Instant;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import io.annot8.components.base.processors.AbstractRegexProcessor;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
 import io.annot8.core.annotations.Annotation.Builder;
 import io.annot8.core.settings.Settings;
-
-import java.time.Instant;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class EpochTime extends AbstractRegexProcessor {
 
@@ -19,7 +19,6 @@ public class EpochTime extends AbstractRegexProcessor {
     this(new EpochTimeSettings());
   }
 
-
   public EpochTime(EpochTimeSettings settings) {
     super(
         Pattern.compile("\\b\\d+\\b", Pattern.CASE_INSENSITIVE),
@@ -27,7 +26,6 @@ public class EpochTime extends AbstractRegexProcessor {
         AnnotationTypes.ANNOTATION_TYPE_TIMESTAMP);
     this.settings = settings;
   }
-
 
   @Override
   protected boolean acceptMatch(Matcher m) {

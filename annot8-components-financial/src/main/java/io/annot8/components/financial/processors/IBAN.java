@@ -1,16 +1,17 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.financial.processors;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.iban4j.Iban4jException;
+
 import io.annot8.common.data.bounds.SpanBounds;
 import io.annot8.common.data.content.Text;
 import io.annot8.components.base.processors.AbstractTextProcessor;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
 import io.annot8.core.stores.AnnotationStore;
-import org.iban4j.Iban4jException;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class IBAN extends AbstractTextProcessor {
 
@@ -46,10 +47,10 @@ public class IBAN extends AbstractTextProcessor {
     }
   }
 
-//  @Override
-//  public Stream<AnnotationCapability> createsAnnotations() {
-//    return Stream.of(
-//        new AnnotationCapability(
-//            AnnotationTypes.ANNOTATION_TYPE_FINANCIALACCOUNT, SpanBounds.class));
-//  }
+  //  @Override
+  //  public Stream<AnnotationCapability> createsAnnotations() {
+  //    return Stream.of(
+  //        new AnnotationCapability(
+  //            AnnotationTypes.ANNOTATION_TYPE_FINANCIALACCOUNT, SpanBounds.class));
+  //  }
 }

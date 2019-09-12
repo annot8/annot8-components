@@ -1,18 +1,18 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.translation.processors;
 
+import uk.gov.nca.remedi4j.client.RemediClient;
+
 import io.annot8.common.data.content.Text;
 import io.annot8.components.base.processors.AbstractTextProcessor;
 import io.annot8.conventions.PropertyKeys;
 import io.annot8.core.exceptions.ProcessingException;
-import uk.gov.nca.remedi4j.client.RemediClient;
 
 /**
  * Use the REMEDI machine translation platform (see
  * https://github.com/ivan-zapreev/Distributed-Translation-Infrastructure) to perform translation of
  * Text content objects.
  */
-
 public class RemediTranslation extends AbstractTextProcessor {
 
   private RemediClient client = null;
@@ -26,12 +26,9 @@ public class RemediTranslation extends AbstractTextProcessor {
     if (client != null) client.close();
 
     client =
-            new RemediClient(
-                    settings.getPreProcessorUri(),
-                    settings.getServerUri(),
-                    settings.getPostProcessorUri());
+        new RemediClient(
+            settings.getPreProcessorUri(), settings.getServerUri(), settings.getPostProcessorUri());
   }
-
 
   @Override
   protected void process(Text content) {

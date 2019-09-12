@@ -1,6 +1,14 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.types.processors;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.junit.jupiter.api.Test;
+
 import io.annot8.common.data.bounds.SpanBounds;
 import io.annot8.common.data.content.Text;
 import io.annot8.core.annotations.Annotation;
@@ -9,13 +17,6 @@ import io.annot8.core.data.Item;
 import io.annot8.core.exceptions.Annot8Exception;
 import io.annot8.core.stores.AnnotationStore;
 import io.annot8.testing.testimpl.TestItem;
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ChangeTypeTest {
 
@@ -26,7 +27,6 @@ public class ChangeTypeTest {
         new ChangeType.ChangeTypeSettings("my.person", "Person", true);
     assertTrue(cts.validate());
     Processor p = new ChangeType(cts);
-
 
     Item item = new TestItem();
     Text content =
@@ -70,7 +70,6 @@ public class ChangeTypeTest {
     ChangeType.ChangeTypeSettings cts = new ChangeType.ChangeTypeSettings("my.person", "Person");
     assertTrue(cts.validate());
     Processor p = new ChangeType(cts);
-
 
     Item item = new TestItem();
     Text content =

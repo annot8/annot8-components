@@ -22,13 +22,13 @@ public class DiscardUnextractedFiles extends AbstractProcessor {
     return ProcessorResponse.ok();
   }
 
-//  @Override
-//  public Stream<ContentCapability> processesContent() {
-//    return Stream.of(new ContentCapability(FileContent.class));
-//  }
-//
-//  @Override
-//  public Stream<ContentCapability> deletesContent() {
-//    return Stream.of(new ContentCapability(FileContent.class));
-//  }
+  //  @Override
+  //  public Stream<ContentCapability> processesContent() {
+  //    return Stream.of(new ContentCapability(FileContent.class));
+  //  }
+  //
+  //  @Override
+  //  public Stream<ContentCapability> deletesContent() {
+  //    return Stream.of(new ContentCapability(FileContent.class));
+  //  }
 }

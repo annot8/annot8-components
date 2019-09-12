@@ -21,9 +21,9 @@ public class Mgrs extends AbstractProcessorDescriptor<MgrsProcessor, MgrsSetting
   @Override
   public Capabilities capabilities() {
     return new SimpleCapabilities.Builder()
-            .withCreatesAnnotations(AnnotationTypes.ANNOTATION_TYPE_COORDINATE, SpanBounds.class)
-            .withProcessesContent(Text.class)
-            .build();
+        .withCreatesAnnotations(AnnotationTypes.ANNOTATION_TYPE_COORDINATE, SpanBounds.class)
+        .withProcessesContent(Text.class)
+        .build();
   }
 
   @Override

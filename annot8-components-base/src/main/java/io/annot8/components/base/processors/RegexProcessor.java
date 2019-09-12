@@ -11,7 +11,7 @@ public class RegexProcessor extends AbstractRegexProcessor {
     this.type = type;
   }
 
-  public RegexProcessor(RegexSettings regexSettings){
+  public RegexProcessor(RegexSettings regexSettings) {
     this.pattern = regexSettings.getRegex();
     this.group = regexSettings.getGroup();
     this.type = regexSettings.getType();

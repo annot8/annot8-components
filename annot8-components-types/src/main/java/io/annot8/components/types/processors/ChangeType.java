@@ -20,7 +20,6 @@ public class ChangeType extends AbstractComponent implements Processor {
     this.changeTypeSettings = settings;
   }
 
-
   @Override
   public ProcessorResponse process(Item item) {
     item.getContents()

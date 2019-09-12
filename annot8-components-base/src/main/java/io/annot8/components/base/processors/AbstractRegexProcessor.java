@@ -1,15 +1,15 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.base.processors;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import io.annot8.common.data.bounds.SpanBounds;
 import io.annot8.common.data.content.Text;
 import io.annot8.core.annotations.Annotation;
 import io.annot8.core.exceptions.BadConfigurationException;
 import io.annot8.core.exceptions.ProcessingException;
 import io.annot8.core.stores.AnnotationStore;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /** Base class for regex annotators */
 public abstract class AbstractRegexProcessor extends AbstractTextProcessor {

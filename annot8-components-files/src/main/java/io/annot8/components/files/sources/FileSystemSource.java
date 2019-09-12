@@ -1,10 +1,8 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.files.sources;
 
-import io.annot8.core.components.responses.SourceResponse;
-import io.annot8.core.data.ItemFactory;
-import io.annot8.core.exceptions.Annot8RuntimeException;
-import io.annot8.core.exceptions.BadConfigurationException;
+import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
+import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,8 +13,10 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
-import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
+import io.annot8.core.components.responses.SourceResponse;
+import io.annot8.core.data.ItemFactory;
+import io.annot8.core.exceptions.Annot8RuntimeException;
+import io.annot8.core.exceptions.BadConfigurationException;
 
 public class FileSystemSource extends AbstractFileSystemSource {
 

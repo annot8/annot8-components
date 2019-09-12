@@ -1,12 +1,12 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.text.processors;
 
+import static io.annot8.components.text.processors.Capitalise.TextCase.UPPERCASE;
+
 import io.annot8.common.data.content.Text;
 import io.annot8.components.base.processors.AbstractTextProcessor;
 import io.annot8.core.data.Item;
 import io.annot8.core.settings.Settings;
-
-import static io.annot8.components.text.processors.Capitalise.TextCase.UPPERCASE;
 
 public class Capitalise extends AbstractTextProcessor {
 
