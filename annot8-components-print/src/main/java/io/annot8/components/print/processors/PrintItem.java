@@ -1,13 +1,13 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.print.processors;
 
-import io.annot8.common.components.AbstractProcessor;
 import io.annot8.api.annotations.Annotation;
 import io.annot8.api.components.responses.ProcessorResponse;
 import io.annot8.api.data.Content;
 import io.annot8.api.data.Item;
 import io.annot8.api.properties.Properties;
 import io.annot8.api.stores.AnnotationStore;
+import io.annot8.common.components.AbstractProcessor;
 
 public class PrintItem extends AbstractProcessor {
 

@@ -13,12 +13,12 @@ import com.drew.metadata.Tag;
 import com.drew.metadata.exif.ExifDirectoryBase;
 import com.drew.metadata.exif.GpsDirectory;
 
-import io.annot8.common.data.bounds.NoBounds;
-import io.annot8.common.data.content.FileContent;
-import io.annot8.components.base.processors.AbstractContentProcessor;
 import io.annot8.api.components.annotations.ComponentDescription;
 import io.annot8.api.components.annotations.ComponentName;
 import io.annot8.api.exceptions.IncompleteException;
+import io.annot8.common.data.bounds.NoBounds;
+import io.annot8.common.data.content.FileContent;
+import io.annot8.components.base.processors.AbstractContentProcessor;
 
 // TODO: Could move to extending AbstractContentProcessor?
 @ComponentName("EXIF Metadata")

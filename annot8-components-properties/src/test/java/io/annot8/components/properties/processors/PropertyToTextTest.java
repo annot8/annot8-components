@@ -11,10 +11,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.jupiter.api.Test;
 
-import io.annot8.components.properties.processors.PropertyToText.PropertyToTextSettings;
 import io.annot8.api.components.Processor;
 import io.annot8.api.data.Item;
 import io.annot8.api.exceptions.Annot8Exception;
+import io.annot8.components.properties.processors.PropertyToText.PropertyToTextSettings;
 import io.annot8.testing.testimpl.TestItem;
 
 public class PropertyToTextTest {

@@ -1,10 +1,10 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.files.processors;
 
-import io.annot8.common.components.AbstractProcessor;
-import io.annot8.common.data.content.FileContent;
 import io.annot8.api.components.responses.ProcessorResponse;
 import io.annot8.api.data.Item;
+import io.annot8.common.components.AbstractProcessor;
+import io.annot8.common.data.content.FileContent;
 
 public class DiscardUnextractedFiles extends AbstractProcessor {
 

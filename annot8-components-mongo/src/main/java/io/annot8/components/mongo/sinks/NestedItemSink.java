@@ -10,15 +10,15 @@ import org.bson.Document;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mongodb.client.MongoCollection;
 
+import io.annot8.api.annotations.Annotation;
+import io.annot8.api.data.Content;
+import io.annot8.api.data.Item;
+import io.annot8.api.exceptions.Annot8Exception;
 import io.annot8.components.mongo.data.AnnotationDto;
 import io.annot8.components.mongo.data.ContentDto;
 import io.annot8.components.mongo.data.ItemDto;
 import io.annot8.components.mongo.resources.MongoConnection;
 import io.annot8.components.mongo.resources.MongoConnectionSettings;
-import io.annot8.api.annotations.Annotation;
-import io.annot8.api.data.Content;
-import io.annot8.api.data.Item;
-import io.annot8.api.exceptions.Annot8Exception;
 
 public class NestedItemSink extends AbstractMongoSink {
 

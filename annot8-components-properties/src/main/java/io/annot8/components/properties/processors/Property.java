@@ -1,12 +1,12 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.properties.processors;
 
-import io.annot8.common.components.AbstractComponent;
-import io.annot8.common.components.AbstractProcessor;
 import io.annot8.api.components.responses.ProcessorResponse;
 import io.annot8.api.data.Item;
 import io.annot8.api.exceptions.BadConfigurationException;
 import io.annot8.api.settings.Settings;
+import io.annot8.common.components.AbstractComponent;
+import io.annot8.common.components.AbstractProcessor;
 
 /** Set a property on an item to a specified value, overwriting any existing value */
 public class Property extends AbstractProcessor {

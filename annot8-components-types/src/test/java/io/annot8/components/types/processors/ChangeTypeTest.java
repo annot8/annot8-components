@@ -9,13 +9,13 @@ import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 
-import io.annot8.common.data.bounds.SpanBounds;
-import io.annot8.common.data.content.Text;
 import io.annot8.api.annotations.Annotation;
 import io.annot8.api.components.Processor;
 import io.annot8.api.data.Item;
 import io.annot8.api.exceptions.Annot8Exception;
 import io.annot8.api.stores.AnnotationStore;
+import io.annot8.common.data.bounds.SpanBounds;
+import io.annot8.common.data.content.Text;
 import io.annot8.testing.testimpl.TestItem;
 
 public class ChangeTypeTest {

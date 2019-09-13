@@ -11,13 +11,13 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.io.CharStreams;
 
+import io.annot8.api.components.responses.ProcessorResponse;
+import io.annot8.api.data.Content;
+import io.annot8.api.data.Item;
 import io.annot8.common.components.AbstractProcessor;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.InputStreamContent;
 import io.annot8.common.data.content.Text;
-import io.annot8.api.components.responses.ProcessorResponse;
-import io.annot8.api.data.Content;
-import io.annot8.api.data.Item;
 
 public class EmlFileExtractor extends AbstractProcessor {
 

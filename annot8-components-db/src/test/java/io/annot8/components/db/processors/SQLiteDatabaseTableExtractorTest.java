@@ -10,14 +10,14 @@ import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 
-import io.annot8.common.data.content.ColumnMetadata;
-import io.annot8.common.data.content.FileContent;
-import io.annot8.common.data.content.TableContent;
-import io.annot8.common.data.content.TableMetadata;
 import io.annot8.api.components.responses.ProcessorResponse;
 import io.annot8.api.components.responses.ProcessorResponse.Status;
 import io.annot8.api.data.Content;
 import io.annot8.api.data.Item;
+import io.annot8.common.data.content.ColumnMetadata;
+import io.annot8.common.data.content.FileContent;
+import io.annot8.common.data.content.TableContent;
+import io.annot8.common.data.content.TableMetadata;
 import io.annot8.testing.testimpl.TestItem;
 
 public class SQLiteDatabaseTableExtractorTest extends AbstractSQLiteDataTest {

@@ -6,12 +6,12 @@ import java.util.Optional;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
 
-import io.annot8.common.data.content.Text;
-import io.annot8.components.base.processors.AbstractTextProcessor;
 import io.annot8.api.annotations.Annotation;
 import io.annot8.api.annotations.Group;
 import io.annot8.api.exceptions.IncompleteException;
 import io.annot8.api.stores.GroupStore;
+import io.annot8.common.data.content.Text;
+import io.annot8.components.base.processors.AbstractTextProcessor;
 
 public class GroupByTypeAndValueAnnotator extends AbstractTextProcessor {
 

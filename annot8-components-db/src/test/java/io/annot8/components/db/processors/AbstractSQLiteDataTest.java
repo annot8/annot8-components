@@ -11,10 +11,10 @@ import java.util.Arrays;
 
 import org.mockito.Mockito;
 
+import io.annot8.api.stores.AnnotationStore;
 import io.annot8.common.data.content.ColumnMetadata;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.TableMetadata;
-import io.annot8.api.stores.AnnotationStore;
 import io.annot8.testing.testimpl.TestAnnotationStore;
 
 public abstract class AbstractSQLiteDataTest {

@@ -3,14 +3,14 @@ package io.annot8.components.files.processors;
 
 import java.io.File;
 
-import io.annot8.common.components.AbstractProcessor;
-import io.annot8.common.data.content.FileContent;
-import io.annot8.common.data.content.TableContent;
-import io.annot8.components.files.content.CSVTable;
 import io.annot8.api.components.responses.ProcessorResponse;
 import io.annot8.api.data.Item;
 import io.annot8.api.exceptions.IncompleteException;
 import io.annot8.api.exceptions.UnsupportedContentException;
+import io.annot8.common.components.AbstractProcessor;
+import io.annot8.common.data.content.FileContent;
+import io.annot8.common.data.content.TableContent;
+import io.annot8.components.files.content.CSVTable;
 
 public class CSVExtractor extends AbstractProcessor {
 

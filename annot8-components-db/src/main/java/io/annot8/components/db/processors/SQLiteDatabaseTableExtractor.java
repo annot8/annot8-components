@@ -6,16 +6,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import io.annot8.api.components.responses.ProcessorResponse;
+import io.annot8.api.data.Item;
+import io.annot8.api.exceptions.IncompleteException;
+import io.annot8.api.exceptions.UnsupportedContentException;
 import io.annot8.common.components.AbstractProcessor;
 import io.annot8.common.data.content.ColumnMetadata;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.TableContent;
 import io.annot8.common.data.content.TableMetadata;
 import io.annot8.components.db.content.DatabaseTable;
-import io.annot8.api.components.responses.ProcessorResponse;
-import io.annot8.api.data.Item;
-import io.annot8.api.exceptions.IncompleteException;
-import io.annot8.api.exceptions.UnsupportedContentException;
 
 public class SQLiteDatabaseTableExtractor extends AbstractProcessor {
 

@@ -5,13 +5,13 @@ import java.util.function.Supplier;
 
 import org.bson.Document;
 
-import io.annot8.common.implementations.content.AbstractContentBuilder;
-import io.annot8.common.implementations.content.AbstractContentBuilderFactory;
-import io.annot8.common.implementations.stores.AnnotationStoreFactory;
 import io.annot8.api.data.Content;
 import io.annot8.api.data.Item;
 import io.annot8.api.properties.ImmutableProperties;
 import io.annot8.api.stores.AnnotationStore;
+import io.annot8.implementations.support.content.AbstractContentBuilder;
+import io.annot8.implementations.support.content.AbstractContentBuilderFactory;
+import io.annot8.implementations.support.stores.AnnotationStoreFactory;
 
 public class MongoDocument implements Content<Document> {
 

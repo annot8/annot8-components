@@ -10,13 +10,13 @@ import net.sourceforge.tess4j.TesseractException;
 
 import org.apache.commons.io.FilenameUtils;
 
+import io.annot8.api.components.responses.ProcessorResponse;
+import io.annot8.api.data.Item;
+import io.annot8.api.settings.Settings;
 import io.annot8.common.components.AbstractProcessor;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.Text;
 import io.annot8.components.tesseract.processors.settings.TesseractSettings;
-import io.annot8.api.components.responses.ProcessorResponse;
-import io.annot8.api.data.Item;
-import io.annot8.api.settings.Settings;
 
 /**
  * Takes FileContent containing either an image or PDF file, and produces a Text content with the

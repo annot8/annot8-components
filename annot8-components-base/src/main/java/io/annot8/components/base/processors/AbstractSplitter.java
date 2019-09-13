@@ -1,10 +1,10 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.base.processors;
 
-import io.annot8.common.components.AbstractComponent;
 import io.annot8.api.components.Processor;
 import io.annot8.api.components.responses.ProcessorResponse;
 import io.annot8.api.data.Item;
+import io.annot8.common.components.AbstractComponent;
 
 /** Base class for dividing items into multiple itemms */
 public abstract class AbstractSplitter extends AbstractComponent implements Processor {

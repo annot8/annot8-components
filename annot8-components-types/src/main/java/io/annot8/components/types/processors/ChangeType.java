@@ -1,12 +1,12 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.types.processors;
 
-import io.annot8.common.components.AbstractComponent;
 import io.annot8.api.components.Processor;
 import io.annot8.api.components.responses.ProcessorResponse;
 import io.annot8.api.data.Item;
 import io.annot8.api.exceptions.IncompleteException;
 import io.annot8.api.settings.Settings;
+import io.annot8.common.components.AbstractComponent;
 
 /**
  * Create a duplicate annotation but with a different type. The original annotation can optionally
