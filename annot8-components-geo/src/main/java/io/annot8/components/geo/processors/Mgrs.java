@@ -10,6 +10,7 @@ import io.annot8.core.capabilities.Capabilities;
 import io.annot8.core.components.annotations.ComponentDescription;
 import io.annot8.core.components.annotations.ComponentName;
 import io.annot8.core.components.annotations.SettingsClass;
+import io.annot8.core.context.Context;
 
 /** Extract MGRS coordinates, optionally ignoring MGRS coordinates that could be dates */
 @ComponentName("MGRS")
@@ -27,7 +28,7 @@ public class Mgrs extends AbstractProcessorDescriptor<MgrsProcessor, MgrsSetting
   }
 
   @Override
-  public MgrsProcessor create() {
+  public MgrsProcessor createComponent(Context context, MgrsSettings settings) {
     return new MgrsProcessor(settings);
   }
 }

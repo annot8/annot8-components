@@ -6,6 +6,7 @@ import io.annot8.common.components.capabilities.SimpleCapabilities;
 import io.annot8.common.data.bounds.SpanBounds;
 import io.annot8.common.data.content.Text;
 import io.annot8.core.capabilities.Capabilities;
+import io.annot8.core.context.Context;
 
 public class Regex extends AbstractProcessorDescriptor<RegexProcessor, RegexSettings> {
   @Override
@@ -17,7 +18,7 @@ public class Regex extends AbstractProcessorDescriptor<RegexProcessor, RegexSett
   }
 
   @Override
-  public RegexProcessor create() {
+  public RegexProcessor createComponent(Context context, RegexSettings settings) {
     return new RegexProcessor(settings);
   }
 }
