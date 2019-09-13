@@ -1,20 +1,21 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.tika.processors;
 
-import io.annot8.common.data.content.FileContent;
-import io.annot8.common.data.content.InputStreamContent;
-import io.annot8.common.data.content.Text;
-import io.annot8.core.data.Item;
-import io.annot8.testing.testimpl.TestItem;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import org.junit.jupiter.api.Test;
+
+import io.annot8.common.data.content.FileContent;
+import io.annot8.common.data.content.InputStreamContent;
+import io.annot8.common.data.content.Text;
+import io.annot8.core.data.Item;
+import io.annot8.testing.testimpl.TestItem;
 
 public class TikaExtractorTest {
 
