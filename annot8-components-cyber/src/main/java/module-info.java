@@ -1,5 +1,5 @@
 open module io.annot8.components.cyber {
-  requires transitive io.annot8.core;
+  requires transitive io.annot8.api;
   requires io.annot8.common.data;
   requires transitive io.annot8.components.base;
   requires io.annot8.conventions;

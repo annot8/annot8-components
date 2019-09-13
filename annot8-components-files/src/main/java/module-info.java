@@ -1,5 +1,5 @@
 module io.annot8.components.files {
-  requires transitive io.annot8.core;
+  requires transitive io.annot8.api;
   requires io.annot8.common.data;
   requires io.annot8.conventions;
   requires io.annot8.common.components;
