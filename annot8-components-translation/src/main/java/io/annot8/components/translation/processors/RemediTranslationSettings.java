@@ -3,7 +3,7 @@ package io.annot8.components.translation.processors;
 
 import java.net.URI;
 
-import io.annot8.core.settings.Settings;
+import io.annot8.api.settings.Settings;
 
 public class RemediTranslationSettings implements Settings {
 

@@ -18,13 +18,13 @@ import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
+import io.annot8.api.annotations.Annotation;
+import io.annot8.api.components.responses.ProcessorResponse;
+import io.annot8.api.components.responses.ProcessorResponse.Status;
+import io.annot8.api.data.Item;
+import io.annot8.api.stores.AnnotationStore;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.conventions.FileMetadataKeys;
-import io.annot8.core.annotations.Annotation;
-import io.annot8.core.components.responses.ProcessorResponse;
-import io.annot8.core.components.responses.ProcessorResponse.Status;
-import io.annot8.core.data.Item;
-import io.annot8.core.stores.AnnotationStore;
 import io.annot8.testing.testimpl.TestAnnotationStore;
 
 public class FileMetadataExtractorTest {

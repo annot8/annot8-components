@@ -9,12 +9,12 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
+import io.annot8.api.exceptions.Annot8RuntimeException;
 import io.annot8.common.data.content.ColumnMetadata;
 import io.annot8.common.data.content.DefaultRow;
 import io.annot8.common.data.content.Row;
 import io.annot8.common.data.content.TableMetadata;
 import io.annot8.components.db.processors.JDBCSettings;
-import io.annot8.core.exceptions.Annot8RuntimeException;
 
 public class DatabaseTableIterator implements Iterator<Row> {
 

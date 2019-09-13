@@ -8,13 +8,13 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import io.annot8.api.annotations.Annotation;
+import io.annot8.api.data.Item;
+import io.annot8.api.exceptions.Annot8Exception;
+import io.annot8.api.stores.AnnotationStore;
 import io.annot8.common.data.bounds.SpanBounds;
 import io.annot8.common.data.content.Text;
 import io.annot8.conventions.AnnotationTypes;
-import io.annot8.core.annotations.Annotation;
-import io.annot8.core.data.Item;
-import io.annot8.core.exceptions.Annot8Exception;
-import io.annot8.core.stores.AnnotationStore;
 import io.annot8.testing.testimpl.TestItem;
 import io.annot8.testing.testimpl.content.TestStringContent;
 

@@ -12,13 +12,13 @@ import org.apache.tika.parser.ParseContext;
 import org.apache.tika.sax.BodyContentHandler;
 import org.xml.sax.SAXException;
 
+import io.annot8.api.components.responses.ProcessorResponse;
+import io.annot8.api.data.Content;
+import io.annot8.api.data.Item;
 import io.annot8.common.components.AbstractProcessor;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.InputStreamContent;
 import io.annot8.common.data.content.Text;
-import io.annot8.core.components.responses.ProcessorResponse;
-import io.annot8.core.data.Content;
-import io.annot8.core.data.Item;
 
 // @ProcessesContent(FileContent.class)
 // @ProcessesContent(InputStreamContent.class)

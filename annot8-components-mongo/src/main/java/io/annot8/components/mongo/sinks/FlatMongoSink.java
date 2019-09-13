@@ -14,15 +14,15 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
+import io.annot8.api.annotations.Annotation;
+import io.annot8.api.data.Content;
+import io.annot8.api.data.Item;
+import io.annot8.api.exceptions.Annot8Exception;
 import io.annot8.components.mongo.data.AnnotationDto;
 import io.annot8.components.mongo.data.ContentDto;
 import io.annot8.components.mongo.data.ItemDto;
 import io.annot8.components.mongo.resources.MongoConnection;
 import io.annot8.components.mongo.resources.MongoConnectionSettings;
-import io.annot8.core.annotations.Annotation;
-import io.annot8.core.data.Content;
-import io.annot8.core.data.Item;
-import io.annot8.core.exceptions.Annot8Exception;
 
 public class FlatMongoSink extends AbstractMongoSink {
 

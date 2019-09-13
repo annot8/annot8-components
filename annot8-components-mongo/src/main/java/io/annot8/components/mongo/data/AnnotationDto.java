@@ -3,7 +3,7 @@ package io.annot8.components.mongo.data;
 
 import java.util.Map;
 
-import io.annot8.core.bounds.Bounds;
+import io.annot8.api.bounds.Bounds;
 
 public class AnnotationDto {
 

@@ -6,9 +6,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.bson.Document;
 import org.junit.jupiter.api.Test;
 
+import io.annot8.api.data.Content.Builder;
+import io.annot8.api.exceptions.IncompleteException;
 import io.annot8.components.mongo.data.MongoDocument.BuilderFactory;
-import io.annot8.core.data.Content.Builder;
-import io.annot8.core.exceptions.IncompleteException;
 import io.annot8.testing.testimpl.TestAnnotationStore;
 import io.annot8.testing.testimpl.TestItem;
 

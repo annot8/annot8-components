@@ -8,12 +8,12 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import io.annot8.api.components.Source;
+import io.annot8.api.data.Item;
+import io.annot8.api.data.ItemFactory;
 import io.annot8.common.components.AbstractComponent;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.conventions.PropertyKeys;
-import io.annot8.core.components.Source;
-import io.annot8.core.data.Item;
-import io.annot8.core.data.ItemFactory;
 
 // @CreatesContent(FileContent.class)
 public abstract class AbstractFileSystemSource extends AbstractComponent implements Source {

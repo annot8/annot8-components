@@ -6,15 +6,15 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
 
+import io.annot8.api.components.responses.ProcessorResponse;
+import io.annot8.api.data.Item;
+import io.annot8.api.exceptions.IncompleteException;
+import io.annot8.api.stores.AnnotationStore;
 import io.annot8.common.components.AbstractProcessor;
 import io.annot8.common.data.bounds.NoBounds;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.conventions.FileMetadataKeys;
 import io.annot8.conventions.PathUtils;
-import io.annot8.core.components.responses.ProcessorResponse;
-import io.annot8.core.data.Item;
-import io.annot8.core.exceptions.IncompleteException;
-import io.annot8.core.stores.AnnotationStore;
 
 public class FileMetadataExtractor extends AbstractProcessor {
 

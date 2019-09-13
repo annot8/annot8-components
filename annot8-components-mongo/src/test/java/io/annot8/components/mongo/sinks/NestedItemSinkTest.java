@@ -13,13 +13,13 @@ import org.mockito.Mockito;
 
 import com.mongodb.client.MongoCollection;
 
+import io.annot8.api.annotations.Annotation;
+import io.annot8.api.components.responses.ProcessorResponse;
+import io.annot8.api.components.responses.ProcessorResponse.Status;
+import io.annot8.api.data.Content;
+import io.annot8.api.data.Item;
 import io.annot8.common.data.content.Text;
 import io.annot8.components.mongo.resources.MongoConnection;
-import io.annot8.core.annotations.Annotation;
-import io.annot8.core.components.responses.ProcessorResponse;
-import io.annot8.core.components.responses.ProcessorResponse.Status;
-import io.annot8.core.data.Content;
-import io.annot8.core.data.Item;
 import io.annot8.testing.testimpl.TestAnnotationStore;
 import io.annot8.testing.testimpl.TestItem;
 import io.annot8.testing.testimpl.TestProperties;

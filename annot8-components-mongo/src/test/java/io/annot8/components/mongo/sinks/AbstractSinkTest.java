@@ -3,13 +3,13 @@ package io.annot8.components.mongo.sinks;
 
 import static org.assertj.core.api.Assertions.fail;
 
+import io.annot8.api.annotations.Annotation;
+import io.annot8.api.data.Content;
+import io.annot8.api.data.Item;
+import io.annot8.api.exceptions.IncompleteException;
+import io.annot8.api.exceptions.UnsupportedContentException;
 import io.annot8.common.data.bounds.SpanBounds;
 import io.annot8.common.data.content.Text;
-import io.annot8.core.annotations.Annotation;
-import io.annot8.core.data.Content;
-import io.annot8.core.data.Item;
-import io.annot8.core.exceptions.IncompleteException;
-import io.annot8.core.exceptions.UnsupportedContentException;
 
 public abstract class AbstractSinkTest {
 

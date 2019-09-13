@@ -1,5 +1,5 @@
 module io.annot8.components.tesseract {
-  requires transitive io.annot8.core;
+  requires transitive io.annot8.api;
   requires io.annot8.common.data;
   requires transitive io.annot8.common.components;
   requires org.slf4j;

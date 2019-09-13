@@ -11,7 +11,7 @@ import net.sourceforge.tess4j.ITesseract;
 import net.sourceforge.tess4j.TessAPI;
 import net.sourceforge.tess4j.util.LoadLibs;
 
-import io.annot8.core.settings.Settings;
+import io.annot8.api.settings.Settings;
 
 public class TesseractSettings implements Settings {
 

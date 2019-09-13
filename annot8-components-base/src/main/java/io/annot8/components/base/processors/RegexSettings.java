@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 
 import com.google.common.base.Strings;
 
-import io.annot8.core.settings.Settings;
+import io.annot8.api.settings.Settings;
 
 public class RegexSettings implements Settings {
   private final Pattern regex;

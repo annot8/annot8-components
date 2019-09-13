@@ -7,16 +7,16 @@ import org.bson.Document;
 
 import com.mongodb.client.MongoCursor;
 
+import io.annot8.api.components.Source;
+import io.annot8.api.components.responses.SourceResponse;
+import io.annot8.api.data.Item;
+import io.annot8.api.data.ItemFactory;
+import io.annot8.api.exceptions.IncompleteException;
+import io.annot8.api.exceptions.UnsupportedContentException;
 import io.annot8.components.mongo.AbstractMongoComponent;
 import io.annot8.components.mongo.data.MongoDocument;
 import io.annot8.components.mongo.resources.MongoConnectionSettings;
 import io.annot8.conventions.PropertyKeys;
-import io.annot8.core.components.Source;
-import io.annot8.core.components.responses.SourceResponse;
-import io.annot8.core.data.Item;
-import io.annot8.core.data.ItemFactory;
-import io.annot8.core.exceptions.IncompleteException;
-import io.annot8.core.exceptions.UnsupportedContentException;
 
 /**
  * Reads the contents of a Mongo collection into items.

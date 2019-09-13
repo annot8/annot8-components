@@ -17,12 +17,10 @@
     <dependency>
       <groupId>io.annot8</groupId>
       <artifactId>annot8-components-base</artifactId>
-      <version>0.4.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>io.annot8</groupId>
-      <artifactId>annot8-common-implementations</artifactId>
-      <version>0.4.0-SNAPSHOT</version>
+      <artifactId>annot8-implementations-support</artifactId>
     </dependency>
     <dependency>
       <groupId>org.xerial</groupId>

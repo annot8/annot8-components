@@ -8,12 +8,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import io.annot8.api.exceptions.Annot8RuntimeException;
 import io.annot8.common.data.content.ColumnMetadata;
 import io.annot8.common.data.content.DefaultRow;
 import io.annot8.common.data.content.Row;
 import io.annot8.common.data.content.TableMetadata;
 import io.annot8.components.files.content.CSVTable;
-import io.annot8.core.exceptions.Annot8RuntimeException;
 
 public class BufferedReaderIterator implements Iterator<Row> {
 

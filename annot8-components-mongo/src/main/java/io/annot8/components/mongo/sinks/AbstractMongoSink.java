@@ -9,14 +9,14 @@ import org.bson.Document;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import io.annot8.api.components.Processor;
+import io.annot8.api.components.responses.ProcessorResponse;
+import io.annot8.api.data.Item;
+import io.annot8.api.exceptions.Annot8Exception;
+import io.annot8.api.properties.ImmutableProperties;
 import io.annot8.components.mongo.AbstractMongoComponent;
 import io.annot8.components.mongo.resources.MongoConnection;
 import io.annot8.components.mongo.resources.MongoConnectionSettings;
-import io.annot8.core.components.Processor;
-import io.annot8.core.components.responses.ProcessorResponse;
-import io.annot8.core.data.Item;
-import io.annot8.core.exceptions.Annot8Exception;
-import io.annot8.core.properties.ImmutableProperties;
 
 public abstract class AbstractMongoSink extends AbstractMongoComponent implements Processor {
 
