@@ -87,11 +87,7 @@
   <dependencies>
     <dependency>
       <groupId>io.annot8</groupId>
-      <artifactId>annot8-core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
+      <artifactId>annot8-api</artifactId>
     </dependency>
 
     <!-- Test dependencies for all projects -->
@@ -258,22 +254,13 @@
     <dependencies>
       <dependency>
         <groupId>io.annot8</groupId>
-        <artifactId>annot8-core</artifactId>
+        <artifactId>annot8-api</artifactId>
         <version>${annot8.version}</version>
       </dependency>
-      <dependency>
-        <groupId>io.annot8</groupId>
-        <artifactId>annot8-common</artifactId>
-        <version>${annot8.version}</version>
-      </dependency>
+      <!-- Common -->
       <dependency>
         <groupId>io.annot8</groupId>
         <artifactId>annot8-common-data</artifactId>
-        <version>${annot8.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>io.annot8</groupId>
-        <artifactId>annot8-common-pipelines</artifactId>
         <version>${annot8.version}</version>
       </dependency>
       <dependency>
@@ -283,25 +270,28 @@
       </dependency>
       <dependency>
         <groupId>io.annot8</groupId>
-        <artifactId>annot8-common-implementations</artifactId>
+        <artifactId>annot8-common-utils</artifactId>
+        <version>${annot8.version}</version>
+      </dependency>
+
+      <!-- Implementation -->
+      <dependency>
+        <groupId>io.annot8</groupId>
+        <artifactId>annot8-implementations-support</artifactId>
         <version>${annot8.version}</version>
       </dependency>
       <dependency>
         <groupId>io.annot8</groupId>
-        <artifactId>annot8-common-jackson-serialisation</artifactId>
+        <artifactId>annot8-pipeline-implementation</artifactId>
         <version>${annot8.version}</version>
       </dependency>
       <dependency>
         <groupId>io.annot8</groupId>
-        <artifactId>annot8-default-impl</artifactId>
+        <artifactId>annot8-reference-implementation</artifactId>
         <version>${annot8.version}</version>
       </dependency>
-      <dependency>
-        <groupId>io.annot8</groupId>
-        <artifactId>annot8-testing</artifactId>
-        <version>${annot8.version}</version>
-        <scope>test</scope>
-      </dependency>
+
+      <!-- Testing -->
       <dependency>
         <groupId>io.annot8</groupId>
         <artifactId>annot8-impl-tck</artifactId>
