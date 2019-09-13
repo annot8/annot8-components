@@ -9,7 +9,7 @@ import io.annot8.common.data.content.Text;
 import io.annot8.components.base.processors.AbstractTextProcessor;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
-import io.annot8.core.annotations.Annotation.Builder;
+import io.annot8.api.annotations.Annotation.Builder;
 
 public class Frequency extends AbstractTextProcessor {
 

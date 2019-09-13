@@ -17,7 +17,7 @@ import io.annot8.common.data.content.Row;
 import io.annot8.common.data.content.TableMetadata;
 import io.annot8.components.db.processors.AbstractSQLiteDataTest;
 import io.annot8.components.db.processors.JDBCSettings;
-import io.annot8.core.exceptions.Annot8RuntimeException;
+import io.annot8.api.exceptions.Annot8RuntimeException;
 
 public class DatabaseTableTest extends AbstractSQLiteDataTest {
 

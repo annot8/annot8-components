@@ -2,9 +2,9 @@
 package io.annot8.components.base.processors;
 
 import io.annot8.common.components.AbstractComponent;
-import io.annot8.core.components.Processor;
-import io.annot8.core.components.responses.ProcessorResponse;
-import io.annot8.core.data.Item;
+import io.annot8.api.components.Processor;
+import io.annot8.api.components.responses.ProcessorResponse;
+import io.annot8.api.data.Item;
 
 /** Base class for dividing items into multiple itemms */
 public abstract class AbstractSplitter extends AbstractComponent implements Processor {

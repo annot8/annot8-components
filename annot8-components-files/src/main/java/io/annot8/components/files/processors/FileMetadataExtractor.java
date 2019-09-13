@@ -11,10 +11,10 @@ import io.annot8.common.data.bounds.NoBounds;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.conventions.FileMetadataKeys;
 import io.annot8.conventions.PathUtils;
-import io.annot8.core.components.responses.ProcessorResponse;
-import io.annot8.core.data.Item;
-import io.annot8.core.exceptions.IncompleteException;
-import io.annot8.core.stores.AnnotationStore;
+import io.annot8.api.components.responses.ProcessorResponse;
+import io.annot8.api.data.Item;
+import io.annot8.api.exceptions.IncompleteException;
+import io.annot8.api.stores.AnnotationStore;
 
 public class FileMetadataExtractor extends AbstractProcessor {
 

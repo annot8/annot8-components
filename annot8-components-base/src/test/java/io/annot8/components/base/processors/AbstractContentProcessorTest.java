@@ -15,9 +15,9 @@ import org.mockito.Mockito;
 import org.mockito.stubbing.Answer;
 
 import io.annot8.common.data.content.Text;
-import io.annot8.core.data.Content;
-import io.annot8.core.data.Item;
-import io.annot8.core.exceptions.ProcessingException;
+import io.annot8.api.data.Content;
+import io.annot8.api.data.Item;
+import io.annot8.api.exceptions.ProcessingException;
 
 public class AbstractContentProcessorTest {
 

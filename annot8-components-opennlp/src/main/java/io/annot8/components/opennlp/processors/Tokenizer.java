@@ -13,8 +13,8 @@ import io.annot8.common.data.bounds.SpanBounds;
 import io.annot8.common.data.content.Text;
 import io.annot8.components.base.processors.AbstractTextProcessor;
 import io.annot8.conventions.AnnotationTypes;
-import io.annot8.core.components.annotations.ComponentDescription;
-import io.annot8.core.exceptions.BadConfigurationException;
+import io.annot8.api.components.annotations.ComponentDescription;
+import io.annot8.api.exceptions.BadConfigurationException;
 
 /** Tokenizes words and sentences using OpenNLP tokenization models */
 @ComponentDescription("Tokenizes words and sentences using OpenNLP tokenization models")

@@ -6,10 +6,10 @@ import java.util.regex.Pattern;
 
 import io.annot8.common.data.bounds.SpanBounds;
 import io.annot8.common.data.content.Text;
-import io.annot8.core.annotations.Annotation;
-import io.annot8.core.exceptions.BadConfigurationException;
-import io.annot8.core.exceptions.ProcessingException;
-import io.annot8.core.stores.AnnotationStore;
+import io.annot8.api.annotations.Annotation;
+import io.annot8.api.exceptions.BadConfigurationException;
+import io.annot8.api.exceptions.ProcessingException;
+import io.annot8.api.stores.AnnotationStore;
 
 /** Base class for regex annotators */
 public abstract class AbstractRegexProcessor extends AbstractTextProcessor {

@@ -10,7 +10,7 @@ import io.annot8.common.data.bounds.SpanBounds;
 import io.annot8.common.data.content.Text;
 import io.annot8.components.base.processors.AbstractTextProcessor;
 import io.annot8.conventions.PropertyKeys;
-import io.annot8.core.annotations.Annotation.Builder;
+import io.annot8.api.annotations.Annotation.Builder;
 
 public abstract class AbstractQuantityProcessor extends AbstractTextProcessor {
 

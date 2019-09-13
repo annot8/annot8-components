@@ -10,8 +10,8 @@ import com.google.openlocationcode.OpenLocationCode.CodeArea;
 import io.annot8.components.base.processors.AbstractRegexProcessor;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
-import io.annot8.core.annotations.Annotation.Builder;
-import io.annot8.core.components.annotations.ComponentDescription;
+import io.annot8.api.annotations.Annotation.Builder;
+import io.annot8.api.components.annotations.ComponentDescription;
 
 /** Extracts full global Plus Codes (also known as Open Location Codes) from text */
 @ComponentDescription(

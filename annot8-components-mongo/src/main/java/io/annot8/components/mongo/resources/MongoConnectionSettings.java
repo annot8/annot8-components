@@ -6,7 +6,7 @@ import java.util.stream.Stream;
 
 import com.google.common.base.Strings;
 
-import io.annot8.core.settings.Settings;
+import io.annot8.api.settings.Settings;
 
 public class MongoConnectionSettings implements Settings {
 

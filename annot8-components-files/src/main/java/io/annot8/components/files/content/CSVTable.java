@@ -19,7 +19,7 @@ import io.annot8.common.data.content.Row;
 import io.annot8.common.data.content.Table;
 import io.annot8.common.data.content.TableMetadata;
 import io.annot8.components.files.utils.BufferedReaderIterator;
-import io.annot8.core.exceptions.Annot8RuntimeException;
+import io.annot8.api.exceptions.Annot8RuntimeException;
 
 public class CSVTable implements Table {
 

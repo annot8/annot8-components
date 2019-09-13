@@ -13,7 +13,7 @@ import com.optimaize.langdetect.profiles.LanguageProfileReader;
 import com.optimaize.langdetect.text.CommonTextObjectFactories;
 import com.optimaize.langdetect.text.TextObjectFactory;
 
-import io.annot8.core.settings.Settings;
+import io.annot8.api.settings.Settings;
 
 public class DetectLanguageSettings implements Settings {
 

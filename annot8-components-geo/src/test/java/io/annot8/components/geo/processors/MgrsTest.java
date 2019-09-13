@@ -11,11 +11,11 @@ import org.junit.jupiter.api.Test;
 import io.annot8.common.data.content.Text;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
-import io.annot8.core.annotations.Annotation;
-import io.annot8.core.components.Processor;
-import io.annot8.core.data.Item;
-import io.annot8.core.exceptions.Annot8Exception;
-import io.annot8.core.stores.AnnotationStore;
+import io.annot8.api.annotations.Annotation;
+import io.annot8.api.components.Processor;
+import io.annot8.api.data.Item;
+import io.annot8.api.exceptions.Annot8Exception;
+import io.annot8.api.stores.AnnotationStore;
 import io.annot8.testing.testimpl.TestItem;
 import io.annot8.testing.testimpl.content.TestStringContent;
 

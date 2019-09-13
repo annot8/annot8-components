@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.Text;
-import io.annot8.core.data.Item;
+import io.annot8.api.data.Item;
 import io.annot8.testing.testimpl.TestItem;
 
 public class OCRTest {

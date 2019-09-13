@@ -12,7 +12,7 @@ import io.annot8.common.data.content.Text;
 import io.annot8.components.base.processors.AbstractTextProcessor;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
-import io.annot8.core.stores.AnnotationStore;
+import io.annot8.api.stores.AnnotationStore;
 
 public class BitcoinAddress extends AbstractTextProcessor {
 

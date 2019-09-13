@@ -8,8 +8,8 @@ import java.nio.file.Files;
 import io.annot8.common.components.AbstractProcessor;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.Text;
-import io.annot8.core.components.responses.ProcessorResponse;
-import io.annot8.core.data.Item;
+import io.annot8.api.components.responses.ProcessorResponse;
+import io.annot8.api.data.Item;
 
 public class TxtFileExtractor extends AbstractProcessor {
 

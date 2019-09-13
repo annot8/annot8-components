@@ -8,10 +8,10 @@ import com.google.common.collect.SetMultimap;
 
 import io.annot8.common.data.content.Text;
 import io.annot8.components.base.processors.AbstractTextProcessor;
-import io.annot8.core.annotations.Annotation;
-import io.annot8.core.annotations.Group;
-import io.annot8.core.exceptions.IncompleteException;
-import io.annot8.core.stores.GroupStore;
+import io.annot8.api.annotations.Annotation;
+import io.annot8.api.annotations.Group;
+import io.annot8.api.exceptions.IncompleteException;
+import io.annot8.api.stores.GroupStore;
 
 public class GroupByTypeAndValueAnnotator extends AbstractTextProcessor {
 

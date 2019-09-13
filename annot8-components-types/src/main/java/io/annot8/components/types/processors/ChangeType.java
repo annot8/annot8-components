@@ -2,11 +2,11 @@
 package io.annot8.components.types.processors;
 
 import io.annot8.common.components.AbstractComponent;
-import io.annot8.core.components.Processor;
-import io.annot8.core.components.responses.ProcessorResponse;
-import io.annot8.core.data.Item;
-import io.annot8.core.exceptions.IncompleteException;
-import io.annot8.core.settings.Settings;
+import io.annot8.api.components.Processor;
+import io.annot8.api.components.responses.ProcessorResponse;
+import io.annot8.api.data.Item;
+import io.annot8.api.exceptions.IncompleteException;
+import io.annot8.api.settings.Settings;
 
 /**
  * Create a duplicate annotation but with a different type. The original annotation can optionally

@@ -13,10 +13,10 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import io.annot8.core.components.responses.SourceResponse;
-import io.annot8.core.data.ItemFactory;
-import io.annot8.core.exceptions.Annot8RuntimeException;
-import io.annot8.core.exceptions.BadConfigurationException;
+import io.annot8.api.components.responses.SourceResponse;
+import io.annot8.api.data.ItemFactory;
+import io.annot8.api.exceptions.Annot8RuntimeException;
+import io.annot8.api.exceptions.BadConfigurationException;
 
 public class FileSystemSource extends AbstractFileSystemSource {
 

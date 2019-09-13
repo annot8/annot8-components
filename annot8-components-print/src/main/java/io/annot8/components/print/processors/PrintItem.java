@@ -2,12 +2,12 @@
 package io.annot8.components.print.processors;
 
 import io.annot8.common.components.AbstractProcessor;
-import io.annot8.core.annotations.Annotation;
-import io.annot8.core.components.responses.ProcessorResponse;
-import io.annot8.core.data.Content;
-import io.annot8.core.data.Item;
-import io.annot8.core.properties.Properties;
-import io.annot8.core.stores.AnnotationStore;
+import io.annot8.api.annotations.Annotation;
+import io.annot8.api.components.responses.ProcessorResponse;
+import io.annot8.api.data.Content;
+import io.annot8.api.data.Item;
+import io.annot8.api.properties.Properties;
+import io.annot8.api.stores.AnnotationStore;
 
 public class PrintItem extends AbstractProcessor {
 

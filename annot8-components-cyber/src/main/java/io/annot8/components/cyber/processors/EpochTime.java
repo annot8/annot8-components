@@ -8,8 +8,8 @@ import java.util.regex.Pattern;
 import io.annot8.components.base.processors.AbstractRegexProcessor;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
-import io.annot8.core.annotations.Annotation.Builder;
-import io.annot8.core.settings.Settings;
+import io.annot8.api.annotations.Annotation.Builder;
+import io.annot8.api.settings.Settings;
 
 public class EpochTime extends AbstractRegexProcessor {
 

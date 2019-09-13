@@ -18,7 +18,7 @@ import io.annot8.common.data.content.Table;
 import io.annot8.common.data.content.TableMetadata;
 import io.annot8.components.db.processors.JDBCSettings;
 import io.annot8.components.db.utils.DatabaseTableIterator;
-import io.annot8.core.exceptions.Annot8RuntimeException;
+import io.annot8.api.exceptions.Annot8RuntimeException;
 
 public class DatabaseTable implements Table {
 

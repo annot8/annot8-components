@@ -6,7 +6,7 @@ import uk.gov.nca.remedi4j.client.RemediClient;
 import io.annot8.common.data.content.Text;
 import io.annot8.components.base.processors.AbstractTextProcessor;
 import io.annot8.conventions.PropertyKeys;
-import io.annot8.core.exceptions.ProcessingException;
+import io.annot8.api.exceptions.ProcessingException;
 
 /**
  * Use the REMEDI machine translation platform (see

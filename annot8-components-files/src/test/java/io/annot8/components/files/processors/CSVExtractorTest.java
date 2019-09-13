@@ -15,8 +15,8 @@ import org.mockito.Mockito;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.TableContent;
 import io.annot8.components.files.AbstractCSVDataTest;
-import io.annot8.core.components.responses.ProcessorResponse;
-import io.annot8.core.components.responses.ProcessorResponse.Status;
+import io.annot8.api.components.responses.ProcessorResponse;
+import io.annot8.api.components.responses.ProcessorResponse.Status;
 import io.annot8.testing.testimpl.TestItem;
 
 public class CSVExtractorTest extends AbstractCSVDataTest {

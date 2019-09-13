@@ -5,8 +5,8 @@ import static io.annot8.components.text.processors.Capitalise.TextCase.UPPERCASE
 
 import io.annot8.common.data.content.Text;
 import io.annot8.components.base.processors.AbstractTextProcessor;
-import io.annot8.core.data.Item;
-import io.annot8.core.settings.Settings;
+import io.annot8.api.data.Item;
+import io.annot8.api.settings.Settings;
 
 public class Capitalise extends AbstractTextProcessor {
 
