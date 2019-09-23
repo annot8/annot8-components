@@ -1,20 +1,8 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.files.processors;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.io.File;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.List;
-
-import org.junit.jupiter.api.Test;
-
 import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
-
 import io.annot8.api.components.Processor;
 import io.annot8.api.data.Content;
 import io.annot8.api.data.Item;
@@ -23,13 +11,23 @@ import io.annot8.common.data.content.InputStreamContent;
 import io.annot8.common.data.content.Text;
 import io.annot8.testing.testimpl.TestItem;
 import io.annot8.testing.testimpl.TestItemFactory;
+import org.junit.jupiter.api.Test;
+
+import java.io.File;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class EmlFileExtractorTest {
 
   @Test
   public void test() throws Exception {
 
-    try (Processor p = new EmlFileExtractor()) {
+    try (Processor p = new EmlFileExtractor.Processor()) {
 
       TestItem item = new TestItem();
       TestItemFactory itemFactory = (TestItemFactory) item.getItemFactory();
@@ -100,7 +98,7 @@ public class EmlFileExtractorTest {
             .filter(
                 c ->
                     c.getProperties()
-                        .get(EmlFileExtractor.PROPERTY_PART_NAME, String.class)
+                        .get(EmlFileExtractor.Processor.PROPERTY_PART_NAME, String.class)
                         .map(s -> s.equals(name))
                         .orElse(false))
             .findFirst()

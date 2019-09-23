@@ -12,4 +12,5 @@ module io.annot8.components.files {
   requires apache.mime4j.dom;
   requires com.google.common;
   requires apache.mime4j.core;
+  requires java.json.bind;
 }
