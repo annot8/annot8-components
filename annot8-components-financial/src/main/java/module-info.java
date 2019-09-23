@@ -5,6 +5,7 @@ open module io.annot8.components.financial {
   requires io.annot8.conventions;
   requires iban4j;
   requires bitcoinj.core;
+  requires io.annot8.common.components;
 
   exports io.annot8.components.financial.processors;
 }
