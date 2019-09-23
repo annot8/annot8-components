@@ -1,12 +1,12 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.mongo.resources;
 
+import com.google.common.base.Strings;
+import io.annot8.api.settings.Description;
+import io.annot8.api.settings.Settings;
+
 import java.util.Optional;
 import java.util.stream.Stream;
-
-import com.google.common.base.Strings;
-
-import io.annot8.api.settings.Settings;
 
 public class MongoConnectionSettings implements Settings {
 
@@ -14,6 +14,7 @@ public class MongoConnectionSettings implements Settings {
   private String database;
   private String collection;
 
+  @Description("Connection string")
   public String getConnection() {
     return connection;
   }
@@ -22,6 +23,7 @@ public class MongoConnectionSettings implements Settings {
     this.connection = connection;
   }
 
+  @Description("Database name")
   public String getDatabase() {
     return database;
   }
@@ -30,6 +32,7 @@ public class MongoConnectionSettings implements Settings {
     this.database = database;
   }
 
+  @Description("Collection name")
   public String getCollection() {
     return collection;
   }
