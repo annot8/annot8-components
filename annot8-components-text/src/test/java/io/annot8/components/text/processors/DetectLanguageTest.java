@@ -1,15 +1,6 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.text.processors;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import org.junit.jupiter.api.Test;
-
 import io.annot8.api.annotations.Annotation;
 import io.annot8.api.components.Processor;
 import io.annot8.api.data.Item;
@@ -17,11 +8,18 @@ import io.annot8.api.exceptions.Annot8Exception;
 import io.annot8.api.stores.AnnotationStore;
 import io.annot8.common.data.bounds.ContentBounds;
 import io.annot8.common.data.content.Text;
-import io.annot8.components.text.processors.settings.DetectLanguageSettings;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
 import io.annot8.testing.testimpl.TestItem;
 import io.annot8.testing.testimpl.content.TestStringContent;
+import org.junit.jupiter.api.Test;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class DetectLanguageTest {
 
@@ -46,7 +44,7 @@ public class DetectLanguageTest {
   }
 
   private void doTest(String sourceText, String expectedLanguage) throws Annot8Exception {
-    try (Processor p = new DetectLanguage(new DetectLanguageSettings())) {
+    try (Processor p = new DetectLanguage.Processor()) {
       Item item = new TestItem();
 
       Text content = item.createContent(TestStringContent.class).withData(sourceText).save();

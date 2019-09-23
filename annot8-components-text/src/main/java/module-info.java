@@ -4,7 +4,7 @@ open module io.annot8.components.text {
   requires io.annot8.components.base;
   requires io.annot8.conventions;
   requires language.detector;
+  requires io.annot8.common.components;
 
   exports io.annot8.components.text.processors;
-  exports io.annot8.components.text.processors.settings;
 }
