@@ -2,6 +2,9 @@
 package io.annot8.components.properties.processors;
 
 import io.annot8.api.capabilities.Capabilities;
+import io.annot8.api.components.annotations.ComponentDescription;
+import io.annot8.api.components.annotations.ComponentName;
+import io.annot8.api.components.annotations.SettingsClass;
 import io.annot8.api.components.responses.ProcessorResponse;
 import io.annot8.api.context.Context;
 import io.annot8.api.data.Item;
@@ -21,6 +24,9 @@ import java.util.Set;
  * Convert properties on an item to separate Text content so they can be processed. The toString()
  * function is used to convert properties into a String.
  */
+@ComponentName("Property to Text")
+@ComponentDescription("Convert Property value to Text content")
+@SettingsClass(PropertyToText.Settings.class)
 public class PropertyToText extends AbstractProcessorDescriptor<PropertyToText.Processor, PropertyToText.Settings> {
 
   @Override

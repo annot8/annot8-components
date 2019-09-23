@@ -4,6 +4,7 @@ package io.annot8.components.properties.processors;
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
 import io.annot8.api.components.annotations.ComponentName;
+import io.annot8.api.components.annotations.SettingsClass;
 import io.annot8.api.components.responses.ProcessorResponse;
 import io.annot8.api.context.Context;
 import io.annot8.api.data.Item;
@@ -18,6 +19,7 @@ import javax.json.bind.annotation.JsonbProperty;
 /** Set a property on an item to a specified value, overwriting any existing value */
 @ComponentName("Set Property")
 @ComponentDescription("Set the value of a property on an item")
+@SettingsClass(Property.Settings.class)
 public class Property extends AbstractProcessorDescriptor<Property.Processor, Property.Settings> {
 
   @Override
