@@ -17,15 +17,15 @@ import io.annot8.common.data.content.ColumnMetadata;
 import io.annot8.common.data.content.Row;
 import io.annot8.common.data.content.Table;
 import io.annot8.common.data.content.TableMetadata;
-import io.annot8.components.db.processors.JDBCSettings;
+import io.annot8.components.db.processors.JdbcSettings;
 import io.annot8.components.db.utils.DatabaseTableIterator;
 
 public class DatabaseTable implements Table {
 
-  private JDBCSettings settings;
+  private JdbcSettings settings;
   private TableMetadata tableMetadata;
 
-  public DatabaseTable(TableMetadata metadata, JDBCSettings settings) {
+  public DatabaseTable(TableMetadata metadata, JdbcSettings settings) {
     this.tableMetadata = metadata;
     this.settings = settings;
   }

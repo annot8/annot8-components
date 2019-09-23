@@ -3,7 +3,7 @@ package io.annot8.components.db.processors;
 
 import io.annot8.api.settings.Settings;
 
-public class JDBCSettings implements Settings {
+public class JdbcSettings implements Settings {
 
   public static final int TIMEOUT = 1000;
 
@@ -11,11 +11,11 @@ public class JDBCSettings implements Settings {
   private final String user;
   private final String password;
 
-  public JDBCSettings(String jdbcUrl) {
+  public JdbcSettings(String jdbcUrl) {
     this(jdbcUrl, null, null);
   }
 
-  public JDBCSettings(String jdbcUrl, String user, String password) {
+  public JdbcSettings(String jdbcUrl, String user, String password) {
     this.jdbcUrl = jdbcUrl;
     this.user = user;
     this.password = password;

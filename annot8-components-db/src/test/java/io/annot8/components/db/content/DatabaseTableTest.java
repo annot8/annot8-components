@@ -17,7 +17,7 @@ import io.annot8.api.exceptions.Annot8RuntimeException;
 import io.annot8.common.data.content.Row;
 import io.annot8.common.data.content.TableMetadata;
 import io.annot8.components.db.processors.AbstractSQLiteDataTest;
-import io.annot8.components.db.processors.JDBCSettings;
+import io.annot8.components.db.processors.JdbcSettings;
 
 public class DatabaseTableTest extends AbstractSQLiteDataTest {
 
@@ -45,7 +45,7 @@ public class DatabaseTableTest extends AbstractSQLiteDataTest {
 
   @Test
   public void testDatabaseTableBadSettings() {
-    JDBCSettings settings = new JDBCSettings("");
+    JdbcSettings settings = new JdbcSettings("");
     DatabaseTable table =
         new DatabaseTable(new TableMetadata("test", "TABLE", Collections.emptyList(), 0), settings);
 

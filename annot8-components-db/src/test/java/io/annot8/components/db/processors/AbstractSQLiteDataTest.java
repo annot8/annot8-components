@@ -36,9 +36,9 @@ public abstract class AbstractSQLiteDataTest {
     return new TableMetadata("test", "TABLE", Arrays.asList(testColumn, idColumn, someValue), 2);
   }
 
-  protected JDBCSettings getTestDBSettings() {
+  protected JdbcSettings getTestDBSettings() {
     File testdb = getTestFile("test.db");
-    return new JDBCSettings("jdbc:sqlite:/" + testdb.getAbsolutePath());
+    return new JdbcSettings("jdbc:sqlite:/" + testdb.getAbsolutePath());
   }
 
   private File getTestFile(String resourceFileName) {

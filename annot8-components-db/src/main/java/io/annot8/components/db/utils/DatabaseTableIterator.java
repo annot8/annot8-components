@@ -14,13 +14,13 @@ import io.annot8.common.data.content.ColumnMetadata;
 import io.annot8.common.data.content.DefaultRow;
 import io.annot8.common.data.content.Row;
 import io.annot8.common.data.content.TableMetadata;
-import io.annot8.components.db.processors.JDBCSettings;
+import io.annot8.components.db.processors.JdbcSettings;
 
 public class DatabaseTableIterator implements Iterator<Row> {
 
   private ResultSet resultSet;
   private TableMetadata metadata;
-  private JDBCSettings settings;
+  private JdbcSettings settings;
   private List<String> columnNames;
 
   public DatabaseTableIterator(ResultSet set, TableMetadata metadata) {
