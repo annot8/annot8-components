@@ -1,9 +1,10 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.translation.processors;
 
-import java.net.URI;
-
+import io.annot8.api.settings.Description;
 import io.annot8.api.settings.Settings;
+
+import java.net.URI;
 
 public class RemediTranslationSettings implements Settings {
 
@@ -19,6 +20,7 @@ public class RemediTranslationSettings implements Settings {
     return preProcessorUri != null && serverUri != null && postProcessorUri != null;
   }
 
+  @Description("URL of the REMEDI Pre-Processor")
   public URI getPreProcessorUri() {
     return preProcessorUri;
   }
@@ -27,6 +29,7 @@ public class RemediTranslationSettings implements Settings {
     this.preProcessorUri = preProcessorUri;
   }
 
+  @Description("URL of the REMEDI Translation Server or Load Balancer")
   public URI getServerUri() {
     return serverUri;
   }
@@ -35,6 +38,7 @@ public class RemediTranslationSettings implements Settings {
     this.serverUri = serverUri;
   }
 
+  @Description("URL of the REMEDI Post-Processor")
   public URI getPostProcessorUri() {
     return postProcessorUri;
   }
@@ -43,6 +47,7 @@ public class RemediTranslationSettings implements Settings {
     this.postProcessorUri = postProcessorUri;
   }
 
+  @Description("Source language")
   public String getSourceLanguage() {
     return sourceLanguage;
   }
@@ -51,6 +56,7 @@ public class RemediTranslationSettings implements Settings {
     this.sourceLanguage = sourceLanguage;
   }
 
+  @Description("Target language")
   public String getTargetLanguage() {
     return targetLanguage;
   }
