@@ -1,27 +1,27 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.tika.processors;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import io.annot8.api.components.Processor;
+import io.annot8.api.data.Item;
+import io.annot8.common.data.content.FileContent;
+import io.annot8.common.data.content.InputStreamContent;
+import io.annot8.common.data.content.Text;
+import io.annot8.testing.testimpl.TestItem;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import org.junit.jupiter.api.Test;
-
-import io.annot8.api.data.Item;
-import io.annot8.common.data.content.FileContent;
-import io.annot8.common.data.content.InputStreamContent;
-import io.annot8.common.data.content.Text;
-import io.annot8.testing.testimpl.TestItem;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class TikaExtractorTest {
 
   @Test
   public void testInputStream() {
-    TikaExtractor extractor = new TikaExtractor();
+    Processor extractor = new TikaExtractor.Processor();
 
     Item item = new TestItem();
     item.createContent(InputStreamContent.class)
@@ -43,7 +43,7 @@ public class TikaExtractorTest {
 
     Files.write(p, "Hello world!".getBytes());
 
-    TikaExtractor extractor = new TikaExtractor();
+    Processor extractor = new TikaExtractor.Processor();
 
     Item item = new TestItem();
     item.createContent(FileContent.class).withData(p.toFile()).save();
@@ -58,7 +58,7 @@ public class TikaExtractorTest {
 
   @Test
   public void testMissingFile() throws IOException {
-    TikaExtractor extractor = new TikaExtractor();
+    Processor extractor = new TikaExtractor.Processor();
 
     File f = new File("missing-file.txt");
     assertFalse(f.exists());
