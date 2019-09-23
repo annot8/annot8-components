@@ -4,6 +4,8 @@ package io.annot8.components.print.processors;
 import io.annot8.api.annotations.Annotation;
 import io.annot8.api.bounds.Bounds;
 import io.annot8.api.capabilities.Capabilities;
+import io.annot8.api.components.annotations.ComponentDescription;
+import io.annot8.api.components.annotations.ComponentName;
 import io.annot8.api.components.responses.ProcessorResponse;
 import io.annot8.api.context.Context;
 import io.annot8.api.data.Content;
@@ -15,6 +17,8 @@ import io.annot8.common.components.AbstractProcessor;
 import io.annot8.common.components.AbstractProcessorDescriptor;
 import io.annot8.common.components.capabilities.SimpleCapabilities;
 
+@ComponentName("Print Items")
+@ComponentDescription("Prints information about each item")
 public class PrintItem extends AbstractProcessorDescriptor<PrintItem.Processor, NoSettings> {
 
   @Override

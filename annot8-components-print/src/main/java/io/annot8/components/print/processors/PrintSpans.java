@@ -2,6 +2,8 @@
 package io.annot8.components.print.processors;
 
 import io.annot8.api.capabilities.Capabilities;
+import io.annot8.api.components.annotations.ComponentDescription;
+import io.annot8.api.components.annotations.ComponentName;
 import io.annot8.api.context.Context;
 import io.annot8.api.settings.NoSettings;
 import io.annot8.common.components.AbstractProcessorDescriptor;
@@ -12,6 +14,8 @@ import io.annot8.components.base.processors.AbstractTextProcessor;
 
 import java.util.Optional;
 
+@ComponentName("Print Spans")
+@ComponentDescription("Prints information about each item")
 public class PrintSpans extends AbstractProcessorDescriptor<PrintSpans.Processor, NoSettings> {
 
   @Override
