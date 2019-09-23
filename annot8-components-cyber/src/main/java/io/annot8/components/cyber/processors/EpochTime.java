@@ -7,6 +7,7 @@ import io.annot8.api.components.annotations.ComponentDescription;
 import io.annot8.api.components.annotations.ComponentName;
 import io.annot8.api.components.annotations.SettingsClass;
 import io.annot8.api.context.Context;
+import io.annot8.api.settings.Description;
 import io.annot8.common.components.AbstractProcessorDescriptor;
 import io.annot8.common.components.capabilities.SimpleCapabilities;
 import io.annot8.common.data.bounds.SpanBounds;
@@ -93,6 +94,7 @@ public class EpochTime extends AbstractProcessorDescriptor<EpochTime.Processor, 
           || earliestTimestamp.equals(latestTimestamp);
     }
 
+    @Description("The earliest timestamp to accept - timestamps before this will be ignored")
     public Instant getEarliestTimestamp() {
       return earliestTimestamp;
     }
@@ -101,6 +103,7 @@ public class EpochTime extends AbstractProcessorDescriptor<EpochTime.Processor, 
       this.earliestTimestamp = earliestTimestamp;
     }
 
+    @Description("The latest timestamp to accept - timestamps after this will be ignored")
     public Instant getLatestTimestamp() {
       return latestTimestamp;
     }
@@ -109,6 +112,7 @@ public class EpochTime extends AbstractProcessorDescriptor<EpochTime.Processor, 
       this.latestTimestamp = latestTimestamp;
     }
 
+    @Description("Whether timestamps are in milliseconds (true) or seconds (false)")
     public boolean isMilliseconds() {
       return milliseconds;
     }
