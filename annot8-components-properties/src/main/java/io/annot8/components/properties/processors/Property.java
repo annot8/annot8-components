@@ -1,47 +1,73 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.properties.processors;
 
+import io.annot8.api.capabilities.Capabilities;
+import io.annot8.api.components.annotations.ComponentDescription;
+import io.annot8.api.components.annotations.ComponentName;
 import io.annot8.api.components.responses.ProcessorResponse;
+import io.annot8.api.context.Context;
 import io.annot8.api.data.Item;
-import io.annot8.api.exceptions.BadConfigurationException;
-import io.annot8.api.settings.Settings;
-import io.annot8.common.components.AbstractComponent;
+import io.annot8.api.settings.Description;
 import io.annot8.common.components.AbstractProcessor;
+import io.annot8.common.components.AbstractProcessorDescriptor;
+import io.annot8.common.components.capabilities.SimpleCapabilities;
+
+import javax.json.bind.annotation.JsonbCreator;
+import javax.json.bind.annotation.JsonbProperty;
 
 /** Set a property on an item to a specified value, overwriting any existing value */
-public class Property extends AbstractProcessor {
+@ComponentName("Set Property")
+@ComponentDescription("Set the value of a property on an item")
+public class Property extends AbstractProcessorDescriptor<Property.Processor, Property.Settings> {
 
-  private final PropertySettings propertySettings;
-
-  public Property(PropertySettings propertySettings) {
-    this.propertySettings = propertySettings;
+  @Override
+  protected Processor createComponent(Context context, Settings settings) {
+    return new Processor(settings.getKey(), settings.getValue());
   }
 
   @Override
-  public ProcessorResponse process(Item item) {
-    if (propertySettings == null)
-      throw new BadConfigurationException("No configuration set - have you called configure?");
-
-    item.getProperties().set(propertySettings.getKey(), propertySettings.getValue());
-
-    return ProcessorResponse.ok();
+  public Capabilities capabilities() {
+    return new SimpleCapabilities.Builder().build();
   }
 
-  /** Configuration for the Property processor */
-  public static class PropertySettings extends AbstractComponent implements Settings {
+  public static class Processor extends AbstractProcessor {
 
     private final String key;
     private final Object value;
 
-    public PropertySettings(String key, Object value) {
+    public Processor(String key, Object value) {
       this.key = key;
       this.value = value;
     }
 
+    @Override
+    public ProcessorResponse process(Item item) {
+      item.getProperties().set(key, value);
+
+      return ProcessorResponse.ok();
+    }
+  }
+
+  /**
+   * Configuration for the Property processor
+   */
+  public static class Settings implements io.annot8.api.settings.Settings {
+
+    private final String key;
+    private final Object value;
+
+    @JsonbCreator
+    public Settings(@JsonbProperty("key") String key, @JsonbProperty("value") Object value) {
+      this.key = key;
+      this.value = value;
+    }
+
+    @Description("Property key")
     public String getKey() {
       return key;
     }
 
+    @Description("Property value")
     public Object getValue() {
       return value;
     }

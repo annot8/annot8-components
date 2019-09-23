@@ -1,7 +1,11 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.properties.processors;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import io.annot8.api.components.Processor;
+import io.annot8.api.data.Item;
+import io.annot8.api.exceptions.Annot8Exception;
+import io.annot8.testing.testimpl.TestItem;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -9,13 +13,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.junit.jupiter.api.Test;
-
-import io.annot8.api.components.Processor;
-import io.annot8.api.data.Item;
-import io.annot8.api.exceptions.Annot8Exception;
-import io.annot8.components.properties.processors.PropertyToText.PropertyToTextSettings;
-import io.annot8.testing.testimpl.TestItem;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class PropertyToTextTest {
 
@@ -30,7 +28,7 @@ public class PropertyToTextTest {
     properties.put(KEY, EXPECTED_VALUE);
     properties.put("foo", "bar");
 
-    PropertyToTextSettings settings = new PropertyToTextSettings();
+    PropertyToText.Settings settings = new PropertyToText.Settings();
     settings.setWhitelist(new HashSet<>(Collections.singletonList(KEY)));
 
     doTest(properties, settings);
@@ -42,15 +40,15 @@ public class PropertyToTextTest {
     properties.put(KEY, EXPECTED_VALUE);
     properties.put("foo", "bar");
 
-    PropertyToTextSettings settings = new PropertyToTextSettings();
+    PropertyToText.Settings settings = new PropertyToText.Settings();
     settings.setBlacklist(new HashSet<>(Collections.singletonList("foo")));
 
     doTest(properties, settings);
   }
 
-  private void doTest(Map<String, Object> properties, PropertyToTextSettings settings) {
+  private void doTest(Map<String, Object> properties, PropertyToText.Settings settings) {
 
-    try (Processor p = new PropertyToText(settings)) {
+    try (Processor p = new PropertyToText.Processor(settings.getWhitelist(), settings.getBlacklist())) {
 
       Item item = new TestItem();
 
