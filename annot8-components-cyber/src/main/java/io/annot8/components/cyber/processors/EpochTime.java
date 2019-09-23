@@ -1,64 +1,81 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.cyber.processors;
 
-import java.time.Instant;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import io.annot8.api.annotations.Annotation.Builder;
-import io.annot8.api.settings.Settings;
+import io.annot8.api.capabilities.Capabilities;
+import io.annot8.api.context.Context;
+import io.annot8.common.components.AbstractProcessorDescriptor;
+import io.annot8.common.components.capabilities.SimpleCapabilities;
+import io.annot8.common.data.bounds.SpanBounds;
+import io.annot8.common.data.content.Text;
 import io.annot8.components.base.processors.AbstractRegexProcessor;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
 
-public class EpochTime extends AbstractRegexProcessor {
+import java.time.Instant;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-  private EpochTimeSettings settings;
-
-  public EpochTime() {
-    this(new EpochTimeSettings());
-  }
-
-  public EpochTime(EpochTimeSettings settings) {
-    super(
-        Pattern.compile("\\b\\d+\\b", Pattern.CASE_INSENSITIVE),
-        0,
-        AnnotationTypes.ANNOTATION_TYPE_TIMESTAMP);
-    this.settings = settings;
+public class EpochTime extends AbstractProcessorDescriptor<EpochTime.Processor, EpochTime.Settings> {
+  @Override
+  protected Processor createComponent(Context context, Settings settings) {
+    return new Processor(settings);
   }
 
   @Override
-  protected boolean acceptMatch(Matcher m) {
-    Long l;
-    try {
-      l = Long.parseLong(m.group());
-    } catch (NumberFormatException nfe) {
-      return false;
-    }
-
-    Instant i;
-    if (settings.isMilliseconds()) {
-      i = Instant.ofEpochMilli(l);
-    } else {
-      i = Instant.ofEpochSecond(l);
-    }
-
-    return (i.isAfter(settings.getEarliestTimestamp()) || i.equals(settings.getEarliestTimestamp()))
-        && (i.isBefore(settings.getLatestTimestamp()) || i.equals(settings.getLatestTimestamp()));
+  public Capabilities capabilities() {
+    return new SimpleCapabilities.Builder()
+        .withProcessesContent(Text.class)
+        .withCreatesAnnotations(AnnotationTypes.ANNOTATION_TYPE_TIMESTAMP, SpanBounds.class)
+        .build();
   }
 
-  @Override
-  protected void addProperties(Builder builder, Matcher m) {
-    if (settings.isMilliseconds()) {
-      builder.withProperty(PropertyKeys.PROPERTY_KEY_UNIT, "ms");
-      builder.withProperty(PropertyKeys.PROPERTY_KEY_REFERENCE, "1970-01-01T00:00:00.000Z");
-    } else {
-      builder.withProperty(PropertyKeys.PROPERTY_KEY_UNIT, "s");
-      builder.withProperty(PropertyKeys.PROPERTY_KEY_REFERENCE, "1970-01-01T00:00:00Z");
+  public static class Processor extends AbstractRegexProcessor {
+
+    private Settings settings;
+
+    public Processor(Settings settings) {
+      super(
+          Pattern.compile("\\b\\d+\\b", Pattern.CASE_INSENSITIVE),
+          0,
+          AnnotationTypes.ANNOTATION_TYPE_TIMESTAMP);
+      this.settings = settings;
     }
+
+    @Override
+    protected boolean acceptMatch(Matcher m) {
+      long l;
+      try {
+        l = Long.parseLong(m.group());
+      } catch (NumberFormatException nfe) {
+        return false;
+      }
+
+      Instant i;
+      if (settings.isMilliseconds()) {
+        i = Instant.ofEpochMilli(l);
+      } else {
+        i = Instant.ofEpochSecond(l);
+      }
+
+      return (i.isAfter(settings.getEarliestTimestamp()) || i.equals(settings.getEarliestTimestamp()))
+          && (i.isBefore(settings.getLatestTimestamp()) || i.equals(settings.getLatestTimestamp()));
+    }
+
+    @Override
+    protected void addProperties(Builder builder, Matcher m) {
+      if (settings.isMilliseconds()) {
+        builder.withProperty(PropertyKeys.PROPERTY_KEY_UNIT, "ms");
+        builder.withProperty(PropertyKeys.PROPERTY_KEY_REFERENCE, "1970-01-01T00:00:00.000Z");
+      } else {
+        builder.withProperty(PropertyKeys.PROPERTY_KEY_UNIT, "s");
+        builder.withProperty(PropertyKeys.PROPERTY_KEY_REFERENCE, "1970-01-01T00:00:00Z");
+      }
+    }
+
   }
 
-  public static class EpochTimeSettings implements Settings {
+  public static class Settings implements io.annot8.api.settings.Settings {
 
     private Instant earliestTimestamp = Instant.MIN;
     private Instant latestTimestamp = Instant.MAX;

@@ -1,34 +1,35 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.cyber.processors;
 
-import java.time.Instant;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
 import io.annot8.api.annotations.Annotation;
 import io.annot8.api.components.Processor;
 import io.annot8.api.data.Item;
 import io.annot8.api.exceptions.Annot8Exception;
 import io.annot8.api.stores.AnnotationStore;
 import io.annot8.common.data.content.Text;
-import io.annot8.components.cyber.processors.EpochTime.EpochTimeSettings;
+import io.annot8.components.cyber.processors.EpochTime.Settings;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
+import io.annot8.implementations.support.context.SimpleContext;
 import io.annot8.testing.testimpl.TestItem;
 import io.annot8.testing.testimpl.content.TestStringContent;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import java.time.Instant;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class EpochTimeTest {
 
   @Test
   public void testMillis() throws Annot8Exception {
+    EpochTime et = new EpochTime();
 
-    EpochTimeSettings settings = new EpochTimeSettings();
+    Settings settings = new Settings();
     settings.setMilliseconds(true);
 
-    try (Processor p = new EpochTime(settings)) {
+    try (Processor p = et.createComponent(new SimpleContext(), settings)) {
       Item item = new TestItem();
 
       Text content =
@@ -57,10 +58,12 @@ public class EpochTimeTest {
 
   @Test
   public void testSeconds() throws Annot8Exception {
-    EpochTimeSettings settings = new EpochTimeSettings();
+    EpochTime et = new EpochTime();
+
+    Settings settings = new Settings();
     settings.setMilliseconds(false);
 
-    try (Processor p = new EpochTime(settings)) {
+    try (Processor p = et.createComponent(new SimpleContext(), settings)) {
       Item item = new TestItem();
 
       Text content =
@@ -86,12 +89,13 @@ public class EpochTimeTest {
 
   @Test
   public void testEarliest() throws Annot8Exception {
+    EpochTime et = new EpochTime();
 
-    EpochTimeSettings settings = new EpochTimeSettings();
+    Settings settings = new Settings();
     settings.setMilliseconds(false);
     settings.setEarliestTimestamp(Instant.ofEpochSecond(1600000000));
 
-    try (Processor p = new EpochTime(settings)) {
+    try (Processor p = et.createComponent(new SimpleContext(), settings)) {
       Item item = new TestItem();
 
       Text content =
@@ -108,11 +112,13 @@ public class EpochTimeTest {
 
   @Test
   public void testLatest() throws Annot8Exception {
-    EpochTimeSettings settings = new EpochTimeSettings();
+    EpochTime et = new EpochTime();
+
+    Settings settings = new Settings();
     settings.setMilliseconds(false);
     settings.setLatestTimestamp(Instant.ofEpochSecond(1400000000));
 
-    try (Processor p = new EpochTime(settings)) {
+    try (Processor p = et.createComponent(new SimpleContext(), settings)) {
       Item item = new TestItem();
 
       Text content =

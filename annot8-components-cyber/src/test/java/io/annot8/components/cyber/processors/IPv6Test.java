@@ -1,27 +1,30 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.cyber.processors;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
 import io.annot8.api.annotations.Annotation;
 import io.annot8.api.components.Processor;
 import io.annot8.api.data.Item;
 import io.annot8.api.exceptions.Annot8Exception;
+import io.annot8.api.settings.NoSettings;
 import io.annot8.api.stores.AnnotationStore;
 import io.annot8.common.data.content.Text;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
+import io.annot8.implementations.support.context.SimpleContext;
 import io.annot8.testing.testimpl.TestItem;
 import io.annot8.testing.testimpl.content.TestStringContent;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class IPv6Test {
 
   private void doTest(String content, String expectedMatch) throws Annot8Exception {
-    try (Processor p = new IPv6()) {
+    IPv6 ip = new IPv6();
+
+    try (Processor p = ip.createComponent(new SimpleContext(), NoSettings.getInstance())) {
       Item item = new TestItem();
 
       Text c = item.createContent(TestStringContent.class).withData(content).save();

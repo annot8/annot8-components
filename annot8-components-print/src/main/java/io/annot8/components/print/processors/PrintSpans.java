@@ -39,6 +39,7 @@ public class PrintSpans extends AbstractProcessorDescriptor<PrintSpans.Processor
                 final SpanBounds bounds = a.getBounds(SpanBounds.class).get();
                 final Optional<String> value = content.getText(a);
 
+                //TODO: Log rather than print if Logging preset
                 System.out.println(
                     String.format("Annotation %s: %s", bounds.toString(), value.orElse("UNKNOWN")));
               });
