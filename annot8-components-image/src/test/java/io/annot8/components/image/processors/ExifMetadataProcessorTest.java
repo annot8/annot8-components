@@ -1,9 +1,19 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.image.processors;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.when;
+import com.drew.lang.GeoLocation;
+import io.annot8.api.annotations.Annotation;
+import io.annot8.api.components.Processor;
+import io.annot8.api.components.responses.ProcessorResponse;
+import io.annot8.api.components.responses.ProcessorResponse.Status;
+import io.annot8.api.data.Item;
+import io.annot8.api.stores.AnnotationStore;
+import io.annot8.common.data.content.FileContent;
+import io.annot8.testing.testimpl.TestAnnotationStore;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 import java.io.File;
 import java.net.URISyntaxException;
@@ -13,20 +23,9 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-
-import com.drew.lang.GeoLocation;
-
-import io.annot8.api.annotations.Annotation;
-import io.annot8.api.components.responses.ProcessorResponse;
-import io.annot8.api.components.responses.ProcessorResponse.Status;
-import io.annot8.api.data.Item;
-import io.annot8.api.stores.AnnotationStore;
-import io.annot8.common.data.content.FileContent;
-import io.annot8.testing.testimpl.TestAnnotationStore;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.when;
 
 public class ExifMetadataProcessorTest {
 
@@ -56,7 +55,7 @@ public class ExifMetadataProcessorTest {
         .when(item)
         .getContents(Mockito.eq(FileContent.class));
 
-    ExifMetadataProcessor processor = new ExifMetadataProcessor();
+    Processor processor = new ExifMetadataProcessor.Processor();
 
     ProcessorResponse response = processor.process(item);
 
