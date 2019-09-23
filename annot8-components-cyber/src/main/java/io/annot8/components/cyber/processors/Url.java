@@ -2,6 +2,8 @@
 package io.annot8.components.cyber.processors;
 
 import io.annot8.api.capabilities.Capabilities;
+import io.annot8.api.components.annotations.ComponentDescription;
+import io.annot8.api.components.annotations.ComponentName;
 import io.annot8.api.context.Context;
 import io.annot8.api.settings.NoSettings;
 import io.annot8.common.components.AbstractProcessorDescriptor;
@@ -13,6 +15,8 @@ import io.annot8.conventions.AnnotationTypes;
 
 import java.util.regex.Pattern;
 
+@ComponentName("URL")
+@ComponentDescription("Extract URLs")
 public class Url extends AbstractProcessorDescriptor<Url.Processor, NoSettings> {
 
   @Override

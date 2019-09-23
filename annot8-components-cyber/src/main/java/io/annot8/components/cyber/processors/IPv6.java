@@ -4,6 +4,8 @@ package io.annot8.components.cyber.processors;
 import com.google.common.net.InetAddresses;
 import io.annot8.api.annotations.Annotation.Builder;
 import io.annot8.api.capabilities.Capabilities;
+import io.annot8.api.components.annotations.ComponentDescription;
+import io.annot8.api.components.annotations.ComponentName;
 import io.annot8.api.context.Context;
 import io.annot8.api.settings.NoSettings;
 import io.annot8.common.components.AbstractProcessorDescriptor;
@@ -17,6 +19,8 @@ import io.annot8.conventions.PropertyKeys;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@ComponentName("IPv6")
+@ComponentDescription("Extract IPv6 addresses")
 public class IPv6 extends AbstractProcessorDescriptor<IPv6.Processor, NoSettings> {
 
   @Override

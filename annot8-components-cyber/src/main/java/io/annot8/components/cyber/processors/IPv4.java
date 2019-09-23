@@ -3,6 +3,8 @@ package io.annot8.components.cyber.processors;
 
 import io.annot8.api.annotations.Annotation.Builder;
 import io.annot8.api.capabilities.Capabilities;
+import io.annot8.api.components.annotations.ComponentDescription;
+import io.annot8.api.components.annotations.ComponentName;
 import io.annot8.api.context.Context;
 import io.annot8.api.settings.NoSettings;
 import io.annot8.common.components.AbstractProcessorDescriptor;
@@ -16,6 +18,8 @@ import io.annot8.conventions.PropertyKeys;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@ComponentName("IPv4")
+@ComponentDescription("Extract IPv4 addresses")
 public class IPv4 extends AbstractProcessorDescriptor<IPv4.Processor, NoSettings> {
 
   @Override
