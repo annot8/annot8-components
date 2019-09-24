@@ -22,6 +22,7 @@ public class PropertyKeys {
   public static final String PROPERTY_KEY_REFERENCE = "reference";
   public static final String PROPERTY_KEY_SOURCE = "source";
   public static final String PROPERTY_KEY_START = "start";
+  public static final String PROPERTY_KEY_SUBTYPE = "subtype";
   public static final String PROPERTY_KEY_SURNAME = "surname";
   public static final String PROPERTY_KEY_TITLE = "title";
   public static final String PROPERTY_KEY_UNIT = "unit";
