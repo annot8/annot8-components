@@ -6,6 +6,7 @@ import io.annot8.api.components.annotations.ComponentDescription;
 import io.annot8.api.components.annotations.ComponentName;
 import io.annot8.api.components.annotations.SettingsClass;
 import io.annot8.api.context.Context;
+import io.annot8.api.settings.Description;
 import io.annot8.common.components.AbstractProcessorDescriptor;
 import io.annot8.common.components.capabilities.SimpleCapabilities;
 import io.annot8.common.data.bounds.SpanBounds;
@@ -133,6 +134,7 @@ public class Mgrs extends AbstractProcessorDescriptor<Mgrs.Processor, Mgrs.Setti
       this.ignoreDates = ignoreDates;
     }
 
+    @Description("Should MGRS co-ordinates that could also be valid dates be ignored")
     public boolean isIgnoreDates() {
       return ignoreDates;
     }

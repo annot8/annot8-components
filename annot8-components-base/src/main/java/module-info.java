@@ -5,6 +5,7 @@ open module io.annot8.components.base {
   requires io.annot8.common.utils;
   requires io.annot8.common.components;
   requires com.google.common;
+  requires java.json.bind;
 
   exports io.annot8.components.base.processors;
 }

@@ -4,6 +4,7 @@ package io.annot8.components.files.sources;
 import io.annot8.api.settings.Description;
 import io.annot8.api.settings.Settings;
 
+import javax.json.bind.annotation.JsonbCreator;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashSet;
@@ -18,6 +19,7 @@ public class FileSystemSourceSettings implements Settings {
   private boolean reprocessOnModify = true;
   private Set<Pattern> acceptedFileNamePatterns = new HashSet<>();
 
+  @JsonbCreator
   public FileSystemSourceSettings() {
     // Do nothing
   }

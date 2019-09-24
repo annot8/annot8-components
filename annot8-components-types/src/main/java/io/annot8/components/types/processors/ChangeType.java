@@ -15,6 +15,9 @@ import io.annot8.common.components.AbstractProcessor;
 import io.annot8.common.components.AbstractProcessorDescriptor;
 import io.annot8.common.components.capabilities.SimpleCapabilities;
 
+import javax.json.bind.annotation.JsonbCreator;
+import javax.json.bind.annotation.JsonbProperty;
+
 /**
  * Create a duplicate annotation but with a different type. The original annotation can optionally
  * be deleted or retained.
@@ -97,7 +100,8 @@ public class ChangeType extends AbstractProcessorDescriptor<ChangeType.Processor
       this.retainOriginal = false;
     }
 
-    public Settings(String originalType, String newType, boolean retainOriginal) {
+    @JsonbCreator
+    public Settings(@JsonbProperty("originalType") String originalType, @JsonbProperty("newType") String newType, @JsonbProperty("retainOriginal") boolean retainOriginal) {
       this.originalType = originalType;
       this.newType = newType;
       this.retainOriginal = retainOriginal;

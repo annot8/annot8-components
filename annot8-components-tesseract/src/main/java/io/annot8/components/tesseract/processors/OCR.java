@@ -8,6 +8,7 @@ import io.annot8.api.components.annotations.SettingsClass;
 import io.annot8.api.components.responses.ProcessorResponse;
 import io.annot8.api.context.Context;
 import io.annot8.api.data.Item;
+import io.annot8.api.settings.Description;
 import io.annot8.common.components.AbstractProcessor;
 import io.annot8.common.components.AbstractProcessorDescriptor;
 import io.annot8.common.components.capabilities.SimpleCapabilities;
@@ -106,6 +107,7 @@ public class OCR extends AbstractProcessorDescriptor<OCR.Processor, OCR.Settings
     private int pageSegmentation = -1;
     private Map<String, String> variables = new HashMap<>();
 
+    @Description("List of file extensions (case insensitive) that will be OCR'd")
     public List<String> getExtensions() {
       return extensions;
     }
@@ -113,6 +115,7 @@ public class OCR extends AbstractProcessorDescriptor<OCR.Processor, OCR.Settings
       this.extensions = extensions;
     }
 
+    @Description("List of Tesseract configs")
     public List<String> getConfigs() {
       return configs;
     }
@@ -120,6 +123,7 @@ public class OCR extends AbstractProcessorDescriptor<OCR.Processor, OCR.Settings
       this.configs = configs;
     }
 
+    @Description("Path to Tesseract models")
     public String getDataPath() {
       return dataPath;
     }
@@ -127,6 +131,7 @@ public class OCR extends AbstractProcessorDescriptor<OCR.Processor, OCR.Settings
       this.dataPath = dataPath;
     }
 
+    @Description("Expected language of text")
     public String getLanguage() {
       return language;
     }
@@ -134,6 +139,7 @@ public class OCR extends AbstractProcessorDescriptor<OCR.Processor, OCR.Settings
       this.language = language;
     }
 
+    @Description("Tesseract engine to use")
     public int getOcrEngine() {
       return ocrEngine;
     }
@@ -141,6 +147,7 @@ public class OCR extends AbstractProcessorDescriptor<OCR.Processor, OCR.Settings
       this.ocrEngine = ocrEngine;
     }
 
+    @Description("Tesseract page segmentation setting")
     public int getPageSegmentation() {
       return pageSegmentation;
     }
@@ -148,6 +155,7 @@ public class OCR extends AbstractProcessorDescriptor<OCR.Processor, OCR.Settings
       this.pageSegmentation = pageSegmentation;
     }
 
+    @Description("Additional Tesseract variables")
     public Map<String, String> getVariables() {
       return variables;
     }

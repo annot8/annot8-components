@@ -13,6 +13,9 @@ import io.annot8.common.components.capabilities.SimpleCapabilities;
 import io.annot8.common.data.content.Text;
 import io.annot8.components.base.processors.AbstractTextProcessor;
 
+import javax.json.bind.annotation.JsonbCreator;
+import javax.json.bind.annotation.JsonbProperty;
+
 import static io.annot8.components.text.processors.Capitalise.TextCase.UPPERCASE;
 
 @ComponentName("Capitalise")
@@ -74,7 +77,8 @@ public class Capitalise extends AbstractProcessorDescriptor<Capitalise.Processor
       textCase = UPPERCASE;
     }
 
-    public Settings(TextCase textCase) {
+    @JsonbCreator
+    public Settings(@JsonbProperty("textCase") TextCase textCase) {
       this.textCase = textCase;
     }
 
