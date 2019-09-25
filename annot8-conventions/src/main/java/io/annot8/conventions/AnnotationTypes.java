@@ -16,6 +16,10 @@ public class AnnotationTypes {
   public static final String ANNOTATION_TYPE_GRAMMAR = ENTITY_PREFIX + "grammar";
   public static final String GRAMMAR_PREFIX = ANNOTATION_TYPE_GRAMMAR + PathUtils.SEPARATOR;
 
+  public static final String ANNOTATION_TYPE_METADATA = ENTITY_PREFIX + "metadata";
+  public static final String METADATA_PREFIX = ANNOTATION_TYPE_METADATA + PathUtils.SEPARATOR;
+
+
   public static final String ANNOTATION_TYPE_ADDRESS = ENTITY_PREFIX + "address";
   public static final String ANNOTATION_TYPE_AREA = QUANTITY_PREFIX + "area";
   public static final String ANNOTATION_TYPE_CHEMICAL = ENTITY_PREFIX + "chemical";
@@ -44,6 +48,7 @@ public class AnnotationTypes {
   public static final String ANNOTATION_TYPE_PHONENUMBER = ENTITY_PREFIX + "phonenumber";
   public static final String ANNOTATION_TYPE_REFERENCE = ENTITY_PREFIX + "reference";
   public static final String ANNOTATION_TYPE_SENTENCE = GRAMMAR_PREFIX + "sentence";
+  public static final String ANNOTATION_TYPE_SUMMARY = METADATA_PREFIX + "summary";
   public static final String ANNOTATION_TYPE_TIMESTAMP = TEMPORAL_PREFIX + "timestamp";
   public static final String ANNOTATION_TYPE_URL = ENTITY_PREFIX + "url";
   public static final String ANNOTATION_TYPE_USERNAME = ENTITY_PREFIX + "username";
