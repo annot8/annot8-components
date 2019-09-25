@@ -19,7 +19,8 @@ public class PropertyKeys {
   public static final String PROPERTY_KEY_NAME = "name";
   public static final String PROPERTY_KEY_NATIONALITY = "nationality";
   public static final String PROPERTY_KEY_PROBABILITY = "probability";
-  public static final String PROPERTY_KEY_REGISTRATION = "registration";
+  public static final String PROPERTY_KEY_PARTOFSPEECH = "pos";
+  public static final String REGISTRATION = "registration";
   public static final String PROPERTY_KEY_REFERENCE = "reference";
   public static final String PROPERTY_KEY_SOURCE = "source";
   public static final String PROPERTY_KEY_START = "start";
