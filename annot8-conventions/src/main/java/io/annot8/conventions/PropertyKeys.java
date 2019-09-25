@@ -16,6 +16,8 @@ public class PropertyKeys {
   public static final String PROPERTY_KEY_GEOJSON = "geojson";
   public static final String PROPERTY_KEY_IDENTIFIER = "identifier";
   public static final String PROPERTY_KEY_LANGUAGE = "language";
+  public static final String PROPERTY_KEY_LATITUDE = "latitude";
+  public static final String PROPERTY_KEY_LONGITUDE = "longitude";
   public static final String PROPERTY_KEY_NAME = "name";
   public static final String PROPERTY_KEY_NATIONALITY = "nationality";
   public static final String PROPERTY_KEY_PROBABILITY = "probability";
