@@ -33,6 +33,8 @@ public class AnnotationTypes {
   public static final String ANNOTATION_TYPE_FINANCIALACCOUNT = ENTITY_PREFIX + "financialAccount";
   public static final String ANNOTATION_TYPE_FREQUENCY = ENTITY_PREFIX + "frequency";
   public static final String ANNOTATION_TYPE_GEOPOLITICALENTITY = ENTITY_PREFIX + "gpe";
+  public static final String ANNOTATION_TYPE_TEMPORAL_INSTANT = TEMPORAL_PREFIX + "instant";
+  public static final String ANNOTATION_TYPE_TEMPORAL_INTERVAL = TEMPORAL_PREFIX + "interval";
   public static final String ANNOTATION_TYPE_IPADDRESS = ENTITY_PREFIX + "ipaddress";
   public static final String ANNOTATION_TYPE_HASHTAG = ENTITY_PREFIX + "hashtag";
   public static final String ANNOTATION_TYPE_LANGUAGE = ENTITY_PREFIX + "language";
@@ -49,7 +51,6 @@ public class AnnotationTypes {
   public static final String ANNOTATION_TYPE_REFERENCE = ENTITY_PREFIX + "reference";
   public static final String ANNOTATION_TYPE_SENTENCE = GRAMMAR_PREFIX + "sentence";
   public static final String ANNOTATION_TYPE_SUMMARY = METADATA_PREFIX + "summary";
-  public static final String ANNOTATION_TYPE_TIMESTAMP = TEMPORAL_PREFIX + "timestamp";
   public static final String ANNOTATION_TYPE_URL = ENTITY_PREFIX + "url";
   public static final String ANNOTATION_TYPE_USERNAME = ENTITY_PREFIX + "username";
   public static final String ANNOTATION_TYPE_VEHICLE = ENTITY_PREFIX + "vehicle";

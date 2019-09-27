@@ -33,7 +33,7 @@ public class EpochTime extends AbstractProcessorDescriptor<EpochTime.Processor, 
   public Capabilities capabilities() {
     return new SimpleCapabilities.Builder()
         .withProcessesContent(Text.class)
-        .withCreatesAnnotations(AnnotationTypes.ANNOTATION_TYPE_TIMESTAMP, SpanBounds.class)
+        .withCreatesAnnotations(AnnotationTypes.ANNOTATION_TYPE_TEMPORAL_INSTANT, SpanBounds.class)
         .build();
   }
 
@@ -45,7 +45,7 @@ public class EpochTime extends AbstractProcessorDescriptor<EpochTime.Processor, 
       super(
           Pattern.compile("\\b\\d+\\b", Pattern.CASE_INSENSITIVE),
           0,
-          AnnotationTypes.ANNOTATION_TYPE_TIMESTAMP);
+          AnnotationTypes.ANNOTATION_TYPE_TEMPORAL_INSTANT);
       this.settings = settings;
     }
 
@@ -71,13 +71,24 @@ public class EpochTime extends AbstractProcessorDescriptor<EpochTime.Processor, 
 
     @Override
     protected void addProperties(Builder builder, Matcher m) {
-      if (settings.isMilliseconds()) {
-        builder.withProperty(PropertyKeys.PROPERTY_KEY_UNIT, "ms");
-        builder.withProperty(PropertyKeys.PROPERTY_KEY_REFERENCE, "1970-01-01T00:00:00.000Z");
-      } else {
-        builder.withProperty(PropertyKeys.PROPERTY_KEY_UNIT, "s");
-        builder.withProperty(PropertyKeys.PROPERTY_KEY_REFERENCE, "1970-01-01T00:00:00Z");
+      long l;
+      try {
+        l = Long.parseLong(m.group());
+      } catch (NumberFormatException nfe) {
+        //This shouldn't happen, as already parsed in acceptMatch
+        return;
       }
+
+      Instant i;
+      if (settings.isMilliseconds()) {
+        i = Instant.ofEpochMilli(l);
+        builder.withProperty(PropertyKeys.PROPERTY_KEY_UNIT, "ms");
+      } else {
+        i = Instant.ofEpochSecond(l);
+        builder.withProperty(PropertyKeys.PROPERTY_KEY_UNIT, "s");
+      }
+
+      builder.withProperty(PropertyKeys.PROPERTY_KEY_VALUE, i);
     }
 
   }

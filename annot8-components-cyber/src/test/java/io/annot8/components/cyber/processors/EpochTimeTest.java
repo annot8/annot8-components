@@ -45,14 +45,12 @@ public class EpochTimeTest {
       Assertions.assertEquals(1, annotations.size());
 
       Annotation a = annotations.get(0);
-      Assertions.assertEquals(AnnotationTypes.ANNOTATION_TYPE_TIMESTAMP, a.getType());
+      Assertions.assertEquals(AnnotationTypes.ANNOTATION_TYPE_TEMPORAL_INSTANT, a.getType());
       Assertions.assertEquals(content.getId(), a.getContentId());
       Assertions.assertEquals("1507725753567", a.getBounds().getData(content).get());
       Assertions.assertEquals(2, a.getProperties().getAll().size());
       Assertions.assertEquals("ms", a.getProperties().get(PropertyKeys.PROPERTY_KEY_UNIT).get());
-      Assertions.assertEquals(
-          "1970-01-01T00:00:00.000Z",
-          a.getProperties().get(PropertyKeys.PROPERTY_KEY_REFERENCE).get());
+      Assertions.assertEquals(Instant.ofEpochMilli(1507725753567L), a.getProperties().get(PropertyKeys.PROPERTY_KEY_VALUE).get());
     }
   }
 
@@ -77,13 +75,13 @@ public class EpochTimeTest {
       Assertions.assertEquals(1, annotations.size());
 
       Annotation a = annotations.get(0);
-      Assertions.assertEquals(AnnotationTypes.ANNOTATION_TYPE_TIMESTAMP, a.getType());
+      Assertions.assertEquals(AnnotationTypes.ANNOTATION_TYPE_TEMPORAL_INSTANT, a.getType());
       Assertions.assertEquals(content.getId(), a.getContentId());
       Assertions.assertEquals("1507725753", a.getBounds().getData(content).get());
       Assertions.assertEquals(2, a.getProperties().getAll().size());
       Assertions.assertEquals("s", a.getProperties().get(PropertyKeys.PROPERTY_KEY_UNIT).get());
-      Assertions.assertEquals(
-          "1970-01-01T00:00:00Z", a.getProperties().get(PropertyKeys.PROPERTY_KEY_REFERENCE).get());
+      Assertions.assertEquals(Instant.ofEpochSecond(1507725753L), a.getProperties().get(PropertyKeys.PROPERTY_KEY_VALUE).get());
+
     }
   }
 
