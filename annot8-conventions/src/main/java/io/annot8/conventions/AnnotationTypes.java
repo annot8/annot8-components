@@ -13,10 +13,10 @@ public class AnnotationTypes {
   public static final String ANNOTATION_TYPE_TEMPORAL = ENTITY_PREFIX + "temporal";
   public static final String TEMPORAL_PREFIX = ANNOTATION_TYPE_TEMPORAL + PathUtils.SEPARATOR;
 
-  public static final String ANNOTATION_TYPE_GRAMMAR = ENTITY_PREFIX + "grammar";
+  public static final String ANNOTATION_TYPE_GRAMMAR = "grammar";
   public static final String GRAMMAR_PREFIX = ANNOTATION_TYPE_GRAMMAR + PathUtils.SEPARATOR;
 
-  public static final String ANNOTATION_TYPE_METADATA = ENTITY_PREFIX + "metadata";
+  public static final String ANNOTATION_TYPE_METADATA = "metadata";
   public static final String METADATA_PREFIX = ANNOTATION_TYPE_METADATA + PathUtils.SEPARATOR;
 
 
