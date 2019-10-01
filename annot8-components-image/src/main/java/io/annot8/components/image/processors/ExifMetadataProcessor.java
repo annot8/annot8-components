@@ -9,6 +9,7 @@ import com.drew.metadata.StringValue;
 import com.drew.metadata.Tag;
 import com.drew.metadata.exif.ExifDirectoryBase;
 import com.drew.metadata.exif.GpsDirectory;
+import io.annot8.api.annotations.Annotation;
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
 import io.annot8.api.components.annotations.ComponentName;
@@ -21,12 +22,18 @@ import io.annot8.common.data.bounds.NoBounds;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.components.base.processors.AbstractContentProcessor;
 
+import io.annot8.conventions.AnnotationTypes;
+import io.annot8.conventions.PathUtils;
+import io.annot8.conventions.PropertyKeys;
 import java.io.IOException;
 import java.util.Date;
 
 @ComponentName("EXIF Metadata")
 @ComponentDescription("Extract EXIF Metadata from images")
 public class ExifMetadataProcessor extends AbstractProcessorDescriptor<ExifMetadataProcessor.Processor, NoSettings> {
+
+  public static final String EXIF_TYPE = AnnotationTypes.METADATA_PREFIX + "exif";
+  public static final String EXIF_GPS_TYPE = AnnotationTypes.METADATA_PREFIX + "exif" + PathUtils.SEPARATOR + "gps";
 
   @Override
   protected Processor createComponent(Context context, NoSettings settings) {
@@ -36,7 +43,8 @@ public class ExifMetadataProcessor extends AbstractProcessorDescriptor<ExifMetad
   @Override
   public Capabilities capabilities() {
     return new SimpleCapabilities.Builder()
-        .withCreatesAnnotations("EXIF_METADATA", NoBounds.class)
+        .withCreatesAnnotations(EXIF_TYPE, NoBounds.class)
+        .withCreatesAnnotations(EXIF_GPS_TYPE, NoBounds.class)
         .withProcessesContent(FileContent.class)
         .build();
   }
@@ -58,26 +66,33 @@ public class ExifMetadataProcessor extends AbstractProcessorDescriptor<ExifMetad
      }
 
      for (ExifDirectoryBase directory : metadata.getDirectoriesOfType(ExifDirectoryBase.class)) {
-       try {
-         if (directory instanceof GpsDirectory) {
-           handleGpsDirectory((GpsDirectory) directory, content);
-         } else {
-           handleDirectory(directory, content);
-         }
-       } catch (IncompleteException e) {
-         log().error("Failed to create annotations", e);
-         return;
+       if (directory instanceof GpsDirectory) {
+         handleGpsDirectory((GpsDirectory) directory, content);
+       } else {
+         handleDirectory(directory, content);
        }
      }
    }
 
    private void handleGpsDirectory(GpsDirectory directory, FileContent content) {
-     directory.getGpsDate();
-     createAnnotation(content, "Geo Location", directory.getGeoLocation());
-     createAnnotation(content, "Gps Date", directory.getGpsDate().getTime());
+     content
+         .getAnnotations()
+         .create()
+         .withType(EXIF_GPS_TYPE)
+         .withBounds(NoBounds.getInstance())
+         .withProperty(PropertyKeys.PROPERTY_KEY_LATITUDE, directory.getGeoLocation().getLatitude())
+         .withProperty(PropertyKeys.PROPERTY_KEY_LONGITUDE, directory.getGeoLocation().getLongitude())
+         .withProperty(PropertyKeys.PROPERTY_KEY_DATE, directory.getGpsDate().getTime())
+         .save();
    }
 
    private void handleDirectory(ExifDirectoryBase directory, FileContent content) {
+     Annotation.Builder builder = content
+         .getAnnotations()
+         .create()
+         .withType(EXIF_TYPE)
+         .withBounds(NoBounds.getInstance());
+
      for (Tag tag : directory.getTags()) {
        Date date = directory.getDate(tag.getTagType());
        Object value;
@@ -93,18 +108,11 @@ public class ExifMetadataProcessor extends AbstractProcessorDescriptor<ExifMetad
        } else {
          value = date.getTime();
        }
-       createAnnotation(content, tag.getTagName(), value);
-     }
-   }
 
-   private void createAnnotation(FileContent content, String key, Object value) {
-     content
-         .getAnnotations()
-         .create()
-         .withProperty(key, value)
-         .withType("EXIF_METADATA")
-         .withBounds(NoBounds.getInstance())
-         .save();
+       builder = builder.withProperty(tag.getTagName(), value);
+     }
+
+     builder.save();
    }
  }
 }
