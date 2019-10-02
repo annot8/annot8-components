@@ -1,6 +1,9 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.types.processors;
 
+import javax.json.bind.annotation.JsonbCreator;
+import javax.json.bind.annotation.JsonbProperty;
+
 import io.annot8.api.bounds.Bounds;
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
@@ -15,9 +18,6 @@ import io.annot8.common.components.AbstractProcessor;
 import io.annot8.common.components.AbstractProcessorDescriptor;
 import io.annot8.common.components.capabilities.SimpleCapabilities;
 
-import javax.json.bind.annotation.JsonbCreator;
-import javax.json.bind.annotation.JsonbProperty;
-
 /**
  * Create a duplicate annotation but with a different type. The original annotation can optionally
  * be deleted or retained.
@@ -25,21 +25,24 @@ import javax.json.bind.annotation.JsonbProperty;
 @ComponentName("Change Type")
 @ComponentDescription("Change the type of an annotation")
 @SettingsClass(ChangeType.Settings.class)
-public class ChangeType extends AbstractProcessorDescriptor<ChangeType.Processor, ChangeType.Settings> {
+public class ChangeType
+    extends AbstractProcessorDescriptor<ChangeType.Processor, ChangeType.Settings> {
 
   @Override
   protected Processor createComponent(Context context, Settings settings) {
-    return new Processor(settings.getOriginalType(), settings.getNewType(), settings.getRetainOriginal());
+    return new Processor(
+        settings.getOriginalType(), settings.getNewType(), settings.getRetainOriginal());
   }
 
   @Override
   public Capabilities capabilities() {
 
-    SimpleCapabilities.Builder builder = new SimpleCapabilities.Builder()
-        .withProcessesAnnotations(getSettings().getOriginalType(), Bounds.class)
-        .withCreatesAnnotations(getSettings().getNewType(), Bounds.class);
+    SimpleCapabilities.Builder builder =
+        new SimpleCapabilities.Builder()
+            .withProcessesAnnotations(getSettings().getOriginalType(), Bounds.class)
+            .withCreatesAnnotations(getSettings().getNewType(), Bounds.class);
 
-    if(!getSettings().getRetainOriginal())
+    if (!getSettings().getRetainOriginal())
       builder = builder.withDeletesAnnotations(getSettings().getOriginalType(), Bounds.class);
 
     return builder.build();
@@ -68,15 +71,9 @@ public class ChangeType extends AbstractProcessorDescriptor<ChangeType.Processor
                         a -> {
                           try {
                             if (retainOriginal) {
-                              c.getAnnotations()
-                                  .copy(a)
-                                  .withType(newType)
-                                  .save();
+                              c.getAnnotations().copy(a).withType(newType).save();
                             } else {
-                              c.getAnnotations()
-                                  .edit(a)
-                                  .withType(newType)
-                                  .save();
+                              c.getAnnotations().edit(a).withType(newType).save();
                             }
                           } catch (IncompleteException ie) {
                             log().warn("Unable to copy annotation", ie);
@@ -101,7 +98,10 @@ public class ChangeType extends AbstractProcessorDescriptor<ChangeType.Processor
     }
 
     @JsonbCreator
-    public Settings(@JsonbProperty("originalType") String originalType, @JsonbProperty("newType") String newType, @JsonbProperty("retainOriginal") boolean retainOriginal) {
+    public Settings(
+        @JsonbProperty("originalType") String originalType,
+        @JsonbProperty("newType") String newType,
+        @JsonbProperty("retainOriginal") boolean retainOriginal) {
       this.originalType = originalType;
       this.newType = newType;
       this.retainOriginal = retainOriginal;

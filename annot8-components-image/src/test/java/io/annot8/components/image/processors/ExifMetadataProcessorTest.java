@@ -1,7 +1,21 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.image.processors;
 
-import com.drew.lang.GeoLocation;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.when;
+
+import java.io.File;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Stream;
+
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.mockito.stubbing.Answer;
+
 import io.annot8.api.annotations.Annotation;
 import io.annot8.api.components.Processor;
 import io.annot8.api.components.responses.ProcessorResponse;
@@ -9,23 +23,8 @@ import io.annot8.api.components.responses.ProcessorResponse.Status;
 import io.annot8.api.data.Item;
 import io.annot8.api.stores.AnnotationStore;
 import io.annot8.common.data.content.FileContent;
+import io.annot8.conventions.PropertyKeys;
 import io.annot8.testing.testimpl.TestAnnotationStore;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-
-import java.io.File;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.when;
 
 public class ExifMetadataProcessorTest {
 
@@ -45,13 +44,7 @@ public class ExifMetadataProcessorTest {
     when(fileContent.getData()).thenReturn(file);
     when(fileContent.getAnnotations()).thenReturn(store);
 
-    doAnswer(
-            new Answer<Stream<FileContent>>() {
-              @Override
-              public Stream<FileContent> answer(InvocationOnMock invocation) throws Throwable {
-                return Stream.of(fileContent);
-              }
-            })
+    doAnswer((Answer<Stream<FileContent>>) invocation -> Stream.of(fileContent))
         .when(item)
         .getContents(Mockito.eq(FileContent.class));
 
@@ -61,48 +54,36 @@ public class ExifMetadataProcessorTest {
 
     assertNotNull(response);
     assertEquals(Status.OK, response.getStatus());
-    assertEquals(61, store.getAll().count());
+    assertEquals(4, store.getByType(ExifMetadataProcessor.EXIF_TYPE).count());
+    assertEquals(1, store.getByType(ExifMetadataProcessor.EXIF_GPS_TYPE).count());
 
-    store.getAll().collect(Collectors.toList());
+    Map<String, Object> allProperties = new HashMap<>();
+    store
+        .getByType(ExifMetadataProcessor.EXIF_TYPE)
+        .forEach(a -> allProperties.putAll(a.getProperties().getAll()));
 
-    assertTrue(containsKeyValue(store.getAll(), "Model", "Pixel XL"));
-    assertTrue(containsKeyValue(store.getAll(), "Make", "Google"));
-    assertTrue(containsKeyValue(store.getAll(), "Model", "Pixel XL"));
-    assertTrue(containsKeyValue(store.getAll(), "Image Width", 3036));
-    assertTrue(containsKeyValue(store.getAll(), "Image Height", 4048));
-    assertTrue(containsKeyValue(store.getAll(), "Date/Time Original", 1537799743000l));
+    containsKeyValue(allProperties, "Make", "Google");
+    containsKeyValue(allProperties, "Model", "Pixel XL");
+    containsKeyValue(allProperties, "Exif Image Width", 3036);
+    containsKeyValue(allProperties, "Exif Image Height", 4048);
+    containsKeyValue(allProperties, "Date/Time Original", 1537799743000L);
 
-    List<Annotation> geoLocation =
-        store
-            .getAll()
-            .filter(a -> a.getProperties().has("Geo Location"))
-            .collect(Collectors.toList());
-    List<Annotation> gpsDate =
-        store.getAll().filter(a -> a.getProperties().has("Gps Date")).collect(Collectors.toList());
+    Annotation geolocation = store.getByType(ExifMetadataProcessor.EXIF_GPS_TYPE).findFirst().get();
+    assertEquals(3, geolocation.getProperties().keys().count());
 
-    assertEquals(1, geoLocation.size());
-    assertEquals(1, gpsDate.size());
-
-    GeoLocation location =
-        (GeoLocation) geoLocation.get(0).getProperties().get("Geo Location").get();
-    long gpsDateMillis = (long) gpsDate.get(0).getProperties().get("Gps Date").get();
-
-    assertEquals(51.897819444444444, location.getLatitude());
-    assertEquals(-2.0717722222222226, location.getLongitude());
-
-    assertEquals(1537796134000l, gpsDateMillis);
+    assertEquals(
+        51.897819444444444,
+        geolocation.getProperties().get(PropertyKeys.PROPERTY_KEY_LATITUDE, Double.class).get());
+    assertEquals(
+        -2.0717722222222226,
+        geolocation.getProperties().get(PropertyKeys.PROPERTY_KEY_LONGITUDE, Double.class).get());
+    assertEquals(
+        1537796134000L,
+        geolocation.getProperties().get(PropertyKeys.PROPERTY_KEY_DATE, Long.class).get());
   }
 
-  private boolean containsKeyValue(Stream<Annotation> annotations, String key, Object value) {
-    return containsKeyValue(annotations, key, (v) -> value.equals(v));
-  }
-
-  private boolean containsKeyValue(
-      Stream<Annotation> annotations, String key, Predicate<Object> valueMatches) {
-    return annotations
-            .map(Annotation::getProperties)
-            .filter(p -> p.has(key) && valueMatches.test(p.get(key).get()))
-            .count()
-        > 0;
+  private void containsKeyValue(Map<String, Object> map, String key, Object value) {
+    assertTrue(map.containsKey(key));
+    assertEquals(value, map.get(key));
   }
 }

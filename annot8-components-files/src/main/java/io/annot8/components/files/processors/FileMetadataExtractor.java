@@ -1,6 +1,11 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.files.processors;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.attribute.BasicFileAttributes;
+
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
 import io.annot8.api.components.annotations.ComponentName;
@@ -18,14 +23,10 @@ import io.annot8.common.data.content.FileContent;
 import io.annot8.conventions.FileMetadataKeys;
 import io.annot8.conventions.PathUtils;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.attribute.BasicFileAttributes;
-
 @ComponentName("File Metadata Extractor")
 @ComponentDescription("Extract metadata from files")
-public class FileMetadataExtractor extends AbstractProcessorDescriptor<FileMetadataExtractor.Processor, NoSettings> {
+public class FileMetadataExtractor
+    extends AbstractProcessorDescriptor<FileMetadataExtractor.Processor, NoSettings> {
 
   @Override
   protected Processor createComponent(Context context, NoSettings settings) {
@@ -34,9 +35,7 @@ public class FileMetadataExtractor extends AbstractProcessorDescriptor<FileMetad
 
   @Override
   public Capabilities capabilities() {
-    return new SimpleCapabilities.Builder()
-        .withProcessesContent(FileContent.class)
-        .build();
+    return new SimpleCapabilities.Builder().withProcessesContent(FileContent.class).build();
   }
 
   public static class Processor extends AbstractProcessor {

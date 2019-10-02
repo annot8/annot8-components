@@ -1,6 +1,11 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.text.processors;
 
+import static io.annot8.components.text.processors.Capitalise.TextCase.UPPERCASE;
+
+import javax.json.bind.annotation.JsonbCreator;
+import javax.json.bind.annotation.JsonbProperty;
+
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
 import io.annot8.api.components.annotations.ComponentName;
@@ -13,15 +18,11 @@ import io.annot8.common.components.capabilities.SimpleCapabilities;
 import io.annot8.common.data.content.Text;
 import io.annot8.components.base.processors.AbstractTextProcessor;
 
-import javax.json.bind.annotation.JsonbCreator;
-import javax.json.bind.annotation.JsonbProperty;
-
-import static io.annot8.components.text.processors.Capitalise.TextCase.UPPERCASE;
-
 @ComponentName("Capitalise")
 @ComponentDescription("Capitalise or lower case text")
 @SettingsClass(Capitalise.Settings.class)
-public class Capitalise extends AbstractProcessorDescriptor<Capitalise.Processor, Capitalise.Settings> {
+public class Capitalise
+    extends AbstractProcessorDescriptor<Capitalise.Processor, Capitalise.Settings> {
 
   @Override
   protected Processor createComponent(Context context, Settings settings) {

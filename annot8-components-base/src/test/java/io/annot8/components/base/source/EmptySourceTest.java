@@ -1,9 +1,11 @@
+/* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.base.source;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import io.annot8.api.components.responses.SourceResponse.Status;
 import org.junit.jupiter.api.Test;
+
+import io.annot8.api.components.responses.SourceResponse.Status;
 
 class EmptySourceTest {
 
@@ -14,6 +16,5 @@ class EmptySourceTest {
     assertEquals(source.read(null).getStatus(), Status.DONE);
     assertEquals(source.read(null).getStatus(), Status.DONE);
     assertEquals(source.read(null).getStatus(), Status.DONE);
-
   }
 }

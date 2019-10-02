@@ -37,9 +37,5 @@
       <artifactId>guava</artifactId>
       <version>28.1-jre</version>
     </dependency>
-    <dependency>
-      <groupId>io.annot8</groupId>
-      <artifactId>annot8-common-utils</artifactId>
-    </dependency>
   </dependencies>
 </project>

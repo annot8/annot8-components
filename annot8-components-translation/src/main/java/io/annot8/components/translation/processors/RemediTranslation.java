@@ -1,6 +1,8 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.translation.processors;
 
+import uk.gov.nca.remedi4j.client.RemediClient;
+
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
 import io.annot8.api.components.annotations.ComponentName;
@@ -12,7 +14,6 @@ import io.annot8.common.components.capabilities.SimpleCapabilities;
 import io.annot8.common.data.content.Text;
 import io.annot8.components.base.processors.AbstractTextProcessor;
 import io.annot8.conventions.PropertyKeys;
-import uk.gov.nca.remedi4j.client.RemediClient;
 
 /**
  * Use the REMEDI machine translation platform (see
@@ -20,9 +21,11 @@ import uk.gov.nca.remedi4j.client.RemediClient;
  * Text content objects.
  */
 @ComponentName("REMEDI Translation")
-@ComponentDescription("Uses the REMEDI Machine Translation tool to translate text between languages")
+@ComponentDescription(
+    "Uses the REMEDI Machine Translation tool to translate text between languages")
 @SettingsClass(RemediTranslationSettings.class)
-public class RemediTranslation extends AbstractProcessorDescriptor<RemediTranslation.Processor, RemediTranslationSettings> {
+public class RemediTranslation
+    extends AbstractProcessorDescriptor<RemediTranslation.Processor, RemediTranslationSettings> {
 
   @Override
   protected Processor createComponent(Context context, RemediTranslationSettings settings) {
@@ -51,7 +54,9 @@ public class RemediTranslation extends AbstractProcessorDescriptor<RemediTransla
 
       client =
           new RemediClient(
-              settings.getPreProcessorUri(), settings.getServerUri(), settings.getPostProcessorUri());
+              settings.getPreProcessorUri(),
+              settings.getServerUri(),
+              settings.getPostProcessorUri());
     }
 
     @Override

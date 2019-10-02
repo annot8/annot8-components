@@ -1,6 +1,8 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.cyber.processors;
 
+import java.util.regex.Pattern;
+
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
 import io.annot8.api.components.annotations.ComponentName;
@@ -12,8 +14,6 @@ import io.annot8.common.data.bounds.SpanBounds;
 import io.annot8.common.data.content.Text;
 import io.annot8.components.base.processors.AbstractRegexProcessor;
 import io.annot8.conventions.AnnotationTypes;
-
-import java.util.regex.Pattern;
 
 @ComponentName("E-mail")
 @ComponentDescription("Extract e-mail addresses")
@@ -32,7 +32,7 @@ public class Email extends AbstractProcessorDescriptor<Email.Processor, NoSettin
         .build();
   }
 
-  public static class Processor extends AbstractRegexProcessor{
+  public static class Processor extends AbstractRegexProcessor {
     public Processor() {
       super(
           Pattern.compile("[A-Z0-9._%+-]+@([A-Z0-9.-]+[.][A-Z]{2,6})", Pattern.CASE_INSENSITIVE),
@@ -40,5 +40,4 @@ public class Email extends AbstractProcessorDescriptor<Email.Processor, NoSettin
           AnnotationTypes.ANNOTATION_TYPE_EMAIL);
     }
   }
-
 }

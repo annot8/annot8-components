@@ -1,13 +1,15 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.base.processors;
 
-import com.google.common.base.Strings;
-import io.annot8.api.settings.Description;
-import io.annot8.api.settings.Settings;
+import java.util.regex.Pattern;
 
 import javax.json.bind.annotation.JsonbCreator;
 import javax.json.bind.annotation.JsonbProperty;
-import java.util.regex.Pattern;
+
+import com.google.common.base.Strings;
+
+import io.annot8.api.settings.Description;
+import io.annot8.api.settings.Settings;
 
 public class RegexSettings implements Settings {
   private final Pattern regex;
@@ -15,7 +17,10 @@ public class RegexSettings implements Settings {
   private final String type;
 
   @JsonbCreator
-  public RegexSettings(@JsonbProperty("regex") Pattern regex, @JsonbProperty("group") int group, @JsonbProperty("type") String type) {
+  public RegexSettings(
+      @JsonbProperty("regex") Pattern regex,
+      @JsonbProperty("group") int group,
+      @JsonbProperty("type") String type) {
     this.regex = regex;
     this.group = group;
     this.type = type;

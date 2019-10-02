@@ -1,6 +1,16 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.tesseract.processors;
 
+import java.util.*;
+
+import net.sourceforge.tess4j.ITesseract;
+import net.sourceforge.tess4j.TessAPI;
+import net.sourceforge.tess4j.Tesseract;
+import net.sourceforge.tess4j.TesseractException;
+import net.sourceforge.tess4j.util.LoadLibs;
+
+import org.apache.commons.io.FilenameUtils;
+
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
 import io.annot8.api.components.annotations.ComponentName;
@@ -14,14 +24,6 @@ import io.annot8.common.components.AbstractProcessorDescriptor;
 import io.annot8.common.components.capabilities.SimpleCapabilities;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.Text;
-import net.sourceforge.tess4j.ITesseract;
-import net.sourceforge.tess4j.TessAPI;
-import net.sourceforge.tess4j.Tesseract;
-import net.sourceforge.tess4j.TesseractException;
-import net.sourceforge.tess4j.util.LoadLibs;
-import org.apache.commons.io.FilenameUtils;
-
-import java.util.*;
 
 /**
  * Takes FileContent containing either an image or PDF file, and produces a Text content with the
@@ -36,8 +38,7 @@ public class OCR extends AbstractProcessorDescriptor<OCR.Processor, OCR.Settings
   protected Processor createComponent(Context context, Settings settings) {
     ITesseract instance = new Tesseract();
 
-    if (!settings.getConfigs().isEmpty())
-      instance.setConfigs(settings.getConfigs());
+    if (!settings.getConfigs().isEmpty()) instance.setConfigs(settings.getConfigs());
 
     instance.setDatapath(settings.getDataPath());
     instance.setLanguage(settings.getLanguage());
@@ -71,8 +72,8 @@ public class OCR extends AbstractProcessorDescriptor<OCR.Processor, OCR.Settings
       item.getContents(FileContent.class)
           .filter(
               fc ->
-                  extensions
-                      .contains(FilenameUtils.getExtension(fc.getData().getName()).toLowerCase()))
+                  extensions.contains(
+                      FilenameUtils.getExtension(fc.getData().getName()).toLowerCase()))
           .forEach(
               fc -> {
                 try {
@@ -92,14 +93,13 @@ public class OCR extends AbstractProcessorDescriptor<OCR.Processor, OCR.Settings
     }
   }
 
-  /**
-   * Settings class for {@link OCR}
-   */
+  /** Settings class for {@link OCR} */
   public static class Settings implements io.annot8.api.settings.Settings {
-    //Processor Settings
-    private List<String> extensions = Arrays.asList("bmp", "gif", "jpg", "jpeg", "pdf", "tif", "tiff");
+    // Processor Settings
+    private List<String> extensions =
+        Arrays.asList("bmp", "gif", "jpg", "jpeg", "pdf", "tif", "tiff");
 
-    //Tesseract Settings
+    // Tesseract Settings
     private List<String> configs = new ArrayList<>();
     private String dataPath = LoadLibs.extractTessResources("tessdata").toString();
     private String language = "eng";
@@ -111,6 +111,7 @@ public class OCR extends AbstractProcessorDescriptor<OCR.Processor, OCR.Settings
     public List<String> getExtensions() {
       return extensions;
     }
+
     public void setExtensions(List<String> extensions) {
       this.extensions = extensions;
     }
@@ -119,6 +120,7 @@ public class OCR extends AbstractProcessorDescriptor<OCR.Processor, OCR.Settings
     public List<String> getConfigs() {
       return configs;
     }
+
     public void setConfigs(List<String> configs) {
       this.configs = configs;
     }
@@ -127,6 +129,7 @@ public class OCR extends AbstractProcessorDescriptor<OCR.Processor, OCR.Settings
     public String getDataPath() {
       return dataPath;
     }
+
     public void setDataPath(String dataPath) {
       this.dataPath = dataPath;
     }
@@ -135,6 +138,7 @@ public class OCR extends AbstractProcessorDescriptor<OCR.Processor, OCR.Settings
     public String getLanguage() {
       return language;
     }
+
     public void setLanguage(String language) {
       this.language = language;
     }
@@ -143,6 +147,7 @@ public class OCR extends AbstractProcessorDescriptor<OCR.Processor, OCR.Settings
     public int getOcrEngine() {
       return ocrEngine;
     }
+
     public void setOcrEngine(int ocrEngine) {
       this.ocrEngine = ocrEngine;
     }
@@ -151,6 +156,7 @@ public class OCR extends AbstractProcessorDescriptor<OCR.Processor, OCR.Settings
     public int getPageSegmentation() {
       return pageSegmentation;
     }
+
     public void setPageSegmentation(int pageSegmentation) {
       this.pageSegmentation = pageSegmentation;
     }
@@ -159,6 +165,7 @@ public class OCR extends AbstractProcessorDescriptor<OCR.Processor, OCR.Settings
     public Map<String, String> getVariables() {
       return variables;
     }
+
     public void setVariables(Map<String, String> variables) {
       this.variables = variables;
     }

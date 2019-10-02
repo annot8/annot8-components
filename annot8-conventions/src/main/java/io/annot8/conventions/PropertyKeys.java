@@ -10,6 +10,7 @@ public class PropertyKeys {
   public static final String PROPERTY_KEY_BANKCODE = "bankCode";
   public static final String PROPERTY_KEY_COORDINATETYPE = "coordinateType";
   public static final String PROPERTY_KEY_COUNTRY = "country";
+  public static final String PROPERTY_KEY_DATE = "date";
   public static final String PROPERTY_KEY_END = "end";
   public static final String PROPERTY_KEY_FIRSTNAME = "firstname";
   public static final String PROPERTY_KEY_GENDER = "gender";

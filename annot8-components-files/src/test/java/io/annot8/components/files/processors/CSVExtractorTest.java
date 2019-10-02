@@ -1,22 +1,23 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.files.processors;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.when;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+
 import io.annot8.api.components.responses.ProcessorResponse;
 import io.annot8.api.components.responses.ProcessorResponse.Status;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.TableContent;
 import io.annot8.components.files.AbstractCSVDataTest;
 import io.annot8.testing.testimpl.TestItem;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.when;
 
 public class CSVExtractorTest extends AbstractCSVDataTest {
 
@@ -45,6 +46,9 @@ public class CSVExtractorTest extends AbstractCSVDataTest {
     TableContent tableContent = tables.get(0);
     assertEquals(
         "test.csv",
-        tableContent.getProperties().get(CSVExtractor.Processor.PROPERTY_FILE, String.class).orElse(null));
+        tableContent
+            .getProperties()
+            .get(CSVExtractor.Processor.PROPERTY_FILE, String.class)
+            .orElse(null));
   }
 }

@@ -1,6 +1,10 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.properties.processors;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
 import io.annot8.api.components.annotations.ComponentName;
@@ -16,10 +20,6 @@ import io.annot8.common.components.AbstractProcessorDescriptor;
 import io.annot8.common.components.capabilities.SimpleCapabilities;
 import io.annot8.common.data.content.Text;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
 /**
  * Convert properties on an item to separate Text content so they can be processed. The toString()
  * function is used to convert properties into a String.
@@ -27,7 +27,8 @@ import java.util.Set;
 @ComponentName("Property to Text")
 @ComponentDescription("Convert Property value to Text content")
 @SettingsClass(PropertyToText.Settings.class)
-public class PropertyToText extends AbstractProcessorDescriptor<PropertyToText.Processor, PropertyToText.Settings> {
+public class PropertyToText
+    extends AbstractProcessorDescriptor<PropertyToText.Processor, PropertyToText.Settings> {
 
   @Override
   protected Processor createComponent(Context context, Settings settings) {
@@ -36,9 +37,7 @@ public class PropertyToText extends AbstractProcessorDescriptor<PropertyToText.P
 
   @Override
   public Capabilities capabilities() {
-    return new SimpleCapabilities.Builder()
-        .withCreatesContent(Text.class)
-        .build();
+    return new SimpleCapabilities.Builder().withCreatesContent(Text.class).build();
   }
 
   public static class Processor extends AbstractProcessor {
@@ -47,13 +46,13 @@ public class PropertyToText extends AbstractProcessorDescriptor<PropertyToText.P
     private Set<String> blacklist;
 
     public Processor(Set<String> whitelist, Set<String> blacklist) {
-      if(whitelist == null){
+      if (whitelist == null) {
         this.whitelist = Collections.emptySet();
-      }else {
+      } else {
         this.whitelist = whitelist;
       }
 
-      if(blacklist == null) {
+      if (blacklist == null) {
         this.blacklist = Collections.emptySet();
       } else {
         this.blacklist = blacklist;
@@ -88,7 +87,8 @@ public class PropertyToText extends AbstractProcessorDescriptor<PropertyToText.P
     private Set<String> whitelist = new HashSet<>();
     private Set<String> blacklist = new HashSet<>();
 
-    @Description("Keys which will be accepted, or an empty set to accept all keys not on the blacklist")
+    @Description(
+        "Keys which will be accepted, or an empty set to accept all keys not on the blacklist")
     public Set<String> getWhitelist() {
       return whitelist;
     }

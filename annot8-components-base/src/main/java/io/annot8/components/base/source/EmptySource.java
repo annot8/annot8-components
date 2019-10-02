@@ -1,3 +1,4 @@
+/* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.base.source;
 
 import io.annot8.api.capabilities.Capabilities;
@@ -12,8 +13,7 @@ import io.annot8.common.components.capabilities.SimpleCapabilities;
 /**
  * A Source which will always return done, without creating any items.
  *
- * Use this in cases were you need a pipeline, but do not need a source.
- *
+ * <p>Use this in cases were you need a pipeline, but do not need a source.
  */
 public class EmptySource extends AbstractSource {
 
@@ -25,7 +25,7 @@ public class EmptySource extends AbstractSource {
   /**
    * A descriptor for EmptySource.
    *
-   * It is unlikely the EmptySource be of use in pipelines.
+   * <p>It is unlikely the EmptySource be of use in pipelines.
    */
   public static class Descriptor extends AbstractSourceDescriptor<EmptySource, NoSettings> {
 
@@ -39,5 +39,4 @@ public class EmptySource extends AbstractSource {
       return new SimpleCapabilities.Builder().build();
     }
   }
-
 }

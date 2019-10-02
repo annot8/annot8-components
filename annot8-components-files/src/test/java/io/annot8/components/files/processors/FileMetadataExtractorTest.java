@@ -1,6 +1,23 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.files.processors;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.when;
+
+import java.io.File;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+
 import io.annot8.api.annotations.Annotation;
 import io.annot8.api.components.Processor;
 import io.annot8.api.components.responses.ProcessorResponse;
@@ -10,22 +27,6 @@ import io.annot8.api.stores.AnnotationStore;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.conventions.FileMetadataKeys;
 import io.annot8.testing.testimpl.TestAnnotationStore;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-
-import java.io.File;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.when;
 
 public class FileMetadataExtractorTest {
 
@@ -58,7 +59,8 @@ public class FileMetadataExtractorTest {
     assertEquals(60L, getKeyValue(annotations, FileMetadataKeys.FILE_SIZE));
     assertNotNull(getKeyValue(annotations, FileMetadataKeys.OWNER));
     assertFalse((boolean) getKeyValue(annotations, FileMetadataKeys.DIRECTORY));
-    annotations.forEach(a -> assertEquals(FileMetadataExtractor.Processor.FILE_METADATA, a.getType()));
+    annotations.forEach(
+        a -> assertEquals(FileMetadataExtractor.Processor.FILE_METADATA, a.getType()));
   }
 
   @Test

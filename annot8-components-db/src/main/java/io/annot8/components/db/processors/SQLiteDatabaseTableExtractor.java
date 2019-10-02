@@ -1,6 +1,11 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.db.processors;
 
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
 import io.annot8.api.components.annotations.ComponentName;
@@ -19,20 +24,16 @@ import io.annot8.common.data.content.TableContent;
 import io.annot8.common.data.content.TableMetadata;
 import io.annot8.components.db.content.DatabaseTable;
 
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 /**
  * Extracts database tables from an SQLite file
  *
- * Note that whilst this class uses JdbcSettings internally, it does not accept it as
- * user definable configuration.
+ * <p>Note that whilst this class uses JdbcSettings internally, it does not accept it as user
+ * definable configuration.
  */
 @ComponentName("SQLite Database Table Extractor")
 @ComponentDescription("Extracts database tables from SQLite files")
-public class SQLiteDatabaseTableExtractor extends AbstractProcessorDescriptor<SQLiteDatabaseTableExtractor.Processor, NoSettings> {
+public class SQLiteDatabaseTableExtractor
+    extends AbstractProcessorDescriptor<SQLiteDatabaseTableExtractor.Processor, NoSettings> {
 
   @Override
   protected Processor createComponent(Context context, NoSettings settings) {
@@ -49,7 +50,7 @@ public class SQLiteDatabaseTableExtractor extends AbstractProcessorDescriptor<SQ
 
   public static class Processor extends AbstractProcessor {
 
-    //TODO: Ought to add these to conventions, or use an existing one
+    // TODO: Ought to add these to conventions, or use an existing one
     public static final String PROPERTY_NAME = "TABLE_NAME";
     public static final String PROPERTY_TYPE = "TABLE_METADATA";
 
