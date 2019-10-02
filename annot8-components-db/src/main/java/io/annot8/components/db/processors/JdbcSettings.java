@@ -1,11 +1,11 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.db.processors;
 
-import io.annot8.api.settings.Description;
-import io.annot8.api.settings.Settings;
-
 import javax.json.bind.annotation.JsonbCreator;
 import javax.json.bind.annotation.JsonbProperty;
+
+import io.annot8.api.settings.Description;
+import io.annot8.api.settings.Settings;
 
 public class JdbcSettings implements Settings {
 
@@ -20,7 +20,10 @@ public class JdbcSettings implements Settings {
   }
 
   @JsonbCreator
-  public JdbcSettings(@JsonbProperty("jdbcUrl") String jdbcUrl, @JsonbProperty("user") String user, @JsonbProperty("password") String password) {
+  public JdbcSettings(
+      @JsonbProperty("jdbcUrl") String jdbcUrl,
+      @JsonbProperty("user") String user,
+      @JsonbProperty("password") String password) {
     this.jdbcUrl = jdbcUrl;
     this.user = user;
     this.password = password;

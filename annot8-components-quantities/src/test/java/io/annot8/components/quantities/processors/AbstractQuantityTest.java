@@ -1,6 +1,11 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.quantities.processors;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.junit.jupiter.api.Assertions;
+
 import io.annot8.api.annotations.Annotation;
 import io.annot8.api.components.Processor;
 import io.annot8.api.data.Item;
@@ -11,10 +16,6 @@ import io.annot8.conventions.PropertyKeys;
 import io.annot8.implementations.support.context.SimpleContext;
 import io.annot8.testing.testimpl.TestItem;
 import io.annot8.testing.testimpl.content.TestStringContent;
-import org.junit.jupiter.api.Assertions;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 public abstract class AbstractQuantityTest {
 
@@ -22,7 +23,8 @@ public abstract class AbstractQuantityTest {
   private final String type;
   private final String unit;
 
-  public AbstractQuantityTest(Class<? extends AbstractProcessorDescriptor> clazz, String type, String unit) {
+  public AbstractQuantityTest(
+      Class<? extends AbstractProcessorDescriptor> clazz, String type, String unit) {
     this.clazz = clazz;
     this.type = type;
     this.unit = unit;
@@ -31,7 +33,7 @@ public abstract class AbstractQuantityTest {
   protected void test(String text, String expectedMatch, Double expectedValue) throws Exception {
     AbstractProcessorDescriptor pd = clazz.getConstructor().newInstance();
 
-    try (Processor p = (Processor)pd.create(new SimpleContext())) {
+    try (Processor p = (Processor) pd.create(new SimpleContext())) {
       Item item = new TestItem();
 
       Text content = item.createContent(TestStringContent.class).withData(text).save();

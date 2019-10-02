@@ -76,7 +76,7 @@ public class PrintItem extends AbstractProcessorDescriptor<PrintItem.Processor, 
       }
       sb.append(s);
 
-      //TODO: Log rather than print if Logging preset
+      // TODO: Log rather than print if Logging preset
       System.out.println(sb.toString());
     }
   }

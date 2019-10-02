@@ -15,7 +15,8 @@ import io.annot8.common.data.content.FileContent;
 
 @ComponentName("Discard Unextracted Files")
 @ComponentDescription("Discards FileContent which hasn't been extracted into other Content")
-public class DiscardUnextractedFiles extends AbstractProcessorDescriptor<DiscardUnextractedFiles.Processor, NoSettings> {
+public class DiscardUnextractedFiles
+    extends AbstractProcessorDescriptor<DiscardUnextractedFiles.Processor, NoSettings> {
 
   @Override
   protected Processor createComponent(Context context, NoSettings settings) {

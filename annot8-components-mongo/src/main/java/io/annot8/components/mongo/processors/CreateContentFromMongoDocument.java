@@ -1,6 +1,8 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.mongo.processors;
 
+import org.bson.Document;
+
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
 import io.annot8.api.components.annotations.ComponentName;
@@ -11,11 +13,11 @@ import io.annot8.common.components.capabilities.SimpleCapabilities;
 import io.annot8.common.data.content.Text;
 import io.annot8.components.base.processors.AbstractContentProcessor;
 import io.annot8.components.mongo.data.MongoDocument;
-import org.bson.Document;
 
 @ComponentName("Create Content from Mongo Document")
 @ComponentDescription("Converts a Mongo Document into other content")
-public class CreateContentFromMongoDocument extends AbstractProcessorDescriptor<CreateContentFromMongoDocument.Processor, NoSettings> {
+public class CreateContentFromMongoDocument
+    extends AbstractProcessorDescriptor<CreateContentFromMongoDocument.Processor, NoSettings> {
 
   @Override
   protected Processor createComponent(Context context, NoSettings settings) {

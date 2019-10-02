@@ -1,9 +1,16 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.files.processors;
 
+import java.io.*;
+import java.util.List;
+import java.util.function.Supplier;
+
+import org.apache.james.mime4j.dom.*;
+
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.io.CharStreams;
+
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
 import io.annot8.api.components.annotations.ComponentName;
@@ -18,15 +25,11 @@ import io.annot8.common.components.capabilities.SimpleCapabilities;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.InputStreamContent;
 import io.annot8.common.data.content.Text;
-import org.apache.james.mime4j.dom.*;
-
-import java.io.*;
-import java.util.List;
-import java.util.function.Supplier;
 
 @ComponentName("Eml File Extractor")
 @ComponentDescription("Extract text and attachments from *.eml files and create new Content")
-public class EmlFileExtractor extends AbstractProcessorDescriptor<EmlFileExtractor.Processor, NoSettings> {
+public class EmlFileExtractor
+    extends AbstractProcessorDescriptor<EmlFileExtractor.Processor, NoSettings> {
 
   @Override
   protected Processor createComponent(Context context, NoSettings settings) {
@@ -70,7 +73,8 @@ public class EmlFileExtractor extends AbstractProcessorDescriptor<EmlFileExtract
                     // Single body part, so create a new content
                     createContentFromBody(item, body, "body", ArrayListMultimap.create());
                   } else if (body instanceof Multipart) {
-                    // Multi body part - attachments should become children items, other bodies become
+                    // Multi body part - attachments should become children items, other bodies
+                    // become
                     // new content
                     processMultipart(item, (Multipart) body, "body");
                   } else {
@@ -195,7 +199,8 @@ public class EmlFileExtractor extends AbstractProcessorDescriptor<EmlFileExtract
       return list;
     }
 
-    private static Supplier<InputStream> createSupplier(InputStream inputStream) throws IOException {
+    private static Supplier<InputStream> createSupplier(InputStream inputStream)
+        throws IOException {
       ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 
       int nRead;

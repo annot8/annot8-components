@@ -1,6 +1,11 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.files.processors;
 
+import java.io.File;
+
+import javax.json.bind.annotation.JsonbCreator;
+import javax.json.bind.annotation.JsonbProperty;
+
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
 import io.annot8.api.components.annotations.ComponentName;
@@ -18,14 +23,11 @@ import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.TableContent;
 import io.annot8.components.files.content.CSVTable;
 
-import javax.json.bind.annotation.JsonbCreator;
-import javax.json.bind.annotation.JsonbProperty;
-import java.io.File;
-
 @ComponentName("CSV Extractor")
 @ComponentDescription("Extract CSV files into a Table content")
 @SettingsClass(CSVExtractor.Settings.class)
-public class CSVExtractor extends AbstractProcessorDescriptor<CSVExtractor.Processor, CSVExtractor.Settings> {
+public class CSVExtractor
+    extends AbstractProcessorDescriptor<CSVExtractor.Processor, CSVExtractor.Settings> {
 
   @Override
   protected Processor createComponent(Context context, Settings settings) {
@@ -89,5 +91,4 @@ public class CSVExtractor extends AbstractProcessorDescriptor<CSVExtractor.Proce
       return hasHeaders;
     }
   }
-
 }

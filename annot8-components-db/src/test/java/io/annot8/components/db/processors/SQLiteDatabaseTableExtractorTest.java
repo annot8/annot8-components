@@ -1,6 +1,15 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.db.processors;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.junit.jupiter.api.Test;
+
 import io.annot8.api.components.responses.ProcessorResponse;
 import io.annot8.api.components.responses.ProcessorResponse.Status;
 import io.annot8.api.data.Content;
@@ -10,14 +19,6 @@ import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.TableContent;
 import io.annot8.common.data.content.TableMetadata;
 import io.annot8.testing.testimpl.TestItem;
-import org.junit.jupiter.api.Test;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 public class SQLiteDatabaseTableExtractorTest extends AbstractSQLiteDataTest {
 
@@ -42,7 +43,9 @@ public class SQLiteDatabaseTableExtractorTest extends AbstractSQLiteDataTest {
 
     item.getContents(TableContent.class)
         .forEach(
-            c -> assertTrue(c.getProperties().has(SQLiteDatabaseTableExtractor.Processor.PROPERTY_TYPE)));
+            c ->
+                assertTrue(
+                    c.getProperties().has(SQLiteDatabaseTableExtractor.Processor.PROPERTY_TYPE)));
 
     String[] expectedTables = new String[] {"test", "test2"};
 

@@ -1,6 +1,15 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.geo.processors;
 
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.json.bind.annotation.JsonbCreator;
+import javax.json.bind.annotation.JsonbProperty;
+
+import org.opensextant.geodesy.MGRS;
+
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
 import io.annot8.api.components.annotations.ComponentName;
@@ -14,13 +23,6 @@ import io.annot8.common.data.content.Text;
 import io.annot8.components.base.processors.AbstractTextProcessor;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
-import org.opensextant.geodesy.MGRS;
-
-import javax.json.bind.annotation.JsonbCreator;
-import javax.json.bind.annotation.JsonbProperty;
-import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /** Extract MGRS coordinates, optionally ignoring MGRS coordinates that could be dates */
 @ComponentName("MGRS")
@@ -66,7 +68,8 @@ public class Mgrs extends AbstractProcessorDescriptor<Mgrs.Processor, Mgrs.Setti
         if (ignoreDates) {
           Matcher mDates = datesPattern.matcher(coordinates);
           if (mDates.matches()) {
-            log().info("Discarding possible MGRS coordinate {} as it resembles a date", coordinates);
+            log()
+                .info("Discarding possible MGRS coordinate {} as it resembles a date", coordinates);
             continue;
           }
         }
@@ -119,7 +122,6 @@ public class Mgrs extends AbstractProcessorDescriptor<Mgrs.Processor, Mgrs.Setti
 
       return Optional.empty();
     }
-
   }
 
   public static class Settings implements io.annot8.api.settings.Settings {

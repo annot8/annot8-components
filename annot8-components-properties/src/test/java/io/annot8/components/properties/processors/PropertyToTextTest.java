@@ -1,11 +1,7 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.properties.processors;
 
-import io.annot8.api.components.Processor;
-import io.annot8.api.data.Item;
-import io.annot8.api.exceptions.Annot8Exception;
-import io.annot8.testing.testimpl.TestItem;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -13,7 +9,12 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
+
+import io.annot8.api.components.Processor;
+import io.annot8.api.data.Item;
+import io.annot8.api.exceptions.Annot8Exception;
+import io.annot8.testing.testimpl.TestItem;
 
 public class PropertyToTextTest {
 
@@ -48,7 +49,8 @@ public class PropertyToTextTest {
 
   private void doTest(Map<String, Object> properties, PropertyToText.Settings settings) {
 
-    try (Processor p = new PropertyToText.Processor(settings.getWhitelist(), settings.getBlacklist())) {
+    try (Processor p =
+        new PropertyToText.Processor(settings.getWhitelist(), settings.getBlacklist())) {
 
       Item item = new TestItem();
 

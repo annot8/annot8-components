@@ -1,15 +1,16 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.text.processors;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import org.junit.jupiter.api.Test;
+
 import io.annot8.api.components.Processor;
 import io.annot8.api.data.Item;
 import io.annot8.common.data.content.Text;
 import io.annot8.components.text.processors.Capitalise.TextCase;
 import io.annot8.testing.testimpl.TestItem;
 import io.annot8.testing.testimpl.content.TestStringContent;
-import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class CapitaliseTest {
 

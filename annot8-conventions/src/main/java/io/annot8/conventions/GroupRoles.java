@@ -5,8 +5,8 @@ package io.annot8.conventions;
 public class GroupRoles {
   public static final String GRAMMAR_PREFIX = "grammar" + PathUtils.SEPARATOR;
 
-  public static final String GROUP_ROLE_GRAMMAR_CONSTITUENT = GRAMMAR_PREFIX+"constituent";
-  public static final String GROUP_ROLE_GRAMMAR_HEAD = GRAMMAR_PREFIX+"head";
+  public static final String GROUP_ROLE_GRAMMAR_CONSTITUENT = GRAMMAR_PREFIX + "constituent";
+  public static final String GROUP_ROLE_GRAMMAR_HEAD = GRAMMAR_PREFIX + "head";
   public static final String GROUP_ROLE_INSTRUMENT = "instrument";
   public static final String GROUP_ROLE_LOCATION = "location";
   public static final String GROUP_ROLE_MENTION = "mention";

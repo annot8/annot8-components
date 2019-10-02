@@ -1,8 +1,12 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.geo.processors;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import com.google.openlocationcode.OpenLocationCode;
 import com.google.openlocationcode.OpenLocationCode.CodeArea;
+
 import io.annot8.api.annotations.Annotation.Builder;
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
@@ -17,12 +21,10 @@ import io.annot8.components.base.processors.AbstractRegexProcessor;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 /** Extracts full global Plus Codes (also known as Open Location Codes) from text */
 @ComponentName("Plus Code")
-@ComponentDescription("Extracts full global Plus Codes (also known as Open Location Codes) from text")
+@ComponentDescription(
+    "Extracts full global Plus Codes (also known as Open Location Codes) from text")
 public class PlusCode extends AbstractProcessorDescriptor<PlusCode.Processor, NoSettings> {
 
   @Override

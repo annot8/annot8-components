@@ -19,7 +19,6 @@ public class AnnotationTypes {
   public static final String ANNOTATION_TYPE_METADATA = "metadata";
   public static final String METADATA_PREFIX = ANNOTATION_TYPE_METADATA + PathUtils.SEPARATOR;
 
-
   public static final String ANNOTATION_TYPE_ADDRESS = ENTITY_PREFIX + "address";
   public static final String ANNOTATION_TYPE_AREA = QUANTITY_PREFIX + "area";
   public static final String ANNOTATION_TYPE_CHEMICAL = ENTITY_PREFIX + "chemical";

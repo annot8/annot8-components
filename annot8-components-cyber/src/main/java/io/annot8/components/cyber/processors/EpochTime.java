@@ -1,6 +1,10 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.cyber.processors;
 
+import java.time.Instant;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import io.annot8.api.annotations.Annotation.Builder;
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
@@ -16,14 +20,12 @@ import io.annot8.components.base.processors.AbstractRegexProcessor;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
 
-import java.time.Instant;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 @ComponentName("Epoch Time")
-@ComponentDescription("Extract epoch time in either seconds or milliseconds, with optional start and end dates")
+@ComponentDescription(
+    "Extract epoch time in either seconds or milliseconds, with optional start and end dates")
 @SettingsClass(EpochTime.Settings.class)
-public class EpochTime extends AbstractProcessorDescriptor<EpochTime.Processor, EpochTime.Settings> {
+public class EpochTime
+    extends AbstractProcessorDescriptor<EpochTime.Processor, EpochTime.Settings> {
   @Override
   protected Processor createComponent(Context context, Settings settings) {
     return new Processor(settings);
@@ -65,7 +67,8 @@ public class EpochTime extends AbstractProcessorDescriptor<EpochTime.Processor, 
         i = Instant.ofEpochSecond(l);
       }
 
-      return (i.isAfter(settings.getEarliestTimestamp()) || i.equals(settings.getEarliestTimestamp()))
+      return (i.isAfter(settings.getEarliestTimestamp())
+              || i.equals(settings.getEarliestTimestamp()))
           && (i.isBefore(settings.getLatestTimestamp()) || i.equals(settings.getLatestTimestamp()));
     }
 
@@ -75,7 +78,7 @@ public class EpochTime extends AbstractProcessorDescriptor<EpochTime.Processor, 
       try {
         l = Long.parseLong(m.group());
       } catch (NumberFormatException nfe) {
-        //This shouldn't happen, as already parsed in acceptMatch
+        // This shouldn't happen, as already parsed in acceptMatch
         return;
       }
 
@@ -90,7 +93,6 @@ public class EpochTime extends AbstractProcessorDescriptor<EpochTime.Processor, 
 
       builder.withProperty(PropertyKeys.PROPERTY_KEY_VALUE, i);
     }
-
   }
 
   public static class Settings implements io.annot8.api.settings.Settings {

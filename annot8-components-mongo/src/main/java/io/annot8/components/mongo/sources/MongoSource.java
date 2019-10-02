@@ -1,7 +1,12 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.mongo.sources;
 
+import java.time.Instant;
+
+import org.bson.Document;
+
 import com.mongodb.client.MongoCursor;
+
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.SourceDescriptor;
 import io.annot8.api.components.annotations.ComponentDescription;
@@ -18,9 +23,6 @@ import io.annot8.components.mongo.AbstractMongoComponent;
 import io.annot8.components.mongo.data.MongoDocument;
 import io.annot8.components.mongo.resources.MongoConnectionSettings;
 import io.annot8.conventions.PropertyKeys;
-import org.bson.Document;
-
-import java.time.Instant;
 
 /**
  * Reads the contents of a Mongo collection into items.
@@ -40,6 +42,7 @@ public class MongoSource implements SourceDescriptor<MongoSource.Source, MongoCo
   public void setName(String name) {
     this.name = name;
   }
+
   @Override
   public String getName() {
     return name;
@@ -49,6 +52,7 @@ public class MongoSource implements SourceDescriptor<MongoSource.Source, MongoCo
   public void setSettings(MongoConnectionSettings settings) {
     this.settings = settings;
   }
+
   @Override
   public MongoConnectionSettings getSettings() {
     return settings;
@@ -56,9 +60,7 @@ public class MongoSource implements SourceDescriptor<MongoSource.Source, MongoCo
 
   @Override
   public Capabilities capabilities() {
-    return new SimpleCapabilities.Builder()
-        .withCreatesContent(MongoDocument.class)
-        .build();
+    return new SimpleCapabilities.Builder().withCreatesContent(MongoDocument.class).build();
   }
 
   @Override
@@ -66,7 +68,8 @@ public class MongoSource implements SourceDescriptor<MongoSource.Source, MongoCo
     return new Source(getSettings());
   }
 
-  public static class Source extends AbstractMongoComponent implements io.annot8.api.components.Source {
+  public static class Source extends AbstractMongoComponent
+      implements io.annot8.api.components.Source {
 
     private MongoCursor<Document> cursor = null;
 

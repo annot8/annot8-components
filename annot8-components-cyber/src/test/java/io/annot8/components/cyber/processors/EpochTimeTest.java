@@ -1,6 +1,13 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.cyber.processors;
 
+import java.time.Instant;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
 import io.annot8.api.annotations.Annotation;
 import io.annot8.api.components.Processor;
 import io.annot8.api.data.Item;
@@ -13,12 +20,6 @@ import io.annot8.conventions.PropertyKeys;
 import io.annot8.implementations.support.context.SimpleContext;
 import io.annot8.testing.testimpl.TestItem;
 import io.annot8.testing.testimpl.content.TestStringContent;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
-import java.time.Instant;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class EpochTimeTest {
 
@@ -50,7 +51,9 @@ public class EpochTimeTest {
       Assertions.assertEquals("1507725753567", a.getBounds().getData(content).get());
       Assertions.assertEquals(2, a.getProperties().getAll().size());
       Assertions.assertEquals("ms", a.getProperties().get(PropertyKeys.PROPERTY_KEY_UNIT).get());
-      Assertions.assertEquals(Instant.ofEpochMilli(1507725753567L), a.getProperties().get(PropertyKeys.PROPERTY_KEY_VALUE).get());
+      Assertions.assertEquals(
+          Instant.ofEpochMilli(1507725753567L),
+          a.getProperties().get(PropertyKeys.PROPERTY_KEY_VALUE).get());
     }
   }
 
@@ -80,8 +83,9 @@ public class EpochTimeTest {
       Assertions.assertEquals("1507725753", a.getBounds().getData(content).get());
       Assertions.assertEquals(2, a.getProperties().getAll().size());
       Assertions.assertEquals("s", a.getProperties().get(PropertyKeys.PROPERTY_KEY_UNIT).get());
-      Assertions.assertEquals(Instant.ofEpochSecond(1507725753L), a.getProperties().get(PropertyKeys.PROPERTY_KEY_VALUE).get());
-
+      Assertions.assertEquals(
+          Instant.ofEpochSecond(1507725753L),
+          a.getProperties().get(PropertyKeys.PROPERTY_KEY_VALUE).get());
     }
   }
 
