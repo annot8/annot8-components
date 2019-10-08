@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.File;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import io.annot8.api.components.Processor;
@@ -15,7 +16,9 @@ import io.annot8.testing.testimpl.TestItem;
 
 public class OCRTest {
 
+  // Disabled as it requires tesseract to be installed
   @Test
+  @Disabled
   public void test() throws Exception {
     OCR desc = new OCR();
     Processor ocr = desc.createComponent(null, new OCR.Settings());
