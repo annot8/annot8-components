@@ -34,6 +34,7 @@ public class AnnotationTypes {
   public static final String ANNOTATION_TYPE_GEOPOLITICALENTITY = ENTITY_PREFIX + "gpe";
   public static final String ANNOTATION_TYPE_TEMPORAL_INSTANT = TEMPORAL_PREFIX + "instant";
   public static final String ANNOTATION_TYPE_TEMPORAL_INTERVAL = TEMPORAL_PREFIX + "interval";
+  public static final String ANNOTATION_TYPE_IDEOLOGY = ENTITY_PREFIX + "ideology";
   public static final String ANNOTATION_TYPE_IPADDRESS = ENTITY_PREFIX + "ipaddress";
   public static final String ANNOTATION_TYPE_HASHTAG = ENTITY_PREFIX + "hashtag";
   public static final String ANNOTATION_TYPE_LANGUAGE = ENTITY_PREFIX + "language";
@@ -42,12 +43,16 @@ public class AnnotationTypes {
   public static final String ANNOTATION_TYPE_MASS = QUANTITY_PREFIX + "mass";
   public static final String ANNOTATION_TYPE_MONEY = ENTITY_PREFIX + "money";
   public static final String ANNOTATION_TYPE_NATIONALITY = ENTITY_PREFIX + "nationality";
+  public static final String ANNOTATION_TYPE_NUMBER = ENTITY_PREFIX + "number";
+  public static final String ANNOTATION_TYPE_ORDINAL = ENTITY_PREFIX + "ordinal";
   public static final String ANNOTATION_TYPE_ORGANISATION = ENTITY_PREFIX + "organisation";
   public static final String ANNOTATION_TYPE_PARAGRAPH = GRAMMAR_PREFIX + "paragraph";
   public static final String ANNOTATION_TYPE_PASSPORT = ENTITY_PREFIX + "passport";
+  public static final String ANNOTATION_TYPE_PERCENT = ENTITY_PREFIX + "percent";
   public static final String ANNOTATION_TYPE_PERSON = ENTITY_PREFIX + "person";
   public static final String ANNOTATION_TYPE_PHONENUMBER = ENTITY_PREFIX + "phonenumber";
   public static final String ANNOTATION_TYPE_REFERENCE = ENTITY_PREFIX + "reference";
+  public static final String ANNOTATION_TYPE_RELIGION = ENTITY_PREFIX + "religion";
   public static final String ANNOTATION_TYPE_SENTENCE = GRAMMAR_PREFIX + "sentence";
   public static final String ANNOTATION_TYPE_SUMMARY = METADATA_PREFIX + "summary";
   public static final String ANNOTATION_TYPE_URL = ENTITY_PREFIX + "url";
