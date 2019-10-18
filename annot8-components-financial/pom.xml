@@ -28,7 +28,7 @@
     <dependency>
       <groupId>org.bitcoinj</groupId>
       <artifactId>bitcoinj-core</artifactId>
-      <version>0.15.3</version>
+      <version>0.15.5</version>
     </dependency>
   </dependencies>
 
