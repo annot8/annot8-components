@@ -1,4 +1,4 @@
-module uk.gov.dstl.annot8.processors.vehicle {
+module io.annot8.components.vehicles {
   requires io.annot8.api;
   requires io.annot8.common.components;
   requires io.annot8.common.data;
