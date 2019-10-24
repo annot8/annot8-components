@@ -439,6 +439,7 @@
     <module>annot8-components-quantities</module>
     <module>annot8-components-social</module>
     <module>annot8-components-stopwords</module>
+    <module>annot8-components-temporal</module>
     <module>annot8-components-tesseract</module>
     <module>annot8-components-text</module>
 <!--    <module>annot8-components-tika</module>-->
