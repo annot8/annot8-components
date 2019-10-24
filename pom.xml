@@ -422,24 +422,33 @@
     <module>annot8-conventions</module>
 
     <module>annot8-components-base</module>
+    <module>annot8-components-comms</module>
     <module>annot8-components-cyber</module>
     <module>annot8-components-db</module>
     <module>annot8-components-files</module>
     <module>annot8-components-financial</module>
+    <module>annot8-components-gazetteers</module>
     <module>annot8-components-geo</module>
     <module>annot8-components-grouping</module>
     <module>annot8-components-image</module>
+    <module>annot8-components-items</module>
     <module>annot8-components-mongo</module>
     <module>annot8-components-opennlp</module>
     <module>annot8-components-print</module>
     <module>annot8-components-properties</module>
     <module>annot8-components-quantities</module>
     <module>annot8-components-social</module>
+    <module>annot8-components-stopwords</module>
+    <module>annot8-components-temporal</module>
     <module>annot8-components-tesseract</module>
     <module>annot8-components-text</module>
 <!--    <module>annot8-components-tika</module>-->
     <module>annot8-components-translation</module>
     <module>annot8-components-types</module>
+    <module>annot8-components-vehicles</module>
+    <module>annot8-components-wordnet</module>
+
+    <module>annot8-utils-text</module>
   </modules>
 
 

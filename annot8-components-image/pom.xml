@@ -11,7 +11,7 @@
   </parent>
 
   <artifactId>annot8-components-image</artifactId>
-  <name>Annot8 Components Images</name>
+  <name>Annot8 Image Components</name>
   <description>Components to process images</description>
 
   <dependencies>

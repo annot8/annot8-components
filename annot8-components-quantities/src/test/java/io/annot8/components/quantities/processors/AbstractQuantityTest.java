@@ -57,4 +57,21 @@ public abstract class AbstractQuantityTest {
           0.000001);
     }
   }
+
+  protected void testCount(String text, Integer count) throws Exception {
+    AbstractProcessorDescriptor pd = clazz.getConstructor().newInstance();
+
+    try (Processor p = (Processor) pd.create(new SimpleContext())) {
+      Item item = new TestItem();
+
+      Text content = item.createContent(TestStringContent.class).withData(text).save();
+
+      p.process(item);
+
+      AnnotationStore store = content.getAnnotations();
+
+      List<Annotation> annotations = store.getAll().collect(Collectors.toList());
+      Assertions.assertEquals(count, annotations.size());
+    }
+  }
 }

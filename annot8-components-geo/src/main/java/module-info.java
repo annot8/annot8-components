@@ -8,6 +8,10 @@ open module io.annot8.components.geo {
   requires java.json.bind;
   requires io.annot8.conventions;
   requires io.annot8.components.base;
+  requires java.json;
+  requires io.annot8.components.gazetteers;
+  requires uk.gov.dstl.geo.osgb;
+  requires opencsv;
 
   exports io.annot8.components.geo.processors;
 }

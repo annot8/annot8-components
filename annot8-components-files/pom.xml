@@ -21,7 +21,6 @@
     <dependency>
       <groupId>io.annot8</groupId>
       <artifactId>annot8-common-components</artifactId>
-
     </dependency>
 
     <dependency>
