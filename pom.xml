@@ -440,6 +440,7 @@
 <!--    <module>annot8-components-tika</module>-->
     <module>annot8-components-translation</module>
     <module>annot8-components-types</module>
+    <module>annot8-components-stopwords</module>
   </modules>
 
 
