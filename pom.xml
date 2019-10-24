@@ -422,6 +422,7 @@
     <module>annot8-conventions</module>
 
     <module>annot8-components-base</module>
+    <module>annot8-components-comms</module>
     <module>annot8-components-cyber</module>
     <module>annot8-components-db</module>
     <module>annot8-components-files</module>
