@@ -18,12 +18,10 @@
     <dependency>
       <groupId>io.annot8</groupId>
       <artifactId>annot8-components-base</artifactId>
-      <version>0.4.0</version>
     </dependency>
     <dependency>
       <groupId>io.annot8</groupId>
       <artifactId>annot8-conventions</artifactId>
-      <version>0.4.0</version>
     </dependency>
     <dependency>
       <groupId>com.drewnoakes</groupId>
