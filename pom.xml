@@ -6,7 +6,7 @@
 
   <groupId>io.annot8</groupId>
   <artifactId>annot8-components</artifactId>
-  <version>0.4.0</version>
+  <version>0.5.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Annot8 Components</name>
@@ -60,11 +60,11 @@
     <maven.compiler.target>${java.version}</maven.compiler.target>
 
     <!-- Annot8 versions -->
-    <annot8.version>0.4.0</annot8.version>
+    <annot8.version>0.5.0-SNAPSHOT</annot8.version>
 
     <!-- Testing -->
     <junit.version>5.5.2</junit.version>
-    <mockito.version>3.0.0</mockito.version>
+    <mockito.version>3.1.0</mockito.version>
     <assertj-core.version>3.13.2</assertj-core.version>
     <assertj-guava.version>3.2.1</assertj-guava.version>
 
