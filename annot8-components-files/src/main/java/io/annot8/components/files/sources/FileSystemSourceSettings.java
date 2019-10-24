@@ -1,16 +1,14 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.files.sources;
 
+import io.annot8.api.settings.Description;
+import io.annot8.api.settings.Settings;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
-
 import javax.json.bind.annotation.JsonbCreator;
-
-import io.annot8.api.settings.Description;
-import io.annot8.api.settings.Settings;
 
 public class FileSystemSourceSettings implements Settings {
 

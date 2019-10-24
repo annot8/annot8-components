@@ -1,18 +1,17 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.files.sources;
 
+import io.annot8.api.data.Item;
+import io.annot8.api.data.ItemFactory;
+import io.annot8.common.components.AbstractSource;
+import io.annot8.common.data.content.FileContent;
+import io.annot8.conventions.PropertyKeys;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import io.annot8.api.data.Item;
-import io.annot8.api.data.ItemFactory;
-import io.annot8.common.components.AbstractSource;
-import io.annot8.common.data.content.FileContent;
-import io.annot8.conventions.PropertyKeys;
 
 public abstract class AbstractFileSystemSource extends AbstractSource {
 

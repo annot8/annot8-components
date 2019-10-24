@@ -9,5 +9,4 @@ open module io.annot8.components.base {
 
   exports io.annot8.components.base.processors;
   exports io.annot8.components.base.source;
-
 }

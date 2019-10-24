@@ -1,9 +1,6 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.quantities.processors;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import io.annot8.api.annotations.Annotation.Builder;
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
@@ -17,6 +14,8 @@ import io.annot8.common.data.content.Text;
 import io.annot8.components.base.processors.AbstractTextProcessor;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @ComponentName("Frequency")
 @ComponentDescription("Extract frequencies from text")

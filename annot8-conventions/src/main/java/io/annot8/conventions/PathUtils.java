@@ -1,14 +1,13 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.conventions;
 
+import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import com.google.common.base.Joiner;
-import com.google.common.base.Splitter;
 
 public final class PathUtils {
 

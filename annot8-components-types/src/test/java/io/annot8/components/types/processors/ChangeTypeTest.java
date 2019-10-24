@@ -4,11 +4,6 @@ package io.annot8.components.types.processors;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.junit.jupiter.api.Test;
-
 import io.annot8.api.annotations.Annotation;
 import io.annot8.api.components.Processor;
 import io.annot8.api.data.Item;
@@ -18,6 +13,9 @@ import io.annot8.common.data.bounds.SpanBounds;
 import io.annot8.common.data.content.Text;
 import io.annot8.implementations.support.context.SimpleContext;
 import io.annot8.testing.testimpl.TestItem;
+import java.util.List;
+import java.util.stream.Collectors;
+import org.junit.jupiter.api.Test;
 
 public class ChangeTypeTest {
 

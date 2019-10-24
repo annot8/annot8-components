@@ -1,9 +1,8 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.mongo.data;
 
-import java.util.Map;
-
 import io.annot8.api.bounds.Bounds;
+import java.util.Map;
 
 public class AnnotationDto {
 

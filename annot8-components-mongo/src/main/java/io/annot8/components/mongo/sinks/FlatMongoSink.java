@@ -1,19 +1,9 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.mongo.sinks;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import org.bson.Document;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-
 import io.annot8.api.annotations.Annotation;
 import io.annot8.api.bounds.Bounds;
 import io.annot8.api.capabilities.Capabilities;
@@ -31,6 +21,13 @@ import io.annot8.components.mongo.data.ContentDto;
 import io.annot8.components.mongo.data.ItemDto;
 import io.annot8.components.mongo.resources.MongoConnection;
 import io.annot8.components.mongo.resources.MongoConnectionSettings;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import org.bson.Document;
 
 @ComponentName("Mongo Sink (Flat)")
 @ComponentDescription("Created a flat representation of an item and persist to Mongo")

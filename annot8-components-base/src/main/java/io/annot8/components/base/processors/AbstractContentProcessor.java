@@ -1,13 +1,12 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.base.processors;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import io.annot8.api.components.responses.ProcessorResponse;
 import io.annot8.api.data.Content;
 import io.annot8.api.data.Item;
 import io.annot8.common.components.AbstractProcessor;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * A base class for building processors which act on a specific class of content

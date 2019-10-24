@@ -1,13 +1,11 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.mongo.resources;
 
-import java.util.Optional;
-import java.util.stream.Stream;
-
 import com.google.common.base.Strings;
-
 import io.annot8.api.settings.Description;
 import io.annot8.api.settings.Settings;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 public class MongoConnectionSettings implements Settings {
 

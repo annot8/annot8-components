@@ -1,10 +1,6 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.files.processors;
 
-import java.io.File;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
 import io.annot8.api.components.annotations.ComponentName;
@@ -17,6 +13,9 @@ import io.annot8.common.components.AbstractProcessorDescriptor;
 import io.annot8.common.components.capabilities.SimpleCapabilities;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.Text;
+import java.io.File;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
 
 @ComponentName("Txt File Extractor")
 @ComponentDescription("Extract text from a *.txt file and create Text content")

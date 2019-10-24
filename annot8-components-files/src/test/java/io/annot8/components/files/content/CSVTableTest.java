@@ -5,14 +5,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import io.annot8.common.data.content.Row;
+import io.annot8.components.files.AbstractCSVDataTest;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import org.junit.jupiter.api.Test;
-
-import io.annot8.common.data.content.Row;
-import io.annot8.components.files.AbstractCSVDataTest;
 
 public class CSVTableTest extends AbstractCSVDataTest {
 

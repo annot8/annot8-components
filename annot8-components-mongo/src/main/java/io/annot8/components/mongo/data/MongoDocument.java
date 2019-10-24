@@ -1,10 +1,6 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.mongo.data;
 
-import java.util.function.Supplier;
-
-import org.bson.Document;
-
 import io.annot8.api.data.Content;
 import io.annot8.api.data.Item;
 import io.annot8.api.properties.ImmutableProperties;
@@ -12,6 +8,8 @@ import io.annot8.api.stores.AnnotationStore;
 import io.annot8.implementations.support.content.AbstractContentBuilder;
 import io.annot8.implementations.support.content.AbstractContentBuilderFactory;
 import io.annot8.implementations.support.stores.AnnotationStoreFactory;
+import java.util.function.Supplier;
+import org.bson.Document;
 
 public class MongoDocument implements Content<Document> {
 

@@ -1,6 +1,13 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.db.content;
 
+import io.annot8.api.exceptions.Annot8RuntimeException;
+import io.annot8.common.data.content.ColumnMetadata;
+import io.annot8.common.data.content.Row;
+import io.annot8.common.data.content.Table;
+import io.annot8.common.data.content.TableMetadata;
+import io.annot8.components.db.processors.JdbcSettings;
+import io.annot8.components.db.utils.DatabaseTableIterator;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -11,14 +18,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-
-import io.annot8.api.exceptions.Annot8RuntimeException;
-import io.annot8.common.data.content.ColumnMetadata;
-import io.annot8.common.data.content.Row;
-import io.annot8.common.data.content.Table;
-import io.annot8.common.data.content.TableMetadata;
-import io.annot8.components.db.processors.JdbcSettings;
-import io.annot8.components.db.utils.DatabaseTableIterator;
 
 public class DatabaseTable implements Table {
 

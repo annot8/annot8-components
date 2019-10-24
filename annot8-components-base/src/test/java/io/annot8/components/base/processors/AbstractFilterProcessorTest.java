@@ -3,13 +3,12 @@ package io.annot8.components.base.processors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
 import io.annot8.api.components.responses.ProcessorResponse;
 import io.annot8.api.components.responses.ProcessorResponse.Status;
 import io.annot8.api.data.Item;
 import io.annot8.api.exceptions.Annot8RuntimeException;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 public class AbstractFilterProcessorTest {
 

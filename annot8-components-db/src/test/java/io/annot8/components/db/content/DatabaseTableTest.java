@@ -6,18 +6,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import org.junit.jupiter.api.Test;
-
 import io.annot8.api.exceptions.Annot8RuntimeException;
 import io.annot8.common.data.content.Row;
 import io.annot8.common.data.content.TableMetadata;
 import io.annot8.components.db.processors.AbstractSQLiteDataTest;
 import io.annot8.components.db.processors.JdbcSettings;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import org.junit.jupiter.api.Test;
 
 public class DatabaseTableTest extends AbstractSQLiteDataTest {
 
