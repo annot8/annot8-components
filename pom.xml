@@ -447,6 +447,7 @@
     <module>annot8-components-types</module>
 
     <module>annot8-utils-text</module>
+    <module>annot8-components-vehicles</module>
   </modules>
 
 
