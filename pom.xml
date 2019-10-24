@@ -192,24 +192,7 @@
           </execution>
         </executions>
       </plugin>
-      <plugin>
-        <groupId>com.diffplug.spotless</groupId>
-        <artifactId>spotless-maven-plugin</artifactId>
-        <version>${spotless.version}</version>
 
-        <configuration>
-          <java>
-            <licenseHeader>
-              <content>/* Annot8 (annot8.io) - Licensed under Apache-2.0. */</content>
-            </licenseHeader>
-            <googleJavaFormat />
-            <removeUnusedImports />
-            <importOrder>
-              <order>java,javax,org,com,io.annot8,</order>
-            </importOrder>
-          </java>
-        </configuration>
-      </plugin>
 
       <plugin>
         <groupId>io.committed</groupId>
@@ -225,9 +208,10 @@
         </executions>
         <configuration>
           <java>
-            <googleJavaFormat>
-              <style>GOOGLE</style>
-            </googleJavaFormat>
+            <licenseHeader>
+              <content>/* Annot8 (annot8.io) - Licensed under Apache-2.0. */</content>
+            </licenseHeader>
+            <googleJavaFormat />
             <removeUnusedImports />
           </java>
         </configuration>
