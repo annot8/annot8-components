@@ -3,10 +3,6 @@ package io.annot8.components.text.processors;
 
 import static io.annot8.conventions.PropertyKeys.PROPERTY_KEY_LANGUAGE;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
-
 import com.optimaize.langdetect.LanguageDetector;
 import com.optimaize.langdetect.LanguageDetectorBuilder;
 import com.optimaize.langdetect.i18n.LdLocale;
@@ -15,7 +11,6 @@ import com.optimaize.langdetect.profiles.LanguageProfile;
 import com.optimaize.langdetect.profiles.LanguageProfileReader;
 import com.optimaize.langdetect.text.CommonTextObjectFactories;
 import com.optimaize.langdetect.text.TextObject;
-
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
 import io.annot8.api.components.annotations.ComponentName;
@@ -28,6 +23,9 @@ import io.annot8.common.data.bounds.ContentBounds;
 import io.annot8.common.data.content.Text;
 import io.annot8.components.base.processors.AbstractTextProcessor;
 import io.annot8.conventions.AnnotationTypes;
+import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Detect the language of a Text content and add the language as an annotation covering the whole

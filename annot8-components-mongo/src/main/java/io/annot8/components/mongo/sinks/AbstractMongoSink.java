@@ -1,14 +1,8 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.mongo.sinks;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.bson.Document;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import io.annot8.api.components.Processor;
 import io.annot8.api.components.responses.ProcessorResponse;
 import io.annot8.api.data.Item;
@@ -17,6 +11,9 @@ import io.annot8.api.properties.ImmutableProperties;
 import io.annot8.components.mongo.AbstractMongoComponent;
 import io.annot8.components.mongo.resources.MongoConnection;
 import io.annot8.components.mongo.resources.MongoConnectionSettings;
+import java.util.HashMap;
+import java.util.Map;
+import org.bson.Document;
 
 public abstract class AbstractMongoSink extends AbstractMongoComponent implements Processor {
 

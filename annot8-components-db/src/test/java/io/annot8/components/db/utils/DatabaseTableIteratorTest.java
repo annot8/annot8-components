@@ -6,6 +6,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import io.annot8.common.data.content.ColumnMetadata;
+import io.annot8.common.data.content.Row;
+import io.annot8.common.data.content.TableMetadata;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -19,12 +22,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-
 import org.junit.jupiter.api.Test;
-
-import io.annot8.common.data.content.ColumnMetadata;
-import io.annot8.common.data.content.Row;
-import io.annot8.common.data.content.TableMetadata;
 
 public class DatabaseTableIteratorTest {
 

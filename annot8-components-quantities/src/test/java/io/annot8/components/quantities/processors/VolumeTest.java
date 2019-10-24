@@ -1,9 +1,8 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.quantities.processors;
 
-import org.junit.jupiter.api.Test;
-
 import io.annot8.conventions.AnnotationTypes;
+import org.junit.jupiter.api.Test;
 
 public class VolumeTest extends AbstractQuantityTest {
 

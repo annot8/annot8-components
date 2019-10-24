@@ -3,9 +3,8 @@ package io.annot8.components.base.source;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.jupiter.api.Test;
-
 import io.annot8.api.components.responses.SourceResponse.Status;
+import org.junit.jupiter.api.Test;
 
 class EmptySourceTest {
 

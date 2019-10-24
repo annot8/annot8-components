@@ -1,12 +1,7 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.mongo.sources;
 
-import java.time.Instant;
-
-import org.bson.Document;
-
 import com.mongodb.client.MongoCursor;
-
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.SourceDescriptor;
 import io.annot8.api.components.annotations.ComponentDescription;
@@ -23,6 +18,8 @@ import io.annot8.components.mongo.AbstractMongoComponent;
 import io.annot8.components.mongo.data.MongoDocument;
 import io.annot8.components.mongo.resources.MongoConnectionSettings;
 import io.annot8.conventions.PropertyKeys;
+import java.time.Instant;
+import org.bson.Document;
 
 /**
  * Reads the contents of a Mongo collection into items.

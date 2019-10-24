@@ -4,18 +4,16 @@ package io.annot8.components.db.processors;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.when;
 
-import java.io.File;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.Arrays;
-
-import org.mockito.Mockito;
-
 import io.annot8.api.stores.AnnotationStore;
 import io.annot8.common.data.content.ColumnMetadata;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.TableMetadata;
 import io.annot8.testing.testimpl.TestAnnotationStore;
+import java.io.File;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.Arrays;
+import org.mockito.Mockito;
 
 public abstract class AbstractSQLiteDataTest {
 

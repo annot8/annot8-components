@@ -3,16 +3,14 @@ package io.annot8.components.tesseract.processors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.io.File;
-
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-
 import io.annot8.api.components.Processor;
 import io.annot8.api.data.Item;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.Text;
 import io.annot8.testing.testimpl.TestItem;
+import java.io.File;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 public class OCRTest {
 

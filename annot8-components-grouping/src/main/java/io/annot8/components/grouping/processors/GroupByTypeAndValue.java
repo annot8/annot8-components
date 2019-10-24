@@ -1,11 +1,8 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.grouping.processors;
 
-import java.util.Optional;
-
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
-
 import io.annot8.api.annotations.Annotation;
 import io.annot8.api.annotations.Group;
 import io.annot8.api.capabilities.Capabilities;
@@ -19,6 +16,7 @@ import io.annot8.common.components.capabilities.SimpleCapabilities;
 import io.annot8.common.data.bounds.SpanBounds;
 import io.annot8.common.data.content.Text;
 import io.annot8.components.base.processors.AbstractTextProcessor;
+import java.util.Optional;
 
 @ComponentName("Group by Type and Value")
 @ComponentDescription("Group annotations where their type and covered text (value) are the same")

@@ -1,19 +1,18 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.files.utils;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import io.annot8.api.exceptions.Annot8RuntimeException;
 import io.annot8.common.data.content.ColumnMetadata;
 import io.annot8.common.data.content.DefaultRow;
 import io.annot8.common.data.content.Row;
 import io.annot8.common.data.content.TableMetadata;
 import io.annot8.components.files.content.CSVTable;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class BufferedReaderIterator implements Iterator<Row> {
 

@@ -1,16 +1,9 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.files.processors;
 
-import java.io.*;
-import java.util.List;
-import java.util.function.Supplier;
-
-import org.apache.james.mime4j.dom.*;
-
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.io.CharStreams;
-
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
 import io.annot8.api.components.annotations.ComponentName;
@@ -25,6 +18,10 @@ import io.annot8.common.components.capabilities.SimpleCapabilities;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.InputStreamContent;
 import io.annot8.common.data.content.Text;
+import java.io.*;
+import java.util.List;
+import java.util.function.Supplier;
+import org.apache.james.mime4j.dom.*;
 
 @ComponentName("Eml File Extractor")
 @ComponentDescription("Extract text and attachments from *.eml files and create new Content")

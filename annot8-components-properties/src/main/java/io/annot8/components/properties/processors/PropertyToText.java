@@ -1,10 +1,6 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.properties.processors;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
 import io.annot8.api.components.annotations.ComponentName;
@@ -19,6 +15,9 @@ import io.annot8.common.components.AbstractProcessor;
 import io.annot8.common.components.AbstractProcessorDescriptor;
 import io.annot8.common.components.capabilities.SimpleCapabilities;
 import io.annot8.common.data.content.Text;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Convert properties on an item to separate Text content so they can be processed. The toString()

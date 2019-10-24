@@ -4,12 +4,6 @@ package io.annot8.components.db.processors;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.junit.jupiter.api.Test;
-
 import io.annot8.api.components.responses.ProcessorResponse;
 import io.annot8.api.components.responses.ProcessorResponse.Status;
 import io.annot8.api.data.Content;
@@ -19,6 +13,10 @@ import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.TableContent;
 import io.annot8.common.data.content.TableMetadata;
 import io.annot8.testing.testimpl.TestItem;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
+import org.junit.jupiter.api.Test;
 
 public class SQLiteDatabaseTableExtractorTest extends AbstractSQLiteDataTest {
 

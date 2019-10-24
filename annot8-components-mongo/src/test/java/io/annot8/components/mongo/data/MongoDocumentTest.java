@@ -3,14 +3,13 @@ package io.annot8.components.mongo.data;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import org.bson.Document;
-import org.junit.jupiter.api.Test;
-
 import io.annot8.api.data.Content.Builder;
 import io.annot8.api.exceptions.IncompleteException;
 import io.annot8.components.mongo.data.MongoDocument.BuilderFactory;
 import io.annot8.testing.testimpl.TestAnnotationStore;
 import io.annot8.testing.testimpl.TestItem;
+import org.bson.Document;
+import org.junit.jupiter.api.Test;
 
 public class MongoDocumentTest {
 

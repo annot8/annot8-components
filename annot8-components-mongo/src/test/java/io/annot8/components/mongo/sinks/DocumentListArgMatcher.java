@@ -2,7 +2,6 @@
 package io.annot8.components.mongo.sinks;
 
 import java.util.List;
-
 import org.bson.Document;
 import org.mockito.ArgumentMatcher;
 

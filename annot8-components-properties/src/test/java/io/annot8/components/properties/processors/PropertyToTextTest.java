@@ -3,18 +3,16 @@ package io.annot8.components.properties.processors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import io.annot8.api.components.Processor;
+import io.annot8.api.data.Item;
+import io.annot8.api.exceptions.Annot8Exception;
+import io.annot8.testing.testimpl.TestItem;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-
 import org.junit.jupiter.api.Test;
-
-import io.annot8.api.components.Processor;
-import io.annot8.api.data.Item;
-import io.annot8.api.exceptions.Annot8Exception;
-import io.annot8.testing.testimpl.TestItem;
 
 public class PropertyToTextTest {
 

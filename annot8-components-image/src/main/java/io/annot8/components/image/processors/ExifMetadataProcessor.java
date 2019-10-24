@@ -1,9 +1,6 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.image.processors;
 
-import java.io.IOException;
-import java.util.Date;
-
 import com.drew.imaging.ImageMetadataReader;
 import com.drew.imaging.ImageProcessingException;
 import com.drew.lang.Rational;
@@ -12,7 +9,6 @@ import com.drew.metadata.StringValue;
 import com.drew.metadata.Tag;
 import com.drew.metadata.exif.ExifDirectoryBase;
 import com.drew.metadata.exif.GpsDirectory;
-
 import io.annot8.api.annotations.Annotation;
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
@@ -27,6 +23,8 @@ import io.annot8.components.base.processors.AbstractContentProcessor;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PathUtils;
 import io.annot8.conventions.PropertyKeys;
+import java.io.IOException;
+import java.util.Date;
 
 @ComponentName("EXIF Metadata")
 @ComponentDescription("Extract EXIF Metadata from images")

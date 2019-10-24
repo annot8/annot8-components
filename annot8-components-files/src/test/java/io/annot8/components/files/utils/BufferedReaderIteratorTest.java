@@ -6,18 +6,16 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import io.annot8.common.data.content.ColumnMetadata;
+import io.annot8.common.data.content.Row;
+import io.annot8.common.data.content.TableMetadata;
+import io.annot8.components.files.AbstractCSVDataTest;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.function.Consumer;
-
 import org.junit.jupiter.api.Test;
-
-import io.annot8.common.data.content.ColumnMetadata;
-import io.annot8.common.data.content.Row;
-import io.annot8.common.data.content.TableMetadata;
-import io.annot8.components.files.AbstractCSVDataTest;
 
 public class BufferedReaderIteratorTest extends AbstractCSVDataTest {
 
