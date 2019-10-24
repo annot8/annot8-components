@@ -9,8 +9,15 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>annot8-components-stopwords</artifactId>
-  <name>Annot8 StopWord Components</name>
-  <description>Resources for sharing lists of stopwords</description>
+  <artifactId>annot8-components-items</artifactId>
+  <name>Annot8 Item Components</name>
+  <description>Annot8 processors focussing on working with Items</description>
+  <dependencies>
+    <dependency>
+      <groupId>io.annot8</groupId>
+      <artifactId>annot8-components-base</artifactId>
+    </dependency>
+  </dependencies>
+
 
 </project>

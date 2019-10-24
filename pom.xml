@@ -431,6 +431,7 @@
     <module>annot8-components-geo</module>
     <module>annot8-components-grouping</module>
     <module>annot8-components-image</module>
+    <module>annot8-components-items</module>
     <module>annot8-components-mongo</module>
     <module>annot8-components-opennlp</module>
     <module>annot8-components-print</module>
