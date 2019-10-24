@@ -1,19 +1,17 @@
-/*
- * Crown Copyright (C) 2019 Dstl
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+/* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.opennlp.processors;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Stream;
+
+import opennlp.tools.namefind.NameFinderME;
+import opennlp.tools.namefind.TokenNameFinderModel;
+import opennlp.tools.util.Span;
 
 import io.annot8.api.annotations.Annotation;
 import io.annot8.api.capabilities.Capabilities;
@@ -30,20 +28,10 @@ import io.annot8.common.data.content.Text;
 import io.annot8.components.base.processors.AbstractTextProcessor;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
-import opennlp.tools.namefind.NameFinderME;
-import opennlp.tools.namefind.TokenNameFinderModel;
-import opennlp.tools.util.Span;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Stream;
 
 @ComponentName("OpenNLP Named Entity Recognition")
-@ComponentDescription("Use OpenNLP Named Entity Recognition (NER) models to extract named entities as annotations")
+@ComponentDescription(
+    "Use OpenNLP Named Entity Recognition (NER) models to extract named entities as annotations")
 @SettingsClass(NER.Settings.class)
 public class NER extends AbstractProcessorDescriptor<NER.Processor, NER.Settings> {
 
@@ -66,53 +54,60 @@ public class NER extends AbstractProcessorDescriptor<NER.Processor, NER.Settings
     private NameFinderME nameFinder;
     private String type;
 
-    public Processor(File model, String type){
+    public Processor(File model, String type) {
       this.type = type;
       try {
         nameFinder = new NameFinderME(new TokenNameFinderModel(model));
-      }catch (IOException ioe){
+      } catch (IOException ioe) {
         throw new BadConfigurationException("Cannot read NER model", ioe);
       }
     }
 
-    public Processor(InputStream model, String type){
+    public Processor(InputStream model, String type) {
       this.type = type;
       try {
         nameFinder = new NameFinderME(new TokenNameFinderModel(model));
-      }catch (IOException ioe){
+      } catch (IOException ioe) {
         throw new BadConfigurationException("Cannot read NER model", ioe);
       }
     }
 
-
-      @Override
+    @Override
     protected void process(Text content) {
-      Stream<Annotation> sentences = content.getAnnotations().getByBoundsAndType(SpanBounds.class, AnnotationTypes.ANNOTATION_TYPE_SENTENCE);
+      Stream<Annotation> sentences =
+          content
+              .getAnnotations()
+              .getByBoundsAndType(SpanBounds.class, AnnotationTypes.ANNOTATION_TYPE_SENTENCE);
 
-      sentences.forEach(s -> {
-        SpanBounds bounds = (SpanBounds) s.getBounds();
+      sentences.forEach(
+          s -> {
+            SpanBounds bounds = (SpanBounds) s.getBounds();
 
-        List<SpanBounds> tokens = new ArrayList<>();
-        content.getBetween(bounds.getBegin(), bounds.getEnd())
-            .filter(a -> AnnotationTypes.ANNOTATION_TYPE_WORDTOKEN.equals(a.getType()))
-            .filter(a -> a.getBounds() instanceof SpanBounds)
-            .sorted(Comparator.comparingInt(a -> ((SpanBounds) a.getBounds()).getBegin()))
-            .forEach(a -> tokens.add((SpanBounds) a.getBounds()));
+            List<SpanBounds> tokens = new ArrayList<>();
+            content
+                .getBetween(bounds.getBegin(), bounds.getEnd())
+                .filter(a -> AnnotationTypes.ANNOTATION_TYPE_WORDTOKEN.equals(a.getType()))
+                .filter(a -> a.getBounds() instanceof SpanBounds)
+                .sorted(Comparator.comparingInt(a -> ((SpanBounds) a.getBounds()).getBegin()))
+                .forEach(a -> tokens.add((SpanBounds) a.getBounds()));
 
-        Span[] spans = nameFinder.find(tokens.stream().map(b -> b.getData(content).get()).toArray(String[]::new));
+            Span[] spans =
+                nameFinder.find(
+                    tokens.stream().map(b -> b.getData(content).get()).toArray(String[]::new));
 
-        for(Span span : spans){
-          int begin = tokens.get(span.getStart()).getBegin();
-          int end = tokens.get(span.getEnd() - 1).getEnd();
+            for (Span span : spans) {
+              int begin = tokens.get(span.getStart()).getBegin();
+              int end = tokens.get(span.getEnd() - 1).getEnd();
 
-          content.getAnnotations().create()
-              .withBounds(new SpanBounds(begin, end))
-              .withType(type)
-              .withProperty(PropertyKeys.PROPERTY_KEY_PROBABILITY, span.getProb())
-              .save();
-        }
-
-      });
+              content
+                  .getAnnotations()
+                  .create()
+                  .withBounds(new SpanBounds(begin, end))
+                  .withType(type)
+                  .withProperty(PropertyKeys.PROPERTY_KEY_PROBABILITY, span.getProb())
+                  .save();
+            }
+          });
 
       nameFinder.clearAdaptiveData();
     }
@@ -136,6 +131,7 @@ public class NER extends AbstractProcessorDescriptor<NER.Processor, NER.Settings
     public File getModel() {
       return model;
     }
+
     public void setModel(File model) {
       this.model = model;
     }
@@ -144,6 +140,7 @@ public class NER extends AbstractProcessorDescriptor<NER.Processor, NER.Settings
     public String getType() {
       return type;
     }
+
     public void setType(String type) {
       this.type = type;
     }

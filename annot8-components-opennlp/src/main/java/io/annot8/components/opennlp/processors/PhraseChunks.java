@@ -1,19 +1,18 @@
-/*
- * Crown Copyright (C) 2019 Dstl
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+/* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.opennlp.processors;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import opennlp.tools.chunker.ChunkerME;
+import opennlp.tools.chunker.ChunkerModel;
+import opennlp.tools.util.Span;
 
 import io.annot8.api.annotations.Annotation;
 import io.annot8.api.annotations.Group;
@@ -34,23 +33,12 @@ import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.GroupRoles;
 import io.annot8.conventions.GroupTypes;
 import io.annot8.conventions.PropertyKeys;
-import opennlp.tools.chunker.ChunkerME;
-import opennlp.tools.chunker.ChunkerModel;
-import opennlp.tools.util.Span;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @ComponentName("OpenNLP Phrase Chunks")
 @ComponentDescription("Annotate phrase chunks identified by OpenNLP's chunker")
 @SettingsClass(PhraseChunks.Settings.class)
-public class PhraseChunks extends AbstractProcessorDescriptor<PhraseChunks.Processor, PhraseChunks.Settings> {
+public class PhraseChunks
+    extends AbstractProcessorDescriptor<PhraseChunks.Processor, PhraseChunks.Settings> {
   @Override
   protected Processor createComponent(Context context, Settings settings) {
     InputStream model;
@@ -77,9 +65,10 @@ public class PhraseChunks extends AbstractProcessorDescriptor<PhraseChunks.Proce
         .build();
   }
 
-  public static class Processor extends AbstractTextProcessor{
+  public static class Processor extends AbstractTextProcessor {
     private ChunkerME phraseChunker;
-    private final Set<String> prepositions = Set.of(
+    private final Set<String> prepositions =
+        Set.of(
             "about",
             "above",
             "across",
@@ -122,7 +111,7 @@ public class PhraseChunks extends AbstractProcessorDescriptor<PhraseChunks.Proce
             "within",
             "without");
 
-    public Processor(InputStream model){
+    public Processor(InputStream model) {
       try {
         phraseChunker = new ChunkerME(new ChunkerModel(model));
       } catch (IOException ioe) {
@@ -132,72 +121,98 @@ public class PhraseChunks extends AbstractProcessorDescriptor<PhraseChunks.Proce
 
     @Override
     protected void process(Text content) {
-      content.getAnnotations().getByBoundsAndType(SpanBounds.class, AnnotationTypes.ANNOTATION_TYPE_SENTENCE).forEach(s -> {
-        SpanBounds sentenceBounds = (SpanBounds) s.getBounds();
-        //Get tokens for sentence
-        List<Annotation> tokens = new ArrayList<>();
-        content.getBetween(sentenceBounds.getBegin(), sentenceBounds.getEnd())
-            .filter(a -> AnnotationTypes.ANNOTATION_TYPE_WORDTOKEN.equals(a.getType()))
-            .filter(a -> a.getBounds() instanceof SpanBounds)
-            .sorted(SortUtils.SORT_BY_SPANBOUNDS)
-            .forEach(tokens::add);
+      content
+          .getAnnotations()
+          .getByBoundsAndType(SpanBounds.class, AnnotationTypes.ANNOTATION_TYPE_SENTENCE)
+          .forEach(
+              s -> {
+                SpanBounds sentenceBounds = (SpanBounds) s.getBounds();
+                // Get tokens for sentence
+                List<Annotation> tokens = new ArrayList<>();
+                content
+                    .getBetween(sentenceBounds.getBegin(), sentenceBounds.getEnd())
+                    .filter(a -> AnnotationTypes.ANNOTATION_TYPE_WORDTOKEN.equals(a.getType()))
+                    .filter(a -> a.getBounds() instanceof SpanBounds)
+                    .sorted(SortUtils.SORT_BY_SPANBOUNDS)
+                    .forEach(tokens::add);
 
-        String[] words = new String[tokens.size()];
-        String[] pos = new String[tokens.size()];
+                String[] words = new String[tokens.size()];
+                String[] pos = new String[tokens.size()];
 
-        int i = 0;
-        for(Annotation a : tokens){
-          String word = content.getText(a).orElse("");
-          String tag = a.getProperties().get(PropertyKeys.PROPERTY_KEY_PARTOFSPEECH, String.class).orElse("UNK");
+                int i = 0;
+                for (Annotation a : tokens) {
+                  String word = content.getText(a).orElse("");
+                  String tag =
+                      a.getProperties()
+                          .get(PropertyKeys.PROPERTY_KEY_PARTOFSPEECH, String.class)
+                          .orElse("UNK");
 
-          words[i] = word;
-          pos[i] = tag;
-          i++;
-        }
+                  words[i] = word;
+                  pos[i] = tag;
+                  i++;
+                }
 
-        Span[] spans = phraseChunker.chunkAsSpans(words, pos);
+                Span[] spans = phraseChunker.chunkAsSpans(words, pos);
 
-        for (Span span : spans){
-          List<Annotation> constituentWords = content
-              .getBetween(tokens.get(span.getStart()).getBounds(SpanBounds.class).get().getBegin(), tokens.get(span.getEnd()).getBounds(SpanBounds.class).get().getEnd())
-              .filter(a -> AnnotationTypes.ANNOTATION_TYPE_WORDTOKEN.equals(a.getType()))
-              .collect(Collectors.toList());
+                for (Span span : spans) {
+                  List<Annotation> constituentWords =
+                      content
+                          .getBetween(
+                              tokens
+                                  .get(span.getStart())
+                                  .getBounds(SpanBounds.class)
+                                  .get()
+                                  .getBegin(),
+                              tokens.get(span.getEnd()).getBounds(SpanBounds.class).get().getEnd())
+                          .filter(
+                              a -> AnnotationTypes.ANNOTATION_TYPE_WORDTOKEN.equals(a.getType()))
+                          .collect(Collectors.toList());
 
-          int headWordId = constituentWords.size() - 1;
+                  int headWordId = constituentWords.size() - 1;
 
-          // Run through prior words, check for propositional - if so skip, if not break
-          for (int a = constituentWords.size() - 2; a > 1; a--) {
-            String cwPos = constituentWords.get(a).getProperties()
-                .get(PropertyKeys.PROPERTY_KEY_PARTOFSPEECH, String.class).orElse("UNK");
-            String cwText = content.getText(constituentWords.get(a)).orElse("");
+                  // Run through prior words, check for propositional - if so skip, if not break
+                  for (int a = constituentWords.size() - 2; a > 1; a--) {
+                    String cwPos =
+                        constituentWords
+                            .get(a)
+                            .getProperties()
+                            .get(PropertyKeys.PROPERTY_KEY_PARTOFSPEECH, String.class)
+                            .orElse("UNK");
+                    String cwText = content.getText(constituentWords.get(a)).orElse("");
 
-            // If a POS tag or word value is prepositional, end increment head word index
-            if ("IN".equals(cwPos)
-                || ",".equals(cwPos)
-                || prepositions.contains(cwText)) {
-              headWordId = a - 1;
-            } else {
-              headWordId = a;
-              break;
-            }
-          }
+                    // If a POS tag or word value is prepositional, end increment head word index
+                    if ("IN".equals(cwPos) || ",".equals(cwPos) || prepositions.contains(cwText)) {
+                      headWordId = a - 1;
+                    } else {
+                      headWordId = a;
+                      break;
+                    }
+                  }
 
-          Group.Builder builder = content.getItem().getGroups().create()
-              .withType(GroupTypes.GROUP_TYPE_GRAMMAR_PHRASE)
-              .withProperty(PropertyKeys.PROPERTY_KEY_PROBABILITY, span.getProb())
-              .withProperty(PropertyKeys.PROPERTY_KEY_SUBTYPE, span.getType());
+                  Group.Builder builder =
+                      content
+                          .getItem()
+                          .getGroups()
+                          .create()
+                          .withType(GroupTypes.GROUP_TYPE_GRAMMAR_PHRASE)
+                          .withProperty(PropertyKeys.PROPERTY_KEY_PROBABILITY, span.getProb())
+                          .withProperty(PropertyKeys.PROPERTY_KEY_SUBTYPE, span.getType());
 
-          for (int a = 0; a < constituentWords.size(); a++) {
-            if(a == headWordId){
-              builder = builder.withAnnotation(GroupRoles.GROUP_ROLE_GRAMMAR_HEAD, constituentWords.get(a));
-            }else {
-              builder = builder.withAnnotation(GroupRoles.GROUP_ROLE_GRAMMAR_CONSTITUENT, constituentWords.get(a));
-            }
-          }
+                  for (int a = 0; a < constituentWords.size(); a++) {
+                    if (a == headWordId) {
+                      builder =
+                          builder.withAnnotation(
+                              GroupRoles.GROUP_ROLE_GRAMMAR_HEAD, constituentWords.get(a));
+                    } else {
+                      builder =
+                          builder.withAnnotation(
+                              GroupRoles.GROUP_ROLE_GRAMMAR_CONSTITUENT, constituentWords.get(a));
+                    }
+                  }
 
-          builder.save();
-        }
-      });
+                  builder.save();
+                }
+              });
     }
   }
 
@@ -213,6 +228,7 @@ public class PhraseChunks extends AbstractProcessorDescriptor<PhraseChunks.Proce
     public File getModel() {
       return model;
     }
+
     public void setModel(File model) {
       this.model = model;
     }

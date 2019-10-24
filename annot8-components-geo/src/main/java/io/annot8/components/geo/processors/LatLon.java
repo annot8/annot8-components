@@ -1,19 +1,12 @@
-/*
- * Crown Copyright (C) 2019 Dstl
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+/* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.geo.processors;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
@@ -28,13 +21,6 @@ import io.annot8.common.data.content.Text;
 import io.annot8.components.base.processors.AbstractTextProcessor;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
-
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @ComponentName("LatLon")
 @ComponentDescription("Extract latitude-longitude pairs from text")
@@ -84,7 +70,10 @@ public class LatLon extends AbstractProcessorDescriptor<LatLon.Processor, LatLon
     /** Variable to hold the regular expression pattern for Digital Degrees with degree symbol */
     private final Pattern llDDSymPattern;
 
-    /** Variable to hold the regular expression pattern for Digital Degrees with  cardinal (NSEW) symbols */
+    /**
+     * Variable to hold the regular expression pattern for Digital Degrees with cardinal (NSEW)
+     * symbols
+     */
     private final Pattern llDDCardPattern;
 
     private final boolean lonLat;
@@ -94,7 +83,7 @@ public class LatLon extends AbstractProcessorDescriptor<LatLon.Processor, LatLon
     private static final String COULD_NOT_PARSE =
         "Couldn't parse extracted coordinates - coordinate will be skipped";
 
-    public Processor(boolean lonLat, int minDP){
+    public Processor(boolean lonLat, int minDP) {
       this.lonLat = lonLat;
 
       if (minDP == 0) {
@@ -143,8 +132,8 @@ public class LatLon extends AbstractProcessorDescriptor<LatLon.Processor, LatLon
 
     /**
      * Searches the text for digital degree strings This method handles digital degree strings
-     * consisting of a pair of decimal numbers separated by whitespace or a comma and optionally with
-     * the degree symbol. The pair is assumed to be in the order Latitude, Longitude unless the
+     * consisting of a pair of decimal numbers separated by whitespace or a comma and optionally
+     * with the degree symbol. The pair is assumed to be in the order Latitude, Longitude unless the
      * variable lonLat has been set to true.
      */
     private void processDD(Text content, String text, Set<String> found) {
@@ -182,9 +171,9 @@ public class LatLon extends AbstractProcessorDescriptor<LatLon.Processor, LatLon
     /**
      * Searches the text for digital degree strings with cardinal points. This method handles
      * processing of digital degree strings consisting of a pair of decimal numbers separated by
-     * whitespace or a comma and each number is followed by a degree symbol and a letter representing
-     * its cardinal compass point, i.e. N, S, E, W. The cardinal point is used to determine which
-     * value is latitude and which is longitude.
+     * whitespace or a comma and each number is followed by a degree symbol and a letter
+     * representing its cardinal compass point, i.e. N, S, E, W. The cardinal point is used to
+     * determine which value is latitude and which is longitude.
      */
     private void processDDCard(Text content, String text, Set<String> found) {
 
@@ -229,7 +218,7 @@ public class LatLon extends AbstractProcessorDescriptor<LatLon.Processor, LatLon
 
       Pattern[] patterns =
           new Pattern[] {
-              llDMSPattern, llDMSSpacePattern, llDMSNumericPattern, llDMSPunctuationPattern
+            llDMSPattern, llDMSSpacePattern, llDMSNumericPattern, llDMSPunctuationPattern
           };
 
       for (Pattern p : patterns) {
@@ -242,7 +231,8 @@ public class LatLon extends AbstractProcessorDescriptor<LatLon.Processor, LatLon
 
           try {
             double[] lonLat = determineLonLatDMS(matcher);
-            addCoordinate(content, matcher.start(), matcher.end(), lonLat[0], lonLat[1], "dms", found);
+            addCoordinate(
+                content, matcher.start(), matcher.end(), lonLat[0], lonLat[1], "dms", found);
           } catch (NumberFormatException e) {
             log().warn(COULD_NOT_PARSE, e);
           }
@@ -353,9 +343,9 @@ public class LatLon extends AbstractProcessorDescriptor<LatLon.Processor, LatLon
 
     /**
      * Converts a Degrees Minutes Seconds coordinate into a decimal degree value The conversion is
-     * ignorant of the cardinality (N, S, E, W) so degrees value should be positive and the conversion
-     * of an S latitude or W longitude coordinate to a negative value should be carried out by the
-     * calling function.
+     * ignorant of the cardinality (N, S, E, W) so degrees value should be positive and the
+     * conversion of an S latitude or W longitude coordinate to a negative value should be carried
+     * out by the calling function.
      *
      * @param d number of degrees. It is assumed this is a positive value
      * @param m number of minutes
@@ -378,23 +368,33 @@ public class LatLon extends AbstractProcessorDescriptor<LatLon.Processor, LatLon
       }
     }
 
-    private void addCoordinate(Text content, int begin, int end, double lon, double lat, String coordinateType, Set<String> found) {
+    private void addCoordinate(
+        Text content,
+        int begin,
+        int end,
+        double lon,
+        double lat,
+        String coordinateType,
+        Set<String> found) {
       if (lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180) {
         String textLoc = begin + "," + end;
 
         if (found.add(textLoc)) {
           String coords = "[" + lon + "," + lat + "]";
 
-          content.getAnnotations()
+          content
+              .getAnnotations()
               .create()
               .withBounds(new SpanBounds(begin, end))
               .withType(AnnotationTypes.ANNOTATION_TYPE_COORDINATE)
               .withProperty(PropertyKeys.PROPERTY_KEY_COORDINATETYPE, coordinateType)
-              .withProperty(PropertyKeys.PROPERTY_KEY_GEOJSON, "{\"type\":\"Point\",\"coordinates\":" + coords + "}")
-              .withProperty(PropertyKeys.PROPERTY_KEY_VALUE, lat + ";" +lon)
+              .withProperty(
+                  PropertyKeys.PROPERTY_KEY_GEOJSON,
+                  "{\"type\":\"Point\",\"coordinates\":" + coords + "}")
+              .withProperty(PropertyKeys.PROPERTY_KEY_VALUE, lat + ";" + lon)
               .withProperty(PropertyKeys.PROPERTY_KEY_LONGITUDE, lon)
               .withProperty(PropertyKeys.PROPERTY_KEY_LATITUDE, lat)
-          .save();
+              .save();
         }
       }
     }
@@ -403,8 +403,8 @@ public class LatLon extends AbstractProcessorDescriptor<LatLon.Processor, LatLon
      * Replace smart quotes, curly quotes, back ticks and mid-dots with standard quotes and dots to
      * simplify the required regular expressions.
      *
-     * Symbols are replaced with the same number of characters (one-to-one replacement) so that character
-     * offsets are not affected.
+     * <p>Symbols are replaced with the same number of characters (one-to-one replacement) so that
+     * character offsets are not affected.
      */
     public static String normalizeQuotesAndDots(String s) {
       return s.replaceAll("[\\u201C\\u201D\\u2033\\u02BA\\u301E\\u3003]", "\"")
@@ -427,6 +427,7 @@ public class LatLon extends AbstractProcessorDescriptor<LatLon.Processor, LatLon
     public boolean isLonLat() {
       return lonLat;
     }
+
     public void setLonLat(boolean lonLat) {
       this.lonLat = lonLat;
     }
@@ -435,6 +436,7 @@ public class LatLon extends AbstractProcessorDescriptor<LatLon.Processor, LatLon
     public int getMinDP() {
       return minDP;
     }
+
     public void setMinDP(int minDP) {
       this.minDP = minDP;
     }

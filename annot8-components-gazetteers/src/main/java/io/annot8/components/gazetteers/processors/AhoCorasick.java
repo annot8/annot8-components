@@ -1,19 +1,11 @@
-/*
- * Crown Copyright (C) 2019 Dstl
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+/* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.gazetteers.processors;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+import org.ahocorasick.trie.Emit;
+import org.ahocorasick.trie.Trie;
 
 import io.annot8.api.annotations.Annotation;
 import io.annot8.api.annotations.Group;
@@ -28,13 +20,9 @@ import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.GroupTypes;
 import io.annot8.conventions.PropertyKeys;
 import io.annot8.utils.text.PluralUtils;
-import org.ahocorasick.trie.Emit;
-import org.ahocorasick.trie.Trie;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
-public abstract class AhoCorasick<S extends AhoCorasick.Settings> extends AbstractProcessorDescriptor<AhoCorasick.Processor, S> {
+public abstract class AhoCorasick<S extends AhoCorasick.Settings>
+    extends AbstractProcessorDescriptor<AhoCorasick.Processor, S> {
 
   @Override
   public Capabilities capabilities() {
@@ -77,7 +65,10 @@ public abstract class AhoCorasick<S extends AhoCorasick.Settings> extends Abstra
 
     @Override
     protected void process(Text content) {
-      TransformedString norm = settings.isExactWhitespace() ? noopString(content.getData()) : normaliseString(content.getData());
+      TransformedString norm =
+          settings.isExactWhitespace()
+              ? noopString(content.getData())
+              : normaliseString(content.getData());
       Collection<Emit> emits = trie.parseText(norm.getTransformedString());
 
       Map<String, List<Annotation>> aliasGroups = new HashMap<>();
@@ -86,15 +77,19 @@ public abstract class AhoCorasick<S extends AhoCorasick.Settings> extends Abstra
         Integer start = norm.getMapping().get(emit.getStart());
         Integer end = norm.getMapping().get(emit.getEnd() + 1);
 
-        Annotation.Builder builder = content.getAnnotations().create()
-            .withBounds(new SpanBounds(start, end))
-            .withType(settings.getType());
+        Annotation.Builder builder =
+            content
+                .getAnnotations()
+                .create()
+                .withBounds(new SpanBounds(start, end))
+                .withType(settings.getType());
 
         if (settings.getSubType() != null)
           builder = builder.withProperty(PropertyKeys.PROPERTY_KEY_SUBTYPE, settings.getSubType());
 
         if (settings.isAdditionalData()) {
-          for (Map.Entry<String, Object> e : gazetteer.getAdditionalData(emit.getKeyword()).entrySet()) {
+          for (Map.Entry<String, Object> e :
+              gazetteer.getAdditionalData(emit.getKeyword()).entrySet()) {
             builder = builder.withProperty(e.getKey(), e.getValue());
           }
         }
@@ -106,12 +101,10 @@ public abstract class AhoCorasick<S extends AhoCorasick.Settings> extends Abstra
       }
 
       for (List<Annotation> group : aliasGroups.values()) {
-        if(group.size() == 1)
-          continue;
+        if (group.size() == 1) continue;
 
-        Group.Builder builder = content.getItem().getGroups()
-            .create()
-            .withType(GroupTypes.GROUP_PREFIX + "aliases");
+        Group.Builder builder =
+            content.getItem().getGroups().create().withType(GroupTypes.GROUP_PREFIX + "aliases");
 
         group.forEach(a -> builder.withAnnotation("alias", a));
 
@@ -126,8 +119,7 @@ public abstract class AhoCorasick<S extends AhoCorasick.Settings> extends Abstra
     protected static TransformedString noopString(String s) {
       Map<Integer, Integer> indexMap = new HashMap<>();
 
-      for (int i = 0; i < s.length(); i++)
-        indexMap.put(i, i);
+      for (int i = 0; i < s.length(); i++) indexMap.put(i, i);
 
       return new TransformedString(s, s, indexMap);
     }
@@ -241,17 +233,15 @@ public abstract class AhoCorasick<S extends AhoCorasick.Settings> extends Abstra
   }
 
   /**
-   * A simple class to hold two strings and the mapping between them. Used for when a string has been
-   * transformed by some function.
+   * A simple class to hold two strings and the mapping between them. Used for when a string has
+   * been transformed by some function.
    */
   protected static class TransformedString {
     private final String original;
     private final String transformed;
     private final Map<Integer, Integer> map;
 
-    /**
-     * Create a new TransformedString
-     */
+    /** Create a new TransformedString */
     public TransformedString(
         String originalString, String transformedString, Map<Integer, Integer> mapping) {
       original = originalString;
@@ -259,23 +249,17 @@ public abstract class AhoCorasick<S extends AhoCorasick.Settings> extends Abstra
       map = mapping;
     }
 
-    /**
-     * Get the original string
-     */
+    /** Get the original string */
     public String getOriginalString() {
       return original;
     }
 
-    /**
-     * Get the transformed string
-     */
+    /** Get the transformed string */
     public String getTransformedString() {
       return transformed;
     }
 
-    /**
-     * Get the mapping from the transformed string back to the original string
-     */
+    /** Get the mapping from the transformed string back to the original string */
     public Map<Integer, Integer> getMapping() {
       return map;
     }

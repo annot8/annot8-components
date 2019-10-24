@@ -1,19 +1,15 @@
-/*
- * Crown Copyright (C) 2019 Dstl
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+/* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.temporal.processors;
+
+import java.time.DateTimeException;
+import java.time.LocalDate;
+import java.time.Year;
+import java.time.YearMonth;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
@@ -30,23 +26,13 @@ import io.annot8.components.temporal.processors.utils.DateTimeUtils;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
 
-import java.time.DateTimeException;
-import java.time.LocalDate;
-import java.time.Year;
-import java.time.YearMonth;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 @ComponentName("Date") // The display name of the processor
 @ComponentDescription("Extracts formatted dates from text")
 @SettingsClass(Date.Settings.class)
 
 /**
- * Annotate dates and date ranges as Temporal/Instant entities. The following examples show the types of
- * dates and ranges that are detected.
+ * Annotate dates and date ranges as Temporal/Instant entities. The following examples show the
+ * types of dates and ranges that are detected.
  *
  * <ul>
  *   <li>1 December 2016
@@ -122,8 +108,9 @@ public class Date extends AbstractProcessorDescriptor<Date.Processor, Date.Setti
     private void identifyYearRanges(Text content, List<SpanBounds> extracted) {
       String text = content.getData();
 
-      //e.g. 2017-19
-      Pattern longYearShortYear = Pattern.compile("\\b(\\d{2})(\\d{2})-(\\d{2})\\b", Pattern.CASE_INSENSITIVE);
+      // e.g. 2017-19
+      Pattern longYearShortYear =
+          Pattern.compile("\\b(\\d{2})(\\d{2})-(\\d{2})\\b", Pattern.CASE_INSENSITIVE);
       Matcher m = longYearShortYear.matcher(text);
 
       while (m.find()) {
@@ -137,8 +124,9 @@ public class Date extends AbstractProcessorDescriptor<Date.Processor, Date.Setti
         createYearTimeRange(content, m.start(), m.end(), y1, y2, extracted);
       }
 
-      //e.g. 2017-2019, 2017 to 2019, between 2017 and 2019
-      Pattern longYearLongYear = Pattern.compile("\\b(\\d{4})\\s*(-|to|and)\\s*(\\d{4})\\b", Pattern.CASE_INSENSITIVE);
+      // e.g. 2017-2019, 2017 to 2019, between 2017 and 2019
+      Pattern longYearLongYear =
+          Pattern.compile("\\b(\\d{4})\\s*(-|to|and)\\s*(\\d{4})\\b", Pattern.CASE_INSENSITIVE);
       m = longYearLongYear.matcher(text);
 
       while (m.find()) {
@@ -153,13 +141,20 @@ public class Date extends AbstractProcessorDescriptor<Date.Processor, Date.Setti
       }
     }
 
-    private void createYearTimeRange(Text content, int charBegin, int charEnd, Year y1, Year y2, Collection<SpanBounds> extracted) {
-      if(alreadyExtracted(extracted, charBegin, charEnd))
-        return;
+    private void createYearTimeRange(
+        Text content,
+        int charBegin,
+        int charEnd,
+        Year y1,
+        Year y2,
+        Collection<SpanBounds> extracted) {
+      if (alreadyExtracted(extracted, charBegin, charEnd)) return;
 
       SpanBounds sb = new SpanBounds(charBegin, charEnd);
 
-      content.getAnnotations().create()
+      content
+          .getAnnotations()
+          .create()
           .withType(AnnotationTypes.ANNOTATION_TYPE_TEMPORAL_INTERVAL)
           .withBounds(sb)
           .withProperty(PropertyKeys.PROPERTY_KEY_START, y1)
@@ -171,10 +166,11 @@ public class Date extends AbstractProcessorDescriptor<Date.Processor, Date.Setti
     private void identifyMonthYearRanges(Text content, List<SpanBounds> extracted) {
       String text = content.getData();
 
-      //e.g. Mar-Apr 1997, between March and April 97, March to Apr '97
-      Pattern sameYear = Pattern.compile(
-          "\\b" + MONTHS + "\\s*(-|to|and)\\s*" + MONTHS + "\\s+(\\d{4}|'?\\d{2})\\b",
-          Pattern.CASE_INSENSITIVE);
+      // e.g. Mar-Apr 1997, between March and April 97, March to Apr '97
+      Pattern sameYear =
+          Pattern.compile(
+              "\\b" + MONTHS + "\\s*(-|to|and)\\s*" + MONTHS + "\\s+(\\d{4}|'?\\d{2})\\b",
+              Pattern.CASE_INSENSITIVE);
       Matcher m = sameYear.matcher(text);
 
       while (m.find()) {
@@ -200,14 +196,15 @@ public class Date extends AbstractProcessorDescriptor<Date.Processor, Date.Setti
         createMonthYearTimeRange(content, m.start(), m.end(), ym1, ym2, extracted);
       }
 
-      //e.g. March 97 to June 98, between Mar '97 and Jun 1998
-      Pattern diffYear = Pattern.compile(
-          "\\b"
-              + MONTHS
-              + "\\s+(\\d{4}|'?\\d{2})\\s*(-|to|and)\\s*"
-              + MONTHS
-              + "\\s+(\\d{4}|'?\\d{2})\\b",
-          Pattern.CASE_INSENSITIVE);
+      // e.g. March 97 to June 98, between Mar '97 and Jun 1998
+      Pattern diffYear =
+          Pattern.compile(
+              "\\b"
+                  + MONTHS
+                  + "\\s+(\\d{4}|'?\\d{2})\\s*(-|to|and)\\s*"
+                  + MONTHS
+                  + "\\s+(\\d{4}|'?\\d{2})\\b",
+              Pattern.CASE_INSENSITIVE);
       m = diffYear.matcher(text);
 
       while (m.find()) {
@@ -235,13 +232,20 @@ public class Date extends AbstractProcessorDescriptor<Date.Processor, Date.Setti
       }
     }
 
-    private void createMonthYearTimeRange(Text content, int charBegin, int charEnd, YearMonth ym1, YearMonth ym2, Collection<SpanBounds> extracted) {
-      if(alreadyExtracted(extracted, charBegin, charEnd))
-        return;
+    private void createMonthYearTimeRange(
+        Text content,
+        int charBegin,
+        int charEnd,
+        YearMonth ym1,
+        YearMonth ym2,
+        Collection<SpanBounds> extracted) {
+      if (alreadyExtracted(extracted, charBegin, charEnd)) return;
 
       SpanBounds sb = new SpanBounds(charBegin, charEnd);
 
-      content.getAnnotations().create()
+      content
+          .getAnnotations()
+          .create()
           .withType(AnnotationTypes.ANNOTATION_TYPE_TEMPORAL_INTERVAL)
           .withBounds(sb)
           .withProperty(PropertyKeys.PROPERTY_KEY_START, ym1)
@@ -252,7 +256,7 @@ public class Date extends AbstractProcessorDescriptor<Date.Processor, Date.Setti
     }
 
     private void identifyDayMonthYearRanges(Text content, List<SpanBounds> extracted) {
-      //e.g. Monday 23rd to Thursday 26 Sept '19, 4-12 June 2020
+      // e.g. Monday 23rd to Thursday 26 Sept '19, 4-12 June 2020
       Pattern sameMonth =
           Pattern.compile(
               "\\b"
@@ -312,7 +316,7 @@ public class Date extends AbstractProcessorDescriptor<Date.Processor, Date.Setti
         }
       }
 
-      //e.g. Monday 26th Aug to Friday 27th September 2019
+      // e.g. Monday 26th Aug to Friday 27th September 2019
       Pattern sameYear =
           Pattern.compile(
               "\\b"
@@ -369,7 +373,7 @@ public class Date extends AbstractProcessorDescriptor<Date.Processor, Date.Setti
         }
       }
 
-      //Between 2 January 2018 and 1 January 2019
+      // Between 2 January 2018 and 1 January 2019
       Pattern fullDates =
           Pattern.compile(
               "\\b"
@@ -429,13 +433,20 @@ public class Date extends AbstractProcessorDescriptor<Date.Processor, Date.Setti
       }
     }
 
-    private void createDayMonthYearRange(Text content, int charBegin, int charEnd, LocalDate ld1, LocalDate ld2, Collection<SpanBounds> extracted) {
-      if(alreadyExtracted(extracted, charBegin, charEnd))
-        return;
+    private void createDayMonthYearRange(
+        Text content,
+        int charBegin,
+        int charEnd,
+        LocalDate ld1,
+        LocalDate ld2,
+        Collection<SpanBounds> extracted) {
+      if (alreadyExtracted(extracted, charBegin, charEnd)) return;
 
       SpanBounds sb = new SpanBounds(charBegin, charEnd);
 
-      content.getAnnotations().create()
+      content
+          .getAnnotations()
+          .create()
           .withType(AnnotationTypes.ANNOTATION_TYPE_TEMPORAL_INTERVAL)
           .withBounds(sb)
           .withProperty(PropertyKeys.PROPERTY_KEY_START, ld1)
@@ -446,10 +457,16 @@ public class Date extends AbstractProcessorDescriptor<Date.Processor, Date.Setti
     }
 
     private void identifyDates(Text content, List<SpanBounds> extracted) {
-      //e.g. 4 November 1998, 8th May '01
+      // e.g. 4 November 1998, 8th May '01
       Pattern fullDateDayMonth =
           Pattern.compile(
-              "\\b" + DAYS + DATES + DATE_SUFFIXES + "?\\s+" + MONTHS + ",?\\s+(\\d{4}|'?\\d{2}\\b)",
+              "\\b"
+                  + DAYS
+                  + DATES
+                  + DATE_SUFFIXES
+                  + "?\\s+"
+                  + MONTHS
+                  + ",?\\s+(\\d{4}|'?\\d{2}\\b)",
               Pattern.CASE_INSENSITIVE);
       String text = content.getData();
       Matcher m = fullDateDayMonth.matcher(text);
@@ -458,7 +475,7 @@ public class Date extends AbstractProcessorDescriptor<Date.Processor, Date.Setti
         createDateFromMatcher(content, m, 16, 3, 1, extracted);
       }
 
-      //e.g. November 4 1998, May 8th '01
+      // e.g. November 4 1998, May 8th '01
       Pattern fullDateMonthDay =
           Pattern.compile(
               "\\b"
@@ -483,7 +500,7 @@ public class Date extends AbstractProcessorDescriptor<Date.Processor, Date.Setti
         createDateFromMatcher(content, m, 1, 2, 3, extracted);
       }
 
-      //e.g. 4/11/98, 08-05-01
+      // e.g. 4/11/98, 08-05-01
       Pattern shortDate =
           Pattern.compile(
               "\\b([0-2]?[0-9]|3[01])[-\\\\/.]([0-2]?[0-9]|3[01])[-\\\\/.](\\d{4}|\\d{2})\\b",
@@ -545,13 +562,15 @@ public class Date extends AbstractProcessorDescriptor<Date.Processor, Date.Setti
       }
     }
 
-    private void createDate(Text content, int charBegin, int charEnd, LocalDate ld, Collection<SpanBounds> extracted) {
-      if(alreadyExtracted(extracted, charBegin, charEnd))
-        return;
+    private void createDate(
+        Text content, int charBegin, int charEnd, LocalDate ld, Collection<SpanBounds> extracted) {
+      if (alreadyExtracted(extracted, charBegin, charEnd)) return;
 
       SpanBounds sb = new SpanBounds(charBegin, charEnd);
 
-      content.getAnnotations().create()
+      content
+          .getAnnotations()
+          .create()
           .withType(AnnotationTypes.ANNOTATION_TYPE_TEMPORAL_INSTANT)
           .withBounds(sb)
           .withProperty(PropertyKeys.PROPERTY_KEY_VALUE, ld)
@@ -560,12 +579,13 @@ public class Date extends AbstractProcessorDescriptor<Date.Processor, Date.Setti
       extracted.add(sb);
     }
 
-    private static boolean alreadyExtracted(Collection<SpanBounds> extracted, Integer begin, Integer end) {
+    private static boolean alreadyExtracted(
+        Collection<SpanBounds> extracted, Integer begin, Integer end) {
       return extracted.stream().anyMatch(sb -> sb.getBegin() <= begin && sb.getEnd() >= end);
     }
 
     private void identifyMonths(Text content, List<SpanBounds> extracted) {
-      //e.g. Beginning of May 2012, Mid-April 1997, Late Jun '12
+      // e.g. Beginning of May 2012, Mid-April 1997, Late Jun '12
       Pattern monthYear =
           Pattern.compile(
               "\\b((beginning of|start of|early|mid|late|end of)[- ])?"
@@ -621,13 +641,15 @@ public class Date extends AbstractProcessorDescriptor<Date.Processor, Date.Setti
       }
     }
 
-    private void createMonth(Text content, int charBegin, int charEnd, YearMonth ym, Collection<SpanBounds> extracted) {
-      if(alreadyExtracted(extracted, charBegin, charEnd))
-        return;
+    private void createMonth(
+        Text content, int charBegin, int charEnd, YearMonth ym, Collection<SpanBounds> extracted) {
+      if (alreadyExtracted(extracted, charBegin, charEnd)) return;
 
       SpanBounds sb = new SpanBounds(charBegin, charEnd);
 
-      content.getAnnotations().create()
+      content
+          .getAnnotations()
+          .create()
           .withType(AnnotationTypes.ANNOTATION_TYPE_TEMPORAL_INSTANT)
           .withBounds(sb)
           .withProperty(PropertyKeys.PROPERTY_KEY_VALUE, ym)
@@ -637,7 +659,7 @@ public class Date extends AbstractProcessorDescriptor<Date.Processor, Date.Setti
     }
 
     private void identifyYears(Text content, List<SpanBounds> extracted) {
-      //e.g. 1997, 2012
+      // e.g. 1997, 2012
       Pattern monthYear =
           Pattern.compile("\\b(19[789][0-9]|20[0-9][0-9])\\b", Pattern.CASE_INSENSITIVE);
       String text = content.getData();
@@ -650,13 +672,15 @@ public class Date extends AbstractProcessorDescriptor<Date.Processor, Date.Setti
       }
     }
 
-    private void createYear(Text content, int charBegin, int charEnd, Year y, Collection<SpanBounds> extracted) {
-      if(alreadyExtracted(extracted, charBegin, charEnd))
-        return;
+    private void createYear(
+        Text content, int charBegin, int charEnd, Year y, Collection<SpanBounds> extracted) {
+      if (alreadyExtracted(extracted, charBegin, charEnd)) return;
 
       SpanBounds sb = new SpanBounds(charBegin, charEnd);
 
-      content.getAnnotations().create()
+      content
+          .getAnnotations()
+          .create()
           .withType(AnnotationTypes.ANNOTATION_TYPE_TEMPORAL_INSTANT)
           .withBounds(sb)
           .withProperty(PropertyKeys.PROPERTY_KEY_VALUE, y)
@@ -678,7 +702,13 @@ public class Date extends AbstractProcessorDescriptor<Date.Processor, Date.Setti
       return "-".equals(nextChar) || "/".equals(nextChar) || "\\".equals(nextChar);
     }
 
-    private void createDateFromMatcher(Text content, Matcher m, int yearGroup, int monthGroup, int dayGroup, Collection<SpanBounds> extracted) {
+    private void createDateFromMatcher(
+        Text content,
+        Matcher m,
+        int yearGroup,
+        int monthGroup,
+        int dayGroup,
+        Collection<SpanBounds> extracted) {
       Year y = DateTimeUtils.asYear(m.group(yearGroup));
 
       String month = m.group(monthGroup);

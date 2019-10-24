@@ -1,19 +1,18 @@
-/*
- * Crown Copyright (C) 2019 Dstl
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+/* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.temporal.processors;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.time.*;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.temporal.Temporal;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.junit.jupiter.api.Test;
 
 import io.annot8.api.annotations.Annotation;
 import io.annot8.api.capabilities.AnnotationCapability;
@@ -27,18 +26,6 @@ import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
 import io.annot8.testing.testimpl.TestItem;
 import io.annot8.testing.testimpl.content.TestStringContent;
-import org.junit.jupiter.api.Test;
-
-import java.time.*;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
-import java.time.temporal.Temporal;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 public class RelativeDateTest {
 
@@ -54,7 +41,7 @@ public class RelativeDateTest {
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     try (RelativeDate.Processor p =
-             new RelativeDate.Processor(formatter, Arrays.asList("date", "documentDate"), false)) {
+        new RelativeDate.Processor(formatter, Arrays.asList("date", "documentDate"), false)) {
       Item item = new TestItem();
 
       item.getProperties().set("documentDate", relativeTo);
@@ -82,7 +69,12 @@ public class RelativeDateTest {
   }
 
   public void testAnnotation(
-      Text content, Annotation a, String coveredText, Temporal start, Temporal stop, boolean resolveDates) {
+      Text content,
+      Annotation a,
+      String coveredText,
+      Temporal start,
+      Temporal stop,
+      boolean resolveDates) {
     assertEquals(content.getId(), a.getContentId());
     assertEquals(coveredText, a.getBounds().getData(content).get());
     if (resolveDates) {
@@ -120,7 +112,10 @@ public class RelativeDateTest {
 
   public void testToday(boolean resolveDates) throws Exception {
     try (RelativeDate.Processor p =
-             new RelativeDate.Processor(DateTimeFormatter.ofPattern("yyyy-mm-dd"), Arrays.asList("date", "documentDate"), false)) {
+        new RelativeDate.Processor(
+            DateTimeFormatter.ofPattern("yyyy-mm-dd"),
+            Arrays.asList("date", "documentDate"),
+            false)) {
       Item item = new TestItem();
 
       Text content =
@@ -139,12 +134,7 @@ public class RelativeDateTest {
 
       assertEquals(1, annotations.size());
 
-      testAnnotation(
-          content,
-          annotations.get(0),
-          "Today",
-          relativeTo,
-          resolveDates);
+      testAnnotation(content, annotations.get(0), "Today", relativeTo, resolveDates);
     }
   }
 
@@ -156,7 +146,10 @@ public class RelativeDateTest {
 
   public void testYesterday(boolean resolveDates) throws Exception {
     try (RelativeDate.Processor p =
-             new RelativeDate.Processor(DateTimeFormatter.ofPattern("yyyy-mm-dd"), Arrays.asList("date", "documentDate"), false)) {
+        new RelativeDate.Processor(
+            DateTimeFormatter.ofPattern("yyyy-mm-dd"),
+            Arrays.asList("date", "documentDate"),
+            false)) {
       Item item = new TestItem();
 
       Text content =
@@ -181,11 +174,7 @@ public class RelativeDateTest {
       int i = 0;
 
       testAnnotation(
-          content,
-          annotations.get(i++),
-          "Yesterday",
-          relativeTo.minusDays(1),
-          resolveDates);
+          content, annotations.get(i++), "Yesterday", relativeTo.minusDays(1), resolveDates);
 
       testAnnotation(
           content,
@@ -204,7 +193,10 @@ public class RelativeDateTest {
 
   public void testTomorrow(boolean resolveDates) throws Exception {
     try (RelativeDate.Processor p =
-             new RelativeDate.Processor(DateTimeFormatter.ofPattern("yyyy-mm-dd"), Arrays.asList("date", "documentDate"), false)) {
+        new RelativeDate.Processor(
+            DateTimeFormatter.ofPattern("yyyy-mm-dd"),
+            Arrays.asList("date", "documentDate"),
+            false)) {
       Item item = new TestItem();
 
       Text content =
@@ -228,11 +220,7 @@ public class RelativeDateTest {
       int i = 0;
 
       testAnnotation(
-          content,
-          annotations.get(i++),
-          "Tomorrow",
-          relativeTo.plusDays(1),
-          resolveDates);
+          content, annotations.get(i++), "Tomorrow", relativeTo.plusDays(1), resolveDates);
 
       testAnnotation(
           content,
@@ -251,7 +239,10 @@ public class RelativeDateTest {
 
   public void testThisX(boolean resolveDates) throws Exception {
     try (RelativeDate.Processor p =
-             new RelativeDate.Processor(DateTimeFormatter.ofPattern("yyyy-mm-dd"), Arrays.asList("date", "documentDate"), false)) {
+        new RelativeDate.Processor(
+            DateTimeFormatter.ofPattern("yyyy-mm-dd"),
+            Arrays.asList("date", "documentDate"),
+            false)) {
       Item item = new TestItem();
 
       Text content =
@@ -283,18 +274,9 @@ public class RelativeDateTest {
           resolveDates);
 
       testAnnotation(
-          content,
-          annotations.get(i++),
-          "this month",
-          YearMonth.of(2016, 10),
-          resolveDates);
+          content, annotations.get(i++), "this month", YearMonth.of(2016, 10), resolveDates);
 
-      testAnnotation(
-          content,
-          annotations.get(i++),
-          "this year",
-          Year.of(2016),
-          resolveDates);
+      testAnnotation(content, annotations.get(i++), "this year", Year.of(2016), resolveDates);
     }
   }
 
@@ -306,7 +288,10 @@ public class RelativeDateTest {
 
   public void testNextLastDay(boolean resolveDates) throws Exception {
     try (RelativeDate.Processor p =
-             new RelativeDate.Processor(DateTimeFormatter.ofPattern("yyyy-mm-dd"), Arrays.asList("date", "documentDate"), false)) {
+        new RelativeDate.Processor(
+            DateTimeFormatter.ofPattern("yyyy-mm-dd"),
+            Arrays.asList("date", "documentDate"),
+            false)) {
       Item item = new TestItem();
 
       Text content =
@@ -330,18 +315,10 @@ public class RelativeDateTest {
       int i = 0;
 
       testAnnotation(
-          content,
-          annotations.get(i++),
-          "Next Friday",
-          relativeTo.plusDays(2),
-          resolveDates);
+          content, annotations.get(i++), "Next Friday", relativeTo.plusDays(2), resolveDates);
 
       testAnnotation(
-          content,
-          annotations.get(i++),
-          "Last Wednesday",
-          relativeTo.minusDays(7),
-          resolveDates);
+          content, annotations.get(i++), "Last Wednesday", relativeTo.minusDays(7), resolveDates);
     }
   }
 
@@ -353,7 +330,10 @@ public class RelativeDateTest {
 
   public void testNextLastWeek(boolean resolveDates) throws Exception {
     try (RelativeDate.Processor p =
-             new RelativeDate.Processor(DateTimeFormatter.ofPattern("yyyy-mm-dd"), Arrays.asList("date", "documentDate"), false)) {
+        new RelativeDate.Processor(
+            DateTimeFormatter.ofPattern("yyyy-mm-dd"),
+            Arrays.asList("date", "documentDate"),
+            false)) {
       Item item = new TestItem();
 
       Text content =
@@ -402,7 +382,10 @@ public class RelativeDateTest {
 
   public void testNextLastWeekPeriod(boolean resolveDates) throws Exception {
     try (RelativeDate.Processor p =
-             new RelativeDate.Processor(DateTimeFormatter.ofPattern("yyyy-mm-dd"), Arrays.asList("date", "documentDate"), false)) {
+        new RelativeDate.Processor(
+            DateTimeFormatter.ofPattern("yyyy-mm-dd"),
+            Arrays.asList("date", "documentDate"),
+            false)) {
       Item item = new TestItem();
 
       Text content =
@@ -452,7 +435,10 @@ public class RelativeDateTest {
 
   public void testNextLastWeekDay(boolean resolveDates) throws Exception {
     try (RelativeDate.Processor p =
-             new RelativeDate.Processor(DateTimeFormatter.ofPattern("yyyy-mm-dd"), Arrays.asList("date", "documentDate"), false)) {
+        new RelativeDate.Processor(
+            DateTimeFormatter.ofPattern("yyyy-mm-dd"),
+            Arrays.asList("date", "documentDate"),
+            false)) {
       Item item = new TestItem();
 
       Text content =
@@ -499,7 +485,10 @@ public class RelativeDateTest {
 
   public void testNextLastMonth(boolean resolveDates) throws Exception {
     try (RelativeDate.Processor p =
-             new RelativeDate.Processor(DateTimeFormatter.ofPattern("yyyy-mm-dd"), Arrays.asList("date", "documentDate"), false)) {
+        new RelativeDate.Processor(
+            DateTimeFormatter.ofPattern("yyyy-mm-dd"),
+            Arrays.asList("date", "documentDate"),
+            false)) {
       Item item = new TestItem();
 
       Text content =
@@ -523,18 +512,10 @@ public class RelativeDateTest {
       int i = 0;
 
       testAnnotation(
-          content,
-          annotations.get(i++),
-          "Last month",
-          YearMonth.of(2016, 9),
-          resolveDates);
+          content, annotations.get(i++), "Last month", YearMonth.of(2016, 9), resolveDates);
 
       testAnnotation(
-          content,
-          annotations.get(i++),
-          "next month",
-          YearMonth.of(2016, 11),
-          resolveDates);
+          content, annotations.get(i++), "next month", YearMonth.of(2016, 11), resolveDates);
     }
   }
 
@@ -546,7 +527,10 @@ public class RelativeDateTest {
 
   public void testNextLastMonthPeriod(boolean resolveDates) throws Exception {
     try (RelativeDate.Processor p =
-             new RelativeDate.Processor(DateTimeFormatter.ofPattern("yyyy-mm-dd"), Arrays.asList("date", "documentDate"), false)) {
+        new RelativeDate.Processor(
+            DateTimeFormatter.ofPattern("yyyy-mm-dd"),
+            Arrays.asList("date", "documentDate"),
+            false)) {
       Item item = new TestItem();
 
       Text content =
@@ -596,7 +580,10 @@ public class RelativeDateTest {
 
   public void testNextLastYear(boolean resolveDates) throws Exception {
     try (RelativeDate.Processor p =
-             new RelativeDate.Processor(DateTimeFormatter.ofPattern("yyyy-mm-dd"), Arrays.asList("date", "documentDate"), false)) {
+        new RelativeDate.Processor(
+            DateTimeFormatter.ofPattern("yyyy-mm-dd"),
+            Arrays.asList("date", "documentDate"),
+            false)) {
       Item item = new TestItem();
 
       Text content =
@@ -619,19 +606,9 @@ public class RelativeDateTest {
 
       int i = 0;
 
-      testAnnotation(
-          content,
-          annotations.get(i++),
-          "Next year",
-          Year.of(2017),
-          resolveDates);
+      testAnnotation(content, annotations.get(i++), "Next year", Year.of(2017), resolveDates);
 
-      testAnnotation(
-          content,
-          annotations.get(i++),
-          "last year",
-          Year.of(2015),
-          resolveDates);
+      testAnnotation(content, annotations.get(i++), "last year", Year.of(2015), resolveDates);
     }
   }
 
@@ -643,7 +620,10 @@ public class RelativeDateTest {
 
   public void testNextLastYearPeriod(boolean resolveDates) throws Exception {
     try (RelativeDate.Processor p =
-             new RelativeDate.Processor(DateTimeFormatter.ofPattern("yyyy-mm-dd"), Arrays.asList("date", "documentDate"), false)) {
+        new RelativeDate.Processor(
+            DateTimeFormatter.ofPattern("yyyy-mm-dd"),
+            Arrays.asList("date", "documentDate"),
+            false)) {
       Item item = new TestItem();
 
       Text content =
@@ -693,7 +673,10 @@ public class RelativeDateTest {
 
   public void testNextLastYearMonth(boolean resolveDates) throws Exception {
     try (RelativeDate.Processor p =
-             new RelativeDate.Processor(DateTimeFormatter.ofPattern("yyyy-mm-dd"), Arrays.asList("date", "documentDate"), false)) {
+        new RelativeDate.Processor(
+            DateTimeFormatter.ofPattern("yyyy-mm-dd"),
+            Arrays.asList("date", "documentDate"),
+            false)) {
       Item item = new TestItem();
 
       Text content =
@@ -717,18 +700,10 @@ public class RelativeDateTest {
       int i = 0;
 
       testAnnotation(
-          content,
-          annotations.get(i++),
-          "October last year",
-          YearMonth.of(2015, 10),
-          resolveDates);
+          content, annotations.get(i++), "October last year", YearMonth.of(2015, 10), resolveDates);
 
       testAnnotation(
-          content,
-          annotations.get(i++),
-          "June next year",
-          YearMonth.of(2017, 6),
-          resolveDates);
+          content, annotations.get(i++), "June next year", YearMonth.of(2017, 6), resolveDates);
     }
   }
 
@@ -740,7 +715,10 @@ public class RelativeDateTest {
 
   public void testInTheNextX(boolean resolveDates) throws Exception {
     try (RelativeDate.Processor p =
-             new RelativeDate.Processor(DateTimeFormatter.ofPattern("yyyy-mm-dd"), Arrays.asList("date", "documentDate"), false)) {
+        new RelativeDate.Processor(
+            DateTimeFormatter.ofPattern("yyyy-mm-dd"),
+            Arrays.asList("date", "documentDate"),
+            false)) {
       Item item = new TestItem();
 
       Text content =
@@ -803,7 +781,7 @@ public class RelativeDateTest {
 
     DateTimeFormatter formatter = createDTF("d MMM yy");
     try (RelativeDate.Processor p =
-             new RelativeDate.Processor(formatter, Arrays.asList("date", "documentDate"), false)) {
+        new RelativeDate.Processor(formatter, Arrays.asList("date", "documentDate"), false)) {
       Item item = new TestItem();
 
       Text content =
@@ -837,7 +815,7 @@ public class RelativeDateTest {
     }
   }
 
-  private DateTimeFormatter createDTF(String pattern){
+  private DateTimeFormatter createDTF(String pattern) {
     return new DateTimeFormatterBuilder()
         .parseCaseInsensitive()
         .appendPattern(pattern)
@@ -855,7 +833,9 @@ public class RelativeDateTest {
     assertEquals(0, c.deletes().count());
 
     // Check that we're creating an Annotation and that it has the correct definitions
-    assertTrue(c.creates(AnnotationCapability.class).allMatch(cap -> cap.getType().startsWith("entity/temporal")));
+    assertTrue(
+        c.creates(AnnotationCapability.class)
+            .allMatch(cap -> cap.getType().startsWith("entity/temporal")));
 
     // Check that we're processing a Content and that it has the correct definitions
     ContentCapability contentCap = c.processes(ContentCapability.class).findFirst().get();
@@ -869,7 +849,11 @@ public class RelativeDateTest {
     // Test that we actually get a component when we create it
     RelativeDate.Processor np =
         n.createComponent(
-            null, new RelativeDate.Settings(DateTimeFormatter.ofPattern("yyyy-mm-dd"), Arrays.asList("date", "documentDate"), false));
+            null,
+            new RelativeDate.Settings(
+                DateTimeFormatter.ofPattern("yyyy-mm-dd"),
+                Arrays.asList("date", "documentDate"),
+                false));
     assertNotNull(np);
   }
 }

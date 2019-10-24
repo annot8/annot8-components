@@ -1,19 +1,11 @@
-/*
- * Crown Copyright (C) 2019 Dstl
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+/* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.base.processors;
+
+import java.util.Map;
+import java.util.Set;
+
+import javax.json.bind.annotation.JsonbCreator;
+import javax.json.bind.annotation.JsonbProperty;
 
 import io.annot8.api.annotations.Annotation;
 import io.annot8.api.capabilities.Capabilities;
@@ -31,19 +23,22 @@ import io.annot8.components.stopwords.resources.NoOpStopwords;
 import io.annot8.components.stopwords.resources.Stopwords;
 import io.annot8.conventions.AnnotationTypes;
 
-import javax.json.bind.annotation.JsonbCreator;
-import javax.json.bind.annotation.JsonbProperty;
-import java.util.Map;
-import java.util.Set;
-
 @ComponentName("Described Word Token")
-@ComponentDescription("Finds word tokens matching a pre-defined list, and then looks for additional descriptors preceding these")
+@ComponentDescription(
+    "Finds word tokens matching a pre-defined list, and then looks for additional descriptors preceding these")
 @SettingsClass(DescribedWordToken.Settings.class)
-public class DescribedWordToken extends AbstractProcessorDescriptor<DescribedWordToken.Processor, DescribedWordToken.Settings> {
+public class DescribedWordToken
+    extends AbstractProcessorDescriptor<DescribedWordToken.Processor, DescribedWordToken.Settings> {
   @Override
   protected Processor createComponent(Context context, Settings settings) {
     Stopwords stopwords = context.getResource(Stopwords.class).orElse(new NoOpStopwords());
-    return new Processor(stopwords, settings.getType(), settings.getRootTokens(), settings.getDescriptors(), settings.isRequireDescriptors(), settings.getProperties());
+    return new Processor(
+        stopwords,
+        settings.getType(),
+        settings.getRootTokens(),
+        settings.getDescriptors(),
+        settings.isRequireDescriptors(),
+        settings.getProperties());
   }
 
   @Override
@@ -56,7 +51,7 @@ public class DescribedWordToken extends AbstractProcessorDescriptor<DescribedWor
         .build();
   }
 
-  public static class Processor extends AbstractTextProcessor{
+  public static class Processor extends AbstractTextProcessor {
     private final String type;
     private final Set<String> rootTokens;
     private final Set<String> descriptors;
@@ -65,7 +60,13 @@ public class DescribedWordToken extends AbstractProcessorDescriptor<DescribedWor
 
     private final Stopwords stopwords;
 
-    public Processor(Stopwords stopwords, String type, Set<String> rootTokens, Set<String> descriptors, boolean requireDescriptors, Map<String, Object> properties){
+    public Processor(
+        Stopwords stopwords,
+        String type,
+        Set<String> rootTokens,
+        Set<String> descriptors,
+        boolean requireDescriptors,
+        Map<String, Object> properties) {
       this.stopwords = stopwords;
       this.type = type;
       this.rootTokens = rootTokens;
@@ -76,41 +77,54 @@ public class DescribedWordToken extends AbstractProcessorDescriptor<DescribedWor
 
     @Override
     protected void process(Text content) {
-      content.getAnnotations().getByBoundsAndType(SpanBounds.class, AnnotationTypes.ANNOTATION_TYPE_SENTENCE).forEach(
-          sentence -> {
-            SpanBounds sentenceSpan = sentence.getBounds(SpanBounds.class).get();
-            content.getBetween(sentenceSpan.getBegin(), sentenceSpan.getEnd())
-                .filter(a -> AnnotationTypes.ANNOTATION_TYPE_WORDTOKEN.equals(a.getType()))
-                .filter(a -> rootTokens.stream().anyMatch(s -> s.equalsIgnoreCase(content.getText(a).orElse(""))))
-                .forEach(a -> findDescriptorsAndCreate(content, sentenceSpan, a)
-            );
-          }
-      );
+      content
+          .getAnnotations()
+          .getByBoundsAndType(SpanBounds.class, AnnotationTypes.ANNOTATION_TYPE_SENTENCE)
+          .forEach(
+              sentence -> {
+                SpanBounds sentenceSpan = sentence.getBounds(SpanBounds.class).get();
+                content
+                    .getBetween(sentenceSpan.getBegin(), sentenceSpan.getEnd())
+                    .filter(a -> AnnotationTypes.ANNOTATION_TYPE_WORDTOKEN.equals(a.getType()))
+                    .filter(
+                        a ->
+                            rootTokens.stream()
+                                .anyMatch(s -> s.equalsIgnoreCase(content.getText(a).orElse(""))))
+                    .forEach(a -> findDescriptorsAndCreate(content, sentenceSpan, a));
+              });
     }
 
-    protected void findDescriptorsAndCreate(Text content, SpanBounds sentence, Annotation rootWord){
+    protected void findDescriptorsAndCreate(
+        Text content, SpanBounds sentence, Annotation rootWord) {
       SpanBounds rootSpan = rootWord.getBounds(SpanBounds.class).get();
 
-      int begin = content.getBetween(sentence.getBegin(), rootSpan.getBegin())
-          .filter(a -> AnnotationTypes.ANNOTATION_TYPE_WORDTOKEN.equals(a.getType()))
-          .sorted(SortUtils.SORT_BY_SPANBOUNDS.reversed())
-          .takeWhile(a -> {
-            String w = content.getText(a).orElse("");
-            return stopwords.isStopword(w) || descriptors.stream().anyMatch(s -> s.equalsIgnoreCase(w));
-          })
-          .sorted(SortUtils.SORT_BY_SPANBOUNDS)
-          .dropWhile(a -> stopwords.isStopword(content.getText(a).orElse("")))
-          .mapToInt(a -> a.getBounds(SpanBounds.class).get().getBegin())
-          .min().orElse(rootSpan.getBegin());
+      int begin =
+          content
+              .getBetween(sentence.getBegin(), rootSpan.getBegin())
+              .filter(a -> AnnotationTypes.ANNOTATION_TYPE_WORDTOKEN.equals(a.getType()))
+              .sorted(SortUtils.SORT_BY_SPANBOUNDS.reversed())
+              .takeWhile(
+                  a -> {
+                    String w = content.getText(a).orElse("");
+                    return stopwords.isStopword(w)
+                        || descriptors.stream().anyMatch(s -> s.equalsIgnoreCase(w));
+                  })
+              .sorted(SortUtils.SORT_BY_SPANBOUNDS)
+              .dropWhile(a -> stopwords.isStopword(content.getText(a).orElse("")))
+              .mapToInt(a -> a.getBounds(SpanBounds.class).get().getBegin())
+              .min()
+              .orElse(rootSpan.getBegin());
 
-      if(requireDescriptors && rootSpan.getBegin() == begin)
-        return;
+      if (requireDescriptors && rootSpan.getBegin() == begin) return;
 
-      Annotation.Builder builder = content.getAnnotations().create()
-          .withType(type)
-          .withBounds(new SpanBounds(begin, rootSpan.getEnd()));
+      Annotation.Builder builder =
+          content
+              .getAnnotations()
+              .create()
+              .withType(type)
+              .withBounds(new SpanBounds(begin, rootSpan.getEnd()));
 
-      for(Map.Entry<String, Object> e : properties.entrySet()){
+      for (Map.Entry<String, Object> e : properties.entrySet()) {
         builder = builder.withProperty(e.getKey(), e.getValue());
       }
 
@@ -126,7 +140,12 @@ public class DescribedWordToken extends AbstractProcessorDescriptor<DescribedWor
     private final Map<String, Object> properties;
 
     @JsonbCreator
-    public Settings(@JsonbProperty("type") String type, @JsonbProperty("rootTokens") Set<String> rootTokens, @JsonbProperty("descriptors") Set<String> descriptors, @JsonbProperty("requireDescriptors") boolean requireDescriptors, @JsonbProperty("properties") Map<String, Object> properties) {
+    public Settings(
+        @JsonbProperty("type") String type,
+        @JsonbProperty("rootTokens") Set<String> rootTokens,
+        @JsonbProperty("descriptors") Set<String> descriptors,
+        @JsonbProperty("requireDescriptors") boolean requireDescriptors,
+        @JsonbProperty("properties") Map<String, Object> properties) {
       this.type = type;
       this.rootTokens = rootTokens;
       this.descriptors = descriptors;
@@ -136,10 +155,12 @@ public class DescribedWordToken extends AbstractProcessorDescriptor<DescribedWor
 
     @Override
     public boolean validate() {
-      return type != null && !type.isEmpty() &&
-          rootTokens != null && !rootTokens.isEmpty() &&
-          descriptors != null &&
-          properties != null;
+      return type != null
+          && !type.isEmpty()
+          && rootTokens != null
+          && !rootTokens.isEmpty()
+          && descriptors != null
+          && properties != null;
     }
 
     @Description("The type to assign to annotations")

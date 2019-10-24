@@ -1,19 +1,8 @@
-/*
- * Crown Copyright (C) 2019 Dstl
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+/* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.temporal.processors;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
@@ -28,19 +17,17 @@ import io.annot8.common.data.content.Text;
 import io.annot8.components.base.processors.AbstractRegexProcessor;
 import io.annot8.conventions.AnnotationTypes;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 @ComponentName("Unqualified Date") // The display name of the processor
-@ComponentDescription("Extracts unqualified dates from text and annotates them as Temporal entities.")
+@ComponentDescription(
+    "Extracts unqualified dates from text and annotates them as Temporal entities.")
 @SettingsClass(UnqualifiedDate.Settings.class)
 
 /**
  * Extracts unqualified dates from text and annotates them as Temporal entities. We take an
  * unqualified date to be any date without a year for the purposes of this annotator.
- *
  */
-public class UnqualifiedDate extends AbstractProcessorDescriptor<UnqualifiedDate.Processor, UnqualifiedDate.Settings> {
+public class UnqualifiedDate
+    extends AbstractProcessorDescriptor<UnqualifiedDate.Processor, UnqualifiedDate.Settings> {
 
   @Override
   public Capabilities capabilities() {
@@ -86,7 +73,10 @@ public class UnqualifiedDate extends AbstractProcessorDescriptor<UnqualifiedDate
 
     public Processor(boolean allowLowerCase) {
 
-      super(Pattern.compile(PATTERN, Pattern.CASE_INSENSITIVE), 0, AnnotationTypes.ANNOTATION_TYPE_TEMPORAL);
+      super(
+          Pattern.compile(PATTERN, Pattern.CASE_INSENSITIVE),
+          0,
+          AnnotationTypes.ANNOTATION_TYPE_TEMPORAL);
       this.allowLowercase = allowLowerCase;
     }
 
@@ -99,22 +89,19 @@ public class UnqualifiedDate extends AbstractProcessorDescriptor<UnqualifiedDate
 
       return allowLowercase
           || (startsWithCapital(matcher.group(2))
-          && startsWithCapital(matcher.group(18))
-          && startsWithCapital(matcher.group(31))
-          && startsWithCapital(matcher.group(46))
-          && startsWithCapital(matcher.group(61)));
+              && startsWithCapital(matcher.group(18))
+              && startsWithCapital(matcher.group(31))
+              && startsWithCapital(matcher.group(46))
+              && startsWithCapital(matcher.group(61)));
     }
 
-    /**
-     * Returns true if the String s starts with a capital letter
-     */
+    /** Returns true if the String s starts with a capital letter */
     public static boolean startsWithCapital(String s) {
       if (s == null || s.length() == 0) return true;
 
       String letter = s.substring(0, 1);
       return letter.toUpperCase().equals(letter);
     }
-
   }
 
   public static class Settings implements io.annot8.api.settings.Settings {
@@ -125,7 +112,6 @@ public class UnqualifiedDate extends AbstractProcessorDescriptor<UnqualifiedDate
      * Extracts unqualified dates from text and annotates them as Temporal entities. We take an
      * unqualified date to be any date without a year for the purposes of this annotator.
      */
-
     @Description("Allow lower case letters for months and days?")
     public boolean getAllowLowercase() {
       return allowLowercase;
@@ -140,7 +126,5 @@ public class UnqualifiedDate extends AbstractProcessorDescriptor<UnqualifiedDate
       // invalid settings are not possible
       return true;
     }
-
-
   }
 }

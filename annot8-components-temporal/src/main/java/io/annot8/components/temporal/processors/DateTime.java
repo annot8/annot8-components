@@ -1,19 +1,17 @@
-/*
- * Crown Copyright (C) 2019 Dstl
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+/* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.temporal.processors;
+
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.temporal.Temporal;
+import java.util.Arrays;
+import java.util.TimeZone;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
@@ -28,18 +26,6 @@ import io.annot8.components.base.processors.AbstractTextProcessor;
 import io.annot8.components.temporal.processors.utils.DateTimeUtils;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
-
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-import java.time.temporal.Temporal;
-import java.util.Arrays;
-import java.util.TimeZone;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 /**
  * Annotate date time strings as Temporal entities. The following examples show the types of date
@@ -75,10 +61,11 @@ public class DateTime extends AbstractProcessorDescriptor<DateTime.Processor, No
     private static final String MONTHS =
         "(Jan(uary)?|Feb(ruary)?|Mar(ch)?|Apr(il)?|May|Jun(e)?|Jul(y)?|Aug(ust)?|Sep(t)?(ember)?|Oct(ober)?|Nov(ember)?|Dec(ember)?)";
     private static final String DATE_SUFFIXES = "(st|nd|rd|th)";
-    private static final String TIME_ZONES = Arrays.stream(TimeZone.getAvailableIDs())
-        .filter(s -> s.length() <= 3)
-        .filter(s -> s.equals(s.toUpperCase()))
-        .collect(Collectors.joining("|"));
+    private static final String TIME_ZONES =
+        Arrays.stream(TimeZone.getAvailableIDs())
+            .filter(s -> s.length() <= 3)
+            .filter(s -> s.equals(s.toUpperCase()))
+            .collect(Collectors.joining("|"));
 
     @Override
     protected void process(Text content) {
@@ -89,19 +76,24 @@ public class DateTime extends AbstractProcessorDescriptor<DateTime.Processor, No
     }
 
     private void processIso(Text content) {
-      Pattern iso8601 = Pattern.compile(
-          "\\b(\\d{4})-?(\\d{2})-?(\\d{2})[T ](\\d{2}):?(\\d{2}):?(\\d{2})(\\.\\d{3})?\\s?(Z|[-+]\\d{2}:\\d{2})?\\b");
+      Pattern iso8601 =
+          Pattern.compile(
+              "\\b(\\d{4})-?(\\d{2})-?(\\d{2})[T ](\\d{2}):?(\\d{2}):?(\\d{2})(\\.\\d{3})?\\s?(Z|[-+]\\d{2}:\\d{2})?\\b");
       Matcher m = iso8601.matcher(content.getData());
 
       while (m.find()) {
         try {
           Temporal t;
           if (m.group(8) == null) {
-            //No time zone, so assume LocalDateTime
-            t = LocalDateTime.parse(m.group().replaceAll(" ", "T"), DateTimeFormatter.ISO_DATE_TIME);
+            // No time zone, so assume LocalDateTime
+            t =
+                LocalDateTime.parse(
+                    m.group().replaceAll(" ", "T"), DateTimeFormatter.ISO_DATE_TIME);
           } else {
-            //Time zone information, so use ZonedDateTime
-            t = ZonedDateTime.parse(m.group().replaceAll(" ", "T"), DateTimeFormatter.ISO_DATE_TIME);
+            // Time zone information, so use ZonedDateTime
+            t =
+                ZonedDateTime.parse(
+                    m.group().replaceAll(" ", "T"), DateTimeFormatter.ISO_DATE_TIME);
           }
 
           createDateTime(content, m.start(), m.end(), t);
@@ -112,30 +104,33 @@ public class DateTime extends AbstractProcessorDescriptor<DateTime.Processor, No
     }
 
     private void processTimeOnDate(Text content) {
-      Pattern timeOnDate = Pattern.compile(
-          "\\b([01][0-9]|2[0-3]):?([0-5][0-9]):?([0-5][0-9])?(hrs)? on ([0-2]?[0-9]|3[01]) "
-              + MONTHS
-              + " (\\d{4}|'?\\d{2})\\b",
-          Pattern.CASE_INSENSITIVE);
+      Pattern timeOnDate =
+          Pattern.compile(
+              "\\b([01][0-9]|2[0-3]):?([0-5][0-9]):?([0-5][0-9])?(hrs)? on ([0-2]?[0-9]|3[01]) "
+                  + MONTHS
+                  + " (\\d{4}|'?\\d{2})\\b",
+              Pattern.CASE_INSENSITIVE);
       Matcher m = timeOnDate.matcher(content.getData());
 
       while (m.find()) {
         LocalDateTime t;
         if (m.group(3) != null) {
-          t = LocalDateTime.of(
-              DateTimeUtils.asYear(m.group(19)).getValue(),
-              DateTimeUtils.asMonth(m.group(6)).getValue(),
-              Integer.parseInt(m.group(5)),
-              Integer.parseInt(m.group(1)),
-              Integer.parseInt(m.group(2)),
-              Integer.parseInt(m.group(3)));
+          t =
+              LocalDateTime.of(
+                  DateTimeUtils.asYear(m.group(19)).getValue(),
+                  DateTimeUtils.asMonth(m.group(6)).getValue(),
+                  Integer.parseInt(m.group(5)),
+                  Integer.parseInt(m.group(1)),
+                  Integer.parseInt(m.group(2)),
+                  Integer.parseInt(m.group(3)));
         } else {
-          t = LocalDateTime.of(
-              DateTimeUtils.asYear(m.group(19)).getValue(),
-              DateTimeUtils.asMonth(m.group(6)).getValue(),
-              Integer.parseInt(m.group(5)),
-              Integer.parseInt(m.group(1)),
-              Integer.parseInt(m.group(2)));
+          t =
+              LocalDateTime.of(
+                  DateTimeUtils.asYear(m.group(19)).getValue(),
+                  DateTimeUtils.asMonth(m.group(6)).getValue(),
+                  Integer.parseInt(m.group(5)),
+                  Integer.parseInt(m.group(1)),
+                  Integer.parseInt(m.group(2)));
         }
 
         createDateTime(content, m.start(), m.end(), t);
@@ -160,20 +155,22 @@ public class DateTime extends AbstractProcessorDescriptor<DateTime.Processor, No
       while (m.find()) {
         LocalDateTime ldt;
         if (m.group(19) != null) {
-          ldt = LocalDateTime.of(
-              DateTimeUtils.asYear(m.group(16)).getValue(),
-              DateTimeUtils.asMonth(m.group(3)).getValue(),
-              Integer.parseInt(m.group(1)),
-              Integer.parseInt(m.group(17)),
-              Integer.parseInt(m.group(18)),
-              Integer.parseInt(m.group(19)));
+          ldt =
+              LocalDateTime.of(
+                  DateTimeUtils.asYear(m.group(16)).getValue(),
+                  DateTimeUtils.asMonth(m.group(3)).getValue(),
+                  Integer.parseInt(m.group(1)),
+                  Integer.parseInt(m.group(17)),
+                  Integer.parseInt(m.group(18)),
+                  Integer.parseInt(m.group(19)));
         } else {
-          ldt = LocalDateTime.of(
-              DateTimeUtils.asYear(m.group(16)).getValue(),
-              DateTimeUtils.asMonth(m.group(3)).getValue(),
-              Integer.parseInt(m.group(1)),
-              Integer.parseInt(m.group(17)),
-              Integer.parseInt(m.group(18)));
+          ldt =
+              LocalDateTime.of(
+                  DateTimeUtils.asYear(m.group(16)).getValue(),
+                  DateTimeUtils.asMonth(m.group(3)).getValue(),
+                  Integer.parseInt(m.group(1)),
+                  Integer.parseInt(m.group(17)),
+                  Integer.parseInt(m.group(18)));
         }
 
         ZoneId zone;
@@ -202,20 +199,22 @@ public class DateTime extends AbstractProcessorDescriptor<DateTime.Processor, No
       while (m.find()) {
         LocalDateTime ldt;
         if (m.group(19) != null) {
-          ldt = LocalDateTime.of(
-              DateTimeUtils.asYear(m.group(16)).getValue(),
-              DateTimeUtils.asMonth(m.group(1)).getValue(),
-              Integer.parseInt(m.group(14)),
-              Integer.parseInt(m.group(17)),
-              Integer.parseInt(m.group(18)),
-              Integer.parseInt(m.group(19)));
+          ldt =
+              LocalDateTime.of(
+                  DateTimeUtils.asYear(m.group(16)).getValue(),
+                  DateTimeUtils.asMonth(m.group(1)).getValue(),
+                  Integer.parseInt(m.group(14)),
+                  Integer.parseInt(m.group(17)),
+                  Integer.parseInt(m.group(18)),
+                  Integer.parseInt(m.group(19)));
         } else {
-          ldt = LocalDateTime.of(
-              DateTimeUtils.asYear(m.group(16)).getValue(),
-              DateTimeUtils.asMonth(m.group(1)).getValue(),
-              Integer.parseInt(m.group(14)),
-              Integer.parseInt(m.group(17)),
-              Integer.parseInt(m.group(18)));
+          ldt =
+              LocalDateTime.of(
+                  DateTimeUtils.asYear(m.group(16)).getValue(),
+                  DateTimeUtils.asMonth(m.group(1)).getValue(),
+                  Integer.parseInt(m.group(14)),
+                  Integer.parseInt(m.group(17)),
+                  Integer.parseInt(m.group(18)));
         }
 
         ZoneId zone;
@@ -228,11 +227,7 @@ public class DateTime extends AbstractProcessorDescriptor<DateTime.Processor, No
       }
     }
 
-    private void createDateTime(
-        Text content,
-        int charBegin,
-        int charEnd,
-        Temporal t) {
+    private void createDateTime(Text content, int charBegin, int charEnd, Temporal t) {
 
       content
           .getAnnotations()

@@ -1,4 +1,10 @@
+/* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.quantities.processors;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import org.junit.jupiter.api.Test;
 
 import io.annot8.api.capabilities.AnnotationCapability;
 import io.annot8.api.capabilities.Capabilities;
@@ -8,10 +14,6 @@ import io.annot8.api.settings.NoSettings;
 import io.annot8.common.data.bounds.SpanBounds;
 import io.annot8.common.data.content.Text;
 import io.annot8.conventions.AnnotationTypes;
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TimeTest extends AbstractQuantityTest {
 

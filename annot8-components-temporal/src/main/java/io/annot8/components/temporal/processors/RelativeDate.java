@@ -1,19 +1,22 @@
-/*
- * Crown Copyright (C) 2019 Dstl
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+/* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.temporal.processors;
+
+import java.time.*;
+import java.time.chrono.ChronoLocalDate;
+import java.time.chrono.ChronoLocalDateTime;
+import java.time.chrono.ChronoZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.Temporal;
+import java.time.temporal.TemporalUnit;
+import java.util.Collection;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.json.bind.annotation.JsonbCreator;
+import javax.json.bind.annotation.JsonbProperty;
 
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
@@ -30,22 +33,6 @@ import io.annot8.components.base.processors.AbstractTextProcessor;
 import io.annot8.components.temporal.processors.utils.DateTimeUtils;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
-
-import javax.json.bind.annotation.JsonbCreator;
-import javax.json.bind.annotation.JsonbProperty;
-import java.time.*;
-import java.time.chrono.ChronoLocalDate;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.Temporal;
-import java.time.temporal.TemporalUnit;
-import java.util.Collection;
-import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Extract expressions that refer to a relative date, e.g. yesterday. These can be resolved by
@@ -84,7 +71,8 @@ import java.util.regex.Pattern;
  * </ul>
  */
 @ComponentName("Relative Date")
-@ComponentDescription("Extracts relative dates from text and resolves them if a document date is available")
+@ComponentDescription(
+    "Extracts relative dates from text and resolves them if a document date is available")
 @SettingsClass(RelativeDate.Settings.class)
 public class RelativeDate
     extends AbstractProcessorDescriptor<RelativeDate.Processor, RelativeDate.Settings> {
@@ -101,7 +89,8 @@ public class RelativeDate
 
   @Override
   protected Processor createComponent(Context context, Settings settings) {
-    return new Processor(settings.getDateFormatter(), settings.getDateProperties(), settings.isUseTodayAsRelative());
+    return new Processor(
+        settings.getDateFormatter(), settings.getDateProperties(), settings.isUseTodayAsRelative());
   }
 
   public static class Processor extends AbstractTextProcessor {
@@ -115,7 +104,10 @@ public class RelativeDate
     private static final String MONTHS =
         "(January|Jan|February|Feb|March|Mar|April|Apr|May|June|Jun|July|Jul|August|Aug|September|Sept|Sep|October|Oct|November|Nov|December|Dec)";
 
-    public Processor(DateTimeFormatter dateTimeFormatter, Collection<String> dateProperties, boolean useTodayAsRelative) {
+    public Processor(
+        DateTimeFormatter dateTimeFormatter,
+        Collection<String> dateProperties,
+        boolean useTodayAsRelative) {
       this.dtf = dateTimeFormatter;
       this.dateProperties = dateProperties;
       this.useTodayAsRelative = useTodayAsRelative;
@@ -164,8 +156,7 @@ public class RelativeDate
         }
       }
 
-      if(useTodayAsRelative)
-        return LocalDate.now();
+      if (useTodayAsRelative) return LocalDate.now();
 
       return null;
     }
@@ -244,9 +235,8 @@ public class RelativeDate
             }
           }
 
-          if(offset != null)
-            createRelativeDay(content, m.start(), m.end(), offset, relativeTo);
-        }else{
+          if (offset != null) createRelativeDay(content, m.start(), m.end(), offset, relativeTo);
+        } else {
           createUnresolvedAnnotation(content, m.start(), m.end());
         }
       }
@@ -255,15 +245,18 @@ public class RelativeDate
     private void nextLastWeek(Text content, LocalDate relativeTo) {
       Pattern p =
           Pattern.compile(
-              "\\b((in the|within the|" + DAYS + ") )?(next|last) week\\b", Pattern.CASE_INSENSITIVE);
+              "\\b((in the|within the|" + DAYS + ") )?(next|last) week\\b",
+              Pattern.CASE_INSENSITIVE);
       Matcher m = p.matcher(content.getData());
 
       while (m.find()) {
         if (m.group(3) != null) {
           if ("next".equalsIgnoreCase(m.group(4))) {
-            createRelativeWeekDay(content, m.start(), m.end(), 1, DateTimeUtils.asDay(m.group(3)), relativeTo);
+            createRelativeWeekDay(
+                content, m.start(), m.end(), 1, DateTimeUtils.asDay(m.group(3)), relativeTo);
           } else {
-            createRelativeWeekDay(content, m.start(), m.end(), -1, DateTimeUtils.asDay(m.group(3)), relativeTo);
+            createRelativeWeekDay(
+                content, m.start(), m.end(), -1, DateTimeUtils.asDay(m.group(3)), relativeTo);
           }
         } else if (m.group(2) != null) {
           if ("next".equalsIgnoreCase(m.group(4))) {
@@ -283,7 +276,8 @@ public class RelativeDate
 
     private void nextLastMonth(Text content, LocalDate relativeTo) {
       Pattern p =
-          Pattern.compile("\\b((in the|within the) )?(next|last) month\\b", Pattern.CASE_INSENSITIVE);
+          Pattern.compile(
+              "\\b((in the|within the) )?(next|last) month\\b", Pattern.CASE_INSENSITIVE);
       Matcher m = p.matcher(content.getData());
 
       while (m.find()) {
@@ -312,7 +306,7 @@ public class RelativeDate
 
       while (m.find()) {
         if (m.group(3) != null) {
-          //e.g. October next year
+          // e.g. October next year
           if ("next".equalsIgnoreCase(m.group(4))) {
             createRelativeYearMonth(
                 content, m.start(), m.end(), 1, DateTimeUtils.asMonth(m.group(3)), relativeTo);
@@ -321,14 +315,14 @@ public class RelativeDate
                 content, m.start(), m.end(), -1, DateTimeUtils.asMonth(m.group(3)), relativeTo);
           }
         } else if (m.group(2) != null) {
-          //e.g. in the next year
+          // e.g. in the next year
           if ("next".equalsIgnoreCase(m.group(4))) {
             createRelativeX(content, m.start(), m.end(), 1, ChronoUnit.YEARS, relativeTo);
           } else {
             createRelativeX(content, m.start(), m.end(), -1, ChronoUnit.YEARS, relativeTo);
           }
         } else {
-          //e.g. next year
+          // e.g. next year
           if ("next".equalsIgnoreCase(m.group(4))) {
             createRelativeYear(content, m.start(), m.end(), 1, relativeTo);
           } else {
@@ -363,12 +357,18 @@ public class RelativeDate
       }
     }
 
-    private void createRelativeX(Text content, int charBegin, int charEnd, int offset, TemporalUnit unit, LocalDate relativeTo) {
+    private void createRelativeX(
+        Text content,
+        int charBegin,
+        int charEnd,
+        int offset,
+        TemporalUnit unit,
+        LocalDate relativeTo) {
       if (relativeTo != null) {
         LocalDate d = relativeTo.plus(offset, unit);
-        if(offset > 0) {
+        if (offset > 0) {
           createResolvedIntervalAnnotation(content, charBegin, charEnd, relativeTo, d, relativeTo);
-        }else{
+        } else {
           createResolvedIntervalAnnotation(content, charBegin, charEnd, d, relativeTo, relativeTo);
         }
       } else {
@@ -376,7 +376,8 @@ public class RelativeDate
       }
     }
 
-    private void createRelativeDay(Text content, int charBegin, int charEnd, int dayOffset, LocalDate relativeTo) {
+    private void createRelativeDay(
+        Text content, int charBegin, int charEnd, int dayOffset, LocalDate relativeTo) {
       if (relativeTo != null) {
         LocalDate d = relativeTo.plusDays(dayOffset);
 
@@ -386,8 +387,9 @@ public class RelativeDate
       }
     }
 
-    private void createRelativeWeek(Text content, int charBegin, int charEnd, int weekOffset, LocalDate relativeTo) {
-      //Creates a week interval, starting on a Monday
+    private void createRelativeWeek(
+        Text content, int charBegin, int charEnd, int weekOffset, LocalDate relativeTo) {
+      // Creates a week interval, starting on a Monday
       if (relativeTo != null) {
         LocalDate startOfWeek = relativeTo.plusWeeks(weekOffset);
 
@@ -395,14 +397,20 @@ public class RelativeDate
           startOfWeek = startOfWeek.minusDays(1);
         }
 
-        createResolvedIntervalAnnotation(content, charBegin, charEnd, startOfWeek, startOfWeek.plusWeeks(1), relativeTo);
+        createResolvedIntervalAnnotation(
+            content, charBegin, charEnd, startOfWeek, startOfWeek.plusWeeks(1), relativeTo);
       } else {
         createUnresolvedAnnotation(content, charBegin, charEnd);
       }
     }
 
     private void createRelativeWeekDay(
-        Text content, int charBegin, int charEnd, int weekOffset, DayOfWeek day, LocalDate relativeTo) {
+        Text content,
+        int charBegin,
+        int charEnd,
+        int weekOffset,
+        DayOfWeek day,
+        LocalDate relativeTo) {
 
       if (relativeTo != null) {
         LocalDate dayOfWeek = relativeTo.plusWeeks(weekOffset);
@@ -421,8 +429,8 @@ public class RelativeDate
       }
     }
 
-
-    private void createRelativeMonth(Text content, int charBegin, int charEnd, int monthOffset, LocalDate relativeTo) {
+    private void createRelativeMonth(
+        Text content, int charBegin, int charEnd, int monthOffset, LocalDate relativeTo) {
       if (relativeTo != null) {
         YearMonth ym = YearMonth.from(relativeTo).plusMonths(monthOffset);
         createResolvedAnnotation(content, charBegin, charEnd, ym, relativeTo);
@@ -443,7 +451,12 @@ public class RelativeDate
     }
 
     private void createRelativeYearMonth(
-        Text content, int charBegin, int charEnd, int yearOffset, Month month, LocalDate relativeTo) {
+        Text content,
+        int charBegin,
+        int charEnd,
+        int yearOffset,
+        Month month,
+        LocalDate relativeTo) {
 
       if (relativeTo != null) {
         Year y = Year.from(relativeTo).plusYears(yearOffset);
@@ -464,7 +477,8 @@ public class RelativeDate
           .save();
     }
 
-    private void createResolvedAnnotation(Text content, int charBegin, int charEnd, Temporal t, LocalDate relativeTo) {
+    private void createResolvedAnnotation(
+        Text content, int charBegin, int charEnd, Temporal t, LocalDate relativeTo) {
       content
           .getAnnotations()
           .create()
@@ -475,36 +489,42 @@ public class RelativeDate
           .save();
     }
 
-    private void createResolvedIntervalAnnotation(Text content, int charBegin, int charEnd, Temporal tStart, Temporal tEnd, LocalDate relativeTo) {
+    private void createResolvedIntervalAnnotation(
+        Text content,
+        int charBegin,
+        int charEnd,
+        Temporal tStart,
+        Temporal tEnd,
+        LocalDate relativeTo) {
       Temporal start = tStart;
       Temporal end = tEnd;
 
-      if(start instanceof ChronoLocalDate && end instanceof ChronoLocalDate){
+      if (start instanceof ChronoLocalDate && end instanceof ChronoLocalDate) {
         ChronoLocalDate cStart = (ChronoLocalDate) start;
         ChronoLocalDate cEnd = (ChronoLocalDate) end;
 
-        if(cStart.isAfter(cEnd)){
+        if (cStart.isAfter(cEnd)) {
           start = cEnd;
           end = cStart;
         }
-      }else if(start instanceof ChronoZonedDateTime && end instanceof ChronoZonedDateTime){
+      } else if (start instanceof ChronoZonedDateTime && end instanceof ChronoZonedDateTime) {
         ChronoZonedDateTime cStart = (ChronoZonedDateTime) start;
         ChronoZonedDateTime cEnd = (ChronoZonedDateTime) end;
 
-        if(cStart.isAfter(cEnd)){
+        if (cStart.isAfter(cEnd)) {
           start = cEnd;
           end = cStart;
         }
-      }else if(start instanceof ChronoLocalDateTime && end instanceof ChronoLocalDateTime){
+      } else if (start instanceof ChronoLocalDateTime && end instanceof ChronoLocalDateTime) {
         ChronoLocalDateTime cStart = (ChronoLocalDateTime) start;
         ChronoLocalDateTime cEnd = (ChronoLocalDateTime) end;
 
-        if(cStart.isAfter(cEnd)){
+        if (cStart.isAfter(cEnd)) {
           start = cEnd;
           end = cStart;
         }
       }
-      //Else they're not the same type, so leave them as they are as we can't compare
+      // Else they're not the same type, so leave them as they are as we can't compare
 
       content
           .getAnnotations()
@@ -528,8 +548,8 @@ public class RelativeDate
     private final DateTimeFormatter dateTimeFormatter;
 
     /**
-     * List of property names, in order of precedence, to use when looking for a date to make other dates
-     * relative to
+     * List of property names, in order of precedence, to use when looking for a date to make other
+     * dates relative to
      *
      * <p>e.g. date,documentDate
      */
@@ -558,7 +578,8 @@ public class RelativeDate
       return dateProperties;
     }
 
-    @Description("If true, then use today's date as the reference point for relative dates where an alternative can't be found in properties")
+    @Description(
+        "If true, then use today's date as the reference point for relative dates where an alternative can't be found in properties")
     public boolean isUseTodayAsRelative() {
       return useTodayAsRelative;
     }

@@ -1,19 +1,11 @@
-/*
- * Crown Copyright (C) 2019 Dstl
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+/* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.temporal.processors;
+
+import java.util.Arrays;
+import java.util.TimeZone;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
@@ -27,12 +19,6 @@ import io.annot8.common.data.bounds.SpanBounds;
 import io.annot8.common.data.content.Text;
 import io.annot8.components.base.processors.AbstractRegexProcessor;
 import io.annot8.conventions.AnnotationTypes;
-
-import java.util.Arrays;
-import java.util.TimeZone;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 /**
  * Annotate times within a document using regular expressions
@@ -71,10 +57,11 @@ public class Time extends AbstractProcessorDescriptor<Time.Processor, Time.Setti
 
     private Boolean requireAlpha;
 
-    private static final String TIME_ZONES = Arrays.stream(TimeZone.getAvailableIDs())
-        .filter(s -> s.length() <= 3)
-        .filter(s -> s.equals(s.toUpperCase()))
-        .collect(Collectors.joining("|"));
+    private static final String TIME_ZONES =
+        Arrays.stream(TimeZone.getAvailableIDs())
+            .filter(s -> s.length() <= 3)
+            .filter(s -> s.equals(s.toUpperCase()))
+            .collect(Collectors.joining("|"));
 
     private static final String TIME_REGEX =
         "\\b(([0-1]?[0-9]|2[0-4])[:.][0-5][0-9]\\h*(("
@@ -104,13 +91,13 @@ public class Time extends AbstractProcessorDescriptor<Time.Processor, Time.Setti
   public static class Settings implements io.annot8.api.settings.Settings {
     private boolean requireAlpha = true;
     /**
-     * Do we require that there are alphabetical characters in the time? This helps avoid picking out
-     * things like 2015 as a time when it should be a year, as it forces the time to be written like
-     * 2015hrs or 8:15pm.
+     * Do we require that there are alphabetical characters in the time? This helps avoid picking
+     * out things like 2015 as a time when it should be a year, as it forces the time to be written
+     * like 2015hrs or 8:15pm.
      *
-     * <p>For the purposes of the TimeRegex annotator, colons are treated as alphabetical characters,
-     * such that times such as 20:15 are captured. Other punctuation isn't, as 20.15 is more like to
-     * be an amount than a time.
+     * <p>For the purposes of the TimeRegex annotator, colons are treated as alphabetical
+     * characters, such that times such as 20:15 are captured. Other punctuation isn't, as 20.15 is
+     * more like to be an amount than a time.
      */
     @Description("Do we require that there are alphabetical characters or colons in the time?")
     public boolean getRequireAlpha() {

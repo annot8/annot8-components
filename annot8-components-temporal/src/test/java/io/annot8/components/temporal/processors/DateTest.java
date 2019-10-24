@@ -1,19 +1,18 @@
-/*
- * Crown Copyright (C) 2019 Dstl
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+/* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.temporal.processors;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.time.LocalDate;
+import java.time.Year;
+import java.time.YearMonth;
+import java.time.temporal.Temporal;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import io.annot8.api.annotations.Annotation;
 import io.annot8.api.capabilities.AnnotationCapability;
@@ -28,18 +27,6 @@ import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
 import io.annot8.testing.testimpl.TestItem;
 import io.annot8.testing.testimpl.content.TestStringContent;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
-import java.time.LocalDate;
-import java.time.Year;
-import java.time.YearMonth;
-import java.time.temporal.Temporal;
-import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 public class DateTest {
 
@@ -53,7 +40,9 @@ public class DateTest {
     assertEquals(1, c.processes().count());
     assertEquals(0, c.deletes().count());
 
-    assertTrue(c.creates(AnnotationCapability.class).allMatch(cap -> cap.getType().startsWith(AnnotationTypes.TEMPORAL_PREFIX)));
+    assertTrue(
+        c.creates(AnnotationCapability.class)
+            .allMatch(cap -> cap.getType().startsWith(AnnotationTypes.TEMPORAL_PREFIX)));
 
     // Check that we're processing a Content and that it has the correct definitions
     ContentCapability contentCap = c.processes(ContentCapability.class).findFirst().get();
@@ -119,9 +108,11 @@ public class DateTest {
 
       int i = 0;
 
-      testAnnotationInterval(content, annotations.get(i++), "1909-2008", Year.of(1909), Year.of(2008));
+      testAnnotationInterval(
+          content, annotations.get(i++), "1909-2008", Year.of(1909), Year.of(2008));
 
-      testAnnotationInterval(content, annotations.get(i++), "2009-11", Year.of(2009), Year.of(2011));
+      testAnnotationInterval(
+          content, annotations.get(i++), "2009-11", Year.of(2009), Year.of(2011));
     }
   }
 
@@ -151,10 +142,18 @@ public class DateTest {
       int i = 0;
 
       testAnnotationInterval(
-          content, annotations.get(i++), "January to November 2015", YearMonth.of(2015, 1), YearMonth.of(2015, 11));
+          content,
+          annotations.get(i++),
+          "January to November 2015",
+          YearMonth.of(2015, 1),
+          YearMonth.of(2015, 11));
 
       testAnnotationInterval(
-          content, annotations.get(i++), "December 15-January '16", YearMonth.of(2015, 12), YearMonth.of(2016, 1));
+          content,
+          annotations.get(i++),
+          "December 15-January '16",
+          YearMonth.of(2015, 12),
+          YearMonth.of(2016, 1));
     }
   }
 
@@ -183,29 +182,40 @@ public class DateTest {
 
       int i = 0;
 
-      testAnnotationInterval(content, annotations.get(i++), "3-10 October 2016", LocalDate.of(2016,10,3), LocalDate.of(2016,10,10));
+      testAnnotationInterval(
+          content,
+          annotations.get(i++),
+          "3-10 October 2016",
+          LocalDate.of(2016, 10, 3),
+          LocalDate.of(2016, 10, 10));
 
       testAnnotationInterval(
           content,
           annotations.get(i++),
           "27th September - Monday 3 Oct 16",
-          LocalDate.of(2016,9,27),
-          LocalDate.of(2016,10,3));
+          LocalDate.of(2016, 9, 27),
+          LocalDate.of(2016, 10, 3));
       testAnnotationInterval(
           content,
           annotations.get(i++),
           "21st December 2016 and 2 January 17",
-          LocalDate.of(2016,12,21),
-          LocalDate.of(2017,1,2));
+          LocalDate.of(2016, 12, 21),
+          LocalDate.of(2017, 1, 2));
 
-      testAnnotationInterval(content, annotations.get(i++), "2/3 January '17", LocalDate.of(2017,1,2), LocalDate.of(2017,1,3));
+      testAnnotationInterval(
+          content,
+          annotations.get(i++),
+          "2/3 January '17",
+          LocalDate.of(2017, 1, 2),
+          LocalDate.of(2017, 1, 3));
       testAnnotationInstant(
           content,
           annotations.get(i++),
           "2nd and 5th January 2017",
-          LocalDate.of(2017,1,2));  //This is 2nd Jan 2017, despite covered text
+          LocalDate.of(2017, 1, 2)); // This is 2nd Jan 2017, despite covered text
 
-      testAnnotationInstant(content, annotations.get(i++), "5th January 2017", LocalDate.of(2017,1,5));
+      testAnnotationInstant(
+          content, annotations.get(i++), "5th January 2017", LocalDate.of(2017, 1, 5));
     }
   }
 
@@ -261,13 +271,14 @@ public class DateTest {
       int i = 0;
 
       testAnnotationInstant(
-          content, annotations.get(i++), "Tuesday 4th October 2016", LocalDate.of(2016,10,4));
+          content, annotations.get(i++), "Tuesday 4th October 2016", LocalDate.of(2016, 10, 4));
 
-      testAnnotationInstant(content, annotations.get(i++), "October 4 2016", LocalDate.of(2016,10,4));
+      testAnnotationInstant(
+          content, annotations.get(i++), "October 4 2016", LocalDate.of(2016, 10, 4));
 
-      testAnnotationInstant(content, annotations.get(i++), "2016-10-04", LocalDate.of(2016,10,4));
+      testAnnotationInstant(content, annotations.get(i++), "2016-10-04", LocalDate.of(2016, 10, 4));
 
-      testAnnotationInstant(content, annotations.get(i++), "4/10/16", LocalDate.of(2016,10,4));
+      testAnnotationInstant(content, annotations.get(i++), "4/10/16", LocalDate.of(2016, 10, 4));
     }
   }
 
@@ -299,7 +310,8 @@ public class DateTest {
 
       testAnnotationInstant(content, annotations.get(i++), "07/04/2017", LocalDate.of(2017, 7, 4));
 
-      testAnnotationInstant(content, annotations.get(i++), "23/12/2017", LocalDate.of(2017, 12, 23));
+      testAnnotationInstant(
+          content, annotations.get(i++), "23/12/2017", LocalDate.of(2017, 12, 23));
     }
   }
 
@@ -385,10 +397,7 @@ public class DateTest {
     }
     try (Processor p = new Date.Processor(false)) {
       testOne(
-          p,
-          "It was during Feb. 2015 that the event happened",
-          "Feb. 2015",
-          YearMonth.of(2015, 2));
+          p, "It was during Feb. 2015 that the event happened", "Feb. 2015", YearMonth.of(2015, 2));
     }
     try (Processor p = new Date.Processor(false)) {
       testOne(

@@ -1,21 +1,19 @@
-/*
- * Crown Copyright (C) 2019 Dstl
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+/* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.geo.processors;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import uk.gov.dstl.geo.osgb.Constants;
+import uk.gov.dstl.geo.osgb.EastingNorthingConversion;
+
 import com.opencsv.CSVReader;
+
 import io.annot8.api.annotations.Annotation;
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
@@ -30,16 +28,6 @@ import io.annot8.common.data.content.Text;
 import io.annot8.components.base.processors.AbstractRegexProcessor;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
-import uk.gov.dstl.geo.osgb.Constants;
-import uk.gov.dstl.geo.osgb.EastingNorthingConversion;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @ComponentName("Postcode")
 @ComponentDescription("Extract UK postcodes from text")
@@ -64,9 +52,7 @@ public class Postcode extends AbstractProcessorDescriptor<Postcode.Processor, No
     private Map<String, double[]> postcodeResource = new HashMap<>();
 
     public Processor() {
-      super(Pattern.compile(POSTCODE_REGEX),
-          0,
-          AnnotationTypes.ANNOTATION_TYPE_ADDRESS);
+      super(Pattern.compile(POSTCODE_REGEX), 0, AnnotationTypes.ANNOTATION_TYPE_ADDRESS);
       initialisePostcodes();
     }
 
@@ -88,7 +74,7 @@ public class Postcode extends AbstractProcessorDescriptor<Postcode.Processor, No
     private void initialisePostcodes() {
       InputStream resourceAsStream = Processor.class.getResourceAsStream("ukpostcodes.csv");
 
-      try (CSVReader reader = new CSVReader(new InputStreamReader(resourceAsStream));) {
+      try (CSVReader reader = new CSVReader(new InputStreamReader(resourceAsStream)); ) {
         String[] line;
         while ((line = reader.readNext()) != null) {
           if (line.length < 3) {
@@ -106,17 +92,15 @@ public class Postcode extends AbstractProcessorDescriptor<Postcode.Processor, No
     }
 
     private double[] parseEastingNorthingToLatLon(String easting, String northing) {
-        return EastingNorthingConversion.toLatLon(
-                new double[]{Double.parseDouble(easting), Double.parseDouble(northing)},
-                Constants.ELLIPSOID_AIRY1830_MAJORAXIS,
-                Constants.ELLIPSOID_AIRY1830_MINORAXIS,
-                Constants.NATIONALGRID_N0,
-                Constants.NATIONALGRID_E0,
-                Constants.NATIONALGRID_F0,
-                Constants.NATIONALGRID_LAT0,
-                Constants.NATIONALGRID_LON0);
+      return EastingNorthingConversion.toLatLon(
+          new double[] {Double.parseDouble(easting), Double.parseDouble(northing)},
+          Constants.ELLIPSOID_AIRY1830_MAJORAXIS,
+          Constants.ELLIPSOID_AIRY1830_MINORAXIS,
+          Constants.NATIONALGRID_N0,
+          Constants.NATIONALGRID_E0,
+          Constants.NATIONALGRID_F0,
+          Constants.NATIONALGRID_LAT0,
+          Constants.NATIONALGRID_LON0);
     }
-
-
   }
 }

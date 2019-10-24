@@ -1,6 +1,12 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.cyber.processors;
 
+import java.util.*;
+import java.util.stream.Collectors;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
 import io.annot8.api.annotations.Annotation;
 import io.annot8.api.components.Processor;
 import io.annot8.api.data.Item;
@@ -10,11 +16,6 @@ import io.annot8.conventions.AnnotationTypes;
 import io.annot8.implementations.support.context.SimpleContext;
 import io.annot8.testing.testimpl.TestItem;
 import io.annot8.testing.testimpl.content.TestStringContent;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 public class UrlTest {
 
@@ -91,7 +92,6 @@ public class UrlTest {
       Assertions.assertEquals(AnnotationTypes.ANNOTATION_TYPE_URL, a4.getType());
       Assertions.assertEquals(content.getId(), a4.getContentId());
       Assertions.assertEquals(0, a4.getProperties().getAll().size());
-
     }
   }
 }

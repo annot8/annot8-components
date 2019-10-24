@@ -1,19 +1,8 @@
-/*
- * Crown Copyright (C) 2019 Dstl
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+/* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.quantities.processors;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
@@ -26,9 +15,6 @@ import io.annot8.common.data.bounds.SpanBounds;
 import io.annot8.common.data.content.Text;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Annotate times within a document using regular expressions
@@ -60,7 +46,8 @@ public class Time extends AbstractProcessorDescriptor<Time.Processor, NoSettings
   public static class Processor extends AbstractQuantityProcessor {
 
     public static final int YEAR_TO_SECOND = 31536000;
-    public static final int MONTH_TO_SECOND = 2628000;      // differs from Baleen 2 - this is YEAR_TO_SECOND / 12
+    public static final int MONTH_TO_SECOND =
+        2628000; // differs from Baleen 2 - this is YEAR_TO_SECOND / 12
     public static final int WEEK_TO_SECOND = 604800;
     public static final int DAY_TO_SECOND = 86400;
 
@@ -99,7 +86,7 @@ public class Time extends AbstractProcessorDescriptor<Time.Processor, NoSettings
 
     @Override
     protected void process(Text content) {
-      //Handle hours ourselves separately...
+      // Handle hours ourselves separately...
 
       Matcher matcher = hourPattern.matcher(content.getData());
       while (matcher.find()) {
@@ -118,13 +105,12 @@ public class Time extends AbstractProcessorDescriptor<Time.Processor, NoSettings
             .withBounds(new SpanBounds(matcher.start(), matcher.end()))
             .withProperty(
                 PropertyKeys.PROPERTY_KEY_VALUE,
-                Double.parseDouble(matcher.group(1).replaceAll("[^0-9\\.]", ""))
-                    * HOUR_TO_SECOND)
+                Double.parseDouble(matcher.group(1).replaceAll("[^0-9\\.]", "")) * HOUR_TO_SECOND)
             .withProperty(PropertyKeys.PROPERTY_KEY_UNIT, UNIT)
             .save();
       }
 
-      //...and then hand off to the AbstractQuantityProcessor for everything else
+      // ...and then hand off to the AbstractQuantityProcessor for everything else
       super.process(content);
     }
   }

@@ -1,4 +1,10 @@
+/* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.cyber.processors;
+
+import java.util.regex.Pattern;
+
+import javax.json.bind.annotation.JsonbCreator;
+import javax.json.bind.annotation.JsonbProperty;
 
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
@@ -13,16 +19,10 @@ import io.annot8.components.base.processors.AbstractRegexProcessor;
 import io.annot8.conventions.AnnotationTypes;
 import java.util.regex.Pattern;
 
-import javax.json.bind.annotation.JsonbCreator;
-import javax.json.bind.annotation.JsonbProperty;
-import java.util.regex.Pattern;
-
-
-/**
- * Extract Urls with the option of doing so in a lenient fashion
- */
+/** Extract Urls with the option of doing so in a lenient fashion */
 @ComponentName("URL")
-@ComponentDescription("Extract valid urls from text, with the option to extract in a lenient fashion")
+@ComponentDescription(
+    "Extract valid urls from text, with the option to extract in a lenient fashion")
 @SettingsClass(Url.Settings.class)
 public class Url extends AbstractProcessorDescriptor<Url.Processor, Url.Settings> {
 
@@ -40,8 +40,14 @@ public class Url extends AbstractProcessorDescriptor<Url.Processor, Url.Settings
   }
 
   public static class Processor extends AbstractRegexProcessor {
-    private static final Pattern URL_PATTERN = Pattern.compile("\\b((https?|ftp)://|www.)(([-a-z0-9]+)\\.)?([-a-z0-9.]+\\.[a-z0-9]+)(:([1-9][0-9]{1,5}))?(/([-a-z0-9+&@#/%=~_|$!:,.]*\\?[-a-z0-9+&@#/%=~_|$!:,.]*)|/([-a-z0-9+&@#/%=~_|$!:,.]*[-a-z0-9+&@#/%=~_|$!:,])|/)?", Pattern.CASE_INSENSITIVE);
-    private static final Pattern LENIENT_URL_PATTERN = Pattern.compile("\\b(?<!@)(http://www\\.|https://www\\.|http://|https://)?[a-z0-9]+([\\-.][a-z0-9]+)*\\.[a-z]{2,5}(:[0-9]{1,5})?([?/]\\S*)?\\b", Pattern.CASE_INSENSITIVE);
+    private static final Pattern URL_PATTERN =
+        Pattern.compile(
+            "\\b((https?|ftp)://|www.)(([-a-z0-9]+)\\.)?([-a-z0-9.]+\\.[a-z0-9]+)(:([1-9][0-9]{1,5}))?(/([-a-z0-9+&@#/%=~_|$!:,.]*\\?[-a-z0-9+&@#/%=~_|$!:,.]*)|/([-a-z0-9+&@#/%=~_|$!:,.]*[-a-z0-9+&@#/%=~_|$!:,])|/)?",
+            Pattern.CASE_INSENSITIVE);
+    private static final Pattern LENIENT_URL_PATTERN =
+        Pattern.compile(
+            "\\b(?<!@)(http://www\\.|https://www\\.|http://|https://)?[a-z0-9]+([\\-.][a-z0-9]+)*\\.[a-z]{2,5}(:[0-9]{1,5})?([?/]\\S*)?\\b",
+            Pattern.CASE_INSENSITIVE);
 
     public Processor(boolean lenient) {
       super(lenient ? LENIENT_URL_PATTERN : URL_PATTERN, 0, AnnotationTypes.ANNOTATION_TYPE_URL);

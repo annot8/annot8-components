@@ -1,19 +1,12 @@
-/*
- * Crown Copyright (C) 2019 Dstl
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+/* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.wordnet.processors;
+
+import java.util.Optional;
+
+import net.sf.extjwnl.JWNLException;
+import net.sf.extjwnl.data.IndexWord;
+import net.sf.extjwnl.data.POS;
+import net.sf.extjwnl.dictionary.Dictionary;
 
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
@@ -28,12 +21,6 @@ import io.annot8.common.data.content.Text;
 import io.annot8.components.base.processors.AbstractTextProcessor;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
-import net.sf.extjwnl.JWNLException;
-import net.sf.extjwnl.data.IndexWord;
-import net.sf.extjwnl.data.POS;
-import net.sf.extjwnl.dictionary.Dictionary;
-
-import java.util.Optional;
 
 @ComponentName("WordNet Lemmas")
 @ComponentDescription("Add lemmas to word tokens using WordNet")
@@ -55,7 +42,7 @@ public class WordNet extends AbstractProcessorDescriptor<WordNet.Processor, NoSe
   public static class Processor extends AbstractTextProcessor {
     private Dictionary dictionary;
 
-    public Processor(){
+    public Processor() {
       try {
         dictionary = Dictionary.getDefaultResourceInstance();
       } catch (JWNLException e) {
@@ -65,24 +52,33 @@ public class WordNet extends AbstractProcessorDescriptor<WordNet.Processor, NoSe
 
     @Override
     protected void process(Text content) {
-      content.getAnnotations().getByBoundsAndType(SpanBounds.class, AnnotationTypes.ANNOTATION_TYPE_WORDTOKEN)
+      content
+          .getAnnotations()
+          .getByBoundsAndType(SpanBounds.class, AnnotationTypes.ANNOTATION_TYPE_WORDTOKEN)
           .filter(a -> a.getProperties().has(PropertyKeys.PROPERTY_KEY_PARTOFSPEECH, String.class))
-          .forEach(a -> {
-            POS pos = toPos(a.getProperties().get(PropertyKeys.PROPERTY_KEY_PARTOFSPEECH, String.class).get());
-            String word = content.getText(a).get();
+          .forEach(
+              a -> {
+                POS pos =
+                    toPos(
+                        a.getProperties()
+                            .get(PropertyKeys.PROPERTY_KEY_PARTOFSPEECH, String.class)
+                            .get());
+                String word = content.getText(a).get();
 
-            if(pos != null){
-              Optional<IndexWord> lookupWord = lookupWord(pos, word);
+                if (pos != null) {
+                  Optional<IndexWord> lookupWord = lookupWord(pos, word);
 
-              if (lookupWord.isPresent()) {
-                content.getAnnotations().copy(a)
-                    .withProperty(PropertyKeys.PROPERTY_KEY_LEMMA, lookupWord.get().getLemma())
-                    .save();
+                  if (lookupWord.isPresent()) {
+                    content
+                        .getAnnotations()
+                        .copy(a)
+                        .withProperty(PropertyKeys.PROPERTY_KEY_LEMMA, lookupWord.get().getLemma())
+                        .save();
 
-                content.getAnnotations().delete(a);
-              }
-            }
-          });
+                    content.getAnnotations().delete(a);
+                  }
+                }
+              });
     }
 
     @Override

@@ -1,19 +1,15 @@
-/*
- * Crown Copyright (C) 2019 Dstl
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+/* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.opennlp.processors;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
+import opennlp.tools.langdetect.Language;
+import opennlp.tools.langdetect.LanguageDetector;
+import opennlp.tools.langdetect.LanguageDetectorME;
+import opennlp.tools.langdetect.LanguageDetectorModel;
 
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
@@ -29,20 +25,12 @@ import io.annot8.common.data.content.Text;
 import io.annot8.components.base.processors.AbstractTextProcessor;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
-import opennlp.tools.langdetect.Language;
-import opennlp.tools.langdetect.LanguageDetector;
-import opennlp.tools.langdetect.LanguageDetectorME;
-import opennlp.tools.langdetect.LanguageDetectorModel;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 
 @ComponentName("OpenNLP Language Detection")
 @ComponentDescription("Annotate tokens identified by OpenNLP's language detector")
 @SettingsClass(LanguageDetection.Settings.class)
-public class LanguageDetection extends AbstractProcessorDescriptor<LanguageDetection.Processor, LanguageDetection.Settings> {
+public class LanguageDetection
+    extends AbstractProcessorDescriptor<LanguageDetection.Processor, LanguageDetection.Settings> {
   @Override
   protected Processor createComponent(Context context, Settings settings) {
     InputStream model;
@@ -82,7 +70,9 @@ public class LanguageDetection extends AbstractProcessorDescriptor<LanguageDetec
     protected void process(Text content) {
       Language l = detector.predictLanguage(content.getData());
 
-      content.getAnnotations().create()
+      content
+          .getAnnotations()
+          .create()
           .withType(AnnotationTypes.ANNOTATION_TYPE_LANGUAGE)
           .withBounds(ContentBounds.getInstance())
           .withProperty(PropertyKeys.PROPERTY_KEY_LANGUAGE, l.getLang())
@@ -108,6 +98,7 @@ public class LanguageDetection extends AbstractProcessorDescriptor<LanguageDetec
     public File getModel() {
       return model;
     }
+
     public void setModel(File model) {
       this.model = model;
     }

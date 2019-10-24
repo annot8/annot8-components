@@ -1,19 +1,16 @@
-/*
- * Crown Copyright (C) 2019 Dstl
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+/* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.temporal.processors;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import io.annot8.api.annotations.Annotation;
 import io.annot8.api.capabilities.AnnotationCapability;
@@ -30,16 +27,6 @@ import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
 import io.annot8.testing.testimpl.TestItem;
 import io.annot8.testing.testimpl.content.TestStringContent;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class DTGTest {
 
@@ -57,7 +44,8 @@ public class DTGTest {
     AnnotationCapability annotCap = c.creates(AnnotationCapability.class).findFirst().get();
     assertEquals(SpanBounds.class, ((AnnotationCapability) annotCap).getBounds());
     assertEquals(
-        AnnotationTypes.ANNOTATION_TYPE_TEMPORAL_INSTANT, ((AnnotationCapability) annotCap).getType());
+        AnnotationTypes.ANNOTATION_TYPE_TEMPORAL_INSTANT,
+        ((AnnotationCapability) annotCap).getType());
 
     // Check that we're processing a Content and that it has the correct definitions
     ContentCapability contentCap = c.processes(ContentCapability.class).findFirst().get();

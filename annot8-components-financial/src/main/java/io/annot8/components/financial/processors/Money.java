@@ -1,19 +1,9 @@
-/*
- * Crown Copyright (C) 2019 Dstl
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+/* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.financial.processors;
+
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import io.annot8.api.annotations.Annotation;
 import io.annot8.api.capabilities.Capabilities;
@@ -27,10 +17,6 @@ import io.annot8.common.data.bounds.SpanBounds;
 import io.annot8.common.data.content.Text;
 import io.annot8.components.base.processors.AbstractRegexProcessor;
 import io.annot8.conventions.AnnotationTypes;
-
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @ComponentName("Money")
 @ComponentDescription("Extracts money amounts from text")
@@ -50,10 +36,11 @@ public class Money extends AbstractProcessorDescriptor<Money.Processor, NoSettin
   }
 
   public static class Processor extends AbstractRegexProcessor {
-    private static final String NUMBER_REGEX = "(?<number>[0-9]{1,3}" +
-        "((?<thousand>[ ,.])?[0-9]{3})?(\\k<thousand>?[0-9]{3})*" +
-        "(?<decimal>[,.])?[0-9]*" +
-        ")";
+    private static final String NUMBER_REGEX =
+        "(?<number>[0-9]{1,3}"
+            + "((?<thousand>[ ,.])?[0-9]{3})?(\\k<thousand>?[0-9]{3})*"
+            + "(?<decimal>[,.])?[0-9]*"
+            + ")";
     private static final String CURRENCY_CODES =
         "AED|AFN|ALL|AMD|ANG|AOA|ARS|AUD|AWG|AZN|"
             + "BAM|BBD|BDT|BGN|BHD|BIF|BMD|BND|BOB|BOV|BRL|BSD|BTN|BWP|BYR|BZD|"
@@ -83,27 +70,27 @@ public class Money extends AbstractProcessorDescriptor<Money.Processor, NoSettin
             + "ZAR|ZMW";
     private static final String CURRENCY_SYMBOLS = "[£$€¥]|Fr";
     private static final String CURRENCY_SYMBOLS_FRACTIONS = "[p¢c]";
-    private static final Map<String, String> symbolCountries = Map.ofEntries(
-        Map.entry("£", "GBP"),
-        Map.entry("$", "USD"),
-        Map.entry("€", "EUR"),
-        Map.entry("¥", "JPY"),
-        Map.entry("Fr", "CHF"),
-        Map.entry("p", "GBP"),
-        Map.entry("¢", "USD"),
-        Map.entry("c", "EUR")
-    );
+    private static final Map<String, String> symbolCountries =
+        Map.ofEntries(
+            Map.entry("£", "GBP"),
+            Map.entry("$", "USD"),
+            Map.entry("€", "EUR"),
+            Map.entry("¥", "JPY"),
+            Map.entry("Fr", "CHF"),
+            Map.entry("p", "GBP"),
+            Map.entry("¢", "USD"),
+            Map.entry("c", "EUR"));
     private static final String MULTIPLIERS = "k|thousand|million|m|billion|b|trillion|t";
-    private static final Map<String, Double> multiplierValues = Map.ofEntries(
-        Map.entry("k", 1000.0),
-        Map.entry("thousand", 1000.0),
-        Map.entry("million", 1000000.0),
-        Map.entry("m", 1000000.0),
-        Map.entry("billion", 1000000000.0),
-        Map.entry("b", 1000000000.0),
-        Map.entry("trillion", 1000000000000.0),
-        Map.entry("t", 1000000000000.0)
-    );
+    private static final Map<String, Double> multiplierValues =
+        Map.ofEntries(
+            Map.entry("k", 1000.0),
+            Map.entry("thousand", 1000.0),
+            Map.entry("million", 1000000.0),
+            Map.entry("m", 1000000.0),
+            Map.entry("billion", 1000000000.0),
+            Map.entry("b", 1000000000.0),
+            Map.entry("trillion", 1000000000000.0),
+            Map.entry("t", 1000000000000.0));
     private static final String WHITESPACE = "\\h*";
     private static final String START = "(?<=^|\\(|\\s)";
     private static final String END = "(?=$|\\)|\\?|!|\\s|[.,](\\s|$))";
@@ -111,47 +98,58 @@ public class Money extends AbstractProcessorDescriptor<Money.Processor, NoSettin
     private static final String MONEY_REGEX =
         START
             + "("
-            + "(?<code1>" + CURRENCY_CODES + ")"
+            + "(?<code1>"
+            + CURRENCY_CODES
+            + ")"
             + "|"
-            + "(?<symbol1>" + CURRENCY_SYMBOLS + ")"
+            + "(?<symbol1>"
+            + CURRENCY_SYMBOLS
+            + ")"
             + ")?("
             + WHITESPACE
             + NUMBER_REGEX
             + ")("
             + WHITESPACE
-            + "(?<multiplier1>" + MULTIPLIERS + ")"
-            + ")?("
-            + WHITESPACE
-            + "("
-            + "(?<code2>" + CURRENCY_CODES + ")"
-            + "|"
-            + "(?<symbol2>" + CURRENCY_SYMBOLS + ")"
-            + "|"
-            + "(?<fraction>" + CURRENCY_SYMBOLS_FRACTIONS + ")"
+            + "(?<multiplier1>"
+            + MULTIPLIERS
             + ")"
             + ")?("
             + WHITESPACE
             + "("
-            + "(?<multiplier2>" + MULTIPLIERS + ")"
+            + "(?<code2>"
+            + CURRENCY_CODES
+            + ")"
+            + "|"
+            + "(?<symbol2>"
+            + CURRENCY_SYMBOLS
+            + ")"
+            + "|"
+            + "(?<fraction>"
+            + CURRENCY_SYMBOLS_FRACTIONS
+            + ")"
+            + ")"
+            + ")?("
+            + WHITESPACE
+            + "("
+            + "(?<multiplier2>"
+            + MULTIPLIERS
+            + ")"
             + "))?"
             + END;
 
     public Processor() {
-      super(Pattern.compile(MONEY_REGEX),
-          0,
-          AnnotationTypes.ANNOTATION_TYPE_MONEY
-      );
+      super(Pattern.compile(MONEY_REGEX), 0, AnnotationTypes.ANNOTATION_TYPE_MONEY);
     }
 
     @Override
     protected void addProperties(Annotation.Builder builder, Matcher m) {
       Double value = calculateValue(m);
-      if(value != null) {
+      if (value != null) {
         builder.withProperty("value", calculateValue(m));
       }
 
       String currencyCode = getCurrencyCode(m);
-      if(currencyCode != null && !currencyCode.isEmpty()){
+      if (currencyCode != null && !currencyCode.isEmpty()) {
         builder.withProperty("currencyCode", currencyCode);
       }
     }
@@ -214,16 +212,15 @@ public class Money extends AbstractProcessorDescriptor<Money.Processor, NoSettin
       }
     }
 
-    private String normaliseMatchedNumber(Matcher m){
+    private String normaliseMatchedNumber(Matcher m) {
       String number = m.group("number");
-      if (m.group("thousand") != null){
+      if (m.group("thousand") != null) {
         number = number.replace(m.group("thousand"), "");
       }
-      if (m.group("decimal") != null){
+      if (m.group("decimal") != null) {
         number = number.replace(m.group("decimal"), ".");
       }
       return number;
     }
   }
-
 }

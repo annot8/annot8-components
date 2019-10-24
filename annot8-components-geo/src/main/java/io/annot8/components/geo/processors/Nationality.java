@@ -1,19 +1,14 @@
-/*
- * Crown Copyright (C) 2019 Dstl
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+/* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.geo.processors;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonReader;
 
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
@@ -27,14 +22,6 @@ import io.annot8.common.data.content.Text;
 import io.annot8.components.base.processors.AbstractTextProcessor;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
-
-import javax.json.Json;
-import javax.json.JsonObject;
-import javax.json.JsonReader;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @ComponentName("Nationality")
 @ComponentDescription("Extract nationality demonyms, e.g. French, from text")
@@ -58,19 +45,24 @@ public class Nationality extends AbstractProcessorDescriptor<Nationality.Process
     private Map<String, String> countryCodes = new HashMap<>();
 
     public Processor() {
-      JsonReader reader = Json.createReader(Nationality.class.getResourceAsStream("countries.json"));
-      reader.readArray().forEach(jv -> {
-        JsonObject jo = jv.asJsonObject();
+      JsonReader reader =
+          Json.createReader(Nationality.class.getResourceAsStream("countries.json"));
+      reader
+          .readArray()
+          .forEach(
+              jv -> {
+                JsonObject jo = jv.asJsonObject();
 
-        String countryDemonym = jo.getString("demonym").toLowerCase();
-        String countryCode = jo.getString("cca3");
+                String countryDemonym = jo.getString("demonym").toLowerCase();
+                String countryCode = jo.getString("cca3");
 
-        if (countryDemonym.length() > 1) {
-          Pattern p = Pattern.compile("\\b" + countryDemonym + "\\b", Pattern.CASE_INSENSITIVE);
-          countryPatterns.put(countryDemonym, p);
-          countryCodes.put(countryDemonym, countryCode);
-        }
-      });
+                if (countryDemonym.length() > 1) {
+                  Pattern p =
+                      Pattern.compile("\\b" + countryDemonym + "\\b", Pattern.CASE_INSENSITIVE);
+                  countryPatterns.put(countryDemonym, p);
+                  countryCodes.put(countryDemonym, countryCode);
+                }
+              });
     }
 
     @Override
@@ -80,7 +72,8 @@ public class Nationality extends AbstractProcessorDescriptor<Nationality.Process
         String countryCode = countryCodes.get(e.getKey());
 
         while (m.find()) {
-          content.getAnnotations()
+          content
+              .getAnnotations()
               .create()
               .withType(AnnotationTypes.ANNOTATION_TYPE_NATIONALITY)
               .withBounds(new SpanBounds(m.start(), m.end()))
