@@ -1,0 +1,102 @@
+/*
+ * Crown Copyright (C) 2019 Dstl
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package io.annot8.components.financial.processors;
+
+import io.annot8.api.components.Processor;
+import io.annot8.api.properties.ImmutableProperties;
+import io.annot8.testing.testimpl.TestItem;
+import io.annot8.testing.testimpl.content.TestStringContent;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public class MoneyTest {
+
+    @Test
+    public void testUK(){
+        assertFoundMoney("The price is £3", 3.0, "GBP");
+        assertFoundMoney("The price is £3.50", 3.5, "GBP");
+        assertFoundMoney("The price is £3000", 3000.0, "GBP");
+        assertFoundMoney("The price is £3,000", 3000.0, "GBP");
+        assertFoundMoney("The price is £2,999.99", 2999.99, "GBP");
+        assertFoundMoney("The price is £2999.99", 2999.99, "GBP");
+        assertFoundMoney("The price is £2 999.99", 2999.99, "GBP");
+        assertFoundMoney("The price is £2,999,999", 2999999.0, "GBP");
+        assertFoundMoney("The price is £2,999,999.99", 2999999.99, "GBP");
+        assertFoundMoney("The price is \u00A3100", 100.0, "GBP");
+        assertFoundMoney("£47", 47.0, "GBP");
+    }
+
+    @Test
+    public void testMultipliers(){
+        assertFoundMoney("The price is £37 million", 37000000.0, "GBP");
+        assertFoundMoney("The price is £37m", 37000000.0, "GBP");
+        assertFoundMoney("The price is $20k", 20000.0, "USD");
+        assertFoundMoney("The price is 47 thousand €", 47000.0, "EUR");
+        assertFoundMoney("The price is 47 € thousand", 47000.0, "EUR");
+    }
+    @Test
+    public void testUS(){
+        assertFoundMoney("The price is $1,234,567.89", 1234567.89, "USD");
+        assertFoundMoney("The price is $1 234 567.89", 1234567.89, "USD");
+        assertFoundMoney("The price is \u0024100", 100.0, "USD");
+    }
+
+    @Test
+    public void testEur(){
+        assertFoundMoney("The price is 1€", 1.0, "EUR");
+        assertFoundMoney("The price is 1 €", 1.0, "EUR");
+        assertFoundMoney("The price is 1,23€", 1.23, "EUR");
+        assertFoundMoney("The price is 1.23 €", 1.23, "EUR");
+        assertFoundMoney("The price is 123 456,78€", 123456.78, "EUR");
+        assertFoundMoney("The price is 123,456.78 €", 123456.78, "EUR");
+        assertFoundMoney("The price is 123.456,78 €", 123456.78, "EUR");
+        assertFoundMoney("The price is 123.456.789,99€", 123456789.99, "EUR");
+        assertFoundMoney("The price is 123.456.789 €", 123456789.0, "EUR");
+        assertFoundMoney("The price is 1.234 €", 1234.0, "EUR");
+        assertFoundMoney("The price is \u20AC100", 100.0, "EUR");
+    }
+
+    @Test
+    public void testOtherCountries(){
+        assertFoundMoney("The price is ¥3000", 3000.0, "JPY");
+        assertFoundMoney("The price is \u00A5100", 100.0, "JPY");
+        assertFoundMoney("The price is SEK 47,000", 47000.0, "SEK");
+        assertFoundMoney("The price is 47,000 IQD", 47000.0, "IQD");
+        assertFoundMoney("The price is 47 Fr", 47.0, "CHF");
+        assertFoundMoney("The price is Fr 47", 47.0, "CHF");
+    }
+
+    @Test
+    public void testFractions(){
+        assertFoundMoney("The price is 47¢", 0.47, "USD");
+        assertFoundMoney("The price is $1.99¢", 1.99, "USD");
+        assertFoundMoney("The price is 47c", 0.47, "EUR");
+        assertFoundMoney("The price is 50p", 0.5, "GBP");
+        assertFoundMoney("The price is £1.99p", 1.99, "GBP");
+    }
+
+    private void assertFoundMoney(String inputString, double value, String currencyCode) {
+        Processor moneyProcessor = new Money.Processor();
+        TestItem testItem = new TestItem();
+        TestStringContent content = testItem.createContent(TestStringContent.class).withData(inputString).save();
+        moneyProcessor.process(testItem);
+        ImmutableProperties properties = content.getAnnotations().getAll().findAny().orElseThrow().getProperties();
+        assertEquals(value, properties.getOrDefault("value", 0.0));
+        assertEquals(currencyCode, properties.getOrDefault("currencyCode", ""));
+    }
+
+}
