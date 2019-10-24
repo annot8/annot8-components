@@ -1,14 +1,13 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.stopwords.resources;
 
+import io.annot8.api.exceptions.BadConfigurationException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import io.annot8.api.exceptions.BadConfigurationException;
 
 public class StopwordsIso implements Stopwords {
 

@@ -3,12 +3,6 @@ package io.annot8.components.geo.processors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Stream;
-
-import org.junit.jupiter.api.Test;
-
 import io.annot8.api.annotations.Annotation;
 import io.annot8.api.components.Processor;
 import io.annot8.api.data.Item;
@@ -18,6 +12,10 @@ import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
 import io.annot8.testing.testimpl.TestItem;
 import io.annot8.testing.testimpl.content.TestStringContent;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Stream;
+import org.junit.jupiter.api.Test;
 
 public class LatLonTest {
 

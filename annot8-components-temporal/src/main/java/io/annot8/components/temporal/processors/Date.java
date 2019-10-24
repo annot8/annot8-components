@@ -1,16 +1,6 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.temporal.processors;
 
-import java.time.DateTimeException;
-import java.time.LocalDate;
-import java.time.Year;
-import java.time.YearMonth;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
 import io.annot8.api.components.annotations.ComponentName;
@@ -25,6 +15,15 @@ import io.annot8.components.base.processors.AbstractTextProcessor;
 import io.annot8.components.temporal.processors.utils.DateTimeUtils;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
+import java.time.DateTimeException;
+import java.time.LocalDate;
+import java.time.Year;
+import java.time.YearMonth;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @ComponentName("Date") // The display name of the processor
 @ComponentDescription("Extracts formatted dates from text")

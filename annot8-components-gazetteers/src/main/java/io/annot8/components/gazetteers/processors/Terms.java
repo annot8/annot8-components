@@ -1,11 +1,10 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.gazetteers.processors;
 
-import java.util.Collections;
-import java.util.List;
-
 import io.annot8.api.context.Context;
 import io.annot8.components.gazetteers.processors.impl.CollectionGazetteer;
+import java.util.Collections;
+import java.util.List;
 
 public class Terms extends AhoCorasick<Terms.Settings> {
 

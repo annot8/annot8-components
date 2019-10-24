@@ -1,9 +1,6 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.items.processors;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
 import io.annot8.api.components.annotations.ComponentName;
@@ -17,6 +14,8 @@ import io.annot8.api.settings.Description;
 import io.annot8.common.components.AbstractProcessor;
 import io.annot8.common.components.AbstractProcessorDescriptor;
 import io.annot8.common.components.capabilities.SimpleCapabilities;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @ComponentName("Item Property from Property")
 @ComponentDescription(

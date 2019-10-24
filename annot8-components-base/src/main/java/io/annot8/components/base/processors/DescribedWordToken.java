@@ -1,12 +1,6 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.base.processors;
 
-import java.util.Map;
-import java.util.Set;
-
-import javax.json.bind.annotation.JsonbCreator;
-import javax.json.bind.annotation.JsonbProperty;
-
 import io.annot8.api.annotations.Annotation;
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
@@ -22,6 +16,10 @@ import io.annot8.common.data.utils.SortUtils;
 import io.annot8.components.stopwords.resources.NoOpStopwords;
 import io.annot8.components.stopwords.resources.Stopwords;
 import io.annot8.conventions.AnnotationTypes;
+import java.util.Map;
+import java.util.Set;
+import javax.json.bind.annotation.JsonbCreator;
+import javax.json.bind.annotation.JsonbProperty;
 
 @ComponentName("Described Word Token")
 @ComponentDescription(

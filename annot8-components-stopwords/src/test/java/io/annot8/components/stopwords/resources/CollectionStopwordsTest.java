@@ -4,7 +4,6 @@ package io.annot8.components.stopwords.resources;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Arrays;
-
 import org.junit.jupiter.api.Test;
 
 public class CollectionStopwordsTest {

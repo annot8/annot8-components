@@ -1,14 +1,13 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.base.processors;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-
 import io.annot8.api.components.Processor;
 import io.annot8.api.components.responses.ProcessorResponse;
 import io.annot8.api.data.Item;
 import io.annot8.common.components.AbstractProcessor;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 
 public class MultiProcessor extends AbstractProcessor {
 

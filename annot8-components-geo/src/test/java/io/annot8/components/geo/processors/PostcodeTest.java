@@ -4,14 +4,13 @@ package io.annot8.components.geo.processors;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-import org.junit.jupiter.api.Test;
-
 import io.annot8.api.components.Processor;
 import io.annot8.api.properties.ImmutableProperties;
 import io.annot8.api.settings.NoSettings;
 import io.annot8.conventions.PropertyKeys;
 import io.annot8.testing.testimpl.TestItem;
 import io.annot8.testing.testimpl.content.TestStringContent;
+import org.junit.jupiter.api.Test;
 
 public class PostcodeTest {
 

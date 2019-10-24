@@ -1,13 +1,12 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.gazetteers.processors.impl;
 
+import io.annot8.components.gazetteers.processors.Gazetteer;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import io.annot8.components.gazetteers.processors.Gazetteer;
 
 public class MapGazetteer implements Gazetteer {
 

@@ -3,9 +3,8 @@ package io.annot8.components.stopwords.resources;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.jupiter.api.Test;
-
 import io.annot8.api.exceptions.BadConfigurationException;
+import org.junit.jupiter.api.Test;
 
 public class StopwordsIsoTest {
   @Test

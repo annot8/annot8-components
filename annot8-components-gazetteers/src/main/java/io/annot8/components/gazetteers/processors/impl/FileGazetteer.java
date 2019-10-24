@@ -1,15 +1,14 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.gazetteers.processors.impl;
 
+import io.annot8.api.exceptions.BadConfigurationException;
+import io.annot8.components.gazetteers.processors.Gazetteer;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
-import io.annot8.api.exceptions.BadConfigurationException;
-import io.annot8.components.gazetteers.processors.Gazetteer;
 
 public class FileGazetteer implements Gazetteer {
 

@@ -1,10 +1,9 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.gazetteers.processors;
 
-import java.nio.file.Path;
-
 import io.annot8.api.context.Context;
 import io.annot8.components.gazetteers.processors.impl.FileGazetteer;
+import java.nio.file.Path;
 
 public class File extends AhoCorasick<File.Settings> {
 

@@ -1,19 +1,6 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.opennlp.processors;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import opennlp.tools.chunker.ChunkerME;
-import opennlp.tools.chunker.ChunkerModel;
-import opennlp.tools.util.Span;
-
 import io.annot8.api.annotations.Annotation;
 import io.annot8.api.annotations.Group;
 import io.annot8.api.capabilities.Capabilities;
@@ -33,6 +20,17 @@ import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.GroupRoles;
 import io.annot8.conventions.GroupTypes;
 import io.annot8.conventions.PropertyKeys;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import opennlp.tools.chunker.ChunkerME;
+import opennlp.tools.chunker.ChunkerModel;
+import opennlp.tools.util.Span;
 
 @ComponentName("OpenNLP Phrase Chunks")
 @ComponentDescription("Annotate phrase chunks identified by OpenNLP's chunker")

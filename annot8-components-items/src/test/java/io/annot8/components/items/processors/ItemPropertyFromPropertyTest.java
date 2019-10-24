@@ -3,15 +3,13 @@ package io.annot8.components.items.processors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.regex.Pattern;
-
-import org.junit.jupiter.api.Test;
-
 import io.annot8.api.components.Processor;
 import io.annot8.api.data.Item;
 import io.annot8.api.exceptions.ProcessingException;
 import io.annot8.conventions.PropertyKeys;
 import io.annot8.testing.testimpl.TestItem;
+import java.util.regex.Pattern;
+import org.junit.jupiter.api.Test;
 
 public class ItemPropertyFromPropertyTest {
   @Test

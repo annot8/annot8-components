@@ -4,16 +4,14 @@ package io.annot8.components.opennlp.processors;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.junit.jupiter.api.Test;
-
 import io.annot8.api.components.Processor;
 import io.annot8.api.data.Item;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.testing.testimpl.TestItem;
 import io.annot8.testing.testimpl.content.TestStringContent;
+import java.util.ArrayList;
+import java.util.List;
+import org.junit.jupiter.api.Test;
 
 public class SentencesTest {
   @Test

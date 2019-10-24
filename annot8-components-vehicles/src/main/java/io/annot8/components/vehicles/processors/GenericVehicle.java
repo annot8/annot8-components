@@ -1,10 +1,6 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.vehicles.processors;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
-
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.Processor;
 import io.annot8.api.components.annotations.ComponentDescription;
@@ -22,6 +18,9 @@ import io.annot8.components.stopwords.resources.Stopwords;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
 import io.annot8.utils.text.PluralUtils;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
 
 @ComponentName("Generic Vehicle")
 @ComponentDescription("Extracts vehicles (with descriptions) from text")

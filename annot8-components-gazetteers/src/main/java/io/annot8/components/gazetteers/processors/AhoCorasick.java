@@ -1,12 +1,6 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.gazetteers.processors;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
-import org.ahocorasick.trie.Emit;
-import org.ahocorasick.trie.Trie;
-
 import io.annot8.api.annotations.Annotation;
 import io.annot8.api.annotations.Group;
 import io.annot8.api.capabilities.Capabilities;
@@ -20,6 +14,10 @@ import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.GroupTypes;
 import io.annot8.conventions.PropertyKeys;
 import io.annot8.utils.text.PluralUtils;
+import java.util.*;
+import java.util.stream.Collectors;
+import org.ahocorasick.trie.Emit;
+import org.ahocorasick.trie.Trie;
 
 public abstract class AhoCorasick<S extends AhoCorasick.Settings>
     extends AbstractProcessorDescriptor<AhoCorasick.Processor, S> {

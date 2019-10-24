@@ -3,7 +3,6 @@ package io.annot8.utils.text;
 
 import java.util.HashSet;
 import java.util.Set;
-
 import org.atteo.evo.inflector.English;
 
 public class PluralUtils {

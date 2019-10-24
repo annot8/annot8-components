@@ -7,7 +7,6 @@ import java.time.DateTimeException;
 import java.time.DayOfWeek;
 import java.time.Month;
 import java.time.Year;
-
 import org.junit.jupiter.api.Test;
 
 public class DateTimeUtilsTest {

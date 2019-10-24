@@ -4,10 +4,6 @@ package io.annot8.components.geo.processors;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import java.util.Set;
-
-import org.junit.jupiter.api.Test;
-
 import io.annot8.api.annotations.Annotation;
 import io.annot8.api.properties.ImmutableProperties;
 import io.annot8.api.stores.AnnotationStore;
@@ -15,6 +11,8 @@ import io.annot8.components.gazetteers.processors.AhoCorasick;
 import io.annot8.conventions.PropertyKeys;
 import io.annot8.testing.testimpl.TestItem;
 import io.annot8.testing.testimpl.content.TestStringContent;
+import java.util.Set;
+import org.junit.jupiter.api.Test;
 
 public class CountryGazetteerTest {
   @Test

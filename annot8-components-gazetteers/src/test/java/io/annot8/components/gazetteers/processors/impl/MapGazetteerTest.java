@@ -3,14 +3,12 @@ package io.annot8.components.gazetteers.processors.impl;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import io.annot8.components.gazetteers.processors.Gazetteer;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-
 import org.junit.jupiter.api.Test;
-
-import io.annot8.components.gazetteers.processors.Gazetteer;
 
 public class MapGazetteerTest {
   @Test

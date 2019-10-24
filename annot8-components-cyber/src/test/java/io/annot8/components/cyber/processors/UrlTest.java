@@ -1,12 +1,6 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.cyber.processors;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
 import io.annot8.api.annotations.Annotation;
 import io.annot8.api.components.Processor;
 import io.annot8.api.data.Item;
@@ -16,6 +10,10 @@ import io.annot8.conventions.AnnotationTypes;
 import io.annot8.implementations.support.context.SimpleContext;
 import io.annot8.testing.testimpl.TestItem;
 import io.annot8.testing.testimpl.content.TestStringContent;
+import java.util.*;
+import java.util.stream.Collectors;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class UrlTest {
 
@@ -25,9 +23,11 @@ public class UrlTest {
     try (Processor p = url.createComponent(new SimpleContext(), new Url.Settings())) {
       Item item = new TestItem();
 
-      Text content = item.createContent(TestStringContent.class).withData(
-          "UK Government's website is http://www.gov.uk/. An example FTP directory is ftp://foo.example.com/this/is/a/path.txt. Here's a secure URL https://www.example.com/index.php?test=true . Some naughty person hasn't specified a schema here... www.example.com/path/to/page.html.")
-          .save();
+      Text content =
+          item.createContent(TestStringContent.class)
+              .withData(
+                  "UK Government's website is http://www.gov.uk/. An example FTP directory is ftp://foo.example.com/this/is/a/path.txt. Here's a secure URL https://www.example.com/index.php?test=true . Some naughty person hasn't specified a schema here... www.example.com/path/to/page.html.")
+              .save();
 
       p.process(item);
 
@@ -36,9 +36,13 @@ public class UrlTest {
       List<Annotation> annotations = store.getAll().collect(Collectors.toList());
       Assertions.assertEquals(4, annotations.size());
 
-      List<String> urls = new ArrayList<>(
-          Arrays.asList("http://www.gov.uk/", "ftp://foo.example.com/this/is/a/path.txt",
-              "https://www.example.com/index.php?test=true", "www.example.com/path/to/page.html"));
+      List<String> urls =
+          new ArrayList<>(
+              Arrays.asList(
+                  "http://www.gov.uk/",
+                  "ftp://foo.example.com/this/is/a/path.txt",
+                  "https://www.example.com/index.php?test=true",
+                  "www.example.com/path/to/page.html"));
 
       for (Annotation a : annotations) {
         Assertions.assertEquals(AnnotationTypes.ANNOTATION_TYPE_URL, a.getType());
@@ -57,11 +61,13 @@ public class UrlTest {
     try (Processor p = new Url.Processor(true)) {
       Item item = new TestItem();
 
-      Text content = item.createContent(TestStringContent.class)
-          .withData("If you visit bbc.co.uk, then you may also want to visit bbc.co.uk/news "
-              + "or http://news.bbc.co.uk, or even news.bbc.co.uk/stories/view.php?id=123. "
-              + "But don't pull out james@example.com")
-          .save();
+      Text content =
+          item.createContent(TestStringContent.class)
+              .withData(
+                  "If you visit bbc.co.uk, then you may also want to visit bbc.co.uk/news "
+                      + "or http://news.bbc.co.uk, or even news.bbc.co.uk/stories/view.php?id=123. "
+                      + "But don't pull out james@example.com")
+              .save();
 
       p.process(item);
 

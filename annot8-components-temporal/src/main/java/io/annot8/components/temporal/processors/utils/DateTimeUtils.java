@@ -1,6 +1,7 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.temporal.processors.utils;
 
+import com.google.common.base.Strings;
 import java.time.DateTimeException;
 import java.time.DayOfWeek;
 import java.time.Month;
@@ -9,8 +10,6 @@ import java.time.format.DateTimeParseException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
-import com.google.common.base.Strings;
 
 /** Utility functions for converting DateTimes. */
 public class DateTimeUtils {

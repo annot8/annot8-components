@@ -3,12 +3,11 @@ package io.annot8.components.financial.processors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.jupiter.api.Test;
-
 import io.annot8.api.components.Processor;
 import io.annot8.api.properties.ImmutableProperties;
 import io.annot8.testing.testimpl.TestItem;
 import io.annot8.testing.testimpl.content.TestStringContent;
+import org.junit.jupiter.api.Test;
 
 public class MoneyTest {
 

@@ -3,11 +3,6 @@ package io.annot8.components.vehicles.processors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.junit.jupiter.api.Test;
-
 import io.annot8.api.annotations.Annotation;
 import io.annot8.api.components.Processor;
 import io.annot8.api.settings.NoSettings;
@@ -16,6 +11,9 @@ import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
 import io.annot8.testing.testimpl.TestItem;
 import io.annot8.testing.testimpl.content.TestStringContent;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import org.junit.jupiter.api.Test;
 
 public class GenericVehicleTest {
   @Test

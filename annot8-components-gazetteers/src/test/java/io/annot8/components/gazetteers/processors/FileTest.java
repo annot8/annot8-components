@@ -4,12 +4,6 @@ package io.annot8.components.gazetteers.processors;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.nio.file.Path;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.junit.jupiter.api.Test;
-
 import io.annot8.api.components.Processor;
 import io.annot8.api.data.Item;
 import io.annot8.common.data.bounds.SpanBounds;
@@ -19,6 +13,10 @@ import io.annot8.components.gazetteers.processors.impl.FileGazetteer;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.testing.testimpl.TestItem;
 import io.annot8.testing.testimpl.content.TestStringContent;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.stream.Collectors;
+import org.junit.jupiter.api.Test;
 
 public class FileTest {
   @Test

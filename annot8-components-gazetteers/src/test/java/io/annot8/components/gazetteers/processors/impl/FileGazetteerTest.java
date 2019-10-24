@@ -3,14 +3,12 @@ package io.annot8.components.gazetteers.processors.impl;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import io.annot8.components.gazetteers.processors.Gazetteer;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
-
 import org.junit.jupiter.api.Test;
-
-import io.annot8.components.gazetteers.processors.Gazetteer;
 
 public class FileGazetteerTest {
   @Test
