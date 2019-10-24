@@ -212,33 +212,25 @@
       </plugin>
 
       <plugin>
-        <groupId>io.github.phillipuniverse</groupId>
-        <artifactId>githook-maven-plugin</artifactId>
-        <version>${githook-maven-plugin.version}</version>
+        <groupId>io.committed</groupId>
+        <artifactId>speedy-spotless-maven-plugin</artifactId>
+        <version>0.0.2</version>
         <executions>
           <execution>
+            <id>install-formatter-hook</id>
             <goals>
-              <goal>install</goal>
+              <goal>install-hooks</goal>
             </goals>
-            <configuration>
-              <hooks>
-<!--                <pre-commit>-->
-<!--                  source ~/.bash_profile-->
-<!--                  set -e-->
-
-<!--                  REPO_ROOT_DIR="$(git rev-parse &#45;&#45;show-toplevel)"-->
-<!--                  cd $REPO_ROOT_DIR-->
-
-<!--                  java_files=$(git diff &#45;&#45;cached &#45;&#45;name-only &#45;&#45;diff-filter=ACMR | grep -Ei "\.java$" | paste -sd "," -)-->
-<!--                  if [ ! -z "${java_files}" ]; then-->
-<!--                  mvn spotless:apply-->
-<!--                  git add "$java_files"-->
-<!--                  fi-->
-<!--                </pre-commit>-->
-              </hooks>
-            </configuration>
           </execution>
         </executions>
+        <configuration>
+          <java>
+            <googleJavaFormat>
+              <style>GOOGLE</style>
+            </googleJavaFormat>
+            <removeUnusedImports />
+          </java>
+        </configuration>
       </plugin>
     </plugins>
 
