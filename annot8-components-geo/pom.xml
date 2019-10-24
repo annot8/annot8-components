@@ -29,7 +29,7 @@
     <dependency>
       <groupId>io.annot8</groupId>
       <artifactId>annot8-components-gazetteers</artifactId>
-      <version>${annot8.version}</version>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>

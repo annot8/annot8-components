@@ -34,7 +34,7 @@
     <dependency>
       <groupId>io.annot8</groupId>
       <artifactId>annot8-components-stopwords</artifactId>
-      <version>${annot8.version}</version>
+      <version>${project.version}</version>
     </dependency>
         
     <dependency>
