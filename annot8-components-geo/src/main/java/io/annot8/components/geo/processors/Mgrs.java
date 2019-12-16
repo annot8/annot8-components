@@ -14,12 +14,13 @@ import io.annot8.common.data.content.Text;
 import io.annot8.components.base.processors.AbstractTextProcessor;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
+import org.opensextant.geodesy.MGRS;
+
+import javax.json.bind.annotation.JsonbCreator;
+import javax.json.bind.annotation.JsonbProperty;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.json.bind.annotation.JsonbCreator;
-import javax.json.bind.annotation.JsonbProperty;
-import org.opensextant.geodesy.MGRS;
 
 /** Extract MGRS coordinates, optionally ignoring MGRS coordinates that could be dates */
 @ComponentName("MGRS")
@@ -133,7 +134,7 @@ public class Mgrs extends AbstractProcessorDescriptor<Mgrs.Processor, Mgrs.Setti
       this.ignoreDates = ignoreDates;
     }
 
-    @Description("Should MGRS co-ordinates that could also be valid dates be ignored")
+    @Description(value = "Should MGRS co-ordinates that could also be valid dates be ignored", defaultValue = "false")
     public boolean isIgnoreDates() {
       return ignoreDates;
     }
