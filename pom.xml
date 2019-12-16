@@ -193,7 +193,6 @@
         </executions>
       </plugin>
 
-
       <plugin>
         <groupId>io.committed</groupId>
         <artifactId>speedy-spotless-maven-plugin</artifactId>
@@ -215,6 +214,28 @@
             <removeUnusedImports />
           </java>
         </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.2.1</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <artifactSet>
+                <excludes>
+                  <exclude>io.annot8:annot8-api</exclude>
+                </excludes>
+              </artifactSet>
+              <shadedArtifactAttached>true</shadedArtifactAttached>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
 
