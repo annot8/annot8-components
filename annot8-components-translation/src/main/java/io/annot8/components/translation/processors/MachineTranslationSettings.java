@@ -1,14 +1,14 @@
+/* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.translation.processors;
 
 import io.annot8.api.exceptions.BadConfigurationException;
 import io.annot8.api.settings.Description;
 import io.annot8.api.settings.Settings;
-import uk.gov.dstl.machinetranslation.connector.api.MTConnectorApi;
-import uk.gov.dstl.machinetranslation.connector.api.utils.ConnectorUtils;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import uk.gov.dstl.machinetranslation.connector.api.MTConnectorApi;
+import uk.gov.dstl.machinetranslation.connector.api.utils.ConnectorUtils;
 
 public class MachineTranslationSettings implements Settings {
   private String sourceLanguage = ConnectorUtils.LANGUAGE_AUTO;
@@ -23,13 +23,15 @@ public class MachineTranslationSettings implements Settings {
     return targetLanguage != null && translatorClass != null;
   }
 
-  @Description(value = "Source language to translate from, or "+ConnectorUtils.LANGUAGE_AUTO, defaultValue = ConnectorUtils.LANGUAGE_AUTO)
+  @Description(
+      value = "Source language to translate from, or " + ConnectorUtils.LANGUAGE_AUTO,
+      defaultValue = ConnectorUtils.LANGUAGE_AUTO)
   public String getSourceLanguage() {
-    if(sourceLanguage == null)
-      return ConnectorUtils.LANGUAGE_AUTO;
+    if (sourceLanguage == null) return ConnectorUtils.LANGUAGE_AUTO;
 
     return sourceLanguage;
   }
+
   public void setSourceLanguage(String sourceLanguage) {
     this.sourceLanguage = sourceLanguage;
   }
@@ -38,6 +40,7 @@ public class MachineTranslationSettings implements Settings {
   public String getTargetLanguage() {
     return targetLanguage;
   }
+
   public void setTargetLanguage(String targetLanguage) {
     this.targetLanguage = targetLanguage;
   }
@@ -46,19 +49,21 @@ public class MachineTranslationSettings implements Settings {
   public Class<? extends MTConnectorApi> getTranslatorClass() {
     return translatorClass;
   }
+
   public void setTranslatorClass(Class<? extends MTConnectorApi> translatorClass) {
     this.translatorClass = translatorClass;
   }
+
   public void setTranslatorClass(String translatorClass) throws BadConfigurationException {
     Class<?> clazz;
     try {
       clazz = Class.forName(translatorClass);
     } catch (ClassNotFoundException e) {
       this.translatorClass = null;
-      throw new BadConfigurationException("Could not find class "+translatorClass, e);
+      throw new BadConfigurationException("Could not find class " + translatorClass, e);
     }
 
-    if(!MTConnectorApi.class.isAssignableFrom(clazz)) {
+    if (!MTConnectorApi.class.isAssignableFrom(clazz)) {
       this.translatorClass = null;
       throw new BadConfigurationException("Translator Class must implement MTConnectorApi");
     }
@@ -68,17 +73,17 @@ public class MachineTranslationSettings implements Settings {
 
   @Description("Configuration for Connector API")
   public Map<String, Object> getTranslatorConfiguration() {
-    if(translatorConfiguration == null)
-      return Collections.emptyMap();
+    if (translatorConfiguration == null) return Collections.emptyMap();
 
     return translatorConfiguration;
   }
+
   public void setTranslatorConfiguration(Map<String, Object> translatorConfiguration) {
     this.translatorConfiguration = translatorConfiguration;
   }
-  public void setTranslatorConfiguration(String key, Object value){
-    if (translatorConfiguration == null)
-      translatorConfiguration = new HashMap<>();
+
+  public void setTranslatorConfiguration(String key, Object value) {
+    if (translatorConfiguration == null) translatorConfiguration = new HashMap<>();
 
     translatorConfiguration.put(key, value);
   }
@@ -87,6 +92,7 @@ public class MachineTranslationSettings implements Settings {
   public boolean isCopyProperties() {
     return copyProperties;
   }
+
   public void setCopyProperties(boolean copyProperties) {
     this.copyProperties = copyProperties;
   }

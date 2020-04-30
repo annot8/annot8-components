@@ -1,7 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns="http://maven.apache.org/POM/4.0.0"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8" ?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>io.annot8</groupId>
@@ -72,7 +70,7 @@
     <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
     <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
     <junit-platform-surefire-provider.version>1.3.2</junit-platform-surefire-provider.version>
-    <!-- IS THIS USED? <spotless.version>1.24.1</spotless.version> -->
+    <speedy-spotless-maven-plugin.version>0.1.1</speedy-spotless-maven-plugin.version>
     <nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>
     <jacoco-maven-plugin.version>0.8.5</jacoco-maven-plugin.version>
     <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
@@ -196,7 +194,7 @@
       <plugin>
         <groupId>io.committed</groupId>
         <artifactId>speedy-spotless-maven-plugin</artifactId>
-        <version>0.1.0</version>
+        <version>${speedy-spotless-maven-plugin.version}</version>
         <executions>
           <execution>
             <id>install-formatter-hook</id>
@@ -463,7 +461,7 @@
     <module>annot8-components-temporal</module>
     <module>annot8-components-tesseract</module>
     <module>annot8-components-text</module>
-<!--    <module>annot8-components-tika</module>-->
+    <!--    <module>annot8-components-tika</module>-->
     <module>annot8-components-translation</module>
     <module>annot8-components-types</module>
     <module>annot8-components-vehicles</module>

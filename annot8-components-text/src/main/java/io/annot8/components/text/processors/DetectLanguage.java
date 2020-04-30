@@ -1,6 +1,8 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.text.processors;
 
+import static io.annot8.conventions.PropertyKeys.PROPERTY_KEY_LANGUAGE;
+
 import com.github.pemistahl.lingua.api.Language;
 import com.github.pemistahl.lingua.api.LanguageDetector;
 import com.github.pemistahl.lingua.api.LanguageDetectorBuilder;
@@ -15,8 +17,6 @@ import io.annot8.common.data.bounds.ContentBounds;
 import io.annot8.common.data.content.Text;
 import io.annot8.components.base.processors.AbstractTextProcessor;
 import io.annot8.conventions.AnnotationTypes;
-
-import static io.annot8.conventions.PropertyKeys.PROPERTY_KEY_LANGUAGE;
 
 /**
  * Detect the language of a Text content and add the language as an annotation covering the whole
@@ -59,8 +59,7 @@ public class DetectLanguage
     public void process(Text text) {
       Language lang = languageDetector.detectLanguageOf(text.getData());
 
-      if(lang == Language.UNKNOWN)
-        return;
+      if (lang == Language.UNKNOWN) return;
 
       text.getAnnotations()
           .create()
