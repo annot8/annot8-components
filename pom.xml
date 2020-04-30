@@ -63,25 +63,25 @@
     <annot8.version>0.4.0</annot8.version>
 
     <!-- Testing -->
-    <junit.version>5.5.2</junit.version>
-    <mockito.version>3.1.0</mockito.version>
-    <assertj-core.version>3.13.2</assertj-core.version>
-    <assertj-guava.version>3.2.1</assertj-guava.version>
+    <junit.version>5.6.0</junit.version>
+    <mockito.version>3.3.3</mockito.version>
+    <assertj-core.version>3.15.0</assertj-core.version>
+    <assertj-guava.version>3.3.0</assertj-guava.version>
 
     <!-- Plugins -->
     <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
     <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
-    <junit-platform-surefire-provider.version>1.3.1</junit-platform-surefire-provider.version>
-    <spotless.version>1.24.1</spotless.version>
+    <junit-platform-surefire-provider.version>1.3.2</junit-platform-surefire-provider.version>
+    <!-- IS THIS USED? <spotless.version>1.24.1</spotless.version> -->
     <nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>
-    <jacoco-maven-plugin.version>0.8.4</jacoco-maven-plugin.version>
+    <jacoco-maven-plugin.version>0.8.5</jacoco-maven-plugin.version>
     <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
-    <maven-source-plugin.version>3.1.0</maven-source-plugin.version>
-    <maven-javadoc-plugin.version>3.1.1</maven-javadoc-plugin.version>
+    <maven-source-plugin.version>3.2.1</maven-source-plugin.version>
+    <maven-javadoc-plugin.version>3.2.0</maven-javadoc-plugin.version>
     <maven-shade-plugin.version>3.2.3</maven-shade-plugin.version>
     <githook-maven-plugin.version>1.0.4</githook-maven-plugin.version>
     <!-- Logging -->
-    <slf4j.version>1.7.28</slf4j.version>
+    <slf4j.version>1.7.30</slf4j.version>
   </properties>
 
   <dependencies>
@@ -161,7 +161,7 @@
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>nexus-staging-maven-plugin</artifactId>
-        <version>1.6.8</version>
+        <version>${nexus-staging-maven-plugin.version}</version>
         <extensions>true</extensions>
         <configuration>
           <serverId>ossrh</serverId>
@@ -196,7 +196,7 @@
       <plugin>
         <groupId>io.committed</groupId>
         <artifactId>speedy-spotless-maven-plugin</artifactId>
-        <version>0.0.2</version>
+        <version>0.1.0</version>
         <executions>
           <execution>
             <id>install-formatter-hook</id>
@@ -335,7 +335,7 @@
       <dependency>
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
-        <version>28.1-jre</version>
+        <version>28.2-jre</version>
       </dependency>
 
       <!-- Testing -->
