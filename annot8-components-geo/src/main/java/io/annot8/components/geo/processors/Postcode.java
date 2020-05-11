@@ -17,9 +17,6 @@ import io.annot8.common.data.content.Text;
 import io.annot8.components.base.processors.AbstractRegexProcessor;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
-import uk.gov.dstl.geo.osgb.Constants;
-import uk.gov.dstl.geo.osgb.EastingNorthingConversion;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -27,6 +24,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import uk.gov.dstl.geo.osgb.Constants;
+import uk.gov.dstl.geo.osgb.EastingNorthingConversion;
 
 @ComponentName("Postcode")
 @ComponentDescription("Extract UK postcodes from text")

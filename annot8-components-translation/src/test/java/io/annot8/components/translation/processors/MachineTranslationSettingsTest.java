@@ -1,18 +1,18 @@
+/* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.translation.processors;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import io.annot8.api.exceptions.BadConfigurationException;
+import java.util.*;
 import org.junit.jupiter.api.Test;
 import uk.gov.dstl.machinetranslation.connector.api.*;
 import uk.gov.dstl.machinetranslation.connector.api.exceptions.ConnectorException;
 import uk.gov.dstl.machinetranslation.connector.api.utils.ConnectorUtils;
 
-import java.util.*;
-
-import static org.junit.jupiter.api.Assertions.*;
-
 public class MachineTranslationSettingsTest {
   @Test
-  public void testSourceLanguage(){
+  public void testSourceLanguage() {
     MachineTranslationSettings settings = new MachineTranslationSettings();
 
     assertEquals(ConnectorUtils.LANGUAGE_AUTO, settings.getSourceLanguage());
@@ -25,7 +25,7 @@ public class MachineTranslationSettingsTest {
   }
 
   @Test
-  public void testTargetLanguage(){
+  public void testTargetLanguage() {
     MachineTranslationSettings settings = new MachineTranslationSettings();
 
     settings.setTargetLanguage("DE");
@@ -33,7 +33,7 @@ public class MachineTranslationSettingsTest {
   }
 
   @Test
-  public void testTranslatorConfiguration(){
+  public void testTranslatorConfiguration() {
     MachineTranslationSettings settings = new MachineTranslationSettings();
 
     Map<String, Object> defaultConf = settings.getTranslatorConfiguration();
@@ -68,7 +68,7 @@ public class MachineTranslationSettingsTest {
   }
 
   @Test
-  public void testCopyProperties(){
+  public void testCopyProperties() {
     MachineTranslationSettings settings = new MachineTranslationSettings();
 
     assertFalse(settings.isCopyProperties());
@@ -78,7 +78,7 @@ public class MachineTranslationSettingsTest {
   }
 
   @Test
-  public void testTranslatorClass(){
+  public void testTranslatorClass() {
     MachineTranslationSettings settings = new MachineTranslationSettings();
 
     assertNull(settings.getTranslatorClass());
@@ -87,7 +87,8 @@ public class MachineTranslationSettingsTest {
     assertEquals(NoOpConnector.class, settings.getTranslatorClass());
 
     assertThrows(BadConfigurationException.class, () -> settings.setTranslatorClass("foo bar baz"));
-    assertThrows(BadConfigurationException.class, () -> settings.setTranslatorClass("java.lang.String"));
+    assertThrows(
+        BadConfigurationException.class, () -> settings.setTranslatorClass("java.lang.String"));
 
     settings.setTranslatorClass((Class<? extends MTConnectorApi>) null);
     assertNull(settings.getTranslatorClass());
@@ -97,7 +98,7 @@ public class MachineTranslationSettingsTest {
   }
 
   @Test
-  public void testValidate(){
+  public void testValidate() {
     MachineTranslationSettings settings = new MachineTranslationSettings();
 
     assertFalse(settings.validate());
@@ -115,10 +116,10 @@ public class MachineTranslationSettingsTest {
     assertFalse(settings.validate());
   }
 
-  private static class NoOpConnector implements MTConnectorApi{
+  private static class NoOpConnector implements MTConnectorApi {
     @Override
     public void configure(Map<String, Object> configuration) {
-      //Do nothing
+      // Do nothing
     }
 
     @Override
@@ -127,12 +128,13 @@ public class MachineTranslationSettingsTest {
     }
 
     @Override
-    public List<LanguageDetection> identifyLanguage(String content)  {
+    public List<LanguageDetection> identifyLanguage(String content) {
       throw new UnsupportedOperationException("NoOpConnector does not support this function");
     }
 
     @Override
-    public Translation translate(String sourceLanguage, String targetLanguage, String content) throws ConnectorException {
+    public Translation translate(String sourceLanguage, String targetLanguage, String content)
+        throws ConnectorException {
       return new Translation("UNK", content);
     }
 
