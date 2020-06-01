@@ -74,6 +74,10 @@ public class CSVExtractor
 
     private final boolean hasHeaders;
 
+    public Settings() {
+      this(true);
+    }
+
     @JsonbCreator
     public Settings(@JsonbProperty("hasHeaders") boolean hasHeaders) {
       this.hasHeaders = hasHeaders;
