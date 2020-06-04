@@ -4,18 +4,17 @@ package io.annot8.components.base.processors;
 import com.google.common.base.Strings;
 import io.annot8.api.settings.Description;
 import io.annot8.api.settings.Settings;
-import java.util.regex.Pattern;
 import javax.json.bind.annotation.JsonbCreator;
 import javax.json.bind.annotation.JsonbProperty;
 
 public class RegexSettings implements Settings {
-  private final Pattern regex;
+  private final String regex;
   private final int group;
   private final String type;
 
   @JsonbCreator
   public RegexSettings(
-      @JsonbProperty("regex") Pattern regex,
+      @JsonbProperty("regex") String regex,
       @JsonbProperty("group") int group,
       @JsonbProperty("type") String type) {
     this.regex = regex;
@@ -24,7 +23,7 @@ public class RegexSettings implements Settings {
   }
 
   @Description("Regular expression pattern to match")
-  public Pattern getRegex() {
+  public String getRegex() {
     return regex;
   }
 

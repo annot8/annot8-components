@@ -12,8 +12,9 @@ public class RegexProcessor extends AbstractRegexProcessor {
   }
 
   public RegexProcessor(RegexSettings regexSettings) {
-    this.pattern = regexSettings.getRegex();
-    this.group = regexSettings.getGroup();
-    this.type = regexSettings.getType();
+    this(
+        Pattern.compile(regexSettings.getRegex()),
+        regexSettings.getGroup(),
+        regexSettings.getType());
   }
 }

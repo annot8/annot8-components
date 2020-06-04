@@ -32,7 +32,7 @@ public class RegexProcessorTest {
 
   @Test
   public void testRegexFromSettings() {
-    RegexSettings rs = new RegexSettings(Pattern.compile("[0-9]+"), 0, "number");
+    RegexSettings rs = new RegexSettings("[0-9]+", 0, "number");
     Processor p = new RegexProcessor(rs);
 
     try {
