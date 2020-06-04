@@ -3,36 +3,33 @@ package io.annot8.components.files.sources;
 
 import io.annot8.api.settings.Description;
 import io.annot8.api.settings.Settings;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.regex.Pattern;
 import javax.json.bind.annotation.JsonbCreator;
 
 public class FileSystemSourceSettings implements Settings {
 
-  private Path rootFolder = Paths.get(".");
+  private String rootFolder = ".";
   private boolean watching = true;
   private boolean recursive = true;
   private boolean reprocessOnModify = true;
-  private Set<Pattern> acceptedFileNamePatterns = new HashSet<>();
+  private Set<String> acceptedFileNamePatterns = new HashSet<>();
 
   @JsonbCreator
   public FileSystemSourceSettings() {
     // Do nothing
   }
 
-  public FileSystemSourceSettings(final Path rootFolder) {
+  public FileSystemSourceSettings(final String rootFolder) {
     this.rootFolder = rootFolder;
   }
 
   @Description("Root folder to read from")
-  public Path getRootFolder() {
+  public String getRootFolder() {
     return rootFolder;
   }
 
-  public void setRootFolder(final Path rootFolder) {
+  public void setRootFolder(final String rootFolder) {
     this.rootFolder = rootFolder;
   }
 
@@ -55,15 +52,15 @@ public class FileSystemSourceSettings implements Settings {
   }
 
   @Description("Accepted file name patterns")
-  public Set<Pattern> getAcceptedFileNamePatterns() {
+  public Set<String> getAcceptedFileNamePatterns() {
     return acceptedFileNamePatterns;
   }
 
-  public void setAcceptedFileNamePatterns(Set<Pattern> acceptedFileNamePatterns) {
+  public void setAcceptedFileNamePatterns(Set<String> acceptedFileNamePatterns) {
     this.acceptedFileNamePatterns = acceptedFileNamePatterns;
   }
 
-  public void addAcceptedFilePattern(Pattern acceptedFilePattern) {
+  public void addAcceptedFilePattern(String acceptedFilePattern) {
     this.acceptedFileNamePatterns.add(acceptedFilePattern);
   }
 

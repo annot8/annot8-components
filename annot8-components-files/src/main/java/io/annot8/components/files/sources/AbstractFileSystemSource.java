@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public abstract class AbstractFileSystemSource extends AbstractSource {
 
@@ -19,7 +20,10 @@ public abstract class AbstractFileSystemSource extends AbstractSource {
   private FileSystemSourceSettings settings;
 
   AbstractFileSystemSource(FileSystemSourceSettings settings) {
-    acceptedFilePatterns = settings.getAcceptedFileNamePatterns();
+    acceptedFilePatterns =
+        settings.getAcceptedFileNamePatterns().stream()
+            .map(Pattern::compile)
+            .collect(Collectors.toSet());
     this.settings = settings;
   }
 

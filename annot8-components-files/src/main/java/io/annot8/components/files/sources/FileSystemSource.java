@@ -58,7 +58,7 @@ public class FileSystemSource
         throw new Annot8RuntimeException("Unable to initialize WatchService", e);
       }
 
-      // TODO: This probably shouldnt' happen in the constructor but on the first read()
+      // TODO: This probably shouldn't happen in the constructor but on the first read()
 
       // Unregister existing watchers
       watchKeys.forEach(WatchKey::cancel);
@@ -67,7 +67,7 @@ public class FileSystemSource
       initialFiles.clear();
 
       try {
-        Path p = getSettings().getRootFolder();
+        Path p = Paths.get(getSettings().getRootFolder());
 
         if (getSettings().isRecursive()) {
           Files.walkFileTree(
