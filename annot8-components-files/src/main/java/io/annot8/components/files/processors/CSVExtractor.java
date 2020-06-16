@@ -17,9 +17,10 @@ import io.annot8.common.components.capabilities.SimpleCapabilities;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.TableContent;
 import io.annot8.components.files.content.CSVTable;
-import java.io.File;
+
 import javax.json.bind.annotation.JsonbCreator;
 import javax.json.bind.annotation.JsonbProperty;
+import java.io.File;
 
 @ComponentName("CSV Extractor")
 @ComponentDescription("Extract CSV files into a Table content")
@@ -70,7 +71,7 @@ public class CSVExtractor
     }
   }
 
-  public class Settings implements io.annot8.api.settings.Settings {
+  public static class Settings implements io.annot8.api.settings.Settings {
 
     private final boolean hasHeaders;
 
@@ -87,6 +88,10 @@ public class CSVExtractor
     @Description("Does the CSV file have headers (true) or not (false)")
     public boolean getHasHeaders() {
       return hasHeaders;
+    }
+
+    public static Settings getDefaultInstance(){
+      return new Settings(true);
     }
   }
 }
