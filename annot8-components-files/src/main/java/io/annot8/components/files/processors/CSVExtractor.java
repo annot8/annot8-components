@@ -90,8 +90,5 @@ public class CSVExtractor
       return hasHeaders;
     }
 
-    public static Settings getDefaultInstance(){
-      return new Settings(true);
-    }
   }
 }
