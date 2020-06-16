@@ -4,6 +4,7 @@ package io.annot8.components.quantities.processors;
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
 import io.annot8.api.components.annotations.ComponentName;
+import io.annot8.api.components.annotations.ComponentTags;
 import io.annot8.api.context.Context;
 import io.annot8.api.settings.NoSettings;
 import io.annot8.common.components.AbstractProcessorDescriptor;
@@ -11,10 +12,12 @@ import io.annot8.common.components.capabilities.SimpleCapabilities;
 import io.annot8.common.data.bounds.SpanBounds;
 import io.annot8.common.data.content.Text;
 import io.annot8.conventions.AnnotationTypes;
+
 import java.util.regex.Pattern;
 
 @ComponentName("Volume")
 @ComponentDescription("Extract volumes from text")
+@ComponentTags({"quantity", "volume", "text"})
 public class Volume extends AbstractProcessorDescriptor<Volume.Processor, NoSettings> {
 
   @Override

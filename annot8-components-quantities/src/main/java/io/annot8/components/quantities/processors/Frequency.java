@@ -5,6 +5,7 @@ import io.annot8.api.annotations.Annotation.Builder;
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
 import io.annot8.api.components.annotations.ComponentName;
+import io.annot8.api.components.annotations.ComponentTags;
 import io.annot8.api.context.Context;
 import io.annot8.api.settings.NoSettings;
 import io.annot8.common.components.AbstractProcessorDescriptor;
@@ -14,11 +15,13 @@ import io.annot8.common.data.content.Text;
 import io.annot8.components.base.processors.AbstractTextProcessor;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @ComponentName("Frequency")
 @ComponentDescription("Extract frequencies from text")
+@ComponentTags({"quantity", "frequency", "text"})
 public class Frequency extends AbstractProcessorDescriptor<Frequency.Processor, NoSettings> {
 
   @Override

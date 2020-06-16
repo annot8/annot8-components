@@ -13,6 +13,7 @@ import io.annot8.api.annotations.Annotation;
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
 import io.annot8.api.components.annotations.ComponentName;
+import io.annot8.api.components.annotations.ComponentTags;
 import io.annot8.api.context.Context;
 import io.annot8.api.settings.NoSettings;
 import io.annot8.common.components.AbstractProcessorDescriptor;
@@ -28,6 +29,7 @@ import java.util.Date;
 
 @ComponentName("EXIF Metadata")
 @ComponentDescription("Extract EXIF Metadata from images")
+@ComponentTags({"image", "exif", "metadata"})
 public class ExifMetadataProcessor
     extends AbstractProcessorDescriptor<ExifMetadataProcessor.Processor, NoSettings> {
 

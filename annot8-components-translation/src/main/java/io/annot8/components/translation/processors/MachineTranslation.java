@@ -4,6 +4,7 @@ package io.annot8.components.translation.processors;
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
 import io.annot8.api.components.annotations.ComponentName;
+import io.annot8.api.components.annotations.ComponentTags;
 import io.annot8.api.components.annotations.SettingsClass;
 import io.annot8.api.context.Context;
 import io.annot8.api.data.Content;
@@ -14,13 +15,14 @@ import io.annot8.common.components.capabilities.SimpleCapabilities;
 import io.annot8.common.data.content.Text;
 import io.annot8.components.base.processors.AbstractTextProcessor;
 import io.annot8.conventions.PropertyKeys;
-import java.util.Collection;
 import uk.gov.dstl.machinetranslation.connector.api.LanguagePair;
 import uk.gov.dstl.machinetranslation.connector.api.MTConnectorApi;
 import uk.gov.dstl.machinetranslation.connector.api.Translation;
 import uk.gov.dstl.machinetranslation.connector.api.exceptions.ConfigurationException;
 import uk.gov.dstl.machinetranslation.connector.api.exceptions.ConnectorException;
 import uk.gov.dstl.machinetranslation.connector.api.utils.ConnectorUtils;
+
+import java.util.Collection;
 
 // TODO: Implement logging
 
@@ -31,6 +33,7 @@ import uk.gov.dstl.machinetranslation.connector.api.utils.ConnectorUtils;
 @ComponentName("Machine Translation")
 @ComponentDescription("Uses the Machine Translation API to translate text between languages")
 @SettingsClass(MachineTranslationSettings.class)
+@ComponentTags({"translation", "text"})
 public class MachineTranslation
     extends AbstractProcessorDescriptor<MachineTranslation.Processor, MachineTranslationSettings> {
   @Override

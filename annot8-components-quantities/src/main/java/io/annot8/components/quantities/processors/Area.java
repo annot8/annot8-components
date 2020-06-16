@@ -4,6 +4,7 @@ package io.annot8.components.quantities.processors;
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
 import io.annot8.api.components.annotations.ComponentName;
+import io.annot8.api.components.annotations.ComponentTags;
 import io.annot8.api.context.Context;
 import io.annot8.api.settings.NoSettings;
 import io.annot8.common.components.AbstractProcessorDescriptor;
@@ -15,6 +16,7 @@ import java.util.regex.Pattern;
 
 @ComponentName("Area")
 @ComponentDescription("Extract area from text")
+@ComponentTags({"quantity", "area", "text"})
 public class Area extends AbstractProcessorDescriptor<Area.Processor, NoSettings> {
 
   @Override

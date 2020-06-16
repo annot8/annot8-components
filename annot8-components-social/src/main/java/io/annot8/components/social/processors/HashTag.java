@@ -4,6 +4,7 @@ package io.annot8.components.social.processors;
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
 import io.annot8.api.components.annotations.ComponentName;
+import io.annot8.api.components.annotations.ComponentTags;
 import io.annot8.api.context.Context;
 import io.annot8.api.settings.NoSettings;
 import io.annot8.common.components.AbstractProcessorDescriptor;
@@ -16,6 +17,7 @@ import java.util.regex.Pattern;
 
 @ComponentName("Hashtag")
 @ComponentDescription("Extract hashtags (e.g. #example) from text")
+@ComponentTags({"social media", "hashtag"})
 public class HashTag extends AbstractProcessorDescriptor<HashTag.Processor, NoSettings> {
 
   @Override
