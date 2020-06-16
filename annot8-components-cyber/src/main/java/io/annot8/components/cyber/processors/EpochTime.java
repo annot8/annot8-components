@@ -5,6 +5,7 @@ import io.annot8.api.annotations.Annotation.Builder;
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
 import io.annot8.api.components.annotations.ComponentName;
+import io.annot8.api.components.annotations.ComponentTags;
 import io.annot8.api.components.annotations.SettingsClass;
 import io.annot8.api.context.Context;
 import io.annot8.api.settings.Description;
@@ -15,6 +16,7 @@ import io.annot8.common.data.content.Text;
 import io.annot8.components.base.processors.AbstractRegexProcessor;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
+
 import java.time.Instant;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -22,6 +24,7 @@ import java.util.regex.Pattern;
 @ComponentName("Epoch Time")
 @ComponentDescription(
     "Extract epoch time in either seconds or milliseconds, with optional start and end dates")
+@ComponentTags({"cyber", "time", "text"})
 @SettingsClass(EpochTime.Settings.class)
 public class EpochTime
     extends AbstractProcessorDescriptor<EpochTime.Processor, EpochTime.Settings> {

@@ -6,6 +6,7 @@ import io.annot8.api.annotations.Annotation.Builder;
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
 import io.annot8.api.components.annotations.ComponentName;
+import io.annot8.api.components.annotations.ComponentTags;
 import io.annot8.api.context.Context;
 import io.annot8.api.settings.NoSettings;
 import io.annot8.common.components.AbstractProcessorDescriptor;
@@ -15,12 +16,14 @@ import io.annot8.common.data.content.Text;
 import io.annot8.components.base.processors.AbstractRegexProcessor;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /** Extract MAC Addresses (EUI-48) in common formats from text */
 @ComponentName("MAC Address")
 @ComponentDescription("Extract MAC Addresses (EUI-48) in common formats")
+@ComponentTags({"cyber", "mac", "text"})
 public class MacAddress extends AbstractProcessorDescriptor<MacAddress.Processor, NoSettings> {
 
   @Override
