@@ -2,6 +2,8 @@
 package io.annot8.components.base.source;
 
 import io.annot8.api.capabilities.Capabilities;
+import io.annot8.api.components.annotations.ComponentDescription;
+import io.annot8.api.components.annotations.ComponentName;
 import io.annot8.api.components.responses.SourceResponse;
 import io.annot8.api.context.Context;
 import io.annot8.api.data.ItemFactory;
@@ -15,28 +17,24 @@ import io.annot8.common.components.capabilities.SimpleCapabilities;
  *
  * <p>Use this in cases were you need a pipeline, but do not need a source.
  */
-public class EmptySource extends AbstractSource {
+@ComponentName("Empty Source")
+@ComponentDescription("A Source which will always return done, without creating any items")
+public class EmptySource extends AbstractSourceDescriptor<EmptySource.Source, NoSettings> {
+  @Override
+  protected Source createComponent(Context context, NoSettings settings) {
+    return new Source();
+  }
 
   @Override
-  public SourceResponse read(ItemFactory itemFactory) {
-    return SourceResponse.done();
+  public Capabilities capabilities() {
+    return new SimpleCapabilities.Builder().build();
   }
 
-  /**
-   * A descriptor for EmptySource.
-   *
-   * <p>It is unlikely the EmptySource be of use in pipelines.
-   */
-  public static class Descriptor extends AbstractSourceDescriptor<EmptySource, NoSettings> {
-
+  public static class Source extends AbstractSource {
     @Override
-    protected EmptySource createComponent(Context context, NoSettings settings) {
-      return new EmptySource();
-    }
-
-    @Override
-    public Capabilities capabilities() {
-      return new SimpleCapabilities.Builder().build();
+    public SourceResponse read(ItemFactory itemFactory) {
+      return SourceResponse.done();
     }
   }
+
 }
