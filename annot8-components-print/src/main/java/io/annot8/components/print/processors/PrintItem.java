@@ -6,12 +6,12 @@ import io.annot8.api.bounds.Bounds;
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
 import io.annot8.api.components.annotations.ComponentName;
+import io.annot8.api.components.annotations.SettingsClass;
 import io.annot8.api.components.responses.ProcessorResponse;
 import io.annot8.api.context.Context;
 import io.annot8.api.data.Content;
 import io.annot8.api.data.Item;
 import io.annot8.api.properties.Properties;
-import io.annot8.api.settings.NoSettings;
 import io.annot8.api.stores.AnnotationStore;
 import io.annot8.common.components.AbstractProcessor;
 import io.annot8.common.components.AbstractProcessorDescriptor;
@@ -19,11 +19,12 @@ import io.annot8.common.components.capabilities.SimpleCapabilities;
 
 @ComponentName("Print Items")
 @ComponentDescription("Prints information about each item")
-public class PrintItem extends AbstractProcessorDescriptor<PrintItem.Processor, NoSettings> {
+@SettingsClass(PrintSettings.class)
+public class PrintItem extends AbstractProcessorDescriptor<PrintItem.Processor, PrintSettings> {
 
   @Override
-  protected Processor createComponent(Context context, NoSettings settings) {
-    return new Processor();
+  protected Processor createComponent(Context context, PrintSettings settings) {
+    return new Processor(settings);
   }
 
   @Override
@@ -35,6 +36,12 @@ public class PrintItem extends AbstractProcessorDescriptor<PrintItem.Processor, 
   }
 
   public static class Processor extends AbstractProcessor {
+    private final PrintSettings settings;
+
+    public Processor(PrintSettings settings) {
+      this.settings = settings;
+    }
+
     @Override
     public ProcessorResponse process(Item item) {
 
@@ -70,14 +77,9 @@ public class PrintItem extends AbstractProcessorDescriptor<PrintItem.Processor, 
     }
 
     private void println(String s, int indent) {
-      StringBuilder sb = new StringBuilder();
-      for (int i = 0; i < indent; i++) {
-        sb.append(" ");
-      }
-      sb.append(s);
+      String sb = " ".repeat(Math.max(0, indent)) + s;
 
-      // TODO: Log rather than print if Logging preset
-      System.out.println(sb.toString());
+      settings.output(log(), sb);
     }
   }
 }
