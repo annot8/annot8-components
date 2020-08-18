@@ -2,6 +2,7 @@
 package io.annot8.components.text.processors;
 
 import static io.annot8.conventions.PropertyKeys.PROPERTY_KEY_LANGUAGE;
+import static io.annot8.conventions.PropertyKeys.PROPERTY_KEY_PROBABILITY;
 
 import com.github.pemistahl.lingua.api.Language;
 import com.github.pemistahl.lingua.api.LanguageDetector;
@@ -17,6 +18,7 @@ import io.annot8.common.data.bounds.ContentBounds;
 import io.annot8.common.data.content.Text;
 import io.annot8.components.base.processors.AbstractTextProcessor;
 import io.annot8.conventions.AnnotationTypes;
+import java.util.SortedMap;
 
 /**
  * Detect the language of a Text content and add the language as an annotation covering the whole
@@ -52,12 +54,14 @@ public class DetectLanguage
     }
 
     public Processor() {
-      this.languageDetector = LanguageDetectorBuilder.fromAllBuiltInLanguages().build();
+      this.languageDetector = LanguageDetectorBuilder.fromAllLanguages().build();
     }
 
     @Override
     public void process(Text text) {
-      Language lang = languageDetector.detectLanguageOf(text.getData());
+      SortedMap<Language, Double> languages =
+          languageDetector.computeLanguageConfidenceValues(text.getData());
+      Language lang = languages.firstKey();
 
       if (lang == Language.UNKNOWN) return;
 
@@ -66,6 +70,7 @@ public class DetectLanguage
           .withType(AnnotationTypes.ANNOTATION_TYPE_LANGUAGE)
           .withBounds(ContentBounds.getInstance())
           .withProperty(PROPERTY_KEY_LANGUAGE, lang.getIsoCode639_1().toString())
+          .withProperty(PROPERTY_KEY_PROBABILITY, languages.get(lang))
           .save();
     }
   }

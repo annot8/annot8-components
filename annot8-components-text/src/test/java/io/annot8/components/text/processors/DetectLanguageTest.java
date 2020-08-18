@@ -59,10 +59,14 @@ public class DetectLanguageTest {
       assertEquals(ContentBounds.getInstance(), a.getBounds());
       assertEquals(AnnotationTypes.ANNOTATION_TYPE_LANGUAGE, a.getType());
 
-      assertEquals(1, a.getProperties().getAll().size());
-      Optional<Object> o = a.getProperties().get(PropertyKeys.PROPERTY_KEY_LANGUAGE);
-      assertTrue(o.isPresent());
-      assertEquals(expectedLanguage, o.get());
+      assertEquals(2, a.getProperties().getAll().size());
+      Optional<Object> o1 = a.getProperties().get(PropertyKeys.PROPERTY_KEY_LANGUAGE);
+      assertTrue(o1.isPresent());
+      assertEquals(expectedLanguage, o1.get());
+
+      Optional<Object> o2 = a.getProperties().get(PropertyKeys.PROPERTY_KEY_PROBABILITY);
+      assertTrue(o2.isPresent());
+      assertTrue((Double) o2.get() > 0.5);
     }
   }
 }
