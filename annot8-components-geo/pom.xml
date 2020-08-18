@@ -35,7 +35,7 @@
     <dependency>
       <groupId>com.opencsv</groupId>
       <artifactId>opencsv</artifactId>
-      <version>5.1</version>
+      <version>5.2</version>
     </dependency>
     <dependency>
       <groupId>com.google.openlocationcode</groupId>
@@ -56,13 +56,13 @@
     <dependency>
       <groupId>uk.gov.dstl.geo</groupId>
       <artifactId>osgb</artifactId>
-      <version>1.0.0</version>
+      <version>1.0.1</version>
     </dependency>
 
     <dependency>
       <groupId>org.apache.johnzon</groupId>
       <artifactId>johnzon-mapper</artifactId>
-      <version>1.2.3</version>
+      <version>1.2.8</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
