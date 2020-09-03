@@ -1,4 +1,4 @@
-open module io.annot8.components.text {
+open module io.annot8.components.types {
   requires transitive io.annot8.api;
   requires io.annot8.common.data;
   requires io.annot8.components.base;
