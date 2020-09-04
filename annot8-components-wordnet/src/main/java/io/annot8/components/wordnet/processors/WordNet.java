@@ -42,8 +42,15 @@ public class WordNet extends AbstractProcessorDescriptor<WordNet.Processor, NoSe
 
     public Processor() {
       try {
+        // With Java 9 modules this will throw IllegalArgumentException.
+        // Which means that the class.getResourceAsStream('path/in/jar') returns null;
+        // We assume this is something to do with accessing the "/extjwnl_resource_properties.xml"
+        // resource.
+        // If we change the code below to get the inputstream itself you can some success, but the
+        // code fails later.
         dictionary = Dictionary.getDefaultResourceInstance();
-      } catch (JWNLException e) {
+      } catch (JWNLException | IllegalArgumentException e) {
+        // IllegalArgumentException is thrown if inputstream is null, but JWNLException.
         throw new Annot8RuntimeException("Could not load WordNet dictionary", e);
       }
     }

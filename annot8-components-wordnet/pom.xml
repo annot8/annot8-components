@@ -30,4 +30,25 @@
     </dependency>
   </dependencies>
 
+  <build>
+    <plugins>
+      <!--
+        We could not make the module-info work with Wordnet.
+        See Processor constructor in Wordnet.java for more information.
+      -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>3.2.0</version>
+        <configuration>
+          <archive>
+            <manifestEntries>
+              <Automatic-Module-Name>io.annot8.components.wordnet</Automatic-Module-Name>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
 </project>
