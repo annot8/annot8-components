@@ -213,39 +213,6 @@
           </java>
         </configuration>
       </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-shade-plugin</artifactId>
-        <version>${maven-shade-plugin.version}</version>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>shade</goal>
-            </goals>
-            <configuration>
-              <artifactSet>
-                <excludes>
-                  <exclude>io.annot8:annot8-api</exclude>
-                </excludes>
-              </artifactSet>
-              <shadedArtifactAttached>true</shadedArtifactAttached>
-              <filters>
-                <filter>
-                  <!-- filter out signature files from signed dependencies, else repackaging fails with security ex -->
-                  <artifact>*:*</artifact>
-                  <excludes>
-                    <exclude>META-INF/*.SF</exclude>
-                    <exclude>META-INF/*.DSA</exclude>
-                    <exclude>META-INF/*.RSA</exclude>
-                  </excludes>
-                </filter>
-              </filters>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
     </plugins>
 
     <pluginManagement>
@@ -426,6 +393,11 @@
                 <goals>
                   <goal>jar</goal>
                 </goals>
+                <!-- Javadoc and Java Modules seem not to play well together -->
+                <!-- Allow errors which is not ideal, but seems necessary -->
+                <configuration>
+                  <failOnError>false</failOnError>
+                </configuration>
               </execution>
             </executions>
           </plugin>
@@ -472,7 +444,7 @@
     <module>annot8-components-temporal</module>
     <module>annot8-components-tesseract</module>
     <module>annot8-components-text</module>
-    <!--    <module>annot8-components-tika</module>-->
+    <module>annot8-components-tika</module>
     <module>annot8-components-translation</module>
     <module>annot8-components-types</module>
     <module>annot8-components-vehicles</module>
