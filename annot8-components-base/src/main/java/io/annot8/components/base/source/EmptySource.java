@@ -36,5 +36,4 @@ public class EmptySource extends AbstractSourceDescriptor<EmptySource.Source, No
       return SourceResponse.done();
     }
   }
-
 }

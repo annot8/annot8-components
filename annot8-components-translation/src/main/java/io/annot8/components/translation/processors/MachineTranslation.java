@@ -15,14 +15,13 @@ import io.annot8.common.components.capabilities.SimpleCapabilities;
 import io.annot8.common.data.content.Text;
 import io.annot8.components.base.processors.AbstractTextProcessor;
 import io.annot8.conventions.PropertyKeys;
+import java.util.Collection;
 import uk.gov.dstl.machinetranslation.connector.api.LanguagePair;
 import uk.gov.dstl.machinetranslation.connector.api.MTConnectorApi;
 import uk.gov.dstl.machinetranslation.connector.api.Translation;
 import uk.gov.dstl.machinetranslation.connector.api.exceptions.ConfigurationException;
 import uk.gov.dstl.machinetranslation.connector.api.exceptions.ConnectorException;
 import uk.gov.dstl.machinetranslation.connector.api.utils.ConnectorUtils;
-
-import java.util.Collection;
 
 // TODO: Implement logging
 
