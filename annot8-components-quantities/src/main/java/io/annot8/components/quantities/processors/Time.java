@@ -13,7 +13,6 @@ import io.annot8.common.data.bounds.SpanBounds;
 import io.annot8.common.data.content.Text;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

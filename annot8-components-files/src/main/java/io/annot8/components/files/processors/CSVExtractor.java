@@ -17,10 +17,9 @@ import io.annot8.common.components.capabilities.SimpleCapabilities;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.TableContent;
 import io.annot8.components.files.content.CSVTable;
-
+import java.io.File;
 import javax.json.bind.annotation.JsonbCreator;
 import javax.json.bind.annotation.JsonbProperty;
-import java.io.File;
 
 @ComponentName("CSV Extractor")
 @ComponentDescription("Extract CSV files into a Table content")
@@ -89,6 +88,5 @@ public class CSVExtractor
     public boolean getHasHeaders() {
       return hasHeaders;
     }
-
   }
 }
