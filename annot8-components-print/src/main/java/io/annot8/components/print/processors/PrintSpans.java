@@ -14,7 +14,7 @@ import io.annot8.components.base.processors.AbstractTextProcessor;
 import java.util.Optional;
 
 @ComponentName("Print Spans")
-@ComponentDescription("Prints information about each item")
+@ComponentDescription("Prints information about each span")
 @SettingsClass(PrintSettings.class)
 public class PrintSpans extends AbstractProcessorDescriptor<PrintSpans.Processor, PrintSettings> {
 
