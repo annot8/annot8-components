@@ -60,12 +60,7 @@ public class SimpleSpanElasticsearchSink
       List<IndexRequest> indexRequests = new ArrayList<>();
 
       // Create document to capture Item
-      Map<String, Object> m = new HashMap<>();
-
-      m.put(TYPE_FIELD, "Item");
-      m.put(PROPERTIES_FIELD, item.getProperties().getAll());
-
-      indexRequests.add(new IndexRequest(index).id(item.getId()).source(m));
+      indexRequests.add(new IndexRequest(index).id(item.getId()).source(itemToMap(item)));
 
       // Create documents to capture all the Text views
       item.getContents(Text.class).map(this::textToIndexRequest).forEach(indexRequests::add);
@@ -73,7 +68,20 @@ public class SimpleSpanElasticsearchSink
       return indexRequests;
     }
 
-    private IndexRequest textToIndexRequest(Text text) {
+    protected static Map<String, Object> itemToMap(Item item) {
+      Map<String, Object> m = new HashMap<>();
+
+      m.put(TYPE_FIELD, "Item");
+      m.put(PROPERTIES_FIELD, item.getProperties().getAll());
+
+      return m;
+    }
+
+    protected IndexRequest textToIndexRequest(Text text) {
+      return new IndexRequest(index).id(text.getId()).source(textToMap(text));
+    }
+
+    protected static Map<String, Object> textToMap(Text text) {
       Map<String, Object> m = new HashMap<>();
       m.put(TYPE_FIELD, "Text");
       m.put(CONTENT_FIELD, text.getData());
@@ -91,7 +99,7 @@ public class SimpleSpanElasticsearchSink
                           a -> text.getText(a).orElse("** OUT OF BOUNDS **"),
                           Collectors.toSet()))));
 
-      return new IndexRequest(index).id(text.getId()).source(m);
+      return m;
     }
   }
 }
