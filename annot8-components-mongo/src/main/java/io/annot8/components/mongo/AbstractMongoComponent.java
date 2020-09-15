@@ -11,9 +11,6 @@ import io.annot8.components.mongo.resources.MongoConnectionSettings;
  *
  * <p>Implement configure(context, connection) to set up using the best connection.
  */
-// @SettingsClass(value = MongoSettings.class, optional = true)
-// @SettingsClass(value = MongoConnectionSettings.class, optional = true)
-// @UsesResource(value = Mongo.class, optional = true)
 public abstract class AbstractMongoComponent extends AbstractComponent {
 
   private MongoConnection connection = null;

@@ -483,6 +483,7 @@
     <module>annot8-components-wordnet</module>
     <module>annot8-utils-text</module>
     <module>annot8-components-annotations</module>
+    <module>annot8-components-elasticsearch</module>
   </modules>
 
 
