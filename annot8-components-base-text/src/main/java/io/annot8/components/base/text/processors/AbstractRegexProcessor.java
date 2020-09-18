@@ -1,5 +1,5 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
-package io.annot8.components.base.processors;
+package io.annot8.components.base.text.processors;
 
 import io.annot8.api.annotations.Annotation;
 import io.annot8.api.exceptions.BadConfigurationException;
@@ -13,12 +13,14 @@ import java.util.regex.Pattern;
 /** Base class for regex annotators */
 public abstract class AbstractRegexProcessor extends AbstractTextProcessor {
 
-  protected Pattern pattern = null; // TODO: Should we provide a default Pattern to avoid NPEs?
-  protected int group = 0;
-  protected String type = "";
+  protected final Pattern pattern;
+  protected final int group;
+  protected final String type;
 
-  public AbstractRegexProcessor() {
-    // Do nothing
+  public AbstractRegexProcessor(Pattern pattern, String type) {
+    this.pattern = pattern;
+    this.group = 0;
+    this.type = type;
   }
 
   public AbstractRegexProcessor(Pattern pattern, int group, String type) {

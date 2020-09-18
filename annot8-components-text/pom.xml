@@ -17,7 +17,7 @@
   <dependencies>
     <dependency>
       <groupId>io.annot8</groupId>
-      <artifactId>annot8-components-base</artifactId>
+      <artifactId>annot8-components-base-text</artifactId>
       <version>1.0.0</version>
     </dependency>
 

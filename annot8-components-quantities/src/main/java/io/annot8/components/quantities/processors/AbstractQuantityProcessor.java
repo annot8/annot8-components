@@ -4,7 +4,7 @@ package io.annot8.components.quantities.processors;
 import io.annot8.api.annotations.Annotation.Builder;
 import io.annot8.common.data.bounds.SpanBounds;
 import io.annot8.common.data.content.Text;
-import io.annot8.components.base.processors.AbstractTextProcessor;
+import io.annot8.components.base.text.processors.AbstractTextProcessor;
 import io.annot8.conventions.PropertyKeys;
 import java.util.ArrayList;
 import java.util.List;

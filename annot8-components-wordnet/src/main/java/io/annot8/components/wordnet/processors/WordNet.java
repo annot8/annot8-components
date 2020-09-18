@@ -11,14 +11,15 @@ import io.annot8.common.components.AbstractProcessorDescriptor;
 import io.annot8.common.components.capabilities.SimpleCapabilities;
 import io.annot8.common.data.bounds.SpanBounds;
 import io.annot8.common.data.content.Text;
-import io.annot8.components.base.processors.AbstractTextProcessor;
+import io.annot8.components.base.text.processors.AbstractTextProcessor;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
-import java.util.Optional;
 import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.data.IndexWord;
 import net.sf.extjwnl.data.POS;
 import net.sf.extjwnl.dictionary.Dictionary;
+
+import java.util.Optional;
 
 @ComponentName("WordNet Lemmas")
 @ComponentDescription("Add lemmas to word tokens using WordNet")

@@ -13,7 +13,7 @@ import io.annot8.api.exceptions.ProcessingException;
 import io.annot8.common.components.AbstractProcessorDescriptor;
 import io.annot8.common.components.capabilities.SimpleCapabilities;
 import io.annot8.common.data.content.Text;
-import io.annot8.components.base.processors.AbstractTextProcessor;
+import io.annot8.components.base.text.processors.AbstractTextProcessor;
 import io.annot8.conventions.PropertyKeys;
 import uk.gov.dstl.machinetranslation.connector.api.LanguagePair;
 import uk.gov.dstl.machinetranslation.connector.api.MTConnectorApi;

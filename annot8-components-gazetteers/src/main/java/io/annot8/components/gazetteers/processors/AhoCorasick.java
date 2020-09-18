@@ -9,15 +9,16 @@ import io.annot8.common.components.AbstractProcessorDescriptor;
 import io.annot8.common.components.capabilities.SimpleCapabilities;
 import io.annot8.common.data.bounds.SpanBounds;
 import io.annot8.common.data.content.Text;
-import io.annot8.components.base.processors.AbstractTextProcessor;
+import io.annot8.components.base.text.processors.AbstractTextProcessor;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.GroupTypes;
 import io.annot8.conventions.PropertyKeys;
 import io.annot8.utils.text.PluralUtils;
-import java.util.*;
-import java.util.stream.Collectors;
 import org.ahocorasick.trie.Emit;
 import org.ahocorasick.trie.Trie;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 public abstract class AhoCorasick<S extends AhoCorasick.Settings>
     extends AbstractProcessorDescriptor<AhoCorasick.Processor, S> {

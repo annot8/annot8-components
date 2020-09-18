@@ -455,6 +455,7 @@
 
   <modules>
     <module>annot8-components-base</module>
+    <module>annot8-components-base-text</module>
     <module>annot8-components-comms</module>
     <module>annot8-components-cyber</module>
     <module>annot8-components-db</module>

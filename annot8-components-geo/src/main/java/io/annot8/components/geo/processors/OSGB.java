@@ -10,15 +10,16 @@ import io.annot8.common.components.AbstractProcessorDescriptor;
 import io.annot8.common.components.capabilities.SimpleCapabilities;
 import io.annot8.common.data.bounds.SpanBounds;
 import io.annot8.common.data.content.Text;
-import io.annot8.components.base.processors.AbstractTextProcessor;
+import io.annot8.components.base.text.processors.AbstractTextProcessor;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import uk.gov.dstl.geo.osgb.Constants;
 import uk.gov.dstl.geo.osgb.EastingNorthingConversion;
 import uk.gov.dstl.geo.osgb.NationalGrid;
 import uk.gov.dstl.geo.osgb.OSGB36;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @ComponentName("Ordnance Survey Coordinates")
 @ComponentDescription("Extract  6, 8 or 10 figure OS coordinates within a document")

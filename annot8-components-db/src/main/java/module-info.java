@@ -1,5 +1,4 @@
 module io.annot8.components.db {
-  requires io.annot8.conventions;
   requires transitive io.annot8.components.base;
   requires io.annot8.common.components;
   requires io.annot8.common.data;

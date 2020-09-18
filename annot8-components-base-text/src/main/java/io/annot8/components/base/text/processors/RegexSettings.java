@@ -1,7 +1,6 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
-package io.annot8.components.base.processors;
+package io.annot8.components.base.text.processors;
 
-import com.google.common.base.Strings;
 import io.annot8.api.settings.Description;
 import io.annot8.api.settings.Settings;
 import java.util.regex.Pattern;
@@ -40,6 +39,6 @@ public class RegexSettings implements Settings {
 
   @Override
   public boolean validate() {
-    return regex != null && group >= 0 && !Strings.isNullOrEmpty(type);
+    return regex != null && group >= 0 && type != null && !type.isBlank();
   }
 }

@@ -8,18 +8,22 @@ import io.annot8.api.annotations.Group;
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
 import io.annot8.api.components.annotations.ComponentName;
+import io.annot8.api.components.responses.ProcessorResponse;
 import io.annot8.api.context.Context;
+import io.annot8.api.data.Content;
+import io.annot8.api.data.Item;
 import io.annot8.api.settings.NoSettings;
 import io.annot8.api.stores.GroupStore;
+import io.annot8.common.components.AbstractProcessor;
 import io.annot8.common.components.AbstractProcessorDescriptor;
 import io.annot8.common.components.capabilities.SimpleCapabilities;
 import io.annot8.common.data.bounds.SpanBounds;
-import io.annot8.common.data.content.Text;
-import io.annot8.components.base.processors.AbstractTextProcessor;
+
+import java.util.Objects;
 import java.util.Optional;
 
 @ComponentName("Group by Type and Value")
-@ComponentDescription("Group annotations where their type and covered text (value) are the same")
+@ComponentDescription("Group annotations within a Content where their type and value are the same")
 public class GroupByTypeAndValue
     extends AbstractProcessorDescriptor<GroupByTypeAndValue.Processor, NoSettings> {
 
@@ -36,15 +40,20 @@ public class GroupByTypeAndValue
         .build();
   }
 
-  public static class Processor extends AbstractTextProcessor {
+  public static class Processor extends AbstractProcessor {
 
     public static final String TYPE = "exactMatches";
     private static final String ROLE = "as";
 
     @Override
-    protected void process(Text content) {
+    public ProcessorResponse process(Item item) {
+      item.getContents().forEach(this::process);
+      return ProcessorResponse.ok();
+    }
 
-      SetMultimap<String, Annotation> map = HashMultimap.create();
+    protected <D> void process(Content<D> content) {
+
+      SetMultimap<TypeObjectPair, Annotation> map = HashMultimap.create();
 
       // Collate up all the annotations which have the same type
 
@@ -53,12 +62,9 @@ public class GroupByTypeAndValue
           .getByBounds(SpanBounds.class)
           .forEach(
               a -> {
-                Optional<String> optional = content.getText(a);
+                Optional<D> optional = a.getBounds().getData(content);
                 optional.ifPresent(
-                    covered -> {
-                      String key = toKey(a.getType(), covered);
-                      map.put(key, a);
-                    });
+                    covered -> map.put(new TypeObjectPair(a.getType(), covered), a));
               });
 
       // Create a group for things which are the same
@@ -73,8 +79,28 @@ public class GroupByTypeAndValue
               });
     }
 
-    private String toKey(String type, String covered) {
-      return type + ":" + covered;
+    private class TypeObjectPair {
+      private final String type;
+      private final Object object;
+
+      public TypeObjectPair(String type, Object object){
+        this.type = type;
+        this.object = object;
+      }
+
+      @Override
+      public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TypeObjectPair that = (TypeObjectPair) o;
+        return Objects.equals(type, that.type) &&
+          Objects.equals(object, that.object);
+      }
+
+      @Override
+      public int hashCode() {
+        return Objects.hash(type, object);
+      }
     }
   }
 }

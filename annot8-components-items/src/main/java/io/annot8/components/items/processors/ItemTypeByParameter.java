@@ -5,13 +5,16 @@ import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
 import io.annot8.api.components.annotations.ComponentName;
 import io.annot8.api.components.annotations.SettingsClass;
+import io.annot8.api.components.responses.ProcessorResponse;
 import io.annot8.api.context.Context;
+import io.annot8.api.data.Item;
 import io.annot8.api.settings.Description;
+import io.annot8.common.components.AbstractProcessor;
 import io.annot8.common.components.AbstractProcessorDescriptor;
 import io.annot8.common.components.capabilities.SimpleCapabilities;
 import io.annot8.common.data.content.Text;
-import io.annot8.components.base.processors.AbstractTextProcessor;
 import io.annot8.conventions.PropertyKeys;
+
 import javax.json.bind.annotation.JsonbCreator;
 import javax.json.bind.annotation.JsonbProperty;
 
@@ -32,7 +35,7 @@ public class ItemTypeByParameter
     return new Processor(settings.getType());
   }
 
-  public static class Processor extends AbstractTextProcessor {
+  public static class Processor extends AbstractProcessor {
 
     private final String type;
 
@@ -41,10 +44,12 @@ public class ItemTypeByParameter
     }
 
     @Override
-    protected void process(Text content) {
-      if (type == null || type.isBlank()) return;
+    public ProcessorResponse process(Item item) {
+      if (type == null || type.isBlank())
+        return ProcessorResponse.ok();
 
-      content.getItem().getProperties().set(PropertyKeys.PROPERTY_KEY_SUBTYPE, type);
+      item.getProperties().set(PropertyKeys.PROPERTY_KEY_SUBTYPE, type);
+      return ProcessorResponse.ok();
     }
   }
 

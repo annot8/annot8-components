@@ -22,6 +22,11 @@
     </dependency>
     <dependency>
       <groupId>io.annot8</groupId>
+      <artifactId>annot8-conventions</artifactId>
+      <version>1.0.0</version>
+    </dependency>
+    <dependency>
+      <groupId>io.annot8</groupId>
       <artifactId>annot8-common-components</artifactId>
       <version>1.0.0</version>
     </dependency>
