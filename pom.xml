@@ -4,7 +4,7 @@
 
   <groupId>io.annot8</groupId>
   <artifactId>annot8-components</artifactId>
-  <version>0.5.0</version>
+  <version>1.0.0</version>
   <packaging>pom</packaging>
 
   <name>Annot8 Components</name>
@@ -58,12 +58,12 @@
     <maven.compiler.target>${java.version}</maven.compiler.target>
 
     <!-- Annot8 versions -->
-    <annot8.version>0.5.0</annot8.version>
+    <annot8.version>1.0</annot8.version>
 
     <!-- Testing -->
-    <junit.version>5.6.2</junit.version>
-    <mockito.version>3.5.7</mockito.version>
-    <assertj-core.version>3.17.1</assertj-core.version>
+    <junit.version>5.7.0</junit.version>
+    <mockito.version>3.5.11</mockito.version>
+    <assertj-core.version>3.17.2</assertj-core.version>
     <assertj-guava.version>3.4.0</assertj-guava.version>
 
     <!-- Plugins -->
@@ -72,7 +72,7 @@
     <junit-platform-surefire-provider.version>1.3.2</junit-platform-surefire-provider.version>
     <speedy-spotless-maven-plugin.version>0.1.1</speedy-spotless-maven-plugin.version>
     <nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>
-    <jacoco-maven-plugin.version>0.8.5</jacoco-maven-plugin.version>
+    <jacoco-maven-plugin.version>0.8.6</jacoco-maven-plugin.version>
     <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
     <maven-source-plugin.version>3.2.1</maven-source-plugin.version>
     <maven-javadoc-plugin.version>3.2.0</maven-javadoc-plugin.version>
@@ -241,51 +241,52 @@
         <artifactId>annot8-api</artifactId>
         <version>${annot8.version}</version>
       </dependency>
+
       <!-- Common -->
       <dependency>
         <groupId>io.annot8</groupId>
         <artifactId>annot8-common-data</artifactId>
-        <version>${annot8.version}</version>
+        <version>1.0.0</version>
       </dependency>
       <dependency>
         <groupId>io.annot8</groupId>
         <artifactId>annot8-common-components</artifactId>
-        <version>${annot8.version}</version>
+        <version>1.0.0</version>
       </dependency>
       <dependency>
         <groupId>io.annot8</groupId>
         <artifactId>annot8-common-utils</artifactId>
-        <version>${annot8.version}</version>
+        <version>1.0.0</version>
       </dependency>
 
       <!-- Implementation -->
       <dependency>
         <groupId>io.annot8</groupId>
         <artifactId>annot8-implementations-support</artifactId>
-        <version>${annot8.version}</version>
+        <version>1.0.0</version>
       </dependency>
       <dependency>
         <groupId>io.annot8</groupId>
         <artifactId>annot8-pipeline-implementation</artifactId>
-        <version>${annot8.version}</version>
+        <version>1.0.0</version>
       </dependency>
       <dependency>
         <groupId>io.annot8</groupId>
         <artifactId>annot8-reference-implementation</artifactId>
-        <version>${annot8.version}</version>
+        <version>1.0.0</version>
       </dependency>
 
       <!-- Testing -->
       <dependency>
         <groupId>io.annot8</groupId>
         <artifactId>annot8-impl-tck</artifactId>
-        <version>${annot8.version}</version>
+        <version>1.0.0</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>io.annot8</groupId>
         <artifactId>annot8-test-impl</artifactId>
-        <version>${annot8.version}</version>
+        <version>1.0.0</version>
         <scope>test</scope>
       </dependency>
 
@@ -293,18 +294,6 @@
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
         <version>${slf4j.version}</version>
-      </dependency>
-
-
-      <dependency>
-        <groupId>io.annot8</groupId>
-        <artifactId>annot8-conventions</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>io.annot8</groupId>
-        <artifactId>annot8-components-base</artifactId>
-        <version>${project.version}</version>
       </dependency>
 
       <!-- Utils -->
@@ -465,8 +454,6 @@
   </profiles>
 
   <modules>
-    <module>annot8-conventions</module>
-
     <module>annot8-components-base</module>
     <module>annot8-components-comms</module>
     <module>annot8-components-cyber</module>

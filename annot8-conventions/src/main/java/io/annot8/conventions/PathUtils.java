@@ -1,35 +1,31 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.conventions;
 
-import com.google.common.base.Joiner;
-import com.google.common.base.Splitter;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 public final class PathUtils {
 
   public static final String SEPARATOR = "/";
-
-  private static final Joiner JOINER = Joiner.on(SEPARATOR).skipNulls();
-  private static final Splitter SPLITTER = Splitter.on(SEPARATOR).omitEmptyStrings().trimResults();
 
   private PathUtils() {
     // Singleton
   }
 
   public static String join(String... parts) {
-    return JOINER.join(parts);
+    return join(Stream.of(parts));
   }
 
   public static String join(Iterable<String> iterable) {
-    return JOINER.join(iterable);
+    return join(StreamSupport.stream(iterable.spliterator(), false));
   }
 
   public static String join(Iterator<String> iterator) {
-    return JOINER.join(iterator);
+    return join(StreamSupport.stream(
+      Spliterators.spliteratorUnknownSize(
+        iterator, Spliterator.ORDERED), false));
   }
 
   public static String join(Stream<String> stream) {
@@ -37,12 +33,12 @@ public final class PathUtils {
   }
 
   public static String[] split(String path) {
-    List<String> l = SPLITTER.splitToList(path);
+    List<String> l = splitToList(path);
     return l.toArray(new String[l.size()]);
   }
 
   public static Iterable<String> splitToIterable(String path) {
-    return SPLITTER.split(path);
+    return splitToList(path);
   }
 
   public static Stream<String> splitToStream(String path) {
@@ -50,6 +46,10 @@ public final class PathUtils {
   }
 
   public static List<String> splitToList(String path) {
-    return SPLITTER.splitToList(path);
+    return Arrays.stream(path.split(SEPARATOR))
+      .filter(s -> !s.isEmpty())
+      .map(String::trim)
+      .collect(Collectors.toList());
   }
+
 }

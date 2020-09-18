@@ -6,10 +6,11 @@
   <parent>
     <artifactId>annot8-components</artifactId>
     <groupId>io.annot8</groupId>
-    <version>0.5.0</version>
+    <version>1.0.0</version>
   </parent>
 
   <artifactId>annot8-components-db</artifactId>
+  <version>1.0.0</version>
   <name>Annot8 DB Components</name>
   <description>Components to deal with databases (primarily JDBC)</description>
 
@@ -17,6 +18,7 @@
     <dependency>
       <groupId>io.annot8</groupId>
       <artifactId>annot8-components-base</artifactId>
+      <version>1.0.0</version>
     </dependency>
     <dependency>
       <groupId>io.annot8</groupId>
