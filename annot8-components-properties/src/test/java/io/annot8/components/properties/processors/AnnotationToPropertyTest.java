@@ -1,8 +1,6 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.properties.processors;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import io.annot8.api.components.responses.ProcessorResponse;
 import io.annot8.api.data.Item;
 import io.annot8.common.data.bounds.ContentBounds;
@@ -11,9 +9,12 @@ import io.annot8.common.data.content.FileContent;
 import io.annot8.testing.testimpl.TestItem;
 import io.annot8.testing.testimpl.content.TestFileContent;
 import io.annot8.testing.testimpl.content.TestStringContent;
+import org.junit.jupiter.api.Test;
+
 import java.io.File;
 import java.util.Map;
-import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class AnnotationToPropertyTest {
   @Test
