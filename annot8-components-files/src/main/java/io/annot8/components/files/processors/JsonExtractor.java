@@ -42,6 +42,7 @@ public class JsonExtractor
     return new SimpleCapabilities.Builder()
         .withProcessesContent(FileContent.class)
         .withCreatesContent(Text.class)
+        .withDeletesContent(FileContent.class)
         .build();
   }
 
