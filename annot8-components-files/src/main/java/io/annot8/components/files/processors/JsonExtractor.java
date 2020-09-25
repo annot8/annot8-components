@@ -39,11 +39,16 @@ public class JsonExtractor
 
   @Override
   public Capabilities capabilities() {
-    return new SimpleCapabilities.Builder()
-        .withProcessesContent(FileContent.class)
-        .withCreatesContent(Text.class)
-        .withDeletesContent(FileContent.class)
-        .build();
+    SimpleCapabilities.Builder builder =
+        new SimpleCapabilities.Builder()
+            .withProcessesContent(FileContent.class)
+            .withCreatesContent(Text.class);
+
+    if (getSettings().isRemoveSourceContent()) {
+      builder = builder.withDeletesContent(FileContent.class);
+    }
+
+    return builder.build();
   }
 
   public static class Processor extends AbstractProcessor {
@@ -62,13 +67,13 @@ public class JsonExtractor
                 int type = isSupportedExtension(f.getData().getName());
                 switch (type) {
                   case 1: // JSON
-                    if (processJson(f)) {
+                    if (processJson(f) && settings.isRemoveSourceContent()) {
                       // If we processed it, remove it from item so it doesn't get reprocessed
                       item.removeContent(f);
                     }
                     break;
                   case 2: // JSON-L
-                    if (processJsonL(f)) {
+                    if (processJsonL(f) && settings.isRemoveSourceContent()) {
                       // If we processed it, remove it from item so it doesn't get reprocessed
                       item.removeContent(f);
                     }
@@ -190,7 +195,7 @@ public class JsonExtractor
     }
   }
 
-  public static class Settings implements io.annot8.api.settings.Settings {
+  public static class Settings extends RemoveSourceContentSettings {
     private List<String> contentFields = null;
     private List<String> jsonExtension = List.of("json");
     private List<String> jsonlExtension = List.of("jsonl");

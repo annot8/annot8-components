@@ -28,6 +28,10 @@ public class JsonExtractorTest {
 
     assertTrue(s.validate());
 
+    boolean removeSource = s.isRemoveSourceContent();
+    s.setRemoveSourceContent(!removeSource);
+    assertEquals(!removeSource, s.isRemoveSourceContent());
+
     assertNotNull(s.getJsonExtension());
     s.setJsonExtension(List.of("abc"));
     assertEquals(List.of("abc"), s.getJsonExtension());
