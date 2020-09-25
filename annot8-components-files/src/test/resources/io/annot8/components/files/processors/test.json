@@ -1,0 +1,17 @@
+{
+  "stringValue1": "Hello, world!",
+  "stringValue2": "Bonjour le monde!",
+  "stringValue3": "Howdy y'all",
+  "intValue": 42,
+  "doubleValue": 1.234,
+  "trueValue": true,
+  "falseValue": false,
+  "nullValue": null,
+  "arrayOfStrings": ["A", "B", "C"],
+  "arrayOfNumbers": [1, 2, 3],
+  "mixedArray": ["A", 1],
+  "object": {
+    "stringValue": "Hello",
+    "intValue": 100
+  }
+}
