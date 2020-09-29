@@ -1,6 +1,8 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.annotations.processors;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import io.annot8.api.components.Processor;
 import io.annot8.api.components.responses.ProcessorResponse;
 import io.annot8.api.data.Item;
@@ -9,15 +11,12 @@ import io.annot8.testing.testimpl.TestItem;
 import io.annot8.testing.testimpl.content.TestStringContent;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 public class FilterAnnotationsByPropertyTest {
   @Test
   public void test() {
     Item item = new TestItem();
 
-    TestStringContent c1 = new TestStringContent(item);
-    c1.setData("ABC");
+    TestStringContent c1 = item.createContent(TestStringContent.class).withData("ABC").save();
     c1.getAnnotations()
         .create()
         .withType("type1")
@@ -40,8 +39,7 @@ public class FilterAnnotationsByPropertyTest {
         .withBounds(new SpanBounds(2, 3))
         .save();
 
-    TestStringContent c2 = new TestStringContent(item);
-    c2.setData("AB");
+    TestStringContent c2 = item.createContent(TestStringContent.class).withData("AB").save();
     c2.getAnnotations()
         .create()
         .withType("type1")

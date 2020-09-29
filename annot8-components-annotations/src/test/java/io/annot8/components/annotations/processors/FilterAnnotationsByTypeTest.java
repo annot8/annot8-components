@@ -17,8 +17,7 @@ public class FilterAnnotationsByTypeTest {
   public void test() {
     Item item = new TestItem();
 
-    TestStringContent c1 = new TestStringContent(item);
-    c1.setData("ABC");
+    TestStringContent c1 = item.createContent(TestStringContent.class).withData("ABC").save();
     c1.getAnnotations().create().withType("type1").withBounds(new SpanBounds(0, 1)).save();
     c1.getAnnotations().create().withType("type1").withBounds(new SpanBounds(1, 2)).save();
     c1.getAnnotations().create().withType("type1").withBounds(new SpanBounds(2, 3)).save();
@@ -26,8 +25,7 @@ public class FilterAnnotationsByTypeTest {
     c1.getAnnotations().create().withType("type2").withBounds(new SpanBounds(1, 3)).save();
     c1.getAnnotations().create().withType("type3").withBounds(new SpanBounds(0, 3)).save();
 
-    TestStringContent c2 = new TestStringContent(item);
-    c2.setData("AB");
+    TestStringContent c2 = item.createContent(TestStringContent.class).withData("AB").save();
     c2.getAnnotations().create().withType("type1").withBounds(new SpanBounds(0, 1)).save();
     c2.getAnnotations().create().withType("type1").withBounds(new SpanBounds(1, 2)).save();
     c2.getAnnotations().create().withType("type2").withBounds(new SpanBounds(0, 2)).save();
