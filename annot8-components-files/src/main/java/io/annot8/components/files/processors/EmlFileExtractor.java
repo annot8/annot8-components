@@ -12,6 +12,7 @@ import io.annot8.api.components.responses.ProcessorResponse;
 import io.annot8.api.context.Context;
 import io.annot8.api.data.Content;
 import io.annot8.api.data.Item;
+import io.annot8.api.settings.Description;
 import io.annot8.common.components.AbstractProcessor;
 import io.annot8.common.components.AbstractProcessorDescriptor;
 import io.annot8.common.components.capabilities.SimpleCapabilities;
@@ -20,18 +21,20 @@ import io.annot8.common.data.content.InputStreamContent;
 import io.annot8.common.data.content.Text;
 import java.io.*;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import org.apache.james.mime4j.dom.*;
 
 @ComponentName("Eml File Extractor")
 @ComponentDescription("Extract text and attachments from *.eml files and create new Content")
 @SettingsClass(RemoveSourceContentSettings.class)
 public class EmlFileExtractor
-    extends AbstractProcessorDescriptor<EmlFileExtractor.Processor, RemoveSourceContentSettings> {
+    extends AbstractProcessorDescriptor<EmlFileExtractor.Processor, EmlFileExtractor.Settings> {
 
   @Override
-  protected Processor createComponent(Context context, RemoveSourceContentSettings settings) {
-    return new Processor(settings.isRemoveSourceContent());
+  protected Processor createComponent(Context context, Settings settings) {
+    return new Processor(settings.isRemoveSourceContent(), settings.getExtensions());
   }
 
   @Override
@@ -54,15 +57,20 @@ public class EmlFileExtractor
     public static final String PROPERTY_PART_NAME = "name";
 
     private final boolean removeSourceContent;
+    private final List<String> extensions;
 
-    public Processor(boolean removeSourceContent) {
+    public Processor(boolean removeSourceContent, List<String> extensions) {
       this.removeSourceContent = removeSourceContent;
+      this.extensions = extensions;
     }
 
     @Override
     public ProcessorResponse process(Item item) {
       item.getContents(FileContent.class)
-          .filter(f -> f.getData().getName().endsWith(".eml"))
+          .filter(
+              f ->
+                  extensions.isEmpty()
+                      || extensions.contains(getExtension(f.getData().getName()).orElse("")))
           .forEach(
               f -> {
                 try {
@@ -105,6 +113,12 @@ public class EmlFileExtractor
 
       return ProcessorResponse
           .ok(); // TODO: If we weren't able to process successfully, should return an error!
+    }
+
+    private Optional<String> getExtension(String filename) {
+      return Optional.ofNullable(filename)
+          .filter(f -> f.contains("."))
+          .map(f -> f.substring(filename.lastIndexOf(".") + 1).toLowerCase());
     }
 
     private void processMultipart(Item item, Multipart multipart, String baseName) {
@@ -223,6 +237,25 @@ public class EmlFileExtractor
       buffer.flush();
 
       return () -> new ByteArrayInputStream(buffer.toByteArray());
+    }
+  }
+
+  public static class Settings extends RemoveSourceContentSettings {
+    private List<String> extensions = List.of("eml");
+
+    @Description(
+        "The list of file extensions on which this processor will act (case insensitive). If empty, then the processor will act on all files.")
+    public List<String> getExtensions() {
+      return extensions;
+    }
+
+    public void setExtensions(List<String> extensions) {
+      this.extensions = extensions.stream().map(String::toLowerCase).collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean validate() {
+      return super.validate() && extensions != null;
     }
   }
 }

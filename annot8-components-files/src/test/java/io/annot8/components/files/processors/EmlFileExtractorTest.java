@@ -26,7 +26,7 @@ public class EmlFileExtractorTest {
   @Test
   public void test() throws Exception {
 
-    try (Processor p = new EmlFileExtractor.Processor(true)) {
+    try (Processor p = new EmlFileExtractor.Processor(true, List.of("eml"))) {
 
       TestItem item = new TestItem();
       TestItemFactory itemFactory = (TestItemFactory) item.getItemFactory();
