@@ -5,11 +5,12 @@
   <parent>
     <artifactId>annot8-components</artifactId>
     <groupId>io.annot8</groupId>
-    <version>0.5.0</version>
+    <version>1.0.0</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>annot8-components-files</artifactId>
+  <version>1.0.0</version>
   <name>Annot8 File Components</name>
   <description>Components to process files</description>
 
@@ -17,10 +18,17 @@
     <dependency>
       <groupId>io.annot8</groupId>
       <artifactId>annot8-components-base</artifactId>
+      <version>1.0.0</version>
+    </dependency>
+    <dependency>
+      <groupId>io.annot8</groupId>
+      <artifactId>annot8-conventions</artifactId>
+      <version>1.0.0</version>
     </dependency>
     <dependency>
       <groupId>io.annot8</groupId>
       <artifactId>annot8-common-components</artifactId>
+      <version>1.0.0</version>
     </dependency>
 
     <dependency>
@@ -31,6 +39,13 @@
       <groupId>org.apache.james</groupId>
       <artifactId>apache-mime4j-dom</artifactId>
       <version>0.8.3</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.johnzon</groupId>
+      <artifactId>johnzon-mapper</artifactId>
+      <version>1.2.8</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>

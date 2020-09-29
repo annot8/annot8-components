@@ -5,11 +5,12 @@
     <parent>
         <artifactId>annot8-components</artifactId>
         <groupId>io.annot8</groupId>
-        <version>0.5.0</version>
+        <version>1.0.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>annot8-components-tesseract</artifactId>
+    <version>1.0.0</version>
     <name>Annot8 Tesseract Components</name>
     <description>Components that use Tesseract to perform OCR on images</description>
 
@@ -22,7 +23,7 @@
         <dependency>
             <groupId>net.sourceforge.tess4j</groupId>
             <artifactId>tess4j</artifactId>
-            <version>4.5.2</version>
+            <version>4.5.3</version>
         </dependency>
     </dependencies>
 

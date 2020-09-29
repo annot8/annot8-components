@@ -1,5 +1,5 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
-package io.annot8.components.base.processors;
+package io.annot8.components.base.text.processors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

@@ -5,18 +5,20 @@
   <parent>
     <artifactId>annot8-components</artifactId>
     <groupId>io.annot8</groupId>
-    <version>0.5.0</version>
+    <version>1.0.0</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>annot8-components-quantities</artifactId>
+  <version>1.0.0</version>
   <name>Annot8 Quantity Components</name>
   <description>Components to extract quantities as annotations</description>
 
   <dependencies>
     <dependency>
       <groupId>io.annot8</groupId>
-      <artifactId>annot8-components-base</artifactId>
+      <artifactId>annot8-components-base-text</artifactId>
+      <version>1.0.0</version>
     </dependency>
   </dependencies>
 

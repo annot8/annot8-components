@@ -7,7 +7,7 @@ import io.annot8.api.components.Processor;
 import io.annot8.api.components.responses.ProcessorResponse;
 import io.annot8.api.data.Item;
 import io.annot8.api.exceptions.Annot8Exception;
-import io.annot8.api.properties.ImmutableProperties;
+import io.annot8.api.properties.Properties;
 import io.annot8.components.mongo.AbstractMongoComponent;
 import io.annot8.components.mongo.resources.MongoConnection;
 import io.annot8.components.mongo.resources.MongoConnectionSettings;
@@ -50,7 +50,7 @@ public abstract class AbstractMongoSink extends AbstractMongoComponent implement
     return Document.parse(json);
   }
 
-  protected Map<String, Object> sanitiseKeys(ImmutableProperties properties) {
+  protected Map<String, Object> sanitiseKeys(Properties properties) {
     Map<String, Object> sanitisedProperties = new HashMap<>();
     properties.getAll().forEach((k, v) -> sanitisedProperties.put(k.replaceAll("\\.", "-"), v));
     return sanitisedProperties;

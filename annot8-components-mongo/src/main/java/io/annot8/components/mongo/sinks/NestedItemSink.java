@@ -99,7 +99,8 @@ public class NestedItemSink
 
     private ItemDto toDto(Item item) {
       String parentId = item.getParent().orElse(null);
-      return new ItemDto(item.getId(), parentId, item.getProperties().getAll(), getContents(item));
+      return new ItemDto(
+          item.getId(), parentId, sanitiseKeys(item.getProperties()), getContents(item));
     }
 
     private Collection<ContentDto> getContents(Item item) {

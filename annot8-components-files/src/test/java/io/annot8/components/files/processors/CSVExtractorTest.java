@@ -28,7 +28,7 @@ public class CSVExtractorTest extends AbstractCSVDataTest {
     doReturn(FileContent.class).when(content).getContentClass();
     item.save(content);
 
-    CSVExtractor.Processor extractor = new CSVExtractor.Processor(false);
+    CSVExtractor.Processor extractor = new CSVExtractor.Processor(false, false);
     ProcessorResponse response = null;
     try {
       response = extractor.process(item);

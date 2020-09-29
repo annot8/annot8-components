@@ -4,11 +4,12 @@ package io.annot8.components.tika.processors;
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
 import io.annot8.api.components.annotations.ComponentName;
+import io.annot8.api.components.annotations.SettingsClass;
 import io.annot8.api.components.responses.ProcessorResponse;
 import io.annot8.api.context.Context;
 import io.annot8.api.data.Content;
 import io.annot8.api.data.Item;
-import io.annot8.api.settings.NoSettings;
+import io.annot8.api.settings.Description;
 import io.annot8.common.components.AbstractProcessor;
 import io.annot8.common.components.AbstractProcessorDescriptor;
 import io.annot8.common.components.capabilities.SimpleCapabilities;
@@ -27,29 +28,48 @@ import org.xml.sax.SAXException;
 
 @ComponentName("Tika Extractor")
 @ComponentDescription("Extract text from files and streams using Apache Tika")
+@SettingsClass(TikaExtractor.Settings.class)
 public class TikaExtractor
-    extends AbstractProcessorDescriptor<TikaExtractor.Processor, NoSettings> {
+    extends AbstractProcessorDescriptor<TikaExtractor.Processor, TikaExtractor.Settings> {
 
   @Override
-  protected Processor createComponent(Context context, NoSettings settings) {
-    return new Processor();
+  protected Processor createComponent(Context context, Settings settings) {
+    return new Processor(settings.isRemoveSourceContent());
   }
 
   @Override
   public Capabilities capabilities() {
-    return new SimpleCapabilities.Builder()
-        .withProcessesContent(InputStreamContent.class)
-        .withProcessesContent(FileContent.class)
-        .withCreatesContent(Text.class)
-        .build();
+    SimpleCapabilities.Builder builder =
+        new SimpleCapabilities.Builder()
+            .withProcessesContent(InputStreamContent.class)
+            .withProcessesContent(FileContent.class)
+            .withCreatesContent(Text.class);
+
+    if (getSettings().isRemoveSourceContent()) {
+      builder =
+          builder
+              .withDeletesContent(InputStreamContent.class)
+              .withDeletesContent(FileContent.class);
+    }
+
+    return builder.build();
   }
 
   public static class Processor extends AbstractProcessor {
+    private final boolean removeSourceContent;
+
+    public Processor(boolean removeSourceContent) {
+      this.removeSourceContent = removeSourceContent;
+    }
 
     public ProcessorResponse process(Item item) {
       // Process InputStream
       item.getContents(InputStreamContent.class)
-          .forEach(c -> this.createText(item, c.getId(), c.getData()));
+          .forEach(
+              c -> {
+                this.createText(item, c.getId(), c.getData());
+                if (removeSourceContent) item.removeContent(c);
+              });
 
       // Process Files
       item.getContents(FileContent.class)
@@ -57,6 +77,7 @@ public class TikaExtractor
               c -> {
                 try {
                   this.createText(item, c.getId(), new FileInputStream(c.getData()));
+                  if (removeSourceContent) item.removeContent(c);
                 } catch (IOException e) {
                   this.log().error("Unable to read File Content {}", c.getId(), e);
                 }
@@ -96,6 +117,26 @@ public class TikaExtractor
       } catch (SAXException | IOException | TikaException e) {
         log().error("Unable to extract text from Content {}", originalContentName, e);
       }
+    }
+  }
+
+  public static class Settings implements io.annot8.api.settings.Settings {
+    private boolean removeSourceContent = true;
+
+    @Override
+    public boolean validate() {
+      return true;
+    }
+
+    @Description(
+        value = "Should the source Content be removed after successful processing?",
+        defaultValue = "true")
+    public boolean isRemoveSourceContent() {
+      return removeSourceContent;
+    }
+
+    public void setRemoveSourceContent(boolean removeSourceContent) {
+      this.removeSourceContent = removeSourceContent;
     }
   }
 }

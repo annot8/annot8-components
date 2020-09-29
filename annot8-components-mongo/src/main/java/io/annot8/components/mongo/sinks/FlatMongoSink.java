@@ -94,7 +94,8 @@ public class FlatMongoSink
       if (item.getParent().isPresent()) {
         parentId = item.getParent().get();
       }
-      ItemDto itemDto = new ItemDto(item.getId(), parentId, item.getProperties().getAll(), null);
+      ItemDto itemDto =
+          new ItemDto(item.getId(), parentId, sanitiseKeys(item.getProperties()), null);
 
       Collection<ContentDto> contents =
           item.getContents()

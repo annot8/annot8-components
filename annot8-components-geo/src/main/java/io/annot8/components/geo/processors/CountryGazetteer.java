@@ -4,7 +4,9 @@ package io.annot8.components.geo.processors;
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
 import io.annot8.api.components.annotations.ComponentName;
+import io.annot8.api.components.annotations.SettingsClass;
 import io.annot8.api.context.Context;
+import io.annot8.api.settings.Description;
 import io.annot8.common.components.capabilities.SimpleCapabilities;
 import io.annot8.common.data.bounds.SpanBounds;
 import io.annot8.common.data.content.Text;
@@ -12,20 +14,22 @@ import io.annot8.components.gazetteers.processors.AhoCorasick;
 import io.annot8.components.gazetteers.processors.impl.MapGazetteer;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
+
 import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
 import javax.json.JsonValue;
 import javax.json.bind.annotation.JsonbCreator;
 import javax.json.bind.annotation.JsonbProperty;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @ComponentName("CountryGazetteer")
 @ComponentDescription("Extract countries from text")
+@SettingsClass(CountryGazetteer.Settings.class)
 public class CountryGazetteer extends AhoCorasick<CountryGazetteer.Settings> {
 
   @Override
@@ -160,10 +164,12 @@ public class CountryGazetteer extends AhoCorasick<CountryGazetteer.Settings> {
       setType(AnnotationTypes.ANNOTATION_TYPE_LOCATION);
     }
 
+    @Description("Add GeoJSON information to annotations?")
     public boolean isGeojson() {
       return geojson;
     }
 
+    @Description("Add country metadata to annotations?")
     public boolean isMetadata() {
       return metadata;
     }

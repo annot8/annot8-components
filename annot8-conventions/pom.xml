@@ -4,22 +4,112 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>io.annot8</groupId>
-    <artifactId>annot8-components</artifactId>
-    <version>0.5.0</version>
-  </parent>
-
+  <groupId>io.annot8</groupId>
   <artifactId>annot8-conventions</artifactId>
+  <version>1.0.0</version>
 
   <name>Annot8 Conventions</name>
   <description>Naming conventions for Annot8 projects, recommended for compatibility</description>
 
-  <dependencies>
-    <!-- TODO: Ideally remove this dependency -->
-    <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-    </dependency>
-  </dependencies>
+  <developers>
+    <developer>
+      <name>James Baker</name>
+      <url>https://github.com/jamesdbaker</url>
+    </developer>
+    <developer>
+      <name>Chris Flatley</name>
+      <url>https://github.com/chrisflatley</url>
+    </developer>
+    <developer>
+      <name>Stuart Hendren</name>
+      <url>https://github.com/stuarthendren</url>
+    </developer>
+    <developer>
+      <name>Steven Taylor</name>
+      <url>https://github.com/stevenmtaylor</url>
+    </developer>
+  </developers>
+
+  <licenses>
+    <license>
+      <name>Apache Software License 2.0</name>
+      <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
+
+  <issueManagement>
+    <url>https://github.com/annot8/annot8-components/issues</url>
+    <system>GitHub Issues</system>
+  </issueManagement>
+
+  <scm>
+    <url>https://github.com/annot8/annot8-components/</url>
+    <connection>scm:git:git://github.com/annot8/annot8-components.git</connection>
+    <developerConnection>scm:git:git@github.com/annot8/annot8-components.git</developerConnection>
+  </scm>
+
+  <properties>
+    <!-- Project settings -->
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <java.version>11</java.version>
+    <maven.compiler.source>${java.version}</maven.compiler.source>
+    <maven.compiler.target>${java.version}</maven.compiler.target>
+
+    <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
+  </properties>
+
+  <profiles>
+    <profile>
+      <!-- This profile is used to deploy to Maven central -->
+      <id>release</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>attach-sources</id>
+                <goals>
+                  <goal>jar-no-fork</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>attach-javadocs</id>
+                <goals>
+                  <goal>jar</goal>
+                </goals>
+                <!-- Javadoc and Java Modules seem not to play well together -->
+                <!-- Allow errors which is not ideal, but seems necessary -->
+                <configuration>
+                  <failOnError>false</failOnError>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>${maven-gpg-plugin.version}</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>

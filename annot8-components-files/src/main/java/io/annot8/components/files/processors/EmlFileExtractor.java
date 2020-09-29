@@ -7,11 +7,11 @@ import com.google.common.io.CharStreams;
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
 import io.annot8.api.components.annotations.ComponentName;
+import io.annot8.api.components.annotations.SettingsClass;
 import io.annot8.api.components.responses.ProcessorResponse;
 import io.annot8.api.context.Context;
 import io.annot8.api.data.Content;
 import io.annot8.api.data.Item;
-import io.annot8.api.settings.NoSettings;
 import io.annot8.common.components.AbstractProcessor;
 import io.annot8.common.components.AbstractProcessorDescriptor;
 import io.annot8.common.components.capabilities.SimpleCapabilities;
@@ -25,26 +25,39 @@ import org.apache.james.mime4j.dom.*;
 
 @ComponentName("Eml File Extractor")
 @ComponentDescription("Extract text and attachments from *.eml files and create new Content")
+@SettingsClass(RemoveSourceContentSettings.class)
 public class EmlFileExtractor
-    extends AbstractProcessorDescriptor<EmlFileExtractor.Processor, NoSettings> {
+    extends AbstractProcessorDescriptor<EmlFileExtractor.Processor, RemoveSourceContentSettings> {
 
   @Override
-  protected Processor createComponent(Context context, NoSettings settings) {
-    return new Processor();
+  protected Processor createComponent(Context context, RemoveSourceContentSettings settings) {
+    return new Processor(settings.isRemoveSourceContent());
   }
 
   @Override
   public Capabilities capabilities() {
-    return new SimpleCapabilities.Builder()
-        .withProcessesContent(FileContent.class)
-        .withCreatesContent(Text.class)
-        .withCreatesContent(InputStreamContent.class)
-        .build();
+
+    SimpleCapabilities.Builder builder =
+        new SimpleCapabilities.Builder()
+            .withProcessesContent(FileContent.class)
+            .withCreatesContent(Text.class)
+            .withCreatesContent(InputStreamContent.class);
+
+    if (getSettings().isRemoveSourceContent()) {
+      builder = builder.withDeletesContent(FileContent.class);
+    }
+
+    return builder.build();
   }
 
   public static class Processor extends AbstractProcessor {
-
     public static final String PROPERTY_PART_NAME = "name";
+
+    private final boolean removeSourceContent;
+
+    public Processor(boolean removeSourceContent) {
+      this.removeSourceContent = removeSourceContent;
+    }
 
     @Override
     public ProcessorResponse process(Item item) {
@@ -78,8 +91,8 @@ public class EmlFileExtractor
                     log().warn("Unexpected body type {}", body.getClass().getName());
                   }
 
-                  // Remove the original *.eml content to avoid reprocessing
-                  item.removeContent(f);
+                  // If processed, then remove it our item so it doesn't get reprocessed
+                  if (removeSourceContent) item.removeContent(f);
                 } catch (IOException e) {
                   log()
                       .error(
