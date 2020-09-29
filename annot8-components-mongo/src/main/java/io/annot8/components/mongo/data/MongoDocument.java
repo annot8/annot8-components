@@ -8,9 +8,8 @@ import io.annot8.api.stores.AnnotationStore;
 import io.annot8.implementations.support.content.AbstractContentBuilder;
 import io.annot8.implementations.support.content.AbstractContentBuilderFactory;
 import io.annot8.implementations.support.stores.AnnotationStoreFactory;
-import org.bson.Document;
-
 import java.util.function.Supplier;
+import org.bson.Document;
 
 public class MongoDocument implements Content<Document> {
 

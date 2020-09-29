@@ -15,14 +15,13 @@ import io.annot8.common.components.AbstractProcessorDescriptor;
 import io.annot8.common.components.capabilities.SimpleCapabilities;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.Text;
+import java.util.*;
 import net.sourceforge.tess4j.ITesseract;
 import net.sourceforge.tess4j.TessAPI;
 import net.sourceforge.tess4j.Tesseract;
 import net.sourceforge.tess4j.TesseractException;
 import net.sourceforge.tess4j.util.LoadLibs;
 import org.apache.commons.io.FilenameUtils;
-
-import java.util.*;
 
 /**
  * Takes FileContent containing either an image or PDF file, and produces a Text content with the
