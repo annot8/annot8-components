@@ -74,8 +74,8 @@ public class ItemPropertyFromProperty
 
     @Override
     public ProcessorResponse process(Item item) {
-      if (item.getProperties().has(sourceKey, String.class)) {
-        String s = item.getProperties().get(sourceKey, String.class).get();
+      if (item.getProperties().has(sourceKey)) {
+        String s = item.getProperties().get(sourceKey).get().toString();
         Matcher m = pattern.matcher(s);
         if (m.matches()) {
           try {
