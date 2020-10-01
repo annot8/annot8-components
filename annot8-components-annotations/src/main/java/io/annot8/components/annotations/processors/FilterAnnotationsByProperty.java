@@ -16,11 +16,10 @@ import io.annot8.api.settings.Description;
 import io.annot8.common.components.AbstractProcessor;
 import io.annot8.common.components.AbstractProcessorDescriptor;
 import io.annot8.common.components.capabilities.SimpleCapabilities;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import javax.json.bind.annotation.JsonbCreator;
-import javax.json.bind.annotation.JsonbProperty;
 
 @ComponentName("Filter Annotations by Property")
 @ComponentDescription("Remove all annotations with a given property value")
@@ -79,11 +78,15 @@ public class FilterAnnotationsByProperty
   }
 
   public static class Settings implements io.annot8.api.settings.Settings {
-    private final String key;
-    private final Object value;
+    private String key;
+    private Object value;
 
-    @JsonbCreator
-    public Settings(@JsonbProperty("key") String key, @JsonbProperty("value") Object value) {
+    public Settings(){
+      this.key = null;
+      this.value = null;
+    }
+
+    public Settings(String key, Object value) {
       this.key = key;
       this.value = value;
     }
@@ -93,9 +96,17 @@ public class FilterAnnotationsByProperty
       return key;
     }
 
+    public void setKey(String key) {
+      this.key = key;
+    }
+
     @Description("Property value to check")
     public Object getValue() {
       return value;
+    }
+
+    public void setValue(Object value) {
+      this.value = value;
     }
 
     @Override

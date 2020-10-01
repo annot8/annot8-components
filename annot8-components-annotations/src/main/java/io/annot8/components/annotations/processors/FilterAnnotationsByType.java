@@ -16,10 +16,10 @@ import io.annot8.api.settings.Description;
 import io.annot8.common.components.AbstractProcessor;
 import io.annot8.common.components.AbstractProcessorDescriptor;
 import io.annot8.common.components.capabilities.SimpleCapabilities;
+
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.json.bind.annotation.JsonbCreator;
-import javax.json.bind.annotation.JsonbProperty;
 
 @ComponentName("Filter Annotations by Type")
 @ComponentDescription("Remove all annotations of a given type")
@@ -78,16 +78,23 @@ public class FilterAnnotationsByType
   }
 
   public static class Settings implements io.annot8.api.settings.Settings {
-    private final List<String> types;
+    private List<String> types;
 
-    @JsonbCreator
-    public Settings(@JsonbProperty("types") List<String> types) {
+    public Settings(){
+      this.types = Collections.emptyList();
+    }
+
+    public Settings(List<String> types) {
       this.types = types;
     }
 
     @Description("Annotation types to remove")
     public List<String> getTypes() {
       return types;
+    }
+
+    public void setTypes(List<String> types) {
+      this.types = types;
     }
 
     @Override
