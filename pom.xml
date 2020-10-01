@@ -465,6 +465,7 @@
   </profiles>
 
   <modules>
+    <module>annot8-conventions</module>
     <module>annot8-components-annotations</module>
     <module>annot8-components-base</module>
     <module>annot8-components-base-text</module>
