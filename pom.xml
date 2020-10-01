@@ -454,11 +454,13 @@
   </profiles>
 
   <modules>
+    <module>annot8-components-annotations</module>
     <module>annot8-components-base</module>
     <module>annot8-components-base-text</module>
     <module>annot8-components-comms</module>
     <module>annot8-components-cyber</module>
     <module>annot8-components-db</module>
+    <module>annot8-components-elasticsearch</module>
     <module>annot8-components-files</module>
     <module>annot8-components-financial</module>
     <module>annot8-components-gazetteers</module>
@@ -482,8 +484,6 @@
     <module>annot8-components-vehicles</module>
     <module>annot8-components-wordnet</module>
     <module>annot8-utils-text</module>
-    <module>annot8-components-annotations</module>
-    <module>annot8-components-elasticsearch</module>
   </modules>
 
 
