@@ -19,16 +19,17 @@ import io.annot8.common.components.capabilities.SimpleCapabilities;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.InputStreamContent;
 import io.annot8.common.data.content.Text;
+import org.apache.james.mime4j.dom.*;
+
 import java.io.*;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import org.apache.james.mime4j.dom.*;
 
 @ComponentName("Eml File Extractor")
 @ComponentDescription("Extract text and attachments from *.eml files and create new Content")
-@SettingsClass(RemoveSourceContentSettings.class)
+@SettingsClass(EmlFileExtractor.Settings.class)
 public class EmlFileExtractor
     extends AbstractProcessorDescriptor<EmlFileExtractor.Processor, EmlFileExtractor.Settings> {
 

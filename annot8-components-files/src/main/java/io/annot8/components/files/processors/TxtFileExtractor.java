@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 
 @ComponentName("Txt File Extractor")
 @ComponentDescription("Extract text from a *.txt file and create Text content")
-@SettingsClass(RemoveSourceContentSettings.class)
+@SettingsClass(TxtFileExtractor.Settings.class)
 public class TxtFileExtractor
     extends AbstractProcessorDescriptor<TxtFileExtractor.Processor, TxtFileExtractor.Settings> {
 
