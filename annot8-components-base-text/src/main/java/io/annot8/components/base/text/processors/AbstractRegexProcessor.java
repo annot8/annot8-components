@@ -45,9 +45,11 @@ public abstract class AbstractRegexProcessor extends AbstractTextProcessor {
 
       try {
 
-        Annotation.Builder builder = annotationStore.create()
-          .withType(type)
-          .withBounds(new SpanBounds(m.start(group), m.end(group)));
+        Annotation.Builder builder =
+            annotationStore
+                .create()
+                .withType(type)
+                .withBounds(new SpanBounds(m.start(group), m.end(group)));
         addProperties(builder, m);
 
         builder.save();

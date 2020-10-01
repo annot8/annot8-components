@@ -16,7 +16,6 @@ import io.annot8.api.settings.Description;
 import io.annot8.common.components.AbstractProcessor;
 import io.annot8.common.components.AbstractProcessorDescriptor;
 import io.annot8.common.components.capabilities.SimpleCapabilities;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -80,7 +79,7 @@ public class FilterAnnotationsByType
   public static class Settings implements io.annot8.api.settings.Settings {
     private List<String> types;
 
-    public Settings(){
+    public Settings() {
       this.types = Collections.emptyList();
     }
 

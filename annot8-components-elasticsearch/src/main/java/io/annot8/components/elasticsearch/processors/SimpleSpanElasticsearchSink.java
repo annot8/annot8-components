@@ -16,14 +16,13 @@ import io.annot8.common.components.capabilities.SimpleCapabilities;
 import io.annot8.common.data.bounds.SpanBounds;
 import io.annot8.common.data.content.Text;
 import io.annot8.components.elasticsearch.ElasticsearchSettings;
-import org.apache.http.HttpHost;
-import org.elasticsearch.action.index.IndexRequest;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.apache.http.HttpHost;
+import org.elasticsearch.action.index.IndexRequest;
 
 @ComponentName("Elasticsearch Sink - Simple Span")
 @ComponentDescription(
@@ -35,7 +34,8 @@ public class SimpleSpanElasticsearchSink
         SimpleSpanElasticsearchSink.Processor, SimpleSpanElasticsearchSink.Settings> {
 
   @Override
-  protected Processor createComponent(Context context, SimpleSpanElasticsearchSink.Settings settings) {
+  protected Processor createComponent(
+      Context context, SimpleSpanElasticsearchSink.Settings settings) {
     return new Processor(List.of(settings.getHost()), settings.getIndex(), settings.isIgnoreCase());
   }
 
@@ -101,18 +101,15 @@ public class SimpleSpanElasticsearchSink
               .collect(
                   Collectors.groupingBy(
                       WithType::getType,
-                      Collectors.mapping(
-                          a -> getText(text, a, ignoreCase),
-                          Collectors.toSet()))));
+                      Collectors.mapping(a -> getText(text, a, ignoreCase), Collectors.toSet()))));
 
       return m;
     }
 
-    private static String getText(Text text, Annotation a, boolean ignoreCase){
+    private static String getText(Text text, Annotation a, boolean ignoreCase) {
       String s = text.getText(a).orElse("** OUT OF BOUNDS **");
 
-      if(ignoreCase)
-        s = s.toUpperCase();
+      if (ignoreCase) s = s.toUpperCase();
 
       return s;
     }
@@ -121,7 +118,8 @@ public class SimpleSpanElasticsearchSink
   public static class Settings extends ElasticsearchSettings {
     private boolean ignoreCase = false;
 
-    @Description("Should annotation values be considered case insensitively when compiling the list of values. If true, all values will be upper cased.")
+    @Description(
+        "Should annotation values be considered case insensitively when compiling the list of values. If true, all values will be upper cased.")
     public boolean isIgnoreCase() {
       return ignoreCase;
     }

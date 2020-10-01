@@ -23,9 +23,9 @@ public final class PathUtils {
   }
 
   public static String join(Iterator<String> iterator) {
-    return join(StreamSupport.stream(
-      Spliterators.spliteratorUnknownSize(
-        iterator, Spliterator.ORDERED), false));
+    return join(
+        StreamSupport.stream(
+            Spliterators.spliteratorUnknownSize(iterator, Spliterator.ORDERED), false));
   }
 
   public static String join(Stream<String> stream) {
@@ -47,9 +47,8 @@ public final class PathUtils {
 
   public static List<String> splitToList(String path) {
     return Arrays.stream(path.split(SEPARATOR))
-      .filter(s -> !s.isEmpty())
-      .map(String::trim)
-      .collect(Collectors.toList());
+        .filter(s -> !s.isEmpty())
+        .map(String::trim)
+        .collect(Collectors.toList());
   }
-
 }

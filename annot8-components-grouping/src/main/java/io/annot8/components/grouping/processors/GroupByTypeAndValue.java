@@ -18,7 +18,6 @@ import io.annot8.common.components.AbstractProcessor;
 import io.annot8.common.components.AbstractProcessorDescriptor;
 import io.annot8.common.components.capabilities.SimpleCapabilities;
 import io.annot8.common.data.bounds.SpanBounds;
-
 import java.util.Objects;
 import java.util.Optional;
 
@@ -63,8 +62,7 @@ public class GroupByTypeAndValue
           .forEach(
               a -> {
                 Optional<D> optional = a.getBounds().getData(content);
-                optional.ifPresent(
-                    covered -> map.put(new TypeObjectPair(a.getType(), covered), a));
+                optional.ifPresent(covered -> map.put(new TypeObjectPair(a.getType(), covered), a));
               });
 
       // Create a group for things which are the same
@@ -83,7 +81,7 @@ public class GroupByTypeAndValue
       private final String type;
       private final Object object;
 
-      public TypeObjectPair(String type, Object object){
+      public TypeObjectPair(String type, Object object) {
         this.type = type;
         this.object = object;
       }
@@ -93,8 +91,7 @@ public class GroupByTypeAndValue
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         TypeObjectPair that = (TypeObjectPair) o;
-        return Objects.equals(type, that.type) &&
-          Objects.equals(object, that.object);
+        return Objects.equals(type, that.type) && Objects.equals(object, that.object);
       }
 
       @Override

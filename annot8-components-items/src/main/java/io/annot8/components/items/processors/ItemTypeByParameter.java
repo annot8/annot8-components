@@ -14,7 +14,6 @@ import io.annot8.common.components.AbstractProcessorDescriptor;
 import io.annot8.common.components.capabilities.SimpleCapabilities;
 import io.annot8.common.data.content.Text;
 import io.annot8.conventions.PropertyKeys;
-
 import javax.json.bind.annotation.JsonbCreator;
 import javax.json.bind.annotation.JsonbProperty;
 
@@ -45,8 +44,7 @@ public class ItemTypeByParameter
 
     @Override
     public ProcessorResponse process(Item item) {
-      if (type == null || type.isBlank())
-        return ProcessorResponse.ok();
+      if (type == null || type.isBlank()) return ProcessorResponse.ok();
 
       item.getProperties().set(PropertyKeys.PROPERTY_KEY_SUBTYPE, type);
       return ProcessorResponse.ok();
