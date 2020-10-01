@@ -50,7 +50,8 @@ public class PrintSpans extends AbstractProcessorDescriptor<PrintSpans.Processor
 
                 settings.output(
                     log(),
-                    String.format("Annotation %s: %s", bounds.toString(), value.orElse("UNKNOWN")));
+                    //Annotation of type grammar/wordToken at [0, 5]: Hello
+                    String.format("Annotation of type %s at [%s, %s]: %s", a.getType(), bounds.getBegin(), bounds.getEnd(), value.orElse("UNKNOWN")));
               });
     }
   }
