@@ -11,7 +11,7 @@
 
   <artifactId>annot8-utils-text</artifactId>
   <version>1.0.0</version>
-  <name>Text Utilities</name>
+  <name>Annot8 Text Utilities</name>
   <description>Utility Classes for working with Text</description>
 
   <dependencies>
