@@ -14,11 +14,10 @@ import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.GroupTypes;
 import io.annot8.conventions.PropertyKeys;
 import io.annot8.utils.text.PluralUtils;
-import org.ahocorasick.trie.Emit;
-import org.ahocorasick.trie.Trie;
-
 import java.util.*;
 import java.util.stream.Collectors;
+import org.ahocorasick.trie.Emit;
+import org.ahocorasick.trie.Trie;
 
 public abstract class AhoCorasick<S extends AhoCorasick.Settings>
     extends AbstractProcessorDescriptor<AhoCorasick.Processor, S> {

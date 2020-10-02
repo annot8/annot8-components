@@ -16,7 +16,6 @@ import io.annot8.api.settings.Description;
 import io.annot8.common.components.AbstractProcessor;
 import io.annot8.common.components.AbstractProcessorDescriptor;
 import io.annot8.common.components.capabilities.SimpleCapabilities;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -81,7 +80,7 @@ public class FilterAnnotationsByProperty
     private String key;
     private Object value;
 
-    public Settings(){
+    public Settings() {
       this.key = null;
       this.value = null;
     }

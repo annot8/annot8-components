@@ -16,23 +16,13 @@ If you wish to build a set of JAR files (one per module) which contain all the d
 mvn -Pplugin clean package
 ```
 
-Note, the above commands do not build the `annot8-conventions` project, which whilst also residing in this repository is currently a standalone project.
-To build the `annot8-conventions` project, run:
-
-```shell script
-cd annot8-conventions
-mvn clean install
-```
-
 ## Deploying to Maven central
 
 To deploy to Maven Central (assuming you have sufficient permissions):
 
 ```shell script
-mvn -Prelease deploy
-``` 
-
-As above, this command should be run separately for the Annot8 Conventions (`annot8-conventions`) project.
+mvn -Prelease clean deploy
+```
 
 ## License
 

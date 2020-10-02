@@ -1,16 +1,15 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.elasticsearch.processors;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import io.annot8.common.data.bounds.SpanBounds;
 import io.annot8.common.data.content.Text;
 import io.annot8.testing.testimpl.TestItem;
 import io.annot8.testing.testimpl.content.TestStringContent;
-import org.junit.jupiter.api.Test;
-
 import java.util.Map;
 import java.util.Set;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 public class SimpleSpanElasticsearchSinkTest {
   @Test
@@ -84,11 +83,11 @@ public class SimpleSpanElasticsearchSinkTest {
   public void testTextToMapIgnoreCase() {
     TestItem item = new TestItem();
     TestStringContent text =
-      item.createContent(TestStringContent.class)
-        .withData("Jack and jAcK went up the hill")
-        .withProperty("test", 123)
-        .withProperty("test2", "Hello, World!")
-        .save();
+        item.createContent(TestStringContent.class)
+            .withData("Jack and jAcK went up the hill")
+            .withProperty("test", 123)
+            .withProperty("test2", "Hello, World!")
+            .save();
 
     text.getAnnotations().create().withType("Person").withBounds(new SpanBounds(0, 4)).save();
     text.getAnnotations().create().withType("Person").withBounds(new SpanBounds(9, 13)).save();
@@ -103,12 +102,12 @@ public class SimpleSpanElasticsearchSinkTest {
     assertTrue(m.containsKey(SimpleSpanElasticsearchSink.Processor.PROPERTIES_FIELD));
 
     Map<String, Object> a =
-      (Map<String, Object>) m.get(SimpleSpanElasticsearchSink.Processor.ANNOTATIONS_FIELD);
+        (Map<String, Object>) m.get(SimpleSpanElasticsearchSink.Processor.ANNOTATIONS_FIELD);
     assertEquals(1, a.size());
     assertEquals(Set.of("JACK"), a.get("Person"));
 
     Map<String, Object> p =
-      (Map<String, Object>) m.get(SimpleSpanElasticsearchSink.Processor.PROPERTIES_FIELD);
+        (Map<String, Object>) m.get(SimpleSpanElasticsearchSink.Processor.PROPERTIES_FIELD);
     assertEquals(2, p.size());
     assertEquals(123, p.get("test"));
     assertEquals("Hello, World!", p.get("test2"));

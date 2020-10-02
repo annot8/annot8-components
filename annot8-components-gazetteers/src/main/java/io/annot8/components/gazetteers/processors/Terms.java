@@ -8,12 +8,12 @@ import io.annot8.api.components.annotations.SettingsClass;
 import io.annot8.api.context.Context;
 import io.annot8.api.settings.Description;
 import io.annot8.components.gazetteers.processors.impl.CollectionGazetteer;
-
 import java.util.Collections;
 import java.util.List;
 
 @ComponentName("Terms Gazetteer")
-@ComponentDescription("Annotate terms within Text using configurable list of terms as the gazetteer")
+@ComponentDescription(
+    "Annotate terms within Text using configurable list of terms as the gazetteer")
 @ComponentTags({"gazetteer"})
 @SettingsClass(Terms.Settings.class)
 public class Terms extends AhoCorasick<Terms.Settings> {

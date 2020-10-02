@@ -1,6 +1,8 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.files.processors;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import io.annot8.api.components.Processor;
 import io.annot8.api.data.Item;
 import io.annot8.common.data.content.FileContent;
@@ -8,8 +10,6 @@ import io.annot8.common.data.content.Text;
 import io.annot8.conventions.PropertyKeys;
 import io.annot8.testing.testimpl.TestItem;
 import io.annot8.testing.testimpl.TestItemFactory;
-import org.junit.jupiter.api.Test;
-
 import java.io.File;
 import java.math.BigDecimal;
 import java.net.URL;
@@ -18,8 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 public class JsonExtractorTest {
 
