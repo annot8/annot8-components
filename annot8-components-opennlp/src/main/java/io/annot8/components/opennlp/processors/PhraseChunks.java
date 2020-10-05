@@ -161,7 +161,11 @@ public class PhraseChunks
                                   .getBounds(SpanBounds.class)
                                   .get()
                                   .getBegin(),
-                              tokens.get(span.getEnd()).getBounds(SpanBounds.class).get().getEnd())
+                              tokens
+                                  .get(span.getEnd() - 1)
+                                  .getBounds(SpanBounds.class)
+                                  .get()
+                                  .getEnd())
                           .filter(
                               a -> AnnotationTypes.ANNOTATION_TYPE_WORDTOKEN.equals(a.getType()))
                           .collect(Collectors.toList());

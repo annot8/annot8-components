@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>annot8-components-opennlp</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <name>Annot8 OpenNLP Components</name>
     <description>Components to work with language features within text (e.g. tokenization, parts of speech) using OpenNLP</description>
 
