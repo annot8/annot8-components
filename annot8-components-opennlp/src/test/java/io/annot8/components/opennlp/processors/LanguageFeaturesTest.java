@@ -88,6 +88,6 @@ public class LanguageFeaturesTest {
                         .collect(Collectors.joining(" ")))
             .collect(Collectors.toList());
 
-    assertTrue(phrases.contains("some text ."));
+    assertTrue(phrases.contains("some text"));
   }
 }
