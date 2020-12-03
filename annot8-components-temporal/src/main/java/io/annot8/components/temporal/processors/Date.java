@@ -25,10 +25,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@ComponentName("Date") // The display name of the processor
-@ComponentDescription("Extracts formatted dates from text")
-@SettingsClass(Date.Settings.class)
-
 /**
  * Annotate dates and date ranges as Temporal/Instant entities. The following examples show the
  * types of dates and ranges that are detected.
@@ -56,6 +52,9 @@ import java.util.regex.Pattern;
  * <p>Years on their own will only extracted for the range 1970-2099 to reduce false positives. Two
  * digit years on their own will not be extracted.
  */
+@ComponentName("Date") // The display name of the processor
+@ComponentDescription("Extracts formatted dates from text")
+@SettingsClass(Date.Settings.class)
 public class Date extends AbstractProcessorDescriptor<Date.Processor, Date.Settings> {
 
   @Override
@@ -74,7 +73,7 @@ public class Date extends AbstractProcessorDescriptor<Date.Processor, Date.Setti
 
   public static class Processor extends AbstractTextProcessor {
 
-    private boolean americanDates;
+    private final boolean americanDates;
 
     // Non-capturing as we don't use this information
     private static final String DAYS =
@@ -509,14 +508,14 @@ public class Date extends AbstractProcessorDescriptor<Date.Processor, Date.Setti
       while (m.find()) {
         Year y = DateTimeUtils.asYear(m.group(3));
 
-        Integer n1 = Integer.parseInt(m.group(1));
-        Integer n2 = Integer.parseInt(m.group(2));
+        int n1 = Integer.parseInt(m.group(1));
+        int n2 = Integer.parseInt(m.group(2));
 
-        Integer day;
-        Integer month;
+        int day;
+        int month;
         if (n1 >= 1 && n1 <= 12) {
           // n1 could be a month or a day
-          if (n2 >= 12 && n2 <= 31) {
+          if (n2 > 12 && n2 <= 31) {
             // n2 must be a day
             month = n1;
             day = n2;
@@ -532,7 +531,7 @@ public class Date extends AbstractProcessorDescriptor<Date.Processor, Date.Setti
             // invalid combination of n1 and n2
             continue;
           }
-        } else if (n1 >= 1 && n1 <= 31) {
+        } else if (n1 > 12 && n1 <= 31) {
           // n1 must be a day
           day = n1;
           if (n2 >= 1 && n2 <= 12) {
@@ -732,7 +731,7 @@ public class Date extends AbstractProcessorDescriptor<Date.Processor, Date.Setti
   public static class Settings implements io.annot8.api.settings.Settings {
     private boolean americanDates = true;
 
-    @Description(" Should we use American dates where applicable (i.e. mm-dd-yy)")
+    @Description("Should we use American dates where applicable (i.e. mm-dd-yy)?")
     public boolean getAmericanDates() {
       return americanDates;
     }

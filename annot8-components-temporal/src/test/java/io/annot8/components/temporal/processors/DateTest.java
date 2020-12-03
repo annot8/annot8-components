@@ -17,6 +17,7 @@ import io.annot8.conventions.PropertyKeys;
 import io.annot8.testing.testimpl.TestItem;
 import io.annot8.testing.testimpl.content.TestStringContent;
 import java.time.LocalDate;
+import java.time.Month;
 import java.time.Year;
 import java.time.YearMonth;
 import java.time.temporal.Temporal;
@@ -80,7 +81,7 @@ public class DateTest {
   }
 
   @Test
-  public void testYears() throws Exception {
+  public void testYears() {
 
     try (Processor p = new Date.Processor(false)) {
       Item item = new TestItem();
@@ -115,7 +116,7 @@ public class DateTest {
   }
 
   @Test
-  public void testMonthYears() throws Exception {
+  public void testMonthYears() {
 
     try (Processor p = new Date.Processor(false)) {
       Item item = new TestItem();
@@ -156,7 +157,7 @@ public class DateTest {
   }
 
   @Test
-  public void testDayMonthYears() throws Exception {
+  public void testDayMonthYears() {
 
     try (Processor p = new Date.Processor(false)) {
       Item item = new TestItem();
@@ -218,7 +219,7 @@ public class DateTest {
   }
 
   @Test
-  public void testBadDayMonthYears() throws Exception {
+  public void testBadDayMonthYears() {
 
     try (Processor p = new Date.Processor(false)) {
       Item item = new TestItem();
@@ -244,7 +245,7 @@ public class DateTest {
   }
 
   @Test
-  public void testDates() throws Exception {
+  public void testDates() {
 
     try (Processor p = new Date.Processor(false)) {
       Item item = new TestItem();
@@ -281,7 +282,7 @@ public class DateTest {
   }
 
   @Test
-  public void testAmericanDates() throws Exception {
+  public void testAmericanDates() {
 
     try (Processor p = new Date.Processor(true)) {
       Item item = new TestItem();
@@ -316,7 +317,7 @@ public class DateTest {
   public void testOne(Processor p, String text, String covered, Temporal start, Temporal end) {
     Item item = new TestItem();
 
-    Text content = item.createContent(TestStringContent.class).withData(covered).save();
+    Text content = item.createContent(TestStringContent.class).withData(text).save();
 
     p.process(item);
 
@@ -331,7 +332,7 @@ public class DateTest {
   public void testOne(Processor p, String text, String covered, Temporal instant) {
     Item item = new TestItem();
 
-    Text content = item.createContent(TestStringContent.class).withData(covered).save();
+    Text content = item.createContent(TestStringContent.class).withData(text).save();
 
     p.process(item);
 
@@ -344,7 +345,7 @@ public class DateTest {
   }
 
   @Test
-  public void testMonth() throws Exception {
+  public void testMonth() {
 
     try (Processor p = new Date.Processor(false)) {
       testOne(
@@ -408,7 +409,7 @@ public class DateTest {
   }
 
   @Test
-  public void testYear() throws Exception {
+  public void testYear() {
 
     try (Processor p = new Date.Processor(true)) {
       Item item = new TestItem();
@@ -438,12 +439,53 @@ public class DateTest {
     }
   }
 
+  @Test
+  public void testDecemberDate() {
+    // Test to confirm that a bug has been fixed where December dates were mistakenly identified as
+    // American regardless of setting
+
+    try (Processor p = new Date.Processor(false)) {
+      Item item = new TestItem();
+
+      Text content =
+          item.createContent(TestStringContent.class).withData("The date is 2/12/2020").save();
+
+      p.process(item);
+
+      AnnotationStore store = content.getAnnotations();
+      List<Annotation> annotations = store.getAll().collect(Collectors.toList());
+
+      Assertions.assertEquals(1, annotations.size());
+
+      testAnnotationInstant(
+          content, annotations.get(0), "2/12/2020", LocalDate.of(2020, Month.DECEMBER, 2));
+    }
+
+    // Now test it in American format
+    try (Processor p = new Date.Processor(true)) {
+      Item item = new TestItem();
+
+      Text content =
+          item.createContent(TestStringContent.class).withData("The date is 2/12/2020").save();
+
+      p.process(item);
+
+      AnnotationStore store = content.getAnnotations();
+      List<Annotation> annotations = store.getAll().collect(Collectors.toList());
+
+      Assertions.assertEquals(1, annotations.size());
+
+      testAnnotationInstant(
+          content, annotations.get(0), "2/12/2020", LocalDate.of(2020, Month.FEBRUARY, 12));
+    }
+  }
+
   public void testOneRegex(String text, String covered) throws Exception {
     try (Processor p = new Date.Processor(false)) {
 
       Item item = new TestItem();
 
-      Text content = item.createContent(TestStringContent.class).withData(covered).save();
+      Text content = item.createContent(TestStringContent.class).withData(text).save();
 
       p.process(item);
 
