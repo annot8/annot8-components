@@ -532,7 +532,7 @@ public class Date extends AbstractProcessorDescriptor<Date.Processor, Date.Setti
             // invalid combination of n1 and n2
             continue;
           }
-        } else if (n1 >= 1 && n1 <= 31) {
+        } else if (n1 > 12 && n1 <= 31) {
           // n1 must be a day
           day = n1;
           if (n2 >= 1 && n2 <= 12) {
