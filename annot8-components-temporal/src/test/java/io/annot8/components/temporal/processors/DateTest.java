@@ -1,6 +1,8 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.temporal.processors;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import io.annot8.api.annotations.Annotation;
 import io.annot8.api.capabilities.AnnotationCapability;
 import io.annot8.api.capabilities.Capabilities;
@@ -14,9 +16,6 @@ import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
 import io.annot8.testing.testimpl.TestItem;
 import io.annot8.testing.testimpl.content.TestStringContent;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.Year;
@@ -25,8 +24,8 @@ import java.time.temporal.Temporal;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class DateTest {
 
@@ -442,27 +441,24 @@ public class DateTest {
 
   @Test
   public void testDecemberDate() {
-    //Test to confirm that a bug has been fixed where December dates were mistakenly identified as American regardless of setting
+    // Test to confirm that a bug has been fixed where December dates were mistakenly identified as
+    // American regardless of setting
 
     try (Processor p = new Date.Processor(false)) {
       Item item = new TestItem();
 
       Text content =
-        item.createContent(TestStringContent.class)
-          .withData("The date is 2/12/2020")
-          .save();
+          item.createContent(TestStringContent.class).withData("The date is 2/12/2020").save();
 
       p.process(item);
 
       AnnotationStore store = content.getAnnotations();
-      List<Annotation> annotations =
-        store
-          .getAll()
-          .collect(Collectors.toList());
+      List<Annotation> annotations = store.getAll().collect(Collectors.toList());
 
       Assertions.assertEquals(1, annotations.size());
 
-      testAnnotationInstant(content, annotations.get(0), "2/12/2020", LocalDate.of(2020, Month.DECEMBER, 2));
+      testAnnotationInstant(
+          content, annotations.get(0), "2/12/2020", LocalDate.of(2020, Month.DECEMBER, 2));
     }
 
     // Now test it in American format
@@ -470,21 +466,17 @@ public class DateTest {
       Item item = new TestItem();
 
       Text content =
-        item.createContent(TestStringContent.class)
-          .withData("The date is 2/12/2020")
-          .save();
+          item.createContent(TestStringContent.class).withData("The date is 2/12/2020").save();
 
       p.process(item);
 
       AnnotationStore store = content.getAnnotations();
-      List<Annotation> annotations =
-        store
-          .getAll()
-          .collect(Collectors.toList());
+      List<Annotation> annotations = store.getAll().collect(Collectors.toList());
 
       Assertions.assertEquals(1, annotations.size());
 
-      testAnnotationInstant(content, annotations.get(0), "2/12/2020", LocalDate.of(2020, Month.FEBRUARY, 12));
+      testAnnotationInstant(
+          content, annotations.get(0), "2/12/2020", LocalDate.of(2020, Month.FEBRUARY, 12));
     }
   }
 

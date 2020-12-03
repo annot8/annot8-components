@@ -15,7 +15,6 @@ import io.annot8.components.base.text.processors.AbstractTextProcessor;
 import io.annot8.components.temporal.processors.utils.DateTimeUtils;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
-
 import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.Year;
