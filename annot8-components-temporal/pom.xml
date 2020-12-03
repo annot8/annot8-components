@@ -10,7 +10,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>annot8-components-temporal</artifactId>
-  <version>1.0.0</version>
+  <version>1.0.1</version>
   <name>Annot8 Temporal Components</name>
   <description>Annot8 processors focussing on time and date information</description>
 
