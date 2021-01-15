@@ -11,16 +11,26 @@ public class ElasticsearchSettings implements Settings {
   private int port = 9200;
   private String scheme = "http";
   private String index = "baleen";
+  private boolean deleteIndex = false;
+  private boolean forceString = false;
 
   public ElasticsearchSettings() {
     // Do nothing - use default values
   }
 
-  public ElasticsearchSettings(String hostname, int port, String scheme, String index) {
+  public ElasticsearchSettings(
+      String hostname,
+      int port,
+      String scheme,
+      String index,
+      boolean deleteIndex,
+      boolean forceString) {
     this.hostname = hostname;
     this.port = port;
     this.scheme = scheme;
     this.index = index;
+    this.deleteIndex = deleteIndex;
+    this.forceString = forceString;
   }
 
   @Override
@@ -36,7 +46,7 @@ public class ElasticsearchSettings implements Settings {
   }
 
   @JsonbTransient
-  public HttpHost getHost() {
+  public HttpHost host() {
     return new HttpHost(hostname, port, scheme);
   }
 
@@ -77,5 +87,28 @@ public class ElasticsearchSettings implements Settings {
 
   public void setIndex(String index) {
     this.index = index;
+  }
+
+  @Description(
+      value = "Should the Elasticsearch be deleted when the processor is initialised?",
+      defaultValue = "false")
+  public boolean isDeleteIndex() {
+    return deleteIndex;
+  }
+
+  public void setDeleteIndex(boolean deleteIndex) {
+    this.deleteIndex = deleteIndex;
+  }
+
+  @Description(
+      value =
+          "Should string representations of properties be used rather than the raw Java object?",
+      defaultValue = "false")
+  public boolean isForceString() {
+    return forceString;
+  }
+
+  public void setForceString(boolean forceString) {
+    this.forceString = forceString;
   }
 }

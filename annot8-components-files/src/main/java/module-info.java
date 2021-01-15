@@ -7,6 +7,8 @@ module io.annot8.components.files {
 
   exports io.annot8.components.files.sources;
   exports io.annot8.components.files.processors;
+  exports io.annot8.components.files.sinks;
+  exports io.annot8.components.files.content;
 
   requires org.slf4j;
   requires apache.mime4j.dom;
@@ -14,4 +16,6 @@ module io.annot8.components.files {
   requires apache.mime4j.core;
   requires java.json.bind;
   requires java.json;
+  requires java.desktop;
+  requires org.apache.commons.text;
 }

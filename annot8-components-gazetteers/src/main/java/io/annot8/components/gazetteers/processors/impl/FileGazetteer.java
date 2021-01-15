@@ -9,16 +9,22 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class FileGazetteer implements Gazetteer {
 
-  private List<Set<String>> terms = new ArrayList<>();
+  private final List<Set<String>> terms = new ArrayList<>();
 
   public FileGazetteer(Path path, char separator) {
     try {
       Files.lines(path)
           .filter(l -> !l.isBlank())
-          .forEach(l -> terms.add(Set.of(l.split(Pattern.quote(String.valueOf(separator))))));
+          .map(
+              l ->
+                  Stream.of(l.split(Pattern.quote(String.valueOf(separator))))
+                      .map(String::strip)
+                      .collect(Collectors.toSet()))
+          .forEach(terms::add);
     } catch (IOException e) {
       throw new BadConfigurationException("Could not read file gazetteer", e);
     }

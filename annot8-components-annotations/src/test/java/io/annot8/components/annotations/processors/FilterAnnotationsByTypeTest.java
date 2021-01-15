@@ -53,4 +53,34 @@ public class FilterAnnotationsByTypeTest {
               assertEquals(1L, c.getAnnotations().getByType("type3").count());
             });
   }
+
+  @Test
+  public void testWildcard() {
+    Item item = new TestItem();
+
+    TestStringContent c1 = item.createContent(TestStringContent.class).withData("ABC").save();
+    c1.getAnnotations().create().withType("foo/bar").withBounds(new SpanBounds(0, 3)).save();
+    c1.getAnnotations().create().withType("foo/baz").withBounds(new SpanBounds(0, 3)).save();
+    c1.getAnnotations().create().withType("bar/baz").withBounds(new SpanBounds(0, 3)).save();
+
+    FilterAnnotationsByType.Settings settings =
+        new FilterAnnotationsByType.Settings(List.of("foo/*"));
+    assertTrue(settings.validate());
+
+    FilterAnnotationsByType d = new FilterAnnotationsByType();
+    d.setSettings(settings);
+
+    assertNotNull(d.capabilities());
+
+    Processor p = d.createComponent(null, settings);
+
+    ProcessorResponse pr = p.process(item);
+    assertEquals(ProcessorResponse.ok(), pr);
+
+    item.getContents()
+        .forEach(
+            c -> {
+              assertEquals(1L, c.getAnnotations().getAll().count());
+            });
+  }
 }

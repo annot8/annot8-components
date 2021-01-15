@@ -8,12 +8,14 @@ import io.annot8.api.components.annotations.ComponentTags;
 import io.annot8.api.components.annotations.SettingsClass;
 import io.annot8.api.components.responses.ProcessorResponse;
 import io.annot8.api.context.Context;
+import io.annot8.api.data.Content;
 import io.annot8.api.data.Item;
 import io.annot8.api.settings.Description;
 import io.annot8.common.components.AbstractProcessor;
 import io.annot8.common.components.AbstractProcessorDescriptor;
 import io.annot8.common.components.capabilities.SimpleCapabilities;
 import io.annot8.common.data.content.FileContent;
+import io.annot8.common.data.content.Image;
 import io.annot8.common.data.content.Text;
 import java.util.*;
 import net.sourceforge.tess4j.ITesseract;
@@ -24,11 +26,12 @@ import net.sourceforge.tess4j.util.LoadLibs;
 import org.apache.commons.io.FilenameUtils;
 
 /**
- * Takes FileContent containing either an image or PDF file, and produces a Text content with the
- * text from the file as extracted by Tesseract
+ * Takes FileContent containing either an image or PDF file, or Image content directly, and produces
+ * a Text content with the text from the image as extracted by Tesseract
  */
 @ComponentName("Tesseract OCR")
-@ComponentDescription("Use Tesseract to extract text from images stored in FileContent")
+@ComponentDescription(
+    "Use Tesseract to extract text from images stored in FileContent, or directly from Image content")
 @SettingsClass(OCR.Settings.class)
 @ComponentTags({"image", "text", "ocr", "tesseract"})
 public class OCR extends AbstractProcessorDescriptor<OCR.Processor, OCR.Settings> {
@@ -52,6 +55,7 @@ public class OCR extends AbstractProcessorDescriptor<OCR.Processor, OCR.Settings
   public Capabilities capabilities() {
     return new SimpleCapabilities.Builder()
         .withProcessesContent(FileContent.class)
+        .withoutProcessesContent(Image.class)
         .withCreatesContent(Text.class)
         .build();
   }
@@ -76,19 +80,31 @@ public class OCR extends AbstractProcessorDescriptor<OCR.Processor, OCR.Settings
           .forEach(
               fc -> {
                 try {
-                  String content = instance.doOCR(fc.getData());
-
-                  item.createContent(Text.class)
-                      .withDescription("OCR from " + fc.getId())
-                      .withData(content)
-                      .withProperties(fc.getProperties())
-                      .save();
+                  createTextContent(item, instance.doOCR(fc.getData()), fc);
                 } catch (TesseractException e) {
                   log().error("Unable to extract text from content {}", fc.getId(), e);
                 }
               });
 
+      item.getContents(Image.class)
+          .forEach(
+              image -> {
+                try {
+                  createTextContent(item, instance.doOCR(image.getData()), image);
+                } catch (TesseractException e) {
+                  log().error("Unable to extract text from content {}", image.getId(), e);
+                }
+              });
+
       return ProcessorResponse.ok();
+    }
+
+    private Text createTextContent(Item item, String textContent, Content<?> sourceContent) {
+      return item.createContent(Text.class)
+          .withDescription("OCR from " + sourceContent.getId())
+          .withData(textContent)
+          .withProperties(sourceContent.getProperties())
+          .save();
     }
   }
 

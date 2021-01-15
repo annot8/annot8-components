@@ -1,74 +1,115 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.elasticsearch.processors;
 
+import io.annot8.api.bounds.Bounds;
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
 import io.annot8.api.components.annotations.ComponentName;
 import io.annot8.api.components.annotations.ComponentTags;
 import io.annot8.api.components.annotations.SettingsClass;
 import io.annot8.api.context.Context;
+import io.annot8.api.data.Content;
 import io.annot8.api.data.Item;
-import io.annot8.api.references.AnnotationReference;
+import io.annot8.api.settings.Description;
 import io.annot8.common.components.AbstractProcessorDescriptor;
 import io.annot8.common.components.capabilities.SimpleCapabilities;
-import io.annot8.common.data.bounds.SpanBounds;
-import io.annot8.common.data.content.Text;
 import io.annot8.components.elasticsearch.ElasticsearchSettings;
+import io.annot8.components.elasticsearch.ElasticsearchUtils;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import org.apache.http.HttpHost;
 import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.support.master.AcknowledgedResponse;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.indices.CreateIndexRequest;
+import org.elasticsearch.client.indices.CreateIndexResponse;
+import org.elasticsearch.client.indices.GetIndexRequest;
+import org.elasticsearch.client.indices.PutMappingRequest;
+import org.elasticsearch.common.xcontent.XContentType;
 
 @ComponentName("Elasticsearch Sink - Nested")
 @ComponentDescription("Persists processed items into Elasticsearch, using a nested structure")
 @ComponentTags("elasticsearch")
-@SettingsClass(ElasticsearchSettings.class)
+@SettingsClass(NestedElasticsearchSink.Settings.class)
 public class NestedElasticsearchSink
-    extends AbstractProcessorDescriptor<NestedElasticsearchSink.Processor, ElasticsearchSettings> {
+    extends AbstractProcessorDescriptor<
+        NestedElasticsearchSink.Processor, NestedElasticsearchSink.Settings> {
 
   @Override
-  protected Processor createComponent(Context context, ElasticsearchSettings settings) {
-    return new Processor(List.of(settings.getHost()), settings.getIndex());
+  protected Processor createComponent(Context context, NestedElasticsearchSink.Settings settings) {
+    return new Processor(settings);
   }
 
   @Override
   public Capabilities capabilities() {
     return new SimpleCapabilities.Builder()
-        .withProcessesContent(Text.class)
-        .withProcessesAnnotations("*", SpanBounds.class)
+        .withProcessesContent(Content.class)
+        .withProcessesAnnotations("*", Bounds.class)
+        .withProcessesGroups("*")
         .build();
   }
 
   public static class Processor extends AbstractElasticsearchSink {
     public static final String ANNOTATIONS = "annotations";
-    public static final String ANNOTATION_ID = "annotationId";
-    public static final String BEGIN = "begin";
-    public static final String BOUNDS_TYPE = "boundsType";
-    public static final String CONTENT = "content";
     public static final String CONTENTS = "contents";
-    public static final String CONTENT_ID = "contentId";
-    public static final String CONTENT_TYPE = "contentType";
-    public static final String DESCRIPTION = "description";
-    public static final String END = "end";
     public static final String GROUPS = "groups";
-    public static final String ID = "id";
-    public static final String PARENT = "parent";
-    public static final String PROPERTIES = "properties";
-    public static final String ROLES = "roles";
-    public static final String TYPE = "type";
-    public static final String VALUE = "value";
 
-    public Processor(List<HttpHost> hosts, String index) {
-      super(hosts, index);
+    public Processor(NestedElasticsearchSink.Settings settings) {
+      super(settings);
+
+      // Create mapping
+      try {
+        if (client.indices().exists(new GetIndexRequest(index), RequestOptions.DEFAULT)) {
+          log().warn("Index {} already exists - mapping will not be applied", index);
+        } else {
+          log().info("Creating index {}", index);
+          CreateIndexResponse createResponse =
+              client.indices().create(new CreateIndexRequest(index), RequestOptions.DEFAULT);
+
+          if (!createResponse.isAcknowledged()) {
+            log().warn("Server did not acknowledge creation index {}", index);
+          }
+
+          // Apply our own logic for creating the mapping here,
+          // as it is dependent on configuration so we can't use
+          // approach in AbstractElasticsearchSink
+
+          log().info("Creating mapping for index {}", index);
+
+          String file = settings.isUseNested() ? "nesNestedMapping" : "nesMapping";
+          file += settings.isForceString() ? "String.json" : ".json";
+
+          String mapping =
+              new BufferedReader(
+                      new InputStreamReader(
+                          NestedElasticsearchSink.class.getResourceAsStream(file)))
+                  .lines()
+                  .collect(Collectors.joining("\n"));
+
+          AcknowledgedResponse mappingResponse =
+              client
+                  .indices()
+                  .putMapping(
+                      new PutMappingRequest(index).source(mapping, XContentType.JSON),
+                      RequestOptions.DEFAULT);
+
+          if (!mappingResponse.isAcknowledged()) {
+            log().warn("Server did not acknowledge creation of mapping for index {}", index);
+          }
+        }
+      } catch (IOException e) {
+        log().error("An exception occurred whilst creating a mapping for index {}", index, e);
+      }
     }
 
     @Override
     protected List<IndexRequest> itemToIndexRequests(Item item) {
-      IndexRequest ir = new IndexRequest(index).source(transformItem(item)).id(item.getId());
+      IndexRequest ir =
+          new IndexRequest(index).source(transformItem(item, forceString)).id(item.getId());
 
       return List.of(ir);
     }
@@ -114,13 +155,8 @@ public class NestedElasticsearchSink
      *   ]
      * }</code>
      */
-    protected static Map<String, Object> transformItem(Item item) {
-      Map<String, Object> m = new HashMap<>();
-
-      item.getParent().ifPresent(parent -> m.put(PARENT, parent));
-
-      Map<String, Object> itemProps = item.getProperties().getAll();
-      if (!itemProps.isEmpty()) m.put(PROPERTIES, itemProps);
+    protected static Map<String, Object> transformItem(Item item, boolean forceString) {
+      Map<String, Object> m = ElasticsearchUtils.itemToMap(item, forceString);
 
       // Contents
       List<Map<String, Object>> contents = new ArrayList<>();
@@ -128,46 +164,15 @@ public class NestedElasticsearchSink
       item.getContents()
           .forEach(
               c -> {
-                Map<String, Object> mc = new HashMap<>();
-
-                mc.put(ID, c.getId());
-
-                if (!c.getDescription().isBlank()) mc.put(DESCRIPTION, c.getDescription());
-
-                mc.put(CONTENT_TYPE, c.getDataClass().getName());
-
-                if (persistData(c.getDataClass())) mc.put(CONTENT, c.getData());
-
-                Map<String, Object> contentProps = c.getProperties().getAll();
-                if (!contentProps.isEmpty()) mc.put(PROPERTIES, contentProps);
+                Map<String, Object> mc = ElasticsearchUtils.contentToMap(c, forceString);
 
                 // Annotations
                 List<Map<String, Object>> annotations = new ArrayList<>();
 
                 c.getAnnotations()
                     .getAll()
-                    .forEach(
-                        a -> {
-                          Map<String, Object> ma = new HashMap<>();
-
-                          ma.put(ID, a.getId());
-                          ma.put(TYPE, a.getType());
-                          ma.put(BOUNDS_TYPE, a.getBounds().getClass().getName());
-
-                          Map<String, Object> annotationProps = a.getProperties().getAll();
-                          if (!annotationProps.isEmpty()) ma.put(PROPERTIES, annotationProps);
-
-                          if (a.getBounds() instanceof SpanBounds) {
-                            SpanBounds sb = (SpanBounds) a.getBounds();
-                            ma.put(BEGIN, sb.getBegin());
-                            ma.put(END, sb.getEnd());
-
-                            if (persistData(c.getDataClass()))
-                              sb.getData(c).ifPresent(value -> ma.put(VALUE, value));
-                          }
-
-                          annotations.add(ma);
-                        });
+                    .map(a -> ElasticsearchUtils.annotationToMap(a, c, forceString))
+                    .forEach(annotations::add);
 
                 mc.put(ANNOTATIONS, annotations);
 
@@ -180,49 +185,27 @@ public class NestedElasticsearchSink
       List<Map<String, Object>> groups = new ArrayList<>();
       item.getGroups()
           .getAll()
-          .forEach(
-              g -> {
-                Map<String, Object> mg = new HashMap<>();
+          .map(g -> ElasticsearchUtils.groupToMap(g, forceString))
+          .forEach(groups::add);
 
-                mg.put(ID, g.getId());
-                mg.put(TYPE, g.getType());
-
-                Map<String, Object> groupProps = g.getProperties().getAll();
-                if (!groupProps.isEmpty()) mg.put(PROPERTIES, groupProps);
-
-                Map<String, List<Map<String, String>>> roles = new HashMap<>();
-
-                Map<String, Stream<AnnotationReference>> mar = g.getReferences();
-                for (String role : mar.keySet()) {
-                  List<Map<String, String>> lr =
-                      mar.get(role)
-                          .map(
-                              r -> {
-                                Map<String, String> mr = new HashMap<>();
-
-                                mr.put(CONTENT_ID, r.getContentId());
-                                mr.put(ANNOTATION_ID, r.getAnnotationId());
-
-                                return mr;
-                              })
-                          .collect(Collectors.toList());
-
-                  roles.put(role, lr);
-                }
-
-                mg.put(ROLES, roles);
-
-                groups.add(mg);
-              });
       m.put(GROUPS, groups);
 
       return m;
     }
+  }
 
-    protected static boolean persistData(Class<?> dataClass) {
-      return String.class.isAssignableFrom(dataClass)
-          || Number.class.isAssignableFrom(dataClass)
-          || Boolean.class.isAssignableFrom(dataClass);
+  public static class Settings extends ElasticsearchSettings {
+    private boolean useNested = false;
+
+    @Description(
+        value = "Should the 'nested' type be used for arrays within Elasticsearch?",
+        defaultValue = "false")
+    public boolean isUseNested() {
+      return useNested;
+    }
+
+    public void setUseNested(boolean useNested) {
+      this.useNested = useNested;
     }
   }
 }

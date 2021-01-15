@@ -29,7 +29,8 @@ public class TxtFileExtractor
 
   @Override
   protected Processor createComponent(Context context, Settings settings) {
-    return new Processor(settings.isRemoveSourceContent(), settings.getExtensions());
+    return new Processor(
+        settings.isRemoveSourceContent(), settings.getExtensions(), settings.getCharset());
   }
 
   @Override
@@ -49,10 +50,22 @@ public class TxtFileExtractor
   public static class Processor extends AbstractProcessor {
     private final boolean removeSourceContent;
     private final List<String> extensions;
+    private final Charset charset;
 
-    public Processor(boolean removeSourceContent, List<String> extensions) {
+    public Processor(boolean removeSourceContent, List<String> extensions, String charset) {
       this.removeSourceContent = removeSourceContent;
       this.extensions = extensions;
+
+      if (Charset.isSupported(charset)) {
+        this.charset = Charset.forName(charset);
+      } else {
+        log()
+            .error(
+                "Charset {} is not supported - default charset {} will be used instead",
+                charset,
+                Charset.defaultCharset().name());
+        this.charset = Charset.defaultCharset();
+      }
     }
 
     @Override
@@ -67,7 +80,7 @@ public class TxtFileExtractor
               f -> {
                 try {
                   File file = f.getData();
-                  String data = Files.readString(file.toPath(), Charset.defaultCharset());
+                  String data = Files.readString(file.toPath(), charset);
                   item.createContent(Text.class)
                       .withDescription("Text from " + f.getId())
                       .withData(data)
@@ -77,8 +90,7 @@ public class TxtFileExtractor
                   if (removeSourceContent) item.removeContent(f);
 
                 } catch (Exception e) {
-                  log().warn("Unable to process file {}", f.getData().getAbsolutePath());
-                  log().debug("Unable to process file", e);
+                  log().warn("Unable to process file {}", f.getData().getAbsolutePath(), e);
                 }
               });
 
@@ -95,6 +107,7 @@ public class TxtFileExtractor
 
   public static class Settings extends RemoveSourceContentSettings {
     private List<String> extensions = List.of("txt");
+    private String charset = Charset.defaultCharset().name();
 
     @Description(
         "The list of file extensions on which this processor will act (case insensitive). If empty, then the processor will act on all files.")
@@ -106,9 +119,18 @@ public class TxtFileExtractor
       this.extensions = extensions.stream().map(String::toLowerCase).collect(Collectors.toList());
     }
 
+    @Description("The charset to read the files with")
+    public String getCharset() {
+      return charset;
+    }
+
+    public void setCharset(String charset) {
+      this.charset = charset;
+    }
+
     @Override
     public boolean validate() {
-      return super.validate() && extensions != null;
+      return super.validate() && extensions != null && Charset.isSupported(charset);
     }
   }
 }

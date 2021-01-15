@@ -51,7 +51,18 @@ public class Nationality extends AbstractProcessorDescriptor<Nationality.Process
               jv -> {
                 JsonObject jo = jv.asJsonObject();
 
-                String countryDemonym = jo.getString("demonym").toLowerCase();
+                String countryDemonym;
+                try {
+                  countryDemonym =
+                      jo.getJsonObject("demonyms")
+                          .getJsonObject("eng")
+                          .getString("m")
+                          .toLowerCase();
+                } catch (NullPointerException npe) {
+                  // Demonym can't be found, so skip
+                  return;
+                }
+
                 String countryCode = jo.getString("cca3");
 
                 if (countryDemonym.length() > 1) {

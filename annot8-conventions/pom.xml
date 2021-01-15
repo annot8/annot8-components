@@ -7,10 +7,11 @@
   <parent>
     <groupId>io.annot8</groupId>
     <artifactId>annot8-components</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
   </parent>
 
   <artifactId>annot8-conventions</artifactId>
+  <version>1.1.0</version>
   <name>Annot8 Conventions</name>
   <description>Naming conventions for Annot8 projects, recommended for compatibility</description>
 
@@ -19,7 +20,7 @@
       <id>plugins</id>
       <!-- 
         This profile is used to build JAR which contain all dependencies.
-        But we don't want it to run on conventions as thats not a plugin,
+        But we don't want it to run on conventions as that's not a plugin,
         so instead we override shading here and skip it.
       --> 
       <build>
@@ -28,9 +29,11 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-shade-plugin</artifactId>
             <version>${maven-shade-plugin.version}</version>
-            <configuration>
-              <skip>true</skip>
-            </configuration>
+            <executions>
+              <execution>
+                <phase>none</phase>
+              </execution>
+            </executions>
           </plugin>
         </plugins>
       </build>

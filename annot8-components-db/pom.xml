@@ -6,11 +6,11 @@
   <parent>
     <artifactId>annot8-components</artifactId>
     <groupId>io.annot8</groupId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
   </parent>
 
   <artifactId>annot8-components-db</artifactId>
-  <version>1.0.0</version>
+  <version>1.1.0</version>
   <name>Annot8 DB Components</name>
   <description>Components to deal with databases (primarily JDBC)</description>
 
@@ -18,7 +18,7 @@
     <dependency>
       <groupId>io.annot8</groupId>
       <artifactId>annot8-components-base</artifactId>
-      <version>1.0.0</version>
+      <version>1.1.0</version>
     </dependency>
     <dependency>
       <groupId>io.annot8</groupId>
@@ -27,7 +27,11 @@
     <dependency>
       <groupId>org.xerial</groupId>
       <artifactId>sqlite-jdbc</artifactId>
-      <version>3.32.3.2</version>
+      <version>3.34.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
     </dependency>
 
     <dependency>
