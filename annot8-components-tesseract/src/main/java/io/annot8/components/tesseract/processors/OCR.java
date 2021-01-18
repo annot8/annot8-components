@@ -17,13 +17,18 @@ import io.annot8.common.components.capabilities.SimpleCapabilities;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.Image;
 import io.annot8.common.data.content.Text;
-import java.util.*;
 import net.sourceforge.tess4j.ITesseract;
 import net.sourceforge.tess4j.TessAPI;
 import net.sourceforge.tess4j.Tesseract;
 import net.sourceforge.tess4j.TesseractException;
 import net.sourceforge.tess4j.util.LoadLibs;
 import org.apache.commons.io.FilenameUtils;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Takes FileContent containing either an image or PDF file, or Image content directly, and produces
@@ -55,7 +60,7 @@ public class OCR extends AbstractProcessorDescriptor<OCR.Processor, OCR.Settings
   public Capabilities capabilities() {
     return new SimpleCapabilities.Builder()
         .withProcessesContent(FileContent.class)
-        .withoutProcessesContent(Image.class)
+        .withProcessesContent(Image.class)
         .withCreatesContent(Text.class)
         .build();
   }
