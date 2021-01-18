@@ -13,19 +13,24 @@ import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.InputStreamContent;
 import io.annot8.components.documents.data.ExtractionWithProperties;
 import io.annot8.conventions.PropertyKeys;
-import java.awt.image.BufferedImage;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.*;
-import javax.imageio.ImageIO;
 import org.apache.poi.ooxml.POIXMLProperties;
 import org.apache.poi.poifs.filesystem.FileMagic;
 import org.apache.poi.xwpf.extractor.XWPFWordExtractor;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFPictureData;
 import org.slf4j.Logger;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @ComponentName("Word Document (DOCX) Extractor")
 @ComponentDescription("Extracts image and text from Word Document (*.docx) files")
@@ -155,6 +160,11 @@ public class DocxExtractor extends AbstractDocumentExtractorDescriptor<DocxExtra
           bImg = ImageIO.read(new ByteArrayInputStream(p.getData()));
         } catch (IOException e) {
           logger.warn("Unable to extract image {} from document", imageNumber, e);
+          continue;
+        }
+
+        if(bImg == null){
+          logger.warn("Null image {} extracted from document", imageNumber);
           continue;
         }
 

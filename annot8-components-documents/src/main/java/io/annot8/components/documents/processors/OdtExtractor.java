@@ -14,11 +14,6 @@ import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.InputStreamContent;
 import io.annot8.components.documents.data.ExtractionWithProperties;
 import io.annot8.conventions.PropertyKeys;
-import java.awt.image.BufferedImage;
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.util.*;
-import javax.imageio.ImageIO;
 import org.apache.poi.poifs.filesystem.FileMagic;
 import org.odftoolkit.odfdom.doc.OdfTextDocument;
 import org.odftoolkit.odfdom.incubator.doc.draw.OdfDrawFrame;
@@ -28,6 +23,16 @@ import org.odftoolkit.odfdom.incubator.meta.OdfOfficeMeta;
 import org.slf4j.Logger;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Extracts content from ODT files
@@ -257,6 +262,11 @@ public class OdtExtractor extends AbstractDocumentExtractorDescriptor<OdtExtract
             bImg = ImageIO.read(doc.getPackage().getInputStream(href));
           } catch (IOException e) {
             logger.warn("Unable to extract image {} from document", imageNumber, e);
+            continue;
+          }
+
+          if(bImg == null){
+            logger.warn("Null image {} extracted from document", imageNumber);
             continue;
           }
 

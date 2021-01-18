@@ -13,6 +13,14 @@ import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.InputStreamContent;
 import io.annot8.components.documents.data.ExtractionWithProperties;
 import io.annot8.conventions.PropertyKeys;
+import org.apache.poi.poifs.filesystem.FileMagic;
+import org.apache.poi.util.IOUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.slf4j.Logger;
+
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
@@ -21,14 +29,13 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
-import javax.imageio.ImageIO;
-import org.apache.poi.poifs.filesystem.FileMagic;
-import org.apache.poi.util.IOUtils;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.slf4j.Logger;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /** Extracts content from HTML files */
 @ComponentName("HTML Extractor")
@@ -236,6 +243,11 @@ public class HtmlExtractor extends AbstractDocumentExtractorDescriptor<HtmlExtra
           bImg = ImageIO.read(bais);
         } catch (Exception e) {
           logger.error("Unable to read image from {}", src, e);
+          continue;
+        }
+
+        if(bImg == null){
+          logger.warn("Null image {} extracted from document", src);
           continue;
         }
 
