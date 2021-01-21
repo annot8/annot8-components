@@ -4,7 +4,7 @@
 
   <groupId>io.annot8</groupId>
   <artifactId>annot8-components</artifactId>
-  <version>1.0.0</version>
+  <version>1.1.0</version>
   <packaging>pom</packaging>
 
   <name>Annot8 Components</name>
@@ -69,12 +69,16 @@
     <maven.compiler.target>${java.version}</maven.compiler.target>
 
     <!-- Annot8 versions -->
-    <annot8.version>1.0</annot8.version>
+    <annot8-api.version>1.0</annot8-api.version>
+    <annot8-implementation.version>1.0.2</annot8-implementation.version>
+
+    <!-- Utils -->
+    <guava.version>30.1-jre</guava.version>
 
     <!-- Testing -->
     <junit.version>5.7.0</junit.version>
-    <mockito.version>3.5.13</mockito.version>
-    <assertj-core.version>3.17.2</assertj-core.version>
+    <mockito.version>3.7.0</mockito.version>
+    <assertj-core.version>3.18.1</assertj-core.version>
     <assertj-guava.version>3.4.0</assertj-guava.version>
 
     <!-- Plugins -->
@@ -250,54 +254,54 @@
       <dependency>
         <groupId>io.annot8</groupId>
         <artifactId>annot8-api</artifactId>
-        <version>${annot8.version}</version>
+        <version>${annot8-api.version}</version>
       </dependency>
 
       <!-- Common -->
       <dependency>
         <groupId>io.annot8</groupId>
         <artifactId>annot8-common-data</artifactId>
-        <version>1.0.0</version>
+        <version>${annot8-implementation.version}</version>
       </dependency>
       <dependency>
         <groupId>io.annot8</groupId>
         <artifactId>annot8-common-components</artifactId>
-        <version>1.0.0</version>
+        <version>${annot8-implementation.version}</version>
       </dependency>
       <dependency>
         <groupId>io.annot8</groupId>
         <artifactId>annot8-common-utils</artifactId>
-        <version>1.0.0</version>
+        <version>${annot8-implementation.version}</version>
       </dependency>
 
       <!-- Implementation -->
       <dependency>
         <groupId>io.annot8</groupId>
         <artifactId>annot8-implementations-support</artifactId>
-        <version>1.0.0</version>
+        <version>${annot8-implementation.version}</version>
       </dependency>
       <dependency>
         <groupId>io.annot8</groupId>
         <artifactId>annot8-pipeline-implementation</artifactId>
-        <version>1.0.0</version>
+        <version>${annot8-implementation.version}</version>
       </dependency>
       <dependency>
         <groupId>io.annot8</groupId>
         <artifactId>annot8-reference-implementation</artifactId>
-        <version>1.0.0</version>
+        <version>${annot8-implementation.version}</version>
       </dependency>
 
       <!-- Testing -->
       <dependency>
         <groupId>io.annot8</groupId>
         <artifactId>annot8-impl-tck</artifactId>
-        <version>1.0.0</version>
+        <version>${annot8-implementation.version}</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>io.annot8</groupId>
         <artifactId>annot8-test-impl</artifactId>
-        <version>1.0.0</version>
+        <version>${annot8-implementation.version}</version>
         <scope>test</scope>
       </dependency>
 
@@ -311,7 +315,7 @@
       <dependency>
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
-        <version>29.0-jre</version>
+        <version>${guava.version}</version>
       </dependency>
 
       <!-- Testing -->
@@ -472,12 +476,14 @@
     <module>annot8-components-comms</module>
     <module>annot8-components-cyber</module>
     <module>annot8-components-db</module>
+    <module>annot8-components-documents</module>
     <module>annot8-components-elasticsearch</module>
     <module>annot8-components-files</module>
     <module>annot8-components-financial</module>
     <module>annot8-components-gazetteers</module>
     <module>annot8-components-geo</module>
     <module>annot8-components-grouping</module>
+    <module>annot8-components-groups</module>
     <module>annot8-components-image</module>
     <module>annot8-components-items</module>
     <module>annot8-components-mongo</module>
@@ -496,6 +502,8 @@
     <module>annot8-components-vehicles</module>
     <module>annot8-components-wordnet</module>
     <module>annot8-utils-text</module>
+    <module>annot8-components-people</module>
+    <module>annot8-components-kafka</module>
   </modules>
 
 

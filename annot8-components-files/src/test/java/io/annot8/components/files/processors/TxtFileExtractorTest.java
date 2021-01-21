@@ -10,6 +10,7 @@ import io.annot8.testing.testimpl.TestItem;
 import io.annot8.testing.testimpl.TestItemFactory;
 import java.io.File;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.nio.file.Paths;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -19,7 +20,8 @@ public class TxtFileExtractorTest {
   @Test
   public void test() throws Exception {
 
-    try (Processor p = new TxtFileExtractor.Processor(true, List.of("txt"))) {
+    try (Processor p =
+        new TxtFileExtractor.Processor(true, List.of("txt"), Charset.defaultCharset().name())) {
 
       TestItem item = new TestItem();
       TestItemFactory itemFactory = (TestItemFactory) item.getItemFactory();
@@ -43,7 +45,8 @@ public class TxtFileExtractorTest {
   @Test
   public void testNoMatch() throws Exception {
 
-    try (Processor p = new TxtFileExtractor.Processor(true, List.of("text"))) {
+    try (Processor p =
+        new TxtFileExtractor.Processor(true, List.of("text"), Charset.defaultCharset().name())) {
 
       TestItem item = new TestItem();
       TestItemFactory itemFactory = (TestItemFactory) item.getItemFactory();
@@ -63,7 +66,8 @@ public class TxtFileExtractorTest {
   @Test
   public void testMatchAll() throws Exception {
 
-    try (Processor p = new TxtFileExtractor.Processor(false, List.of())) {
+    try (Processor p =
+        new TxtFileExtractor.Processor(false, List.of(), Charset.defaultCharset().name())) {
 
       TestItem item = new TestItem();
       TestItemFactory itemFactory = (TestItemFactory) item.getItemFactory();

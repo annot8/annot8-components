@@ -3,12 +3,18 @@ package io.annot8.components.elasticsearch.processors;
 
 import io.annot8.api.components.responses.ProcessorResponse;
 import io.annot8.api.data.Item;
+import io.annot8.api.exceptions.BadConfigurationException;
 import io.annot8.common.components.AbstractProcessor;
+import io.annot8.components.elasticsearch.ElasticsearchSettings;
 import java.io.IOException;
+import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import org.apache.http.HttpHost;
 import org.elasticsearch.action.DocWriteResponse;
+import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
@@ -16,15 +22,65 @@ import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.client.indices.CreateIndexRequest;
+import org.elasticsearch.client.indices.GetIndexRequest;
 
 public abstract class AbstractElasticsearchSink extends AbstractProcessor {
   protected final RestHighLevelClient client;
   protected final String index;
+  protected final boolean forceString;
 
-  public AbstractElasticsearchSink(List<HttpHost> hosts, String index) {
+  public AbstractElasticsearchSink(ElasticsearchSettings settings) {
+    this(
+        List.of(settings.host()),
+        settings.getIndex(),
+        settings.isDeleteIndex(),
+        settings.isForceString());
+  }
+
+  public AbstractElasticsearchSink(
+      List<HttpHost> hosts, String index, boolean deleteIndex, boolean forceString) {
     client = new RestHighLevelClient(RestClient.builder(hosts.toArray(new HttpHost[0])));
-
     this.index = index;
+    this.forceString = forceString;
+
+    // Validate connection
+    try {
+      if (!client.ping(RequestOptions.DEFAULT))
+        throw new BadConfigurationException(
+            "Could not connect to Elasticsearch - ping returned false");
+
+    } catch (IOException e) {
+      throw new BadConfigurationException("Could not connect to Elasticsearch", e);
+    }
+
+    // Delete index
+    try {
+      if (deleteIndex
+          && client.indices().exists(new GetIndexRequest(index), RequestOptions.DEFAULT)) {
+        log().info("Deleting index {}", index);
+        client.indices().delete(new DeleteIndexRequest(index), RequestOptions.DEFAULT);
+      }
+    } catch (IOException e) {
+      log().error("An exception occurred whilst deleting index {}", index, e);
+    }
+
+    // Create index
+    try {
+      if (client.indices().exists(new GetIndexRequest(index), RequestOptions.DEFAULT)) {
+        log().warn("Index {} already exists - existing mapping will be used", index);
+      } else {
+        Optional<Map<String, Object>> mapping = getMapping();
+        if (mapping.isPresent()) {
+          log().info("Creating index {} with mapping", index);
+          client
+              .indices()
+              .create(new CreateIndexRequest(index).mapping(mapping.get()), RequestOptions.DEFAULT);
+        }
+      }
+    } catch (IOException e) {
+      log().error("An exception occurred whilst creating index {}", index, e);
+    }
   }
 
   @Override
@@ -40,7 +96,13 @@ public abstract class AbstractElasticsearchSink extends AbstractProcessor {
 
   @Override
   public ProcessorResponse process(Item item) {
-    List<IndexRequest> requests = itemToIndexRequests(item);
+    List<IndexRequest> requests;
+    try {
+      requests = itemToIndexRequests(item);
+    } catch (Exception e) {
+      log().error("Unable to serialize item {}: {}", item.getId(), e.getMessage());
+      return ProcessorResponse.itemError(e);
+    }
 
     if (requests.isEmpty()) {
       log().debug("No index requests created for item {}", item.getId());
@@ -98,6 +160,12 @@ public abstract class AbstractElasticsearchSink extends AbstractProcessor {
                   itemResponse.getResult().name());
         }
       }
+    } catch (ConnectException e) {
+      log()
+          .error(
+              "Unable to connect to Elasticsearch whilst performing bulk request: {}",
+              e.getMessage());
+      return ProcessorResponse.processingError(e);
     } catch (IOException e) {
       log().error("Exception thrown whilst performing bulk request: {}", e.getMessage());
       return ProcessorResponse.itemError(e);
@@ -108,6 +176,10 @@ public abstract class AbstractElasticsearchSink extends AbstractProcessor {
     } else {
       return ProcessorResponse.itemError(exceptions);
     }
+  }
+
+  protected Optional<Map<String, Object>> getMapping() {
+    return Optional.empty();
   }
 
   protected abstract List<IndexRequest> itemToIndexRequests(Item item);

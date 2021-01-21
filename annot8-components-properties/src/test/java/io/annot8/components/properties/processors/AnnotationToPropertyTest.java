@@ -12,6 +12,7 @@ import io.annot8.testing.testimpl.TestItem;
 import io.annot8.testing.testimpl.content.TestFileContent;
 import io.annot8.testing.testimpl.content.TestStringContent;
 import java.io.File;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
@@ -59,17 +60,23 @@ public class AnnotationToPropertyTest {
 
   @Test
   public void testMostCommon() {
-    testStrategy(AnnotationToProperty.Strategy.MOST_COMMON, "*", "A");
+    testStrategy(AnnotationToProperty.Strategy.MOST_COMMON, createTestItem(), "*", "A");
   }
 
   @Test
   public void testLeastCommon() {
-    testStrategy(AnnotationToProperty.Strategy.LEAST_COMMON, "*", "ANNOTATE");
+    testStrategy(AnnotationToProperty.Strategy.LEAST_COMMON, createTestItem(), "*", "ANNOTATE");
   }
 
   @Test
   public void testLeastCommonFiltered() {
-    testStrategy(AnnotationToProperty.Strategy.LEAST_COMMON, "letter", "Z");
+    testStrategy(AnnotationToProperty.Strategy.LEAST_COMMON, createTestItem(), "letter", "Z");
+  }
+
+  @Test
+  public void testLeastCommonProperty() {
+    // Least common property is true, because there are 5 vowels and 21 consonants
+    testStrategy(AnnotationToProperty.Strategy.LEAST_COMMON, createTestItem(), "*", true, "vowel");
   }
 
   @Test
@@ -114,23 +121,74 @@ public class AnnotationToPropertyTest {
     assertNotNull(m.get("test"));
   }
 
-  private void testStrategy(AnnotationToProperty.Strategy strategy, String type, Object expected) {
+  @Test
+  public void testFirstSpan() {
+    testStrategy(AnnotationToProperty.Strategy.FIRST_SPAN, createTestItemOneContent(), "*", "A");
+  }
+
+  @Test
+  public void testFirstSpanFiltered() {
+    testStrategy(
+        AnnotationToProperty.Strategy.FIRST_SPAN, createTestItemOneContent(), "letter", "A");
+  }
+
+  @Test
+  public void testLastSpan() {
+    testStrategy(AnnotationToProperty.Strategy.LAST_SPAN, createTestItemOneContent(), "*", "Z");
+  }
+
+  @Test
+  public void testLastSpanFiltered() {
+    testStrategy(
+        AnnotationToProperty.Strategy.LAST_SPAN, createTestItemOneContent(), "letter", "Z");
+  }
+
+  @Test
+  public void testLastSpanProperty() {
+    testStrategy(
+        AnnotationToProperty.Strategy.LAST_SPAN, createTestItemOneContent(), "*", false, "vowel");
+  }
+
+  @Test
+  public void testLastSpanMultiple() {
+    testStrategy(AnnotationToProperty.Strategy.LAST_SPAN, createTestItemOneContent(), "*");
+  }
+
+  private void testStrategy(AnnotationToProperty.Strategy strategy, Item item, String type) {
+    testStrategy(strategy, item, type, null);
+  }
+
+  private void testStrategy(
+      AnnotationToProperty.Strategy strategy, Item item, String type, Object expected) {
+    testStrategy(strategy, item, type, expected, null);
+  }
+
+  private void testStrategy(
+      AnnotationToProperty.Strategy strategy,
+      Item item,
+      String type,
+      Object expected,
+      String annotationProperty) {
     AnnotationToProperty.Settings s = new AnnotationToProperty.Settings();
     s.setStrategy(strategy);
     s.setAnnotationType(type);
     s.setPropertyName(strategy.name());
+    s.setAnnotationProperty(annotationProperty);
 
     AnnotationToProperty.Processor p = new AnnotationToProperty.Processor(s);
 
-    Item i = createTestItem();
-
-    ProcessorResponse r = p.process(i);
+    ProcessorResponse r = p.process(item);
     assertEquals(ProcessorResponse.ok(), r);
 
-    Map<String, Object> m = i.getProperties().getAll();
+    Map<String, Object> m = item.getProperties().getAll();
     assertEquals(1, m.size());
     assertTrue(m.containsKey(strategy.name()));
-    assertEquals(expected, m.get(strategy.name()));
+
+    if (expected == null) {
+      assertNotNull(m.get(strategy.name()));
+    } else {
+      assertEquals(expected, m.get(strategy.name()));
+    }
   }
 
   private Item createTestItem() {
@@ -169,6 +227,34 @@ public class AnnotationToPropertyTest {
                     .create()
                     .withBounds(new SpanBounds(i, i + 1))
                     .withType("letter")
+                    .withProperty(
+                        "vowel",
+                        List.of("A", "E", "I", "O", "U").contains(c.getData().substring(i, i + 1)))
+                    .save();
+            });
+
+    return item;
+  }
+
+  private Item createTestItemOneContent() {
+    Item item = new TestItem();
+
+    item.createContent(TestStringContent.class)
+        .withData("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+        .withDescription("Alphabet")
+        .save();
+
+    item.getContents(TestStringContent.class)
+        .forEach(
+            c -> {
+              for (int i = 0; i < c.getData().length(); i++)
+                c.getAnnotations()
+                    .create()
+                    .withBounds(new SpanBounds(i, i + 1))
+                    .withType("letter")
+                    .withProperty(
+                        "vowel",
+                        List.of("A", "E", "I", "O", "U").contains(c.getData().substring(i, i + 1)))
                     .save();
             });
 

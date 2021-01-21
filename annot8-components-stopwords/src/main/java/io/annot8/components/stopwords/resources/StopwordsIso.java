@@ -6,10 +6,14 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public class StopwordsIso implements Stopwords {
+
+  public static final List<String> SUPPORTED_LANGUAGES =
+      List.of("ar", "bn", "en", "es", "fr", "hi", "ms", "pt", "ru", "zh");
 
   private final String language;
   private final Set<String> stopwords;

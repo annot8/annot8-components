@@ -67,8 +67,8 @@ public class GroupByTypeAndValue
 
       // Create a group for things which are the same
       GroupStore groupStore = content.getItem().getGroups();
-      map.asMap()
-          .values()
+      map.asMap().values().stream()
+          .filter(annotations -> annotations.size() > 1)
           .forEach(
               annotations -> {
                 Group.Builder builder = groupStore.create().withType(TYPE);

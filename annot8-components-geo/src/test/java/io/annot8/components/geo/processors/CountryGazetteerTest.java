@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import io.annot8.api.annotations.Annotation;
+import io.annot8.api.components.Processor;
 import io.annot8.api.properties.ImmutableProperties;
 import io.annot8.api.stores.AnnotationStore;
 import io.annot8.components.gazetteers.processors.AhoCorasick;
@@ -18,7 +19,7 @@ public class CountryGazetteerTest {
   @Test
   public void testCreation() {
     CountryGazetteer countryGazetteer = new CountryGazetteer();
-    CountryGazetteer.Processor countryProcessor =
+    Processor countryProcessor =
         countryGazetteer.createComponent(null, new CountryGazetteer.Settings(true, true));
     assertNotNull(countryProcessor);
     countryProcessor.close();
@@ -58,6 +59,7 @@ public class CountryGazetteerTest {
     assertEquals("Africa", properties.getOrDefault("region", ""));
     assertEquals(11.5, properties.getOrDefault(PropertyKeys.PROPERTY_KEY_LATITUDE, 0.0));
     assertEquals(43.0, properties.getOrDefault(PropertyKeys.PROPERTY_KEY_LONGITUDE, 0.0));
+    assertNotNull(properties.get(PropertyKeys.PROPERTY_KEY_GEOJSON));
   }
 
   @Test

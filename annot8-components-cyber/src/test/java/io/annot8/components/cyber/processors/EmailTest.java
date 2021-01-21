@@ -1,6 +1,8 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.cyber.processors;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import io.annot8.api.annotations.Annotation;
 import io.annot8.api.components.Processor;
 import io.annot8.api.context.Context;
@@ -14,8 +16,8 @@ import io.annot8.implementations.support.context.SimpleContext;
 import io.annot8.testing.testimpl.TestItem;
 import io.annot8.testing.testimpl.content.TestStringContent;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 public class EmailTest {
@@ -38,13 +40,17 @@ public class EmailTest {
       AnnotationStore store = content.getAnnotations();
 
       List<Annotation> annotations = store.getAll().collect(Collectors.toList());
-      Assertions.assertEquals(1, annotations.size());
+      assertEquals(1, annotations.size());
 
       Annotation a = annotations.get(0);
-      Assertions.assertEquals(AnnotationTypes.ANNOTATION_TYPE_EMAIL, a.getType());
-      Assertions.assertEquals(content.getId(), a.getContentId());
-      Assertions.assertEquals("sally@example.com", a.getBounds().getData(content).get());
-      Assertions.assertEquals(0, a.getProperties().getAll().size());
+      assertEquals(AnnotationTypes.ANNOTATION_TYPE_EMAIL, a.getType());
+      assertEquals(content.getId(), a.getContentId());
+      assertEquals("sally@example.com", a.getBounds().getData(content).get());
+
+      Map<String, Object> props = a.getProperties().getAll();
+      assertEquals(2, props.size());
+      assertEquals("sally", props.get("username"));
+      assertEquals("example.com", props.get("domain"));
     }
   }
 }

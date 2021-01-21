@@ -16,6 +16,7 @@ import io.annot8.api.settings.Description;
 import io.annot8.common.components.AbstractProcessor;
 import io.annot8.common.components.AbstractProcessorDescriptor;
 import io.annot8.common.components.capabilities.SimpleCapabilities;
+import io.annot8.components.base.utils.TypeUtils;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -59,8 +60,9 @@ public class FilterAnnotationsByType
               c -> {
                 types.forEach(
                     type -> {
-                      List<Annotation> toRemove =
-                          c.getAnnotations().getByType(type).collect(Collectors.toList());
+                      List<Annotation> toRemove = getAnnotations(c, type);
+                      if (toRemove.isEmpty()) return;
+
                       log()
                           .info(
                               "Removing {} annotations of type {} from Content {}",
@@ -73,6 +75,19 @@ public class FilterAnnotationsByType
               });
 
       return ProcessorResponse.ok();
+    }
+
+    private static List<Annotation> getAnnotations(Content<?> c, String type) {
+      if (type.contains("*")) {
+        // Wildcard, so we need to loop through everything
+        return c.getAnnotations()
+            .getAll()
+            .filter(a -> TypeUtils.matchesWildcard(a.getType(), type))
+            .collect(Collectors.toList());
+      } else {
+        // No wildcard, so use the exact type to quickly get annotations
+        return c.getAnnotations().getByType(type).collect(Collectors.toList());
+      }
     }
   }
 
@@ -87,7 +102,8 @@ public class FilterAnnotationsByType
       this.types = types;
     }
 
-    @Description("Annotation types to remove")
+    @Description(
+        "Annotation types to remove - you can use * as a wildcard for a single part, or ** as a wildcard for multiple parts")
     public List<String> getTypes() {
       return types;
     }

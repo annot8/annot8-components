@@ -13,7 +13,7 @@ mvn clean install
 If you wish to build a set of JAR files (one per module) which contain all the dependencies of the project.
 
 ```
-mvn -Pplugin clean package
+mvn -Pplugins clean package
 ```
 
 ## Deploying to Maven central

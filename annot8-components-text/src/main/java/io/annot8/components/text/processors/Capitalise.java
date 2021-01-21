@@ -25,23 +25,29 @@ public class Capitalise
 
   @Override
   protected Processor createComponent(Context context, Settings settings) {
-    return new Processor(settings.getTextCase());
+    return new Processor(settings.getTextCase(), settings.isRemoveSourceContent());
   }
 
   @Override
   public Capabilities capabilities() {
-    return new SimpleCapabilities.Builder()
-        .withProcessesContent(Text.class)
-        .withCreatesContent(Text.class)
-        .build();
+    SimpleCapabilities.Builder builder =
+        new SimpleCapabilities.Builder()
+            .withProcessesContent(Text.class)
+            .withCreatesContent(Text.class);
+
+    if (getSettings().isRemoveSourceContent()) builder = builder.withDeletesContent(Text.class);
+
+    return builder.build();
   }
 
   public static class Processor extends AbstractTextProcessor {
 
     private final TextCase textCase;
+    private final boolean removeSourceContent;
 
-    public Processor(TextCase textCase) {
+    public Processor(TextCase textCase, boolean removeSourceContent) {
       this.textCase = textCase;
+      this.removeSourceContent = removeSourceContent;
     }
 
     @Override
@@ -62,6 +68,8 @@ public class Capitalise
               .save();
           break;
       }
+
+      if (removeSourceContent) item.removeContent(content);
     }
   }
 
@@ -72,14 +80,19 @@ public class Capitalise
 
   public static class Settings implements io.annot8.api.settings.Settings {
     private TextCase textCase;
+    private boolean removeSourceContent;
 
     public Settings() {
       textCase = UPPERCASE;
+      removeSourceContent = false;
     }
 
     @JsonbCreator
-    public Settings(@JsonbProperty("textCase") TextCase textCase) {
+    public Settings(
+        @JsonbProperty("textCase") TextCase textCase,
+        @JsonbProperty("removeSourceContent") boolean removeSourceContent) {
       this.textCase = textCase;
+      this.removeSourceContent = removeSourceContent;
     }
 
     @Override
@@ -94,6 +107,17 @@ public class Capitalise
 
     public void setTextCase(TextCase textCase) {
       this.textCase = textCase;
+    }
+
+    @Description(
+        value = "Should the source Content be removed after successful processing?",
+        defaultValue = "true")
+    public boolean isRemoveSourceContent() {
+      return removeSourceContent;
+    }
+
+    public void setRemoveSourceContent(boolean removeSourceContent) {
+      this.removeSourceContent = removeSourceContent;
     }
   }
 }

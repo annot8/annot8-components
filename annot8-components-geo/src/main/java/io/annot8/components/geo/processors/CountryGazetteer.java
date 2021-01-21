@@ -7,6 +7,7 @@ import io.annot8.api.components.annotations.ComponentName;
 import io.annot8.api.components.annotations.SettingsClass;
 import io.annot8.api.context.Context;
 import io.annot8.api.settings.Description;
+import io.annot8.common.components.AbstractProcessorDescriptor;
 import io.annot8.common.components.capabilities.SimpleCapabilities;
 import io.annot8.common.data.bounds.SpanBounds;
 import io.annot8.common.data.content.Text;
@@ -23,19 +24,25 @@ import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
 import javax.json.JsonValue;
-import javax.json.bind.annotation.JsonbCreator;
-import javax.json.bind.annotation.JsonbProperty;
 
-@ComponentName("CountryGazetteer")
+@ComponentName("Country Gazetteer")
 @ComponentDescription("Extract countries from text")
 @SettingsClass(CountryGazetteer.Settings.class)
-public class CountryGazetteer extends AhoCorasick<CountryGazetteer.Settings> {
+public class CountryGazetteer
+    extends AbstractProcessorDescriptor<AhoCorasick.Processor, CountryGazetteer.Settings> {
 
   @Override
-  protected Processor createComponent(
-      Context context, CountryGazetteer.Settings countryGazetteerSettings) {
-    return new Processor(
-        new MapGazetteer(getCountryData(countryGazetteerSettings)), countryGazetteerSettings);
+  protected AhoCorasick.Processor createComponent(
+      Context context, CountryGazetteer.Settings settings) {
+    AhoCorasick.Settings s = new AhoCorasick.Settings();
+    s.setAdditionalData(true);
+    s.setCaseSensitive(settings.isCaseSensitive());
+    s.setExactWhitespace(false);
+    s.setPlurals(false);
+    s.setSubType(settings.getSubType());
+    s.setType(AnnotationTypes.ANNOTATION_TYPE_LOCATION);
+
+    return new AhoCorasick.Processor(new MapGazetteer(getCountryData(settings)), s);
   }
 
   @Override
@@ -65,7 +72,7 @@ public class CountryGazetteer extends AhoCorasick<CountryGazetteer.Settings> {
         .forEach(
             jv -> {
               JsonObject jo = jv.asJsonObject();
-              Set<String> names = getNames(jo);
+              Set<String> names = getNames(jo, settings.isIncludeCountryCodes());
               Map<String, Object> metadata = new HashMap<>();
               metadata.put("cca3", jo.getString("cca3"));
               if (settings.isMetadata()) {
@@ -74,7 +81,7 @@ public class CountryGazetteer extends AhoCorasick<CountryGazetteer.Settings> {
               output.put(names, metadata);
             });
 
-    if (settings.isGeojson()) {
+    if (settings.isGeoJson()) {
       addGeojsonsToMetadata(output);
     }
     return output;
@@ -109,9 +116,22 @@ public class CountryGazetteer extends AhoCorasick<CountryGazetteer.Settings> {
             .map(JsonValue::toString)
             .map(this::removeQuotes)
             .collect(Collectors.toSet()));
-    metadata.put("demonym", jo.getString("demonym"));
+
+    try {
+      metadata.put("demonym", jo.getJsonObject("demonyms").getJsonObject("eng").getString("m"));
+    } catch (NullPointerException npe) {
+      // Demonym can't be found, so skip
+    }
+
     metadata.put("flag", jo.getString("flag"));
-    metadata.put("independent", jo.getBoolean("independent"));
+
+    try {
+      metadata.put("independent", jo.getBoolean("independent"));
+    } catch (ClassCastException cce) {
+      // Kosovo has a null value for independent in the dataset we have, so need to catch and skip
+      // this
+    }
+
     metadata.put("landlocked", jo.getBoolean("landlocked"));
     List<Double> latlng =
         jo.getJsonArray("latlng").stream()
@@ -124,7 +144,7 @@ public class CountryGazetteer extends AhoCorasick<CountryGazetteer.Settings> {
     metadata.put("subregion", jo.getString("subregion"));
   }
 
-  private Set<String> getNames(JsonObject jo) {
+  private Set<String> getNames(JsonObject jo, boolean includeCountryCodes) {
     Set<String> initialSet =
         jo.getJsonObject("name").getJsonObject("native").values().stream()
             .flatMap(a -> a.asJsonObject().values().stream().map(JsonValue::toString))
@@ -135,7 +155,10 @@ public class CountryGazetteer extends AhoCorasick<CountryGazetteer.Settings> {
         .values()
         .forEach(a -> addNamesToSet(initialSet, a.asJsonObject()));
     jo.getJsonArray("altSpellings").forEach(s -> initialSet.add(s.toString()));
-    return initialSet.stream().map(this::removeQuotes).collect(Collectors.toSet());
+    return initialSet.stream()
+        .map(this::removeQuotes)
+        .filter(s -> includeCountryCodes || s.length() > 2)
+        .collect(Collectors.toSet());
   }
 
   private String removeQuotes(String input) {
@@ -147,30 +170,82 @@ public class CountryGazetteer extends AhoCorasick<CountryGazetteer.Settings> {
     runningSet.add(jo.getString("official"));
   }
 
-  public static class Settings extends AhoCorasick.Settings {
-    private boolean geojson;
-    private boolean metadata;
+  public static class Settings implements io.annot8.api.settings.Settings {
+    private boolean caseSensitive = true;
+    private boolean geoJson = true;
+    private boolean metadata = false;
+    private boolean includeCountryCodes = false;
+    private String subType;
 
-    @JsonbCreator
-    public Settings(
-        @JsonbProperty("geojson") boolean geojson, @JsonbProperty("metadata") boolean metadata) {
-      this.geojson = geojson;
+    public Settings() {
+      // Default constructor
+    }
+
+    public Settings(boolean geoJson, boolean metadata) {
+      this.geoJson = geoJson;
       this.metadata = metadata;
-      setAdditionalData(true);
-      setCaseSensitive(true);
-      setExactWhitespace(false);
-      setPlurals(false);
-      setType(AnnotationTypes.ANNOTATION_TYPE_LOCATION);
     }
 
-    @Description("Add GeoJSON information to annotations?")
-    public boolean isGeojson() {
-      return geojson;
+    public Settings(
+        boolean geoJson,
+        boolean metadata,
+        boolean caseSensitive,
+        String subType,
+        boolean includeCountryCodes) {
+      this.geoJson = geoJson;
+      this.metadata = metadata;
+      this.caseSensitive = caseSensitive;
+      this.subType = subType;
+      this.includeCountryCodes = includeCountryCodes;
     }
 
-    @Description("Add country metadata to annotations?")
+    @Description(
+        value = "Only annotate matches with the same case as the data file",
+        defaultValue = "true")
+    public boolean isCaseSensitive() {
+      return caseSensitive;
+    }
+
+    public void setCaseSensitive(boolean caseSensitive) {
+      this.caseSensitive = caseSensitive;
+    }
+
+    @Description(value = "Add GeoJSON information to annotations", defaultValue = "true")
+    public boolean isGeoJson() {
+      return geoJson;
+    }
+
+    public void setGeoJson(boolean geoJson) {
+      this.geoJson = geoJson;
+    }
+
+    @Description(value = "Add country metadata to annotations", defaultValue = "false")
     public boolean isMetadata() {
       return metadata;
+    }
+
+    public void setMetadata(boolean metadata) {
+      this.metadata = metadata;
+    }
+
+    @Description("Sub-type to assign to annotations, or null")
+    public String getSubType() {
+      return subType;
+    }
+
+    public void setSubType(String subType) {
+      this.subType = subType;
+    }
+
+    @Description(
+        value = "Include two letter country codes in list of country names",
+        defaultValue = "false")
+    public boolean isIncludeCountryCodes() {
+      return includeCountryCodes;
+    }
+
+    public void setIncludeCountryCodes(boolean includeCountryCodes) {
+      this.includeCountryCodes = includeCountryCodes;
     }
 
     @Override

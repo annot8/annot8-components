@@ -5,12 +5,12 @@
   <parent>
     <artifactId>annot8-components</artifactId>
     <groupId>io.annot8</groupId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>annot8-components-financial</artifactId>
-  <version>1.0.0</version>
+  <version>1.1.0</version>
   <name>Annot8 Financial Components</name>
   <description>Components to deal with finance related annotations</description>
 
@@ -18,18 +18,18 @@
     <dependency>
       <groupId>io.annot8</groupId>
       <artifactId>annot8-components-base-text</artifactId>
-      <version>1.0.0</version>
+      <version>1.1.0</version>
     </dependency>
 
     <dependency>
       <groupId>org.iban4j</groupId>
       <artifactId>iban4j</artifactId>
-      <version>3.2.1</version>
+      <version>3.2.2-RELEASE</version>
     </dependency>
     <dependency>
       <groupId>org.bitcoinj</groupId>
       <artifactId>bitcoinj-core</artifactId>
-      <version>0.15.8</version>
+      <version>0.15.9</version>
     </dependency>
   </dependencies>
 
