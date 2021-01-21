@@ -13,13 +13,6 @@ import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.InputStreamContent;
 import io.annot8.components.documents.data.ExtractionWithProperties;
 import io.annot8.conventions.PropertyKeys;
-import org.apache.poi.hwpf.HWPFDocument;
-import org.apache.poi.hwpf.extractor.WordExtractor;
-import org.apache.poi.hwpf.usermodel.Picture;
-import org.apache.poi.poifs.filesystem.FileMagic;
-import org.slf4j.Logger;
-
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
@@ -31,6 +24,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.imageio.ImageIO;
+import org.apache.poi.hwpf.HWPFDocument;
+import org.apache.poi.hwpf.extractor.WordExtractor;
+import org.apache.poi.hwpf.usermodel.Picture;
+import org.apache.poi.poifs.filesystem.FileMagic;
+import org.slf4j.Logger;
 
 @ComponentName("Word Document (DOC) Extractor")
 @ComponentDescription("Extracts image and text from Word Document (*.doc) files")
@@ -123,7 +122,7 @@ public class DocExtractor extends AbstractDocumentExtractorDescriptor<DocExtract
           continue;
         }
 
-        if(bImg == null){
+        if (bImg == null) {
           logger.warn("Null image {} extracted from document", imageNumber);
           continue;
         }

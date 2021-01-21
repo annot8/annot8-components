@@ -13,14 +13,6 @@ import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.InputStreamContent;
 import io.annot8.components.documents.data.ExtractionWithProperties;
 import io.annot8.conventions.PropertyKeys;
-import org.apache.poi.poifs.filesystem.FileMagic;
-import org.apache.poi.util.IOUtils;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.slf4j.Logger;
-
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
@@ -36,6 +28,13 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.imageio.ImageIO;
+import org.apache.poi.poifs.filesystem.FileMagic;
+import org.apache.poi.util.IOUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.slf4j.Logger;
 
 /** Extracts content from HTML files */
 @ComponentName("HTML Extractor")
@@ -246,7 +245,7 @@ public class HtmlExtractor extends AbstractDocumentExtractorDescriptor<HtmlExtra
           continue;
         }
 
-        if(bImg == null){
+        if (bImg == null) {
           logger.warn("Null image {} extracted from document", src);
           continue;
         }

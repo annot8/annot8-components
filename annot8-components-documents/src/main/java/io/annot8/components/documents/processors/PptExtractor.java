@@ -13,16 +13,6 @@ import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.InputStreamContent;
 import io.annot8.components.documents.data.ExtractionWithProperties;
 import io.annot8.conventions.PropertyKeys;
-import org.apache.poi.hslf.usermodel.HSLFPictureData;
-import org.apache.poi.hslf.usermodel.HSLFShape;
-import org.apache.poi.hslf.usermodel.HSLFSlide;
-import org.apache.poi.hslf.usermodel.HSLFSlideShow;
-import org.apache.poi.hslf.usermodel.HSLFTextParagraph;
-import org.apache.poi.poifs.filesystem.FileMagic;
-import org.apache.poi.sl.extractor.SlideShowExtractor;
-import org.slf4j.Logger;
-
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
@@ -34,6 +24,15 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.imageio.ImageIO;
+import org.apache.poi.hslf.usermodel.HSLFPictureData;
+import org.apache.poi.hslf.usermodel.HSLFShape;
+import org.apache.poi.hslf.usermodel.HSLFSlide;
+import org.apache.poi.hslf.usermodel.HSLFSlideShow;
+import org.apache.poi.hslf.usermodel.HSLFTextParagraph;
+import org.apache.poi.poifs.filesystem.FileMagic;
+import org.apache.poi.sl.extractor.SlideShowExtractor;
+import org.slf4j.Logger;
 
 @ComponentName("PowerPoint (PPT) Extractor")
 @ComponentDescription("Extracts image and text from PowerPoint (*.ppt) files")
@@ -183,7 +182,7 @@ public class PptExtractor extends AbstractDocumentExtractorDescriptor<PptExtract
           continue;
         }
 
-        if(bImg == null){
+        if (bImg == null) {
           logger.warn("Null image {} extracted from document", picture.getIndex() + 1);
           continue;
         }

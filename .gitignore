@@ -3,3 +3,6 @@ target/
 .idea/
 dependency-reduced-pom.xml
 *.versionsBackup
+.classpath
+.settings/
+.project
