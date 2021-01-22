@@ -7,6 +7,7 @@ public class DocumentExtractorSettings implements io.annot8.api.settings.Setting
   private boolean extractMetadata = true;
   private boolean extractText = true;
   private boolean extractImages = true;
+  private boolean discardOriginal = false;
 
   @Override
   public boolean validate() {
@@ -38,5 +39,13 @@ public class DocumentExtractorSettings implements io.annot8.api.settings.Setting
 
   public void setExtractImages(boolean extractImages) {
     this.extractImages = extractImages;
+  }
+
+  @Description(value = "Discard original Content from which content is extracted", defaultValue = "false")
+  public boolean isDiscardOriginal() {
+    return discardOriginal;
+  }
+  public void setDiscardOriginal(boolean discardOriginal) {
+    this.discardOriginal = discardOriginal;
   }
 }

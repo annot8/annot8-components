@@ -24,6 +24,11 @@ public abstract class AbstractDocumentExtractorDescriptor<
 
     if (settings.isExtractImages()) builder = builder.withCreatesContent(Image.class);
 
+    if(settings.isDiscardOriginal())
+      builder = builder
+        .withDeletesContent(FileContent.class)
+        .withDeletesContent(InputStreamContent.class);
+
     return builder.build();
   }
 }

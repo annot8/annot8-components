@@ -15,14 +15,23 @@ import io.annot8.common.data.content.Image;
 import io.annot8.common.data.content.InputStreamContent;
 import io.annot8.common.data.content.Text;
 import io.annot8.components.documents.data.ExtractionWithProperties;
+import org.slf4j.Logger;
+import org.slf4j.helpers.NOPLogger;
+
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.time.temporal.TemporalAccessor;
-import java.util.*;
-import org.slf4j.Logger;
-import org.slf4j.helpers.NOPLogger;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Base class for DocumentExtractor processors, handling a lot of the common boilerplate code.
@@ -72,6 +81,9 @@ public abstract class AbstractDocumentExtractorProcessor<T> extends AbstractProc
               }
 
               exceptions.addAll(extract(item, c.getId(), doc));
+
+              if(settings.isDiscardOriginal())
+                item.removeContent(c);
             });
 
     item.getContents(InputStreamContent.class)
@@ -87,6 +99,9 @@ public abstract class AbstractDocumentExtractorProcessor<T> extends AbstractProc
               }
 
               exceptions.addAll(extract(item, c.getId(), doc));
+
+              if(settings.isDiscardOriginal())
+                item.removeContent(c);
             });
 
     if (exceptions.isEmpty()) {
