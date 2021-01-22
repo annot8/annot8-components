@@ -13,6 +13,16 @@ import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.InputStreamContent;
 import io.annot8.components.documents.data.ExtractionWithProperties;
 import io.annot8.conventions.PropertyKeys;
+import org.apache.poi.hslf.usermodel.HSLFPictureData;
+import org.apache.poi.hslf.usermodel.HSLFShape;
+import org.apache.poi.hslf.usermodel.HSLFSlide;
+import org.apache.poi.hslf.usermodel.HSLFSlideShow;
+import org.apache.poi.hslf.usermodel.HSLFTextParagraph;
+import org.apache.poi.poifs.filesystem.FileMagic;
+import org.apache.poi.sl.extractor.SlideShowExtractor;
+import org.slf4j.Logger;
+
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
@@ -24,15 +34,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.imageio.ImageIO;
-import org.apache.poi.hslf.usermodel.HSLFPictureData;
-import org.apache.poi.hslf.usermodel.HSLFShape;
-import org.apache.poi.hslf.usermodel.HSLFSlide;
-import org.apache.poi.hslf.usermodel.HSLFSlideShow;
-import org.apache.poi.hslf.usermodel.HSLFTextParagraph;
-import org.apache.poi.poifs.filesystem.FileMagic;
-import org.apache.poi.sl.extractor.SlideShowExtractor;
-import org.slf4j.Logger;
 
 @ComponentName("PowerPoint (PPT) Extractor")
 @ComponentDescription("Extracts image and text from PowerPoint (*.ppt) files")
@@ -178,12 +179,12 @@ public class PptExtractor extends AbstractDocumentExtractorDescriptor<PptExtract
         try {
           bImg = ImageIO.read(new ByteArrayInputStream(picture.getData()));
         } catch (IOException e) {
-          logger.warn("Unable to extract image {} from document", picture.getIndex() + 1, e);
+          logger.warn("Unable to extract image {} from document", picture.getIndex(), e);
           continue;
         }
 
         if (bImg == null) {
-          logger.warn("Null image {} extracted from document", picture.getIndex() + 1);
+          logger.warn("Null image {} extracted from document", picture.getIndex());
           continue;
         }
 
@@ -194,10 +195,10 @@ public class PptExtractor extends AbstractDocumentExtractorDescriptor<PptExtract
               ImageMetadataReader.readMetadata(new ByteArrayInputStream(picture.getData()));
           properties.putAll(toMap(imageMetadata));
         } catch (ImageProcessingException | IOException e) {
-          logger.warn("Unable to extract metadata from image {}", picture.getIndex() + 1, e);
+          logger.warn("Unable to extract metadata from image {}", picture.getIndex(), e);
         }
 
-        properties.put(PropertyKeys.PROPERTY_KEY_INDEX, picture.getIndex() + 1);
+        properties.put(PropertyKeys.PROPERTY_KEY_INDEX, picture.getIndex());
         properties.put(PropertyKeys.PROPERTY_KEY_MIMETYPE, picture.getContentType());
 
         extractedImages.add(new ExtractionWithProperties<>(bImg, properties));

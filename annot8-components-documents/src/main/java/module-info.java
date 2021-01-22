@@ -11,7 +11,8 @@ module io.annot8.components.documents {
   requires org.apache.pdfbox;
   requires org.jsoup;
   requires org.slf4j;
-  requires poi;
-  requires poi.ooxml;
-  requires poi.scratchpad;
+  requires org.apache.poi.poi;
+  requires org.apache.poi.ooxml;
+  requires org.apache.poi.scratchpad;
+  requires org.apache.commons.compress;
 }

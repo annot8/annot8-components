@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.helpers.NOPLogger;
 
 import java.awt.image.BufferedImage;
+import java.io.Closeable;
 import java.io.IOException;
 import java.time.Instant;
 import java.time.ZonedDateTime;
@@ -82,6 +83,14 @@ public abstract class AbstractDocumentExtractorProcessor<T> extends AbstractProc
 
               exceptions.addAll(extract(item, c.getId(), doc));
 
+              if(doc instanceof Closeable){
+                try {
+                  ((Closeable)doc).close();
+                } catch (IOException e) {
+                  //Do nothing
+                }
+              }
+
               if(settings.isDiscardOriginal())
                 item.removeContent(c);
             });
@@ -99,6 +108,14 @@ public abstract class AbstractDocumentExtractorProcessor<T> extends AbstractProc
               }
 
               exceptions.addAll(extract(item, c.getId(), doc));
+
+              if(doc instanceof Closeable){
+                try {
+                  ((Closeable)doc).close();
+                } catch (IOException e) {
+                  //Do nothing
+                }
+              }
 
               if(settings.isDiscardOriginal())
                 item.removeContent(c);
