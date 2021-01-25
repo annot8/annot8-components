@@ -19,8 +19,8 @@ public class TextDetectionTest {
     TextDetection.Settings s = new TextDetection.Settings();
     s.setEastModel(Path.of("/home/jdbaker/Downloads/frozen_east_text_detection.pb"));
     s.setDiscardOriginal(true);
-    s.setOutputMode(TextDetection.OutputMode.MASK);
-    s.setPadding(5);
+    s.setOutputMode(TextDetection.OutputMode.BOX);
+    s.setPadding(0);
 
     TextDetection.Processor p = new TextDetection.Processor(s);
 
@@ -30,7 +30,6 @@ public class TextDetectionTest {
         .save();
 
     assertEquals(ProcessorResponse.ok(), p.process(item));
-    System.out.println(item.getContents(Image.class).count());
 
     item.getContents(Image.class)
         .forEach(

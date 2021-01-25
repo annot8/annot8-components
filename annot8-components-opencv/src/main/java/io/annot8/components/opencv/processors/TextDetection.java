@@ -14,9 +14,13 @@ import io.annot8.common.components.AbstractProcessorDescriptor;
 import io.annot8.common.components.capabilities.SimpleCapabilities;
 import io.annot8.common.data.content.Image;
 import io.annot8.components.opencv.utils.OpenCVUtils;
+import java.awt.*;
+import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.opencv.core.CvType;
@@ -122,7 +126,13 @@ public class TextDetection
                 settings.getScoreThreshold(),
                 settings.getNmsThreshold(),
                 indices);
-            int[] indexes = indices.toArray();
+
+            // Convert model output into RotatedRect
+            List<RotatedRect> rotatedRects =
+                Arrays.stream(indices.toArray())
+                    .mapToObj(i -> boxesArray[i])
+                    .map(rr -> OpenCVUtils.padRotatedRect(rr, settings.getPadding()))
+                    .collect(Collectors.toList());
 
             // Calculate the scaling ratio we need to apply
             Point ratio =
@@ -131,21 +141,15 @@ public class TextDetection
             switch (settings.getOutputMode()) {
               case BOX:
                 // Draw boxes around identified text
-                for (int index : indexes) {
-                  RotatedRect rot =
-                      OpenCVUtils.padRotatedRect(boxesArray[index], settings.getPadding());
-                  Point[] vertices = new Point[4];
-                  rot.points(vertices);
-                  for (int j = 0; j < 4; ++j) {
-                    vertices[j].x *= ratio.x;
-                    vertices[j].y *= ratio.y;
-                  }
+                for (RotatedRect rot : rotatedRects) {
+                  Point[] vertices = OpenCVUtils.scaleRotatedRect(rot, ratio.x, ratio.y);
                   for (int j = 0; j < 4; ++j) {
                     Imgproc.line(
                         frame, vertices[j], vertices[(j + 1) % 4], new Scalar(0, 0, 255), 1);
                   }
                 }
 
+                // Save frame to new Image Content
                 try {
                   item.createContent(Image.class)
                       .withData(OpenCVUtils.matToBufferedImage(frame))
@@ -157,48 +161,70 @@ public class TextDetection
                 }
                 break;
               case EXTRACT:
-                // TODO: Merge detections that are adjacent
-                // TODO: Rather than using bounding box, rotate rectangle
-                for (int index : indexes) {
-                  RotatedRect rot =
-                      OpenCVUtils.padRotatedRect(boxesArray[index], settings.getPadding());
+                // Extract text areas individually into new Image Content
+
+                // TODO: Merge intersecting boxes
+                for (RotatedRect rot : rotatedRects) {
                   Rect bounding = rot.boundingRect();
 
-                  item.createContent(Image.class)
-                      .withData(
-                          img.getData()
-                              .getSubimage(
-                                  (int) (bounding.x * ratio.x),
-                                  (int) (bounding.y * ratio.y),
-                                  (int) (bounding.width * ratio.x),
-                                  (int) (bounding.height * ratio.y)))
-                      .withDescription("EAST output (EXTRACT) from " + img.getId())
-                      .save();
+                  // Reduce image to bounding box
+                  BufferedImage bounded =
+                      img.getData()
+                          .getSubimage(
+                              (int) (bounding.x * ratio.x),
+                              (int) (bounding.y * ratio.y),
+                              (int) (bounding.width * ratio.x),
+                              (int) (bounding.height * ratio.y));
 
-                  // TODO: Add properties to item - e.g. coordinates, size, original image, etc
+                  // Rotate bounding box
+                  BufferedImage rotated = rotateImageByDegrees(bounded, -rot.angle);
+
+                  // Trim bounding box to detections
+                  int centreX = rotated.getWidth() / 2;
+                  int centreY = rotated.getHeight() / 2;
+
+                  BufferedImage trimmed =
+                      rotated.getSubimage(
+                          (int) ((centreX - (ratio.x * rot.size.width) / 2.0)),
+                          (int) ((centreY - (ratio.y * rot.size.height) / 2.0)),
+                          (int) (ratio.x * rot.size.width),
+                          (int) (ratio.y * rot.size.height));
+
+                  // Save trimmed image to new Image Content
+                  item.createContent(Image.class)
+                      .withData(trimmed)
+                      .withDescription("EAST output (EXTRACT) from " + img.getId())
+                      .withProperty("x", (int) (bounding.x * ratio.x))
+                      .withProperty("y", (int) (bounding.y * ratio.y))
+                      .withProperty("width", (int) (bounding.width * ratio.x))
+                      .withProperty("height", (int) (bounding.height * ratio.y))
+                      .withProperty("source", img.getId())
+                      .withProperty("angle", rot.angle)
+                      .save();
                 }
 
                 break;
               case MASK:
                 // Mask out non-text with black pixels
+
+                // Create mask, which is white by default
                 Mat mask = new Mat(frame.rows(), frame.cols(), CvType.CV_8U);
                 mask.setTo(OpenCVUtils.WHITE);
-                for (int index : indexes) {
-                  RotatedRect rot =
-                      OpenCVUtils.padRotatedRect(boxesArray[index], settings.getPadding());
-                  Point[] vertices = new Point[4];
-                  rot.points(vertices);
-                  for (int j = 0; j < 4; ++j) {
-                    vertices[j].x *= ratio.x;
-                    vertices[j].y *= ratio.y;
-                  }
+
+                // Create masked areas, using black
+                for (RotatedRect rot : rotatedRects) {
+                  Point[] vertices = OpenCVUtils.scaleRotatedRect(rot, ratio.x, ratio.y);
 
                   Imgproc.fillPoly(mask, List.of(new MatOfPoint(vertices)), OpenCVUtils.BLACK);
                 }
 
+                // Mask out original image by setting any white pixels in the mask to black,
+                // and using the original pixels for black pixels in the mask
+
                 Imgproc.cvtColor(mask, mask, Imgproc.COLOR_GRAY2BGR, 3);
                 frame.setTo(OpenCVUtils.BLACK, mask);
 
+                // Save frame to new Image Content
                 try {
                   item.createContent(Image.class)
                       .withData(OpenCVUtils.matToBufferedImage(frame))
@@ -212,12 +238,37 @@ public class TextDetection
                 break;
             }
 
+            // Discard original according to settings
             if (settings.isDiscardOriginal()) item.removeContent(img);
           });
 
       if (exceptions.isEmpty()) return ProcessorResponse.ok();
 
       return ProcessorResponse.processingError(exceptions);
+    }
+
+    private static BufferedImage rotateImageByDegrees(BufferedImage img, double angle) {
+      double rads = Math.toRadians(angle);
+      double sin = Math.abs(Math.sin(rads)), cos = Math.abs(Math.cos(rads));
+      int w = img.getWidth();
+      int h = img.getHeight();
+      int newWidth = (int) Math.floor(w * cos + h * sin);
+      int newHeight = (int) Math.floor(h * cos + w * sin);
+
+      BufferedImage rotated = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB);
+      Graphics2D g2d = rotated.createGraphics();
+      AffineTransform at = new AffineTransform();
+      at.translate((newWidth - w) / 2.0, (newHeight - h) / 2.0);
+
+      int x = w / 2;
+      int y = h / 2;
+
+      at.rotate(rads, x, y);
+      g2d.setTransform(at);
+      g2d.drawImage(img, 0, 0, null);
+      g2d.dispose();
+
+      return rotated;
     }
 
     private static List<RotatedRect> decode(

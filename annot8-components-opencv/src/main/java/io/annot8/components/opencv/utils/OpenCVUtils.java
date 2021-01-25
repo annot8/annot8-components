@@ -9,6 +9,7 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfByte;
+import org.opencv.core.Point;
 import org.opencv.core.RotatedRect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
@@ -27,6 +28,18 @@ public class OpenCVUtils {
         orig.center,
         new Size(orig.size.width + 2 * padding, orig.size.height + 2 * padding),
         orig.angle);
+  }
+
+  public static Point[] scaleRotatedRect(RotatedRect rect, double xScale, double yScale) {
+    Point[] vertices = new org.opencv.core.Point[4];
+    rect.points(vertices);
+
+    for (int j = 0; j < 4; ++j) {
+      vertices[j].x *= xScale;
+      vertices[j].y *= yScale;
+    }
+
+    return vertices;
   }
 
   public static Mat bufferedImageToMat(BufferedImage image) throws IOException {
