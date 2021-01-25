@@ -504,6 +504,7 @@
     <module>annot8-utils-text</module>
     <module>annot8-components-people</module>
     <module>annot8-components-kafka</module>
+    <module>annot8-components-opencv</module>
   </modules>
 
 
