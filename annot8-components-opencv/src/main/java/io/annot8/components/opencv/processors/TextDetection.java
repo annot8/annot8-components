@@ -17,7 +17,6 @@ import io.annot8.components.opencv.utils.OpenCVUtils;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -80,162 +79,12 @@ public class TextDetection
 
       images.forEach(
           img -> {
-            // Based on code from: https://gist.github.com/berak/788da80d1dd5bade3f878210f45d6742
-            Mat frame;
             try {
-              frame = OpenCVUtils.bufferedImageToMat(img.getData());
-            } catch (IOException ioe) {
-              exceptions.add(ioe);
+              // Process image
+              processImage(item, img);
+            } catch (Exception e) {
+              exceptions.add(e);
               return;
-            }
-            // Convert to 3-channel RGB
-            Imgproc.cvtColor(frame, frame, Imgproc.COLOR_RGBA2RGB);
-
-            // Calculate mean RGB values
-            Scalar meanRGB = OpenCVUtils.meanRGB(img.getData());
-
-            // Convert to blob
-            Size size = new Size(settings.getSize(), settings.getSize());
-            int height = (int) (size.height / 4);
-            Mat blob = Dnn.blobFromImage(frame, 1.0, size, meanRGB, true, false);
-
-            // Pass blob through to EAST and get outputs
-            eastNet.setInput(blob);
-            List<Mat> outs = new ArrayList<>(2);
-            List<String> outNames = new ArrayList<>();
-            outNames.add("feature_fusion/Conv_7/Sigmoid");
-            outNames.add("feature_fusion/concat_3");
-            eastNet.forward(outs, outNames);
-
-            // Read results from EAST, and decode into RotatedRect
-            Mat scores = outs.get(0).reshape(1, height);
-            Mat geometry = outs.get(1).reshape(1, 5 * height);
-            List<Float> confidencesList = new ArrayList<>();
-            List<RotatedRect> boxesList =
-                decode(scores, geometry, confidencesList, settings.getScoreThreshold());
-
-            // Suppress non-maximal boxes
-            MatOfFloat confidences =
-                new MatOfFloat(Converters.vector_float_to_Mat(confidencesList));
-            RotatedRect[] boxesArray = boxesList.toArray(new RotatedRect[0]);
-            MatOfRotatedRect boxes = new MatOfRotatedRect(boxesArray);
-            MatOfInt indices = new MatOfInt();
-            Dnn.NMSBoxesRotated(
-                boxes,
-                confidences,
-                settings.getScoreThreshold(),
-                settings.getNmsThreshold(),
-                indices);
-
-            // Convert model output into RotatedRect
-            List<RotatedRect> rotatedRects =
-                Arrays.stream(indices.toArray())
-                    .mapToObj(i -> boxesArray[i])
-                    .map(rr -> OpenCVUtils.padRotatedRect(rr, settings.getPadding()))
-                    .collect(Collectors.toList());
-
-            // Calculate the scaling ratio we need to apply
-            Point ratio =
-                new Point((float) frame.cols() / size.width, (float) frame.rows() / size.height);
-
-            switch (settings.getOutputMode()) {
-              case BOX:
-                // Draw boxes around identified text
-                for (RotatedRect rot : rotatedRects) {
-                  Point[] vertices = OpenCVUtils.scaleRotatedRect(rot, ratio.x, ratio.y);
-                  for (int j = 0; j < 4; ++j) {
-                    Imgproc.line(
-                        frame, vertices[j], vertices[(j + 1) % 4], new Scalar(0, 0, 255), 1);
-                  }
-                }
-
-                // Save frame to new Image Content
-                try {
-                  item.createContent(Image.class)
-                      .withData(OpenCVUtils.matToBufferedImage(frame))
-                      .withDescription("EAST output (BOX) from " + img.getId())
-                      .save();
-                } catch (IOException ioe) {
-                  exceptions.add(ioe);
-                  return;
-                }
-                break;
-              case EXTRACT:
-                // Extract text areas individually into new Image Content
-
-                // TODO: Merge intersecting boxes
-                for (RotatedRect rot : rotatedRects) {
-                  Rect bounding = rot.boundingRect();
-
-                  // Reduce image to bounding box
-                  BufferedImage bounded =
-                      img.getData()
-                          .getSubimage(
-                              (int) (bounding.x * ratio.x),
-                              (int) (bounding.y * ratio.y),
-                              (int) (bounding.width * ratio.x),
-                              (int) (bounding.height * ratio.y));
-
-                  // Rotate bounding box
-                  BufferedImage rotated = rotateImageByDegrees(bounded, -rot.angle);
-
-                  // Trim bounding box to detections
-                  int centreX = rotated.getWidth() / 2;
-                  int centreY = rotated.getHeight() / 2;
-
-                  BufferedImage trimmed =
-                      rotated.getSubimage(
-                          (int) ((centreX - (ratio.x * rot.size.width) / 2.0)),
-                          (int) ((centreY - (ratio.y * rot.size.height) / 2.0)),
-                          (int) (ratio.x * rot.size.width),
-                          (int) (ratio.y * rot.size.height));
-
-                  // Save trimmed image to new Image Content
-                  item.createContent(Image.class)
-                      .withData(trimmed)
-                      .withDescription("EAST output (EXTRACT) from " + img.getId())
-                      .withProperty("x", (int) (bounding.x * ratio.x))
-                      .withProperty("y", (int) (bounding.y * ratio.y))
-                      .withProperty("width", (int) (bounding.width * ratio.x))
-                      .withProperty("height", (int) (bounding.height * ratio.y))
-                      .withProperty("source", img.getId())
-                      .withProperty("angle", rot.angle)
-                      .save();
-                }
-
-                break;
-              case MASK:
-                // Mask out non-text with black pixels
-
-                // Create mask, which is white by default
-                Mat mask = new Mat(frame.rows(), frame.cols(), CvType.CV_8U);
-                mask.setTo(OpenCVUtils.WHITE);
-
-                // Create masked areas, using black
-                for (RotatedRect rot : rotatedRects) {
-                  Point[] vertices = OpenCVUtils.scaleRotatedRect(rot, ratio.x, ratio.y);
-
-                  Imgproc.fillPoly(mask, List.of(new MatOfPoint(vertices)), OpenCVUtils.BLACK);
-                }
-
-                // Mask out original image by setting any white pixels in the mask to black,
-                // and using the original pixels for black pixels in the mask
-
-                Imgproc.cvtColor(mask, mask, Imgproc.COLOR_GRAY2BGR, 3);
-                frame.setTo(OpenCVUtils.BLACK, mask);
-
-                // Save frame to new Image Content
-                try {
-                  item.createContent(Image.class)
-                      .withData(OpenCVUtils.matToBufferedImage(frame))
-                      .withDescription("EAST output (MASK) from " + img.getId())
-                      .save();
-                } catch (IOException ioe) {
-                  exceptions.add(ioe);
-                  return;
-                }
-
-                break;
             }
 
             // Discard original according to settings
@@ -245,6 +94,146 @@ public class TextDetection
       if (exceptions.isEmpty()) return ProcessorResponse.ok();
 
       return ProcessorResponse.processingError(exceptions);
+    }
+
+    private void processImage(Item item, Image img) throws Exception {
+      // Based on code from: https://gist.github.com/berak/788da80d1dd5bade3f878210f45d6742
+      Mat frame = OpenCVUtils.bufferedImageToMat(img.getData());
+
+      // Convert to 3-channel RGB
+      Imgproc.cvtColor(frame, frame, Imgproc.COLOR_RGBA2RGB);
+
+      // Calculate mean RGB values
+      Scalar meanRGB = OpenCVUtils.meanRGB(img.getData());
+
+      // Convert to blob
+      Size size = new Size(settings.getSize(), settings.getSize());
+      int height = (int) (size.height / 4);
+      Mat blob = Dnn.blobFromImage(frame, 1.0, size, meanRGB, true, false);
+
+      // Pass blob through to EAST and get outputs
+      eastNet.setInput(blob);
+      List<Mat> outs = new ArrayList<>(2);
+      List<String> outNames = new ArrayList<>();
+      outNames.add("feature_fusion/Conv_7/Sigmoid");
+      outNames.add("feature_fusion/concat_3");
+      eastNet.forward(outs, outNames);
+
+      // Read results from EAST, and decode into RotatedRect
+      Mat scores = outs.get(0).reshape(1, height);
+      Mat geometry = outs.get(1).reshape(1, 5 * height);
+      List<Float> confidencesList = new ArrayList<>();
+      List<RotatedRect> boxesList =
+          decode(scores, geometry, confidencesList, settings.getScoreThreshold());
+
+      // Suppress non-maximal boxes
+      MatOfFloat confidences = new MatOfFloat(Converters.vector_float_to_Mat(confidencesList));
+      RotatedRect[] boxesArray = boxesList.toArray(new RotatedRect[0]);
+      MatOfRotatedRect boxes = new MatOfRotatedRect(boxesArray);
+      MatOfInt indices = new MatOfInt();
+      Dnn.NMSBoxesRotated(
+          boxes, confidences, settings.getScoreThreshold(), settings.getNmsThreshold(), indices);
+
+      // Convert model output into RotatedRect
+      List<RotatedRect> rotatedRects =
+          Arrays.stream(indices.toArray())
+              .mapToObj(i -> boxesArray[i])
+              .map(rr -> OpenCVUtils.padRotatedRect(rr, settings.getPadding()))
+              .collect(Collectors.toList());
+
+      // Calculate the scaling ratio we need to apply
+      Point ratio =
+          new Point((float) frame.cols() / size.width, (float) frame.rows() / size.height);
+
+      switch (settings.getOutputMode()) {
+        case BOX:
+          // Draw boxes around identified text
+          for (RotatedRect rot : rotatedRects) {
+            Point[] vertices = OpenCVUtils.scaleRotatedRect(rot, ratio.x, ratio.y);
+            for (int j = 0; j < 4; ++j) {
+              Imgproc.line(frame, vertices[j], vertices[(j + 1) % 4], new Scalar(0, 0, 255), 1);
+            }
+          }
+
+          // Save frame to new Image Content
+          item.createContent(Image.class)
+              .withData(OpenCVUtils.matToBufferedImage(frame))
+              .withDescription("EAST output (BOX) from " + img.getId())
+              .save();
+
+          break;
+        case EXTRACT:
+          // Extract text areas individually into new Image Content
+
+          // TODO: Merge intersecting boxes
+          for (RotatedRect rot : rotatedRects) {
+            Rect bounding = rot.boundingRect();
+
+            // Reduce image to bounding box
+            BufferedImage bounded =
+                img.getData()
+                    .getSubimage(
+                        (int) (bounding.x * ratio.x),
+                        (int) (bounding.y * ratio.y),
+                        (int) (bounding.width * ratio.x),
+                        (int) (bounding.height * ratio.y));
+
+            // Rotate bounding box
+            BufferedImage rotated = rotateImageByDegrees(bounded, -rot.angle);
+
+            // Trim bounding box to detections
+            int centreX = rotated.getWidth() / 2;
+            int centreY = rotated.getHeight() / 2;
+
+            BufferedImage trimmed =
+                rotated.getSubimage(
+                    (int) ((centreX - (ratio.x * rot.size.width) / 2.0)),
+                    (int) ((centreY - (ratio.y * rot.size.height) / 2.0)),
+                    (int) (ratio.x * rot.size.width),
+                    (int) (ratio.y * rot.size.height));
+
+            // Save trimmed image to new Image Content
+            item.createContent(Image.class)
+                .withData(trimmed)
+                .withDescription("EAST output (EXTRACT) from " + img.getId())
+                .withProperty("x", (int) (bounding.x * ratio.x))
+                .withProperty("y", (int) (bounding.y * ratio.y))
+                .withProperty("width", (int) (bounding.width * ratio.x))
+                .withProperty("height", (int) (bounding.height * ratio.y))
+                .withProperty("source", img.getId())
+                .withProperty("angle", rot.angle)
+                .save();
+          }
+
+          break;
+        case MASK:
+          // Mask out non-text with black pixels
+
+          // Create mask, which is white by default
+          Mat mask = new Mat(frame.rows(), frame.cols(), CvType.CV_8U);
+          mask.setTo(OpenCVUtils.WHITE);
+
+          // Create masked areas, using black
+          for (RotatedRect rot : rotatedRects) {
+            Point[] vertices = OpenCVUtils.scaleRotatedRect(rot, ratio.x, ratio.y);
+
+            Imgproc.fillPoly(mask, List.of(new MatOfPoint(vertices)), OpenCVUtils.BLACK);
+          }
+
+          // Mask out original image by setting any white pixels in the mask to black,
+          // and using the original pixels for black pixels in the mask
+
+          Imgproc.cvtColor(mask, mask, Imgproc.COLOR_GRAY2BGR, 3);
+          frame.setTo(OpenCVUtils.BLACK, mask);
+
+          // Save frame to new Image Content
+          item.createContent(Image.class)
+              .withData(OpenCVUtils.matToBufferedImage(frame))
+              .withDescription("EAST output (MASK) from " + img.getId())
+              .save();
+
+          break;
+      }
     }
 
     private static BufferedImage rotateImageByDegrees(BufferedImage img, double angle) {
