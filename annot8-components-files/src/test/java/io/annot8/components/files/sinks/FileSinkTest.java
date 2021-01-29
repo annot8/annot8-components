@@ -10,8 +10,21 @@ import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.Processor;
 import io.annot8.api.data.Content;
 import io.annot8.api.data.Item;
-import io.annot8.common.data.bounds.*;
-import io.annot8.common.data.content.*;
+import io.annot8.common.data.bounds.CellBounds;
+import io.annot8.common.data.bounds.ContentBounds;
+import io.annot8.common.data.bounds.MultiCellBounds;
+import io.annot8.common.data.bounds.NoBounds;
+import io.annot8.common.data.bounds.PositionBounds;
+import io.annot8.common.data.bounds.RectangleBounds;
+import io.annot8.common.data.bounds.SpanBounds;
+import io.annot8.common.data.content.FileContent;
+import io.annot8.common.data.content.Image;
+import io.annot8.common.data.content.InputStreamContent;
+import io.annot8.common.data.content.Row;
+import io.annot8.common.data.content.Table;
+import io.annot8.common.data.content.TableContent;
+import io.annot8.common.data.content.Text;
+import io.annot8.common.data.content.UriContent;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.GroupRoles;
 import io.annot8.conventions.GroupTypes;
@@ -29,10 +42,22 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Stream;
 import javax.imageio.ImageIO;
-import javax.json.*;
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonArrayBuilder;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
+import javax.json.JsonValue;
 import org.junit.jupiter.api.Test;
 
 public class FileSinkTest {
@@ -53,7 +78,7 @@ public class FileSinkTest {
         FileSink.Processor.getItemPath(item, Path.of("./output/"), Collections.emptyList());
 
     assertEquals(Path.of("./output", "/path/to/my/file.txt"), itemPath);
-    assertEquals("./output/path/to/my/file.txt", itemPath.toString());
+    assertEquals(Path.of("./output/path/to/my/file.txt").toString(), itemPath.toString());
   }
 
   @Test
@@ -65,7 +90,7 @@ public class FileSinkTest {
         FileSink.Processor.getItemPath(item, Path.of("./output/"), Collections.emptyList());
 
     assertEquals(Path.of("./output/", "/path/to/my/file.txt"), itemPath);
-    assertEquals("./output/path/to/my/file.txt", itemPath.toString());
+    assertEquals(Path.of("./output/path/to/my/file.txt").toString(), itemPath.toString());
   }
 
   @Test
@@ -77,7 +102,7 @@ public class FileSinkTest {
         FileSink.Processor.getItemPath(item, Path.of("./output/"), Collections.emptyList());
 
     assertEquals(Path.of("./output/", "/path/to/my/file.txt"), itemPath);
-    assertEquals("./output/path/to/my/file.txt", itemPath.toString());
+    assertEquals(Path.of("./output/path/to/my/file.txt").toString(), itemPath.toString());
   }
 
   @Test
@@ -90,7 +115,7 @@ public class FileSinkTest {
             item, Path.of("./output/"), List.of(Path.of("/my/path/"), Path.of("/path/to")));
 
     assertEquals(Path.of("./output/", "my/file.txt"), itemPath);
-    assertEquals("./output/my/file.txt", itemPath.toString());
+    assertEquals(Path.of("./output/my/file.txt").toString(), itemPath.toString());
   }
 
   @Test
@@ -953,13 +978,13 @@ public class FileSinkTest {
 
     FileSink.Settings settings = new FileSink.Settings();
     settings.setRootOutputFolder(tempRootDir);
-    settings.setBasePaths(List.of(Path.of("/test/example/")));
+    settings.setBasePaths(List.of(Path.of(tempFile.getParent())));
     settings.setCopyOriginalFile(true);
 
     FileSink.Processor processor = new FileSink.Processor(settings);
     processor.process(item);
 
-    Path outputFolder = Path.of(tempRootDir.toString(), tempFile.toString());
+    Path outputFolder = Path.of(tempRootDir.toString(), tempFile.getName());
 
     // Original file
     assertTrue(outputFolder.resolve(tempFile.getName()).toFile().exists());
@@ -1013,9 +1038,9 @@ public class FileSinkTest {
             .exists());
 
     // Delete temp directory
-    /*Files.walk(tempRootDir)
-    .sorted(Comparator.reverseOrder())
-    .map(Path::toFile)
-    .forEach(File::delete);*/
+    Files.walk(tempRootDir)
+        .sorted(Comparator.reverseOrder())
+        .map(Path::toFile)
+        .forEach(File::delete);
   }
 }
