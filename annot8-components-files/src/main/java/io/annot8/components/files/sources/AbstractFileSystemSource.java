@@ -10,6 +10,8 @@ import java.nio.file.Path;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,6 +34,10 @@ public abstract class AbstractFileSystemSource extends AbstractSource {
   }
 
   protected boolean createItem(ItemFactory itemFactory, Path path) {
+    return createItem(itemFactory, path, 0L);
+  }
+
+  protected boolean createItem(ItemFactory itemFactory, Path path, long delay) {
     boolean include = false;
 
     if (getAcceptedFilePatterns().isEmpty()) {
@@ -47,24 +53,35 @@ public abstract class AbstractFileSystemSource extends AbstractSource {
     }
 
     if (include) {
-      final Item item = itemFactory.create();
-      try {
-        item.getProperties().set(PropertyKeys.PROPERTY_KEY_SOURCE, path);
-        item.getProperties()
-            .set(PropertyKeys.PROPERTY_KEY_ACCESSEDAT, Instant.now().getEpochSecond());
+      log().debug("Scheduling item creation for {} after delay of {} milliseconds", path, delay);
 
-        item.createContent(FileContent.class)
-            .withDescription("File " + path.toString())
-            .withData(path.toFile())
-            .save();
+      new Timer()
+          .schedule(
+              new TimerTask() {
+                @Override
+                public void run() {
+                  log().debug("Creating item for {}", path);
+                  final Item item = itemFactory.create();
+                  try {
+                    item.getProperties().set(PropertyKeys.PROPERTY_KEY_SOURCE, path);
+                    item.getProperties()
+                        .set(PropertyKeys.PROPERTY_KEY_ACCESSEDAT, Instant.now().getEpochSecond());
 
-        return true;
-      } catch (Throwable t) {
-        log().error("Unable to create item, discarding", t);
-        item.discard();
-      }
+                    item.createContent(FileContent.class)
+                        .withDescription("File " + path.toString())
+                        .withData(path.toFile())
+                        .save();
+                  } catch (Throwable t) {
+                    log().warn("Unable to create item, discarding", t);
+                    item.discard();
+                  }
+                }
+              },
+              delay);
+
+      return true;
+    } else {
+      return false;
     }
-
-    return false;
   }
 }

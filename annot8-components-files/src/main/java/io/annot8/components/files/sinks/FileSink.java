@@ -17,19 +17,46 @@ import io.annot8.api.settings.Description;
 import io.annot8.common.components.AbstractProcessor;
 import io.annot8.common.components.AbstractProcessorDescriptor;
 import io.annot8.common.components.capabilities.SimpleCapabilities;
-import io.annot8.common.data.bounds.*;
-import io.annot8.common.data.content.*;
+import io.annot8.common.data.bounds.CellBounds;
+import io.annot8.common.data.bounds.ContentBounds;
+import io.annot8.common.data.bounds.MultiCellBounds;
+import io.annot8.common.data.bounds.NoBounds;
+import io.annot8.common.data.bounds.PositionBounds;
+import io.annot8.common.data.bounds.RectangleBounds;
+import io.annot8.common.data.bounds.SpanBounds;
+import io.annot8.common.data.content.FileContent;
+import io.annot8.common.data.content.Image;
+import io.annot8.common.data.content.InputStreamContent;
+import io.annot8.common.data.content.Table;
+import io.annot8.common.data.content.TableContent;
+import io.annot8.common.data.content.Text;
+import io.annot8.common.data.content.UriContent;
 import io.annot8.conventions.PropertyKeys;
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.StringJoiner;
 import java.util.stream.Stream;
-import javax.json.*;
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonArrayBuilder;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
+import javax.json.JsonValue;
+import javax.json.JsonWriter;
 import org.apache.commons.text.StringEscapeUtils;
 
 @ComponentName("File Sink")
@@ -153,6 +180,20 @@ public class FileSink extends AbstractProcessorDescriptor<FileSink.Processor, Fi
                     log()
                         .error(
                             "Unable to write annotations file for content {}", content.getId(), e);
+                  }
+                }
+
+                // Output description for each content
+                if (!Strings.isNullOrEmpty(settings.getDescriptionFilename())
+                    && !Strings.isNullOrEmpty(content.getDescription())) {
+                  try {
+                    Files.writeString(
+                        new File(contentFolder, settings.getDescriptionFilename()).toPath(),
+                        content.getDescription());
+                  } catch (IOException e) {
+                    log()
+                        .error(
+                            "Unable to write description file for content {}", content.getId(), e);
                   }
                 }
               });
@@ -439,6 +480,7 @@ public class FileSink extends AbstractProcessorDescriptor<FileSink.Processor, Fi
     private String groupsFilename = "groups.json";
     private List<Path> basePaths = Collections.emptyList();
     private boolean copyOriginalFile = false;
+    private String descriptionFilename = "description.txt";
 
     @Override
     public boolean validate() {
@@ -527,6 +569,17 @@ public class FileSink extends AbstractProcessorDescriptor<FileSink.Processor, Fi
 
     public void setCopyOriginalFile(boolean copyOriginalFile) {
       this.copyOriginalFile = copyOriginalFile;
+    }
+
+    @Description(
+        value = "The file name for the description of Content",
+        defaultValue = "description.txt")
+    public String getDescriptionFilename() {
+      return descriptionFilename;
+    }
+
+    public void setDescriptionFilename(String descriptionFilename) {
+      this.descriptionFilename = descriptionFilename;
     }
 
     public enum ImageType {

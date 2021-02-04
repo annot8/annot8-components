@@ -926,6 +926,7 @@ public class FileSinkTest {
     Content<?> c1 =
         item.createContent(Text.class)
             .withData("Test Content")
+            .withDescription("Test Content Description")
             .withProperty("val", "Text content property")
             .save();
 
@@ -1034,6 +1035,20 @@ public class FileSinkTest {
         outputFolder
             .resolve(c2.getId())
             .resolve(settings.getAnnotationsFilename())
+            .toFile()
+            .exists());
+
+    // Description
+    assertTrue(
+        outputFolder
+            .resolve(c1.getId())
+            .resolve(settings.getDescriptionFilename())
+            .toFile()
+            .exists());
+    assertFalse(
+        outputFolder
+            .resolve(c2.getId())
+            .resolve(settings.getDescriptionFilename())
             .toFile()
             .exists());
 

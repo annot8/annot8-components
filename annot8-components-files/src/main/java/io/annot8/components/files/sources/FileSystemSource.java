@@ -18,7 +18,14 @@ import io.annot8.common.components.capabilities.SimpleCapabilities;
 import io.annot8.common.data.content.FileContent;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.*;
+import java.nio.file.FileSystems;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.WatchEvent;
+import java.nio.file.WatchKey;
+import java.nio.file.WatchService;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.HashSet;
 import java.util.Set;
@@ -117,12 +124,18 @@ public class FileSystemSource
           if (getAcceptedFilePatterns().isEmpty()) {
             initialFiles.add(path);
           } else {
+            boolean matched = false;
+
             for (Pattern p : getAcceptedFilePatterns()) {
               Matcher m = p.matcher(path.getFileName().toString());
               if (m.matches()) {
-                initialFiles.add(path);
+                matched = true;
                 break;
               }
+            }
+
+            if (matched == !settings.isNegateAcceptedFileNamePatterns()) {
+              initialFiles.add(path);
             }
           }
         } else if (settings.isRecursive()) {
@@ -147,8 +160,12 @@ public class FileSystemSource
       boolean read = false;
       WatchKey key;
       while ((key = watchService.poll()) != null) {
+        Path dir = (Path) key.watchable();
+
         for (WatchEvent<?> event : key.pollEvents()) {
-          if (createItem(itemFactory, ((WatchEvent<Path>) event).context())) {
+          Path file = dir.resolve(((WatchEvent<Path>) event).context());
+
+          if (createItem(itemFactory, file, getSettings().getDelay())) {
             read = true;
           }
         }

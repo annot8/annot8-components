@@ -104,6 +104,8 @@ public class OCR extends AbstractProcessorDescriptor<OCR.Processor, OCR.Settings
     }
 
     private Text createTextContent(Item item, String textContent, Content<?> sourceContent) {
+      if (textContent.isBlank()) return null;
+
       return item.createContent(Text.class)
           .withDescription("OCR from " + sourceContent.getId())
           .withData(textContent)

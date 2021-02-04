@@ -81,6 +81,7 @@ public class TextDetection
           img -> {
             try {
               // Process image
+              log().debug("Processing image {}", img.getId());
               processImage(item, img);
             } catch (Exception e) {
               exceptions.add(e);
@@ -88,12 +89,19 @@ public class TextDetection
             }
 
             // Discard original according to settings
-            if (settings.isDiscardOriginal()) item.removeContent(img);
+            if (settings.isDiscardOriginal()) {
+              log().debug("Discarding image {}", img.getId());
+              item.removeContent(img);
+            }
           });
 
-      if (exceptions.isEmpty()) return ProcessorResponse.ok();
+      // Need to work out what causes the common Mat.dim > 2 error, as if we error on that it causes
+      // problems for Baleen 3
+      /*if (exceptions.isEmpty()) return ProcessorResponse.ok();
 
-      return ProcessorResponse.processingError(exceptions);
+      return ProcessorResponse.itemError(exceptions);*/
+
+      return ProcessorResponse.ok();
     }
 
     private void processImage(Item item, Image img) throws Exception {
@@ -140,6 +148,13 @@ public class TextDetection
               .mapToObj(i -> boxesArray[i])
               .map(rr -> OpenCVUtils.padRotatedRect(rr, settings.getPadding()))
               .collect(Collectors.toList());
+
+      if (rotatedRects.isEmpty()) {
+        log().debug("No text found in image {}", img.getId());
+        return;
+      }
+
+      log().debug("{} text segments found in image {}", rotatedRects.size(), img.getId());
 
       // Calculate the scaling ratio we need to apply
       Point ratio =

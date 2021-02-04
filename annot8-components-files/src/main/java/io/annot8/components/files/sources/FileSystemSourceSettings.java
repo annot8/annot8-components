@@ -17,6 +17,8 @@ public class FileSystemSourceSettings implements Settings {
   private boolean recursive = true;
   private boolean reprocessOnModify = true;
   private Set<Pattern> acceptedFileNamePatterns = new HashSet<>();
+  private boolean negateAcceptedFileNamePatterns = false;
+  private long delay = 0L;
 
   @JsonbCreator
   public FileSystemSourceSettings() {
@@ -67,6 +69,16 @@ public class FileSystemSourceSettings implements Settings {
     this.acceptedFileNamePatterns.add(acceptedFilePattern);
   }
 
+  @Description(
+      "If true, then the list of accepted file name patterns is treated as a reject list rather than an accept list")
+  public boolean isNegateAcceptedFileNamePatterns() {
+    return negateAcceptedFileNamePatterns;
+  }
+
+  public void setNegateAcceptedFileNamePatterns(boolean negateAcceptedFileNamePatterns) {
+    this.negateAcceptedFileNamePatterns = negateAcceptedFileNamePatterns;
+  }
+
   @Description("Should the folder be watched for changes (true), or just scanned once (false)")
   public boolean isWatching() {
     return watching;
@@ -76,8 +88,18 @@ public class FileSystemSourceSettings implements Settings {
     this.watching = watching;
   }
 
+  @Description(
+      "The length of delay to introduce between the file being detected and the file being processed - can be used to avoid partially copied files being picked up")
+  public long getDelay() {
+    return delay;
+  }
+
+  public void setDelay(long delay) {
+    this.delay = delay;
+  }
+
   @Override
   public boolean validate() {
-    return rootFolder != null;
+    return rootFolder != null && delay >= 0;
   }
 }
