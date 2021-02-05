@@ -271,13 +271,8 @@ public class FileSink extends AbstractProcessorDescriptor<FileSink.Processor, Fi
       } else if (content instanceof InputStreamContent) {
         f = new File(contentFolder, settings.getContentFilename());
 
-        byte[] bytes = new byte[8192];
-        int read;
-
         try (FileOutputStream fos = new FileOutputStream(f)) {
-          while ((read = ((InputStreamContent) content).getData().read(bytes)) != -1) {
-            fos.write(bytes, 0, read);
-          }
+          ((InputStreamContent) content).getData().transferTo(fos);
         }
       } else if (content instanceof Image) {
         String extension;
