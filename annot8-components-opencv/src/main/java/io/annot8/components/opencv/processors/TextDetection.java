@@ -95,13 +95,9 @@ public class TextDetection
             }
           });
 
-      // Need to work out what causes the common Mat.dim > 2 error, as if we error on that it causes
-      // problems for Baleen 3
-      /*if (exceptions.isEmpty()) return ProcessorResponse.ok();
+      if (exceptions.isEmpty()) return ProcessorResponse.ok();
 
-      return ProcessorResponse.itemError(exceptions);*/
-
-      return ProcessorResponse.ok();
+      return ProcessorResponse.itemError(exceptions);
     }
 
     private void processImage(Item item, Image img) throws Exception {
@@ -134,6 +130,11 @@ public class TextDetection
       List<RotatedRect> boxesList =
           decode(scores, geometry, confidencesList, settings.getScoreThreshold());
 
+      if (boxesList.isEmpty()) {
+        log().debug("No text found in image {}", img.getId());
+        return;
+      }
+
       // Suppress non-maximal boxes
       MatOfFloat confidences = new MatOfFloat(Converters.vector_float_to_Mat(confidencesList));
       RotatedRect[] boxesArray = boxesList.toArray(new RotatedRect[0]);
@@ -148,11 +149,6 @@ public class TextDetection
               .mapToObj(i -> boxesArray[i])
               .map(rr -> OpenCVUtils.padRotatedRect(rr, settings.getPadding()))
               .collect(Collectors.toList());
-
-      if (rotatedRects.isEmpty()) {
-        log().debug("No text found in image {}", img.getId());
-        return;
-      }
 
       log().debug("{} text segments found in image {}", rotatedRects.size(), img.getId());
 
