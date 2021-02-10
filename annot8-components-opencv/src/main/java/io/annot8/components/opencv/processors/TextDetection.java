@@ -21,6 +21,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
@@ -102,6 +103,8 @@ public class TextDetection
 
     private void processImage(Item item, Image img) throws Exception {
       // Based on code from: https://gist.github.com/berak/788da80d1dd5bade3f878210f45d6742
+      long start = System.currentTimeMillis();
+
       Mat frame = OpenCVUtils.bufferedImageToMat(img.getData());
 
       // Convert to 3-channel RGB
@@ -115,6 +118,10 @@ public class TextDetection
       int height = (int) (size.height / 4);
       Mat blob = Dnn.blobFromImage(frame, 1.0, size, meanRGB, true, false);
 
+      long end = System.currentTimeMillis();
+      metrics().timer("preprocessing").record(end - start, TimeUnit.MILLISECONDS);
+      start = end;
+
       // Pass blob through to EAST and get outputs
       eastNet.setInput(blob);
       List<Mat> outs = new ArrayList<>(2);
@@ -122,6 +129,10 @@ public class TextDetection
       outNames.add("feature_fusion/Conv_7/Sigmoid");
       outNames.add("feature_fusion/concat_3");
       eastNet.forward(outs, outNames);
+
+      end = System.currentTimeMillis();
+      metrics().timer("east").record(end - start, TimeUnit.MILLISECONDS);
+      start = end;
 
       // Read results from EAST, and decode into RotatedRect
       Mat scores = outs.get(0).reshape(1, height);
@@ -151,6 +162,10 @@ public class TextDetection
               .collect(Collectors.toList());
 
       log().debug("{} text segments found in image {}", rotatedRects.size(), img.getId());
+
+      end = System.currentTimeMillis();
+      metrics().timer("decode").record(end - start, TimeUnit.MILLISECONDS);
+      start = end;
 
       // Calculate the scaling ratio we need to apply
       Point ratio =
@@ -245,6 +260,9 @@ public class TextDetection
 
           break;
       }
+
+      end = System.currentTimeMillis();
+      metrics().timer("output").record(end - start, TimeUnit.MILLISECONDS);
     }
 
     private static BufferedImage rotateImageByDegrees(BufferedImage img, double angle) {

@@ -83,28 +83,56 @@ public class OCR extends AbstractProcessorDescriptor<OCR.Processor, OCR.Settings
                       FilenameUtils.getExtension(fc.getData().getName()).toLowerCase()))
           .forEach(
               fc -> {
-                try {
-                  createTextContent(item, instance.doOCR(fc.getData()), fc);
-                } catch (TesseractException e) {
-                  log().error("Unable to extract text from content {}", fc.getId(), e);
-                }
+                String content =
+                    metrics()
+                        .timer("ocr")
+                        .record(
+                            () -> {
+                              try {
+                                return instance.doOCR(fc.getData());
+                              } catch (TesseractException e) {
+                                log()
+                                    .error(
+                                        "Unable to extract text from File content {}",
+                                        fc.getId(),
+                                        e);
+                              }
+
+                              return null;
+                            });
+
+                createTextContent(item, content, fc);
               });
 
       item.getContents(Image.class)
           .forEach(
               image -> {
-                try {
-                  createTextContent(item, instance.doOCR(image.getData()), image);
-                } catch (TesseractException e) {
-                  log().error("Unable to extract text from content {}", image.getId(), e);
-                }
+                String content =
+                    metrics()
+                        .timer("ocr")
+                        .record(
+                            () -> {
+                              try {
+                                return instance.doOCR(image.getData());
+                              } catch (TesseractException e) {
+                                log()
+                                    .error(
+                                        "Unable to extract text from Image content {}",
+                                        image.getId(),
+                                        e);
+                              }
+
+                              return null;
+                            });
+
+                createTextContent(item, content, image);
               });
 
       return ProcessorResponse.ok();
     }
 
     private Text createTextContent(Item item, String textContent, Content<?> sourceContent) {
-      if (textContent.isBlank()) return null;
+      if (textContent == null || textContent.isBlank()) return null;
 
       return item.createContent(Text.class)
           .withDescription("OCR from " + sourceContent.getId())
