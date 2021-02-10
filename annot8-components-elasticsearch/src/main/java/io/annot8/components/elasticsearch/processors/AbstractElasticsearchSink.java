@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.apache.http.HttpHost;
+import org.apache.http.client.CredentialsProvider;
 import org.elasticsearch.action.DocWriteResponse;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.bulk.BulkItemResponse;
@@ -21,6 +22,7 @@ import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.indices.CreateIndexRequest;
 import org.elasticsearch.client.indices.GetIndexRequest;
@@ -35,12 +37,26 @@ public abstract class AbstractElasticsearchSink extends AbstractProcessor {
         List.of(settings.host()),
         settings.getIndex(),
         settings.isDeleteIndex(),
-        settings.isForceString());
+        settings.isForceString(),
+        settings.credentials());
   }
 
   public AbstractElasticsearchSink(
-      List<HttpHost> hosts, String index, boolean deleteIndex, boolean forceString) {
-    client = new RestHighLevelClient(RestClient.builder(hosts.toArray(new HttpHost[0])));
+      List<HttpHost> hosts,
+      String index,
+      boolean deleteIndex,
+      boolean forceString,
+      CredentialsProvider credentials) {
+
+    RestClientBuilder builder = RestClient.builder(hosts.toArray(new HttpHost[0]));
+
+    if (credentials != null) {
+      builder.setHttpClientConfigCallback(
+          httpClientBuilder -> httpClientBuilder.setDefaultCredentialsProvider(credentials));
+    }
+
+    client = new RestHighLevelClient(builder);
+
     this.index = index;
     this.forceString = forceString;
 
