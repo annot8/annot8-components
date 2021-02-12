@@ -28,7 +28,7 @@ public class FilterAnnotationsBySpanTest {
     c2.getAnnotations().create().withType("letter").withBounds(new SpanBounds(1, 2)).save();
 
     FilterAnnotationsBySpan.Settings settings =
-        new FilterAnnotationsBySpan.Settings(List.of("B"), true);
+        new FilterAnnotationsBySpan.Settings(List.of("B"), true, false);
     assertTrue(settings.validate());
 
     FilterAnnotationsBySpan d = new FilterAnnotationsBySpan();
@@ -73,7 +73,52 @@ public class FilterAnnotationsBySpanTest {
     c2.getAnnotations().create().withType("letter").withBounds(new SpanBounds(1, 2)).save();
 
     FilterAnnotationsBySpan.Settings settings =
-        new FilterAnnotationsBySpan.Settings(List.of("b"), false);
+        new FilterAnnotationsBySpan.Settings(List.of("b"), false, false);
+    assertTrue(settings.validate());
+
+    FilterAnnotationsBySpan d = new FilterAnnotationsBySpan();
+    d.setSettings(settings);
+
+    assertNotNull(d.capabilities());
+
+    Processor p = d.createComponent(null, settings);
+
+    ProcessorResponse pr = p.process(item);
+    assertEquals(ProcessorResponse.ok(), pr);
+
+    item.getContents(Text.class)
+        .forEach(
+            c -> {
+              assertEquals(
+                  0L,
+                  c.getAnnotations()
+                      .getByBounds(SpanBounds.class)
+                      .filter(a -> c.getText(a).orElse("**BAD**").equals("B"))
+                      .count());
+              assertEquals(
+                  1L,
+                  c.getAnnotations()
+                      .getByBounds(SpanBounds.class)
+                      .filter(a -> c.getText(a).orElse("**BAD**").equals("A"))
+                      .count());
+            });
+  }
+
+  @Test
+  public void testRegex() {
+    Item item = new TestItem();
+
+    TestStringContent c1 = item.createContent(TestStringContent.class).withData("ABC").save();
+    c1.getAnnotations().create().withType("letter").withBounds(new SpanBounds(0, 1)).save();
+    c1.getAnnotations().create().withType("letter").withBounds(new SpanBounds(1, 2)).save();
+    c1.getAnnotations().create().withType("letter").withBounds(new SpanBounds(2, 3)).save();
+
+    TestStringContent c2 = item.createContent(TestStringContent.class).withData("AB").save();
+    c2.getAnnotations().create().withType("letter").withBounds(new SpanBounds(0, 1)).save();
+    c2.getAnnotations().create().withType("letter").withBounds(new SpanBounds(1, 2)).save();
+
+    FilterAnnotationsBySpan.Settings settings =
+        new FilterAnnotationsBySpan.Settings(List.of("[BDE]"), false, true);
     assertTrue(settings.validate());
 
     FilterAnnotationsBySpan d = new FilterAnnotationsBySpan();

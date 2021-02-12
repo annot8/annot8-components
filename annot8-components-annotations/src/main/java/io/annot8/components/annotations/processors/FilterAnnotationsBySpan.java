@@ -18,6 +18,7 @@ import io.annot8.common.data.bounds.SpanBounds;
 import io.annot8.common.data.content.Text;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @ComponentName("Filter Annotations by Span")
@@ -30,7 +31,7 @@ public class FilterAnnotationsBySpan
 
   @Override
   protected Processor createComponent(Context context, Settings settings) {
-    return new Processor(settings.getSpanValues(), settings.isCaseSensitive());
+    return new Processor(settings.getSpanValues(), settings.isCaseSensitive(), settings.isRegex());
   }
 
   @Override
@@ -42,17 +43,17 @@ public class FilterAnnotationsBySpan
   }
 
   public static class Processor extends AbstractProcessor {
-    private final List<String> spanValues;
-    private final boolean caseSensitive;
+    private final List<Pattern> spanPatterns;
 
-    public Processor(List<String> spanValues, boolean caseSensitive) {
-      if (caseSensitive) {
-        this.spanValues = spanValues;
-      } else {
-        this.spanValues = spanValues.stream().map(String::toUpperCase).collect(Collectors.toList());
-      }
-
-      this.caseSensitive = caseSensitive;
+    public Processor(List<String> spanValues, boolean caseSensitive, boolean regex) {
+      spanPatterns =
+          spanValues.stream()
+              .map(
+                  s ->
+                      Pattern.compile(
+                          regex ? s : Pattern.quote(s),
+                          caseSensitive ? 0 : Pattern.CASE_INSENSITIVE))
+              .collect(Collectors.toList());
     }
 
     @Override
@@ -68,9 +69,7 @@ public class FilterAnnotationsBySpan
                               String val = c.getText(a).orElse(null);
                               if (val == null) return false;
 
-                              if (!caseSensitive) val = val.toUpperCase();
-
-                              return spanValues.contains(val);
+                              return spanPatterns.stream().anyMatch(p -> p.matcher(val).matches());
                             })
                         .collect(Collectors.toList());
 
@@ -84,15 +83,18 @@ public class FilterAnnotationsBySpan
   public static class Settings implements io.annot8.api.settings.Settings {
     private List<String> spanValues;
     private boolean caseSensitive;
+    private boolean regex;
 
     public Settings() {
       this.spanValues = Collections.emptyList();
       this.caseSensitive = true;
+      this.regex = true;
     }
 
-    public Settings(List<String> spanValues, boolean caseSensitive) {
+    public Settings(List<String> spanValues, boolean caseSensitive, boolean regex) {
       this.spanValues = spanValues;
       this.caseSensitive = caseSensitive;
+      this.regex = regex;
     }
 
     @Description("Span values to remove")
@@ -116,6 +118,16 @@ public class FilterAnnotationsBySpan
 
     public void setCaseSensitive(boolean caseSensitive) {
       this.caseSensitive = caseSensitive;
+    }
+
+    @Description(
+        "If true, then span values will be treated as regular expression patterns rather than exact values")
+    public boolean isRegex() {
+      return regex;
+    }
+
+    public void setRegex(boolean regex) {
+      this.regex = regex;
     }
   }
 }
