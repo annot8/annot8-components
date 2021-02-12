@@ -19,6 +19,7 @@ public class PropertyKeys {
   public static final String PROPERTY_KEY_GEOJSON = "geojson";
   public static final String PROPERTY_KEY_IDENTIFIER = "identifier";
   public static final String PROPERTY_KEY_INDEX = "index";
+  public static final String PROPERTY_KEY_KEY = "key";
   public static final String PROPERTY_KEY_LANGUAGE = "language";
   public static final String PROPERTY_KEY_LATITUDE = "latitude";
   public static final String PROPERTY_KEY_LEMMA = "lemma";
@@ -37,6 +38,7 @@ public class PropertyKeys {
   public static final String PROPERTY_KEY_SUBTYPE = "subtype";
   public static final String PROPERTY_KEY_SURNAME = "surname";
   public static final String PROPERTY_KEY_TITLE = "title";
+  public static final String PROPERTY_KEY_TYPE = "type";
   public static final String PROPERTY_KEY_UNIT = "unit";
   public static final String PROPERTY_KEY_VALUE = "value";
   public static final String PROPERTY_KEY_VERSION = "version";
