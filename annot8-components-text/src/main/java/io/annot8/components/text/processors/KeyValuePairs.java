@@ -53,7 +53,7 @@ public class KeyValuePairs
 
       keyValuePattern =
           Pattern.compile(
-              "^\\h*(?<key>.*)\\h*" + settings.getKeyValueSeparator() + "\\h*(?<value>.*?)\\h*$",
+              "^\\h*(?<key>.*?)\\h*" + settings.getKeyValueSeparator() + "\\h*(?<value>.*?)\\h*$",
               Pattern.MULTILINE);
     }
 

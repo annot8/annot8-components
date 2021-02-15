@@ -25,7 +25,7 @@ public class KeyValuePairsTest {
     Text text =
         item.createContent(Text.class)
             .withData(
-                "Name: Alice\nAge : 21 \r\nFavourite Food: Pizza, Chips  \nHair Colour: Light Brown")
+                "Name: Alice\nAge : 21 \r\nFavourite Food: Pizza, Chips  \nHair Colour: Light Brown\nSocial media: Twitter: @alice")
             .save();
 
     text.getAnnotations()
@@ -72,7 +72,7 @@ public class KeyValuePairsTest {
     assertEquals(ProcessorResponse.ok(), p.process(item));
 
     assertEquals(
-        4, text.getAnnotations().getByType(AnnotationTypes.ANNOTATION_TYPE_METADATA).count());
+        5, text.getAnnotations().getByType(AnnotationTypes.ANNOTATION_TYPE_METADATA).count());
 
     List<Annotation> annotations =
         text.getAnnotations()
@@ -122,5 +122,12 @@ public class KeyValuePairsTest {
         "colour", annotations.get(3).getProperties().get(PropertyKeys.PROPERTY_KEY_TYPE).get());
     assertEquals(54, annotations.get(3).getBounds(SpanBounds.class).get().getBegin());
     assertEquals(78, annotations.get(3).getBounds(SpanBounds.class).get().getEnd());
+
+    assertEquals(
+        "Social media",
+        annotations.get(4).getProperties().get(PropertyKeys.PROPERTY_KEY_KEY).get());
+    assertEquals(
+        "Twitter: @alice",
+        annotations.get(4).getProperties().get(PropertyKeys.PROPERTY_KEY_VALUE).get());
   }
 }
