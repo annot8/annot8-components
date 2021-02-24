@@ -68,6 +68,14 @@ public class PdfExtractorTest extends AbstractDocumentExtractorTest {
   public void testAdditionalSettings() {
     PdfExtractor.Settings s = new PdfExtractor.Settings();
 
+    assertNotNull(s.getArticleStart());
+    s.setArticleStart("ARTICLE START");
+    assertEquals("ARTICLE START", s.getArticleStart());
+
+    assertNotNull(s.getArticleEnd());
+    s.setArticleEnd("ARTICLE END");
+    assertEquals("ARTICLE END", s.getArticleEnd());
+
     assertNotNull(s.getPageStart());
     s.setPageStart("PAGE START");
     assertEquals("PAGE START", s.getPageStart());

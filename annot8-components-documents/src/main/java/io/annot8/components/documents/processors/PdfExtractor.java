@@ -67,6 +67,8 @@ public class PdfExtractor
           stripper.setPageEnd(settings.getPageEnd());
           stripper.setParagraphStart(settings.getParagraphStart());
           stripper.setParagraphEnd(settings.getParagraphEnd());
+          stripper.setArticleStart(settings.getArticleStart());
+          stripper.setArticleEnd(settings.getArticleEnd());
         } catch (IOException ioe) {
           throw new Annot8RuntimeException("Unable to create PDFTextStripper", ioe);
         }
@@ -219,6 +221,8 @@ public class PdfExtractor
   }
 
   public static class Settings extends DocumentExtractorSettings {
+    private String articleStart = "";
+    private String articleEnd = "";
     private String pageStart = "";
     private String pageEnd = "";
     private String paragraphStart = "";
@@ -226,10 +230,34 @@ public class PdfExtractor
 
     @Override
     public boolean validate() {
-      return super.validate() && paragraphEnd != null;
+      return super.validate()
+          && articleStart != null
+          && articleEnd != null
+          && pageStart != null
+          && pageEnd != null
+          && paragraphStart != null
+          && paragraphEnd != null;
     }
 
-    @Description("String to add at the start of each page")
+    @Description("String to add at the start of each article")
+    public String getArticleStart() {
+      return articleStart;
+    }
+
+    public void setArticleStart(String articleStart) {
+      this.articleStart = articleStart;
+    }
+
+    @Description("String to add at the end of each article")
+    public String getArticleEnd() {
+      return articleEnd;
+    }
+
+    public void setArticleEnd(String articleEnd) {
+      this.articleEnd = articleEnd;
+    }
+
+    @Description("String to add at the start of each article")
     public String getPageStart() {
       return pageStart;
     }
