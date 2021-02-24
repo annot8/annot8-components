@@ -95,10 +95,10 @@ public class SimpleFileSystemSource
       log().info("Processing {}", p);
 
       Item item = itemFactory.create();
-      item.createContent(FileContent.class)
-          .withData(p.toFile())
-          .withProperty(PropertyKeys.PROPERTY_KEY_SOURCE, p)
-          .save();
+
+      item.getProperties().set(PropertyKeys.PROPERTY_KEY_SOURCE, p);
+
+      item.createContent(FileContent.class).withData(p.toFile()).save();
 
       return SourceResponse.ok();
     }
