@@ -41,14 +41,17 @@ import org.slf4j.Logger;
 @ComponentDescription("Extracts image and text from HTML (*.html) files")
 @ComponentTags({"documents", "html", "extractor", "text", "images", "metadata"})
 @SettingsClass(DocumentExtractorSettings.class)
-public class HtmlExtractor extends AbstractDocumentExtractorDescriptor<HtmlExtractor.Processor> {
+public class HtmlExtractor
+    extends AbstractDocumentExtractorDescriptor<
+        HtmlExtractor.Processor, DocumentExtractorSettings> {
 
   @Override
   protected Processor createComponent(Context context, DocumentExtractorSettings settings) {
     return new Processor(context, settings);
   }
 
-  public static class Processor extends AbstractDocumentExtractorProcessor<Document> {
+  public static class Processor
+      extends AbstractDocumentExtractorProcessor<Document, DocumentExtractorSettings> {
     private final Logger logger = getLogger();
 
     public Processor(Context context, DocumentExtractorSettings settings) {

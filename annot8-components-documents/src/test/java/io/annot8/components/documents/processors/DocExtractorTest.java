@@ -15,7 +15,8 @@ import java.util.Collection;
 
 public class DocExtractorTest extends AbstractDocumentExtractorTest {
   @Override
-  protected Class<? extends AbstractDocumentExtractorDescriptor<?>> getDescriptor() {
+  protected Class<? extends AbstractDocumentExtractorDescriptor<?, DocumentExtractorSettings>>
+      getDescriptor() {
     return DocExtractor.class;
   }
 

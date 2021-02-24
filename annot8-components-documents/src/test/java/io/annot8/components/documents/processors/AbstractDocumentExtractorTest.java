@@ -30,7 +30,9 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 
 public abstract class AbstractDocumentExtractorTest {
-  protected abstract Class<? extends AbstractDocumentExtractorDescriptor<?>> getDescriptor();
+  protected abstract Class<
+          ? extends AbstractDocumentExtractorDescriptor<?, ? extends DocumentExtractorSettings>>
+      getDescriptor();
 
   protected abstract File getTestFile();
 
@@ -42,7 +44,7 @@ public abstract class AbstractDocumentExtractorTest {
 
   @Test
   public void testForAnnotations() {
-    Class<? extends AbstractDocumentExtractorDescriptor<?>> desc = getDescriptor();
+    Class<? extends AbstractDocumentExtractorDescriptor<?, ?>> desc = getDescriptor();
 
     assertNotNull(desc.getAnnotation(ComponentName.class));
     assertNotNull(desc.getAnnotation(ComponentDescription.class));
@@ -51,8 +53,8 @@ public abstract class AbstractDocumentExtractorTest {
 
   @Test
   public void testDefaultCapabilities() throws Exception {
-    AbstractDocumentExtractorDescriptor<?> desc = getInstantiatedDescriptor();
-    desc.setSettings(new DocumentExtractorSettings());
+    AbstractDocumentExtractorDescriptor<?, ? extends DocumentExtractorSettings> desc =
+        getInstantiatedDescriptor(new DocumentExtractorSettings());
 
     Capabilities capabilities = desc.capabilities();
     assertNotNull(capabilities);
@@ -62,28 +64,27 @@ public abstract class AbstractDocumentExtractorTest {
 
   @Test
   public void testTextCapabilities() throws Exception {
-    AbstractDocumentExtractorDescriptor<?> desc = getInstantiatedDescriptor();
-
     DocumentExtractorSettings settings = new DocumentExtractorSettings();
 
     settings.setExtractText(true);
-    desc.setSettings(settings);
-    Capabilities capabilities = desc.capabilities();
+    AbstractDocumentExtractorDescriptor<?, ? extends DocumentExtractorSettings> desc =
+        getInstantiatedDescriptor(settings);
 
     assertEquals(
         1,
-        capabilities
+        desc.capabilities()
             .creates(ContentCapability.class)
             .filter(cc -> cc.getType() == Text.class)
             .count());
 
     settings.setExtractText(false);
-    desc.setSettings(settings);
-    capabilities = desc.capabilities();
+    AbstractDocumentExtractorDescriptor<?, ? extends DocumentExtractorSettings> desc2 =
+        getInstantiatedDescriptor(settings);
 
     assertEquals(
         0,
-        capabilities
+        desc2
+            .capabilities()
             .creates(ContentCapability.class)
             .filter(cc -> cc.getType() == Text.class)
             .count());
@@ -91,28 +92,29 @@ public abstract class AbstractDocumentExtractorTest {
 
   @Test
   public void testImageCapabilities() throws Exception {
-    AbstractDocumentExtractorDescriptor<?> desc = getInstantiatedDescriptor();
-
     DocumentExtractorSettings settings = new DocumentExtractorSettings();
 
     settings.setExtractImages(true);
-    desc.setSettings(settings);
+    AbstractDocumentExtractorDescriptor<?, DocumentExtractorSettings> desc =
+        getInstantiatedDescriptor(settings);
+
     Capabilities capabilities = desc.capabilities();
 
     assertEquals(
         1,
-        capabilities
+        desc.capabilities()
             .creates(ContentCapability.class)
             .filter(cc -> cc.getType() == Image.class)
             .count());
 
     settings.setExtractImages(false);
-    desc.setSettings(settings);
-    capabilities = desc.capabilities();
+    AbstractDocumentExtractorDescriptor<?, DocumentExtractorSettings> desc2 =
+        getInstantiatedDescriptor(settings);
 
     assertEquals(
         0,
-        capabilities
+        desc2
+            .capabilities()
             .creates(ContentCapability.class)
             .filter(cc -> cc.getType() == Image.class)
             .count());
@@ -120,12 +122,13 @@ public abstract class AbstractDocumentExtractorTest {
 
   @Test
   public void testMetadata() {
-    DocumentExtractorSettings settings = new DocumentExtractorSettings();
+    DocumentExtractorSettings settings = getSettings();
     settings.setExtractMetadata(true);
     settings.setExtractText(false);
     settings.setExtractImages(false);
 
-    AbstractDocumentExtractorProcessor<?> processor = getInstantiatedProcessor(settings);
+    AbstractDocumentExtractorProcessor<?, DocumentExtractorSettings> processor =
+        getInstantiatedProcessor(settings);
 
     if (!processor.isMetadataSupported()) return; // No metadata for this
 
@@ -143,12 +146,13 @@ public abstract class AbstractDocumentExtractorTest {
 
   @Test
   public void testText() {
-    DocumentExtractorSettings settings = new DocumentExtractorSettings();
+    DocumentExtractorSettings settings = getSettings();
     settings.setExtractMetadata(false);
     settings.setExtractText(true);
     settings.setExtractImages(false);
 
-    AbstractDocumentExtractorProcessor<?> processor = getInstantiatedProcessor(settings);
+    AbstractDocumentExtractorProcessor<?, ? extends DocumentExtractorSettings> processor =
+        getInstantiatedProcessor(settings);
 
     Item item = createTestItem();
 
@@ -168,12 +172,13 @@ public abstract class AbstractDocumentExtractorTest {
 
   @Test
   public void testImages() {
-    DocumentExtractorSettings settings = new DocumentExtractorSettings();
+    DocumentExtractorSettings settings = getSettings();
     settings.setExtractMetadata(false);
     settings.setExtractText(false);
     settings.setExtractImages(true);
 
-    AbstractDocumentExtractorProcessor<?> processor = getInstantiatedProcessor(settings);
+    AbstractDocumentExtractorProcessor<?, ? extends DocumentExtractorSettings> processor =
+        getInstantiatedProcessor(settings);
 
     Item item = createTestItem();
 
@@ -193,12 +198,13 @@ public abstract class AbstractDocumentExtractorTest {
 
   @Test
   public void testInputStream() {
-    DocumentExtractorSettings settings = new DocumentExtractorSettings();
+    DocumentExtractorSettings settings = getSettings();
     settings.setExtractMetadata(false);
     settings.setExtractText(true);
     settings.setExtractImages(true);
 
-    AbstractDocumentExtractorProcessor<?> processor = getInstantiatedProcessor(settings);
+    AbstractDocumentExtractorProcessor<?, ? extends DocumentExtractorSettings> processor =
+        getInstantiatedProcessor(settings);
 
     Item item = createTestItemInputStream();
 
@@ -223,12 +229,13 @@ public abstract class AbstractDocumentExtractorTest {
 
   @Test
   public void testBadFile() {
-    DocumentExtractorSettings settings = new DocumentExtractorSettings();
+    DocumentExtractorSettings settings = getSettings();
     settings.setExtractMetadata(false);
     settings.setExtractText(true);
     settings.setExtractImages(true);
 
-    AbstractDocumentExtractorProcessor<?> processor = getInstantiatedProcessor(settings);
+    AbstractDocumentExtractorProcessor<?, ? extends DocumentExtractorSettings> processor =
+        getInstantiatedProcessor(settings);
 
     Item item = createTestItemBadFile();
 
@@ -243,12 +250,13 @@ public abstract class AbstractDocumentExtractorTest {
 
   @Test
   public void testBadInputStream() {
-    DocumentExtractorSettings settings = new DocumentExtractorSettings();
+    DocumentExtractorSettings settings = getSettings();
     settings.setExtractMetadata(false);
     settings.setExtractText(true);
     settings.setExtractImages(true);
 
-    AbstractDocumentExtractorProcessor<?> processor = getInstantiatedProcessor(settings);
+    AbstractDocumentExtractorProcessor<?, ? extends DocumentExtractorSettings> processor =
+        getInstantiatedProcessor(settings);
 
     Item item = createTestItemBadInputStream();
 
@@ -261,16 +269,32 @@ public abstract class AbstractDocumentExtractorTest {
     assertEquals(1, item.getContents().count());
   }
 
-  protected AbstractDocumentExtractorDescriptor<?> getInstantiatedDescriptor() throws Exception {
+  protected DocumentExtractorSettings getSettings() {
+    return new DocumentExtractorSettings();
+  }
+
+  protected AbstractDocumentExtractorDescriptor<?, ? extends DocumentExtractorSettings>
+      getInstantiatedDescriptor() throws Exception {
     return getDescriptor().getConstructor().newInstance();
   }
 
-  protected AbstractDocumentExtractorProcessor<?> getInstantiatedProcessor(
-      DocumentExtractorSettings settings) {
+  protected <S extends DocumentExtractorSettings>
+      AbstractDocumentExtractorDescriptor<?, S> getInstantiatedDescriptor(S settings)
+          throws Exception {
+    AbstractDocumentExtractorDescriptor<?, S> desc =
+        (AbstractDocumentExtractorDescriptor<?, S>) getDescriptor().getConstructor().newInstance();
+    desc.setSettings(settings);
+
+    return desc;
+  }
+
+  protected <S extends DocumentExtractorSettings>
+      AbstractDocumentExtractorProcessor<?, S> getInstantiatedProcessor(S settings) {
     try {
       Context context = new SimpleContext();
 
-      AbstractDocumentExtractorDescriptor<?> desc = getInstantiatedDescriptor();
+      AbstractDocumentExtractorDescriptor<?, S> desc =
+          (AbstractDocumentExtractorDescriptor<?, S>) getInstantiatedDescriptor();
       desc.setSettings(settings);
 
       return desc.create(context);

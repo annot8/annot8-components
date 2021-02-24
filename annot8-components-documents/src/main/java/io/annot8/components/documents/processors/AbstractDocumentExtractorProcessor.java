@@ -15,9 +15,6 @@ import io.annot8.common.data.content.Image;
 import io.annot8.common.data.content.InputStreamContent;
 import io.annot8.common.data.content.Text;
 import io.annot8.components.documents.data.ExtractionWithProperties;
-import org.slf4j.Logger;
-import org.slf4j.helpers.NOPLogger;
-
 import java.awt.image.BufferedImage;
 import java.io.Closeable;
 import java.io.IOException;
@@ -33,19 +30,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.helpers.NOPLogger;
 
 /**
  * Base class for DocumentExtractor processors, handling a lot of the common boilerplate code.
  *
  * @param <T> The document type
  */
-public abstract class AbstractDocumentExtractorProcessor<T> extends AbstractProcessor {
+public abstract class AbstractDocumentExtractorProcessor<T, S extends DocumentExtractorSettings>
+    extends AbstractProcessor {
   private final Context context;
-  private final DocumentExtractorSettings settings;
+  protected final S settings;
 
   protected static final String METADATA_SEPARATOR = "/";
 
-  public AbstractDocumentExtractorProcessor(Context context, DocumentExtractorSettings settings) {
+  public AbstractDocumentExtractorProcessor(Context context, S settings) {
     this.context = context;
     this.settings = settings;
 
@@ -83,16 +83,15 @@ public abstract class AbstractDocumentExtractorProcessor<T> extends AbstractProc
 
               exceptions.addAll(extract(item, c.getId(), doc));
 
-              if(doc instanceof Closeable){
+              if (doc instanceof Closeable) {
                 try {
-                  ((Closeable)doc).close();
+                  ((Closeable) doc).close();
                 } catch (IOException e) {
-                  //Do nothing
+                  // Do nothing
                 }
               }
 
-              if(settings.isDiscardOriginal())
-                item.removeContent(c);
+              if (settings.isDiscardOriginal()) item.removeContent(c);
             });
 
     item.getContents(InputStreamContent.class)
@@ -109,16 +108,15 @@ public abstract class AbstractDocumentExtractorProcessor<T> extends AbstractProc
 
               exceptions.addAll(extract(item, c.getId(), doc));
 
-              if(doc instanceof Closeable){
+              if (doc instanceof Closeable) {
                 try {
-                  ((Closeable)doc).close();
+                  ((Closeable) doc).close();
                 } catch (IOException e) {
-                  //Do nothing
+                  // Do nothing
                 }
               }
 
-              if(settings.isDiscardOriginal())
-                item.removeContent(c);
+              if (settings.isDiscardOriginal()) item.removeContent(c);
             });
 
     if (exceptions.isEmpty()) {

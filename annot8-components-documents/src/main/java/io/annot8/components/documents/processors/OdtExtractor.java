@@ -45,14 +45,16 @@ import org.w3c.dom.NodeList;
 @ComponentDescription("Extracts image and text from Open Document Text (*.odt) files")
 @ComponentTags({"documents", "opendocument", "odt", "extractor", "text", "images", "metadata"})
 @SettingsClass(DocumentExtractorSettings.class)
-public class OdtExtractor extends AbstractDocumentExtractorDescriptor<OdtExtractor.Processor> {
+public class OdtExtractor
+    extends AbstractDocumentExtractorDescriptor<OdtExtractor.Processor, DocumentExtractorSettings> {
 
   @Override
   protected Processor createComponent(Context context, DocumentExtractorSettings settings) {
     return new Processor(context, settings);
   }
 
-  public static class Processor extends AbstractDocumentExtractorProcessor<OdfTextDocument> {
+  public static class Processor
+      extends AbstractDocumentExtractorProcessor<OdfTextDocument, DocumentExtractorSettings> {
     private final Logger logger = getLogger();
 
     public Processor(Context context, DocumentExtractorSettings settings) {

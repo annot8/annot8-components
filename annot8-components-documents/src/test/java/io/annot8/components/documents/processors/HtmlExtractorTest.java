@@ -19,7 +19,8 @@ import java.util.stream.Collectors;
 
 public class HtmlExtractorTest extends AbstractDocumentExtractorTest {
   @Override
-  protected Class<? extends AbstractDocumentExtractorDescriptor<?>> getDescriptor() {
+  protected Class<? extends AbstractDocumentExtractorDescriptor<?, DocumentExtractorSettings>>
+      getDescriptor() {
     return HtmlExtractor.class;
   }
 

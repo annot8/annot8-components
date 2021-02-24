@@ -8,7 +8,9 @@ import io.annot8.api.components.annotations.ComponentName;
 import io.annot8.api.components.annotations.ComponentTags;
 import io.annot8.api.components.annotations.SettingsClass;
 import io.annot8.api.context.Context;
+import io.annot8.api.exceptions.Annot8RuntimeException;
 import io.annot8.api.exceptions.ProcessingException;
+import io.annot8.api.settings.Description;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.InputStreamContent;
 import io.annot8.components.documents.data.ExtractionWithProperties;
@@ -17,7 +19,11 @@ import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.apache.pdfbox.contentstream.PDFStreamEngine;
 import org.apache.pdfbox.contentstream.operator.Operator;
 import org.apache.pdfbox.cos.COSBase;
@@ -36,19 +42,37 @@ import org.slf4j.Logger;
 @ComponentName("PDF Extractor")
 @ComponentDescription("Extracts image and text from PDF (*.pdf) files")
 @ComponentTags({"documents", "pdf", "extractor", "text", "images", "metadata"})
-@SettingsClass(DocumentExtractorSettings.class)
-public class PdfExtractor extends AbstractDocumentExtractorDescriptor<PdfExtractor.Processor> {
+@SettingsClass(PdfExtractor.Settings.class)
+public class PdfExtractor
+    extends AbstractDocumentExtractorDescriptor<PdfExtractor.Processor, PdfExtractor.Settings> {
 
   @Override
-  protected Processor createComponent(Context context, DocumentExtractorSettings settings) {
+  protected Processor createComponent(Context context, PdfExtractor.Settings settings) {
     return new Processor(context, settings);
   }
 
-  public static class Processor extends AbstractDocumentExtractorProcessor<PDDocument> {
+  public static class Processor
+      extends AbstractDocumentExtractorProcessor<PDDocument, PdfExtractor.Settings> {
     private final Logger logger = getLogger();
 
-    public Processor(Context context, DocumentExtractorSettings settings) {
+    private final PDFTextStripper stripper;
+
+    public Processor(Context context, PdfExtractor.Settings settings) {
       super(context, settings);
+
+      if (settings.isExtractText()) {
+        try {
+          stripper = new PDFTextStripper();
+          stripper.setPageStart(settings.getPageStart());
+          stripper.setPageEnd(settings.getPageEnd());
+          stripper.setParagraphStart(settings.getParagraphStart());
+          stripper.setParagraphEnd(settings.getParagraphEnd());
+        } catch (IOException ioe) {
+          throw new Annot8RuntimeException("Unable to create PDFTextStripper", ioe);
+        }
+      } else {
+        stripper = null;
+      }
     }
 
     @Override
@@ -118,7 +142,7 @@ public class PdfExtractor extends AbstractDocumentExtractorDescriptor<PdfExtract
     public Collection<ExtractionWithProperties<String>> extractText(PDDocument doc)
         throws ProcessingException {
       try {
-        return List.of(new ExtractionWithProperties<>(new PDFTextStripper().getText(doc)));
+        return List.of(new ExtractionWithProperties<>(stripper.getText(doc)));
       } catch (IOException e) {
         throw new ProcessingException("Unable to extract text from PDF", e);
       }
@@ -191,6 +215,54 @@ public class PdfExtractor extends AbstractDocumentExtractorDescriptor<PdfExtract
           super.processOperator(operator, operands);
         }
       }
+    }
+  }
+
+  public static class Settings extends DocumentExtractorSettings {
+    private String pageStart = "";
+    private String pageEnd = "";
+    private String paragraphStart = "";
+    private String paragraphEnd = "\n\n";
+
+    @Override
+    public boolean validate() {
+      return super.validate() && paragraphEnd != null;
+    }
+
+    @Description("String to add at the start of each page")
+    public String getPageStart() {
+      return pageStart;
+    }
+
+    public void setPageStart(String pageStart) {
+      this.pageStart = pageStart;
+    }
+
+    @Description("String to add at the end of each page")
+    public String getPageEnd() {
+      return pageEnd;
+    }
+
+    public void setPageEnd(String pageEnd) {
+      this.pageEnd = pageEnd;
+    }
+
+    @Description("String to add at the start of each paragraph")
+    public String getParagraphStart() {
+      return paragraphStart;
+    }
+
+    public void setParagraphStart(String paragraphStart) {
+      this.paragraphStart = paragraphStart;
+    }
+
+    @Description("String to add at the end of each paragraph")
+    public String getParagraphEnd() {
+      return paragraphEnd;
+    }
+
+    public void setParagraphEnd(String paragraphEnd) {
+      this.paragraphEnd = paragraphEnd;
     }
   }
 }

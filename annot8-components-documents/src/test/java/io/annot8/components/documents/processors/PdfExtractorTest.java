@@ -13,11 +13,17 @@ import java.net.URL;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Map;
+import org.junit.jupiter.api.Test;
 
 public class PdfExtractorTest extends AbstractDocumentExtractorTest {
   @Override
-  protected Class<? extends AbstractDocumentExtractorDescriptor<?>> getDescriptor() {
+  protected Class<? extends AbstractDocumentExtractorDescriptor<?, ?>> getDescriptor() {
     return PdfExtractor.class;
+  }
+
+  @Override
+  protected DocumentExtractorSettings getSettings() {
+    return new PdfExtractor.Settings();
   }
 
   @Override
@@ -56,5 +62,26 @@ public class PdfExtractorTest extends AbstractDocumentExtractorTest {
     assertTrue(image.getData().getHeight() > 0);
     assertEquals(1, image.getProperties().get(PropertyKeys.PROPERTY_KEY_INDEX).get());
     assertEquals(2, image.getProperties().get(PropertyKeys.PROPERTY_KEY_PAGE).get());
+  }
+
+  @Test
+  public void testAdditionalSettings() {
+    PdfExtractor.Settings s = new PdfExtractor.Settings();
+
+    assertNotNull(s.getPageStart());
+    s.setPageStart("PAGE START");
+    assertEquals("PAGE START", s.getPageStart());
+
+    assertNotNull(s.getPageEnd());
+    s.setPageEnd("PAGE END");
+    assertEquals("PAGE END", s.getPageEnd());
+
+    assertNotNull(s.getParagraphStart());
+    s.setParagraphStart("PARA START");
+    assertEquals("PARA START", s.getParagraphStart());
+
+    assertNotNull(s.getParagraphEnd());
+    s.setParagraphEnd("PARA END");
+    assertEquals("PARA END", s.getParagraphEnd());
   }
 }

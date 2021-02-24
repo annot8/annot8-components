@@ -19,7 +19,8 @@ import java.util.stream.Collectors;
 
 public class PptxExtractorTest extends AbstractDocumentExtractorTest {
   @Override
-  protected Class<? extends AbstractDocumentExtractorDescriptor<?>> getDescriptor() {
+  protected Class<? extends AbstractDocumentExtractorDescriptor<?, DocumentExtractorSettings>>
+      getDescriptor() {
     return PptxExtractor.class;
   }
 

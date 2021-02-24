@@ -111,7 +111,12 @@ public class KeyValuePairs
             .withPropertyIfPresent(PropertyKeys.PROPERTY_KEY_TYPE, Optional.ofNullable(type))
             .withProperty(PropertyKeys.PROPERTY_KEY_KEY, m.group("key").strip())
             .withProperty(
-                PropertyKeys.PROPERTY_KEY_VALUE, values.size() > 1 ? values : values.get(0))
+                PropertyKeys.PROPERTY_KEY_VALUE,
+                values.size() > 1
+                    ? values
+                    : values.get(
+                        0)) // TODO: This is overwriting properties on time, for example. Need a
+            // better way of doing this
             .save();
       }
     }

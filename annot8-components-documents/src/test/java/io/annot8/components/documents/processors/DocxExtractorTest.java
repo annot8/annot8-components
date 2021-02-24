@@ -16,7 +16,8 @@ import java.util.Map;
 
 public class DocxExtractorTest extends AbstractDocumentExtractorTest {
   @Override
-  protected Class<? extends AbstractDocumentExtractorDescriptor<?>> getDescriptor() {
+  protected Class<? extends AbstractDocumentExtractorDescriptor<?, DocumentExtractorSettings>>
+      getDescriptor() {
     return DocxExtractor.class;
   }
 

@@ -13,6 +13,16 @@ import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.InputStreamContent;
 import io.annot8.components.documents.data.ExtractionWithProperties;
 import io.annot8.conventions.PropertyKeys;
+import java.awt.image.BufferedImage;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.imageio.ImageIO;
 import org.apache.poi.ooxml.POIXMLProperties;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
@@ -26,29 +36,21 @@ import org.apache.poi.xslf.usermodel.XSLFSlideShowFactory;
 import org.apache.poi.xslf.usermodel.XSLFTextParagraph;
 import org.slf4j.Logger;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 @ComponentName("PowerPoint (PPTX) Extractor")
 @ComponentDescription("Extracts image and text from PowerPoint (*.pptx) files")
 @ComponentTags({"documents", "powerpoint", "pptx", "extractor", "text", "images", "metadata"})
 @SettingsClass(DocumentExtractorSettings.class)
-public class PptxExtractor extends AbstractDocumentExtractorDescriptor<PptxExtractor.Processor> {
+public class PptxExtractor
+    extends AbstractDocumentExtractorDescriptor<
+        PptxExtractor.Processor, DocumentExtractorSettings> {
 
   @Override
   protected Processor createComponent(Context context, DocumentExtractorSettings settings) {
     return new Processor(context, settings);
   }
 
-  public static class Processor extends AbstractDocumentExtractorProcessor<XMLSlideShow> {
+  public static class Processor
+      extends AbstractDocumentExtractorProcessor<XMLSlideShow, DocumentExtractorSettings> {
     private final Logger logger = getLogger();
 
     public Processor(Context context, DocumentExtractorSettings settings) {

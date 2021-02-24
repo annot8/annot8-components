@@ -35,14 +35,17 @@ import org.slf4j.Logger;
 @ComponentDescription("Extracts image and text from Word Document (*.docx) files")
 @ComponentTags({"documents", "word", "docx", "extractor", "text", "images", "metadata"})
 @SettingsClass(DocumentExtractorSettings.class)
-public class DocxExtractor extends AbstractDocumentExtractorDescriptor<DocxExtractor.Processor> {
+public class DocxExtractor
+    extends AbstractDocumentExtractorDescriptor<
+        DocxExtractor.Processor, DocumentExtractorSettings> {
 
   @Override
   protected Processor createComponent(Context context, DocumentExtractorSettings settings) {
     return new Processor(context, settings);
   }
 
-  public static class Processor extends AbstractDocumentExtractorProcessor<XWPFDocument> {
+  public static class Processor
+      extends AbstractDocumentExtractorProcessor<XWPFDocument, DocumentExtractorSettings> {
     private final Logger logger = getLogger();
 
     public Processor(Context context, DocumentExtractorSettings settings) {
