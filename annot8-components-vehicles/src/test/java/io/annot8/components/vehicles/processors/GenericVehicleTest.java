@@ -45,6 +45,12 @@ public class GenericVehicleTest {
     testSingleMatch("Natalie owns a lime green van", "lime green van", "road");
   }
 
+  @Test
+  public void testVehicle() {
+    testSingleMatch("4 unidentified vehicles were seen in the area.", "vehicles", null);
+    testSingleMatch("The suspect's vehicle is red", "vehicle", null);
+  }
+
   private void testSingleMatch(String sentence, String match, String subtype) {
     TestItem item = new TestItem();
     TestStringContent content =

@@ -6,6 +6,7 @@ public class PropertyKeys {
   public static final String PROPERTY_KEY_ACCESSEDAT = "accessedAt";
   public static final String PROPERTY_KEY_ACCOUNTNUMBER = "accountNumber";
   public static final String PROPERTY_KEY_ACCOUNTTYPE = "accountType";
+  public static final String PROPERTY_KEY_AGE = "age";
   public static final String PROPERTY_KEY_BRANCHCODE = "branchCode";
   public static final String PROPERTY_KEY_BANKCODE = "bankCode";
   public static final String PROPERTY_KEY_COORDINATETYPE = "coordinateType";
