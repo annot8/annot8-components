@@ -15,6 +15,7 @@ import io.annot8.implementations.support.context.SimpleContext;
 import io.annot8.testing.testimpl.TestItem;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 
@@ -87,7 +88,13 @@ public class KeyValuePairsTest {
     assertEquals(
         "Alice", annotations.get(0).getProperties().get(PropertyKeys.PROPERTY_KEY_VALUE).get());
     assertEquals(
-        "female", annotations.get(0).getProperties().get(PropertyKeys.PROPERTY_KEY_GENDER).get());
+        "female",
+        annotations
+            .get(0)
+            .getProperties()
+            .get("entity", Map.class)
+            .get()
+            .get(PropertyKeys.PROPERTY_KEY_GENDER));
     assertEquals(
         AnnotationTypes.ANNOTATION_TYPE_PERSON,
         annotations.get(0).getProperties().get(PropertyKeys.PROPERTY_KEY_TYPE).get());
@@ -108,7 +115,7 @@ public class KeyValuePairsTest {
     assertEquals(
         List.of("Pizza", "Chips"),
         annotations.get(2).getProperties().get(PropertyKeys.PROPERTY_KEY_VALUE).get());
-    assertFalse(annotations.get(2).getProperties().get("calories").isPresent());
+    assertFalse(annotations.get(2).getProperties().get("entity").isPresent());
     assertEquals(23, annotations.get(2).getBounds(SpanBounds.class).get().getBegin());
     assertEquals(51, annotations.get(2).getBounds(SpanBounds.class).get().getEnd());
 
@@ -117,7 +124,9 @@ public class KeyValuePairsTest {
     assertEquals(
         "Light Brown",
         annotations.get(3).getProperties().get(PropertyKeys.PROPERTY_KEY_VALUE).get());
-    assertEquals("#964B00", annotations.get(3).getProperties().get("hex").get());
+    assertEquals(
+        "#964B00", annotations.get(3).getProperties().get("entity", Map.class).get().get("hex"));
+
     assertEquals(
         "colour", annotations.get(3).getProperties().get(PropertyKeys.PROPERTY_KEY_TYPE).get());
     assertEquals(54, annotations.get(3).getBounds(SpanBounds.class).get().getBegin());

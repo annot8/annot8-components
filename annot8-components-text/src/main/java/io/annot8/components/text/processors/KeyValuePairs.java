@@ -7,19 +7,18 @@ import io.annot8.api.components.annotations.ComponentDescription;
 import io.annot8.api.components.annotations.ComponentName;
 import io.annot8.api.components.annotations.SettingsClass;
 import io.annot8.api.context.Context;
-import io.annot8.api.properties.Properties;
 import io.annot8.api.settings.Description;
 import io.annot8.common.components.AbstractProcessorDescriptor;
 import io.annot8.common.components.capabilities.SimpleCapabilities;
 import io.annot8.common.data.bounds.SpanBounds;
 import io.annot8.common.data.content.Text;
-import io.annot8.common.data.properties.EmptyImmutableProperties;
 import io.annot8.components.base.text.processors.AbstractTextProcessor;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -72,7 +71,7 @@ public class KeyValuePairs
           values = List.of(m.group("value").strip());
         }
 
-        Properties p = EmptyImmutableProperties.getInstance();
+        Optional<Map<String, Object>> mergedProperties = Optional.empty();
         String type = null;
         if (values.size() == 1) {
           // Merge existing properties with existing annotation if we have a single value
@@ -97,7 +96,7 @@ public class KeyValuePairs
                   .findFirst();
 
           if (aMerge.isPresent()) {
-            p = aMerge.get().getProperties();
+            mergedProperties = Optional.of(aMerge.get().getProperties().getAll());
             type = aMerge.get().getType();
           }
         }
@@ -107,16 +106,11 @@ public class KeyValuePairs
             .create()
             .withBounds(new SpanBounds(m.start("key"), m.end("value")))
             .withType(settings.getAnnotationType())
-            .withProperties(p)
+            .withPropertyIfPresent("entity", mergedProperties)
             .withPropertyIfPresent(PropertyKeys.PROPERTY_KEY_TYPE, Optional.ofNullable(type))
             .withProperty(PropertyKeys.PROPERTY_KEY_KEY, m.group("key").strip())
             .withProperty(
-                PropertyKeys.PROPERTY_KEY_VALUE,
-                values.size() > 1
-                    ? values
-                    : values.get(
-                        0)) // TODO: This is overwriting properties on time, for example. Need a
-            // better way of doing this
+                PropertyKeys.PROPERTY_KEY_VALUE, values.size() > 1 ? values : values.get(0))
             .save();
       }
     }
