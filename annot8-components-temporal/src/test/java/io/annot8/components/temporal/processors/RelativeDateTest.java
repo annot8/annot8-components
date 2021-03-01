@@ -15,7 +15,12 @@ import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
 import io.annot8.testing.testimpl.TestItem;
 import io.annot8.testing.testimpl.content.TestStringContent;
-import java.time.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Year;
+import java.time.YearMonth;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.Temporal;
@@ -848,10 +853,7 @@ public class RelativeDateTest {
     RelativeDate.Processor np =
         n.createComponent(
             null,
-            new RelativeDate.Settings(
-                DateTimeFormatter.ofPattern("yyyy-mm-dd"),
-                Arrays.asList("date", "documentDate"),
-                false));
+            new RelativeDate.Settings("yyyy-mm-dd", Arrays.asList("date", "documentDate"), false));
     assertNotNull(np);
   }
 }
