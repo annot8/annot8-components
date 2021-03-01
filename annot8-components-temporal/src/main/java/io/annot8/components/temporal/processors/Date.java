@@ -729,9 +729,10 @@ public class Date extends AbstractProcessorDescriptor<Date.Processor, Date.Setti
   }
 
   public static class Settings implements io.annot8.api.settings.Settings {
-    private boolean americanDates = true;
+    private boolean americanDates = false;
 
-    @Description("Should we use American dates where applicable (i.e. mm-dd-yy)?")
+    @Description(
+        "If true, then where the day and month fields of a date are ambiguous (e.g. 01/03/2021) then the American ordering (e.g. mm-dd-yyyy) will be used")
     public boolean getAmericanDates() {
       return americanDates;
     }
