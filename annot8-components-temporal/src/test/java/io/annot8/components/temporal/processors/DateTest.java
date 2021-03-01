@@ -245,6 +245,57 @@ public class DateTest {
   }
 
   @Test
+  public void testBadYearRange() {
+
+    try (Processor p = new Date.Processor(false)) {
+      Item item = new TestItem();
+      Text content = item.createContent(TestStringContent.class).withData("2015-2012").save();
+
+      p.process(item);
+
+      // We should expect two separate dates here, not a range because in a range the first date
+      // must precede the second
+      assertEquals(2L, content.getAnnotations().getAll().count());
+    }
+  }
+
+  @Test
+  public void testBadYearMonthRange() {
+
+    try (Processor p = new Date.Processor(false)) {
+      Item item = new TestItem();
+      Text content =
+          item.createContent(TestStringContent.class)
+              .withData("between November and March 2015")
+              .save();
+
+      p.process(item);
+
+      // Should only detect March 2015
+      assertEquals(1L, content.getAnnotations().getAll().count());
+      assertEquals(
+          "March 2015", content.getText(content.getAnnotations().getAll().findFirst().get()).get());
+    }
+  }
+
+  @Test
+  public void testBadYearMonthDayRange() {
+
+    try (Processor p = new Date.Processor(false)) {
+      Item item = new TestItem();
+      Text content = item.createContent(TestStringContent.class).withData("4-2 June 2020").save();
+
+      p.process(item);
+
+      // Should detect only 2 June 2020
+      assertEquals(1L, content.getAnnotations().getAll().count());
+      assertEquals(
+          "2 June 2020",
+          content.getText(content.getAnnotations().getAll().findFirst().get()).get());
+    }
+  }
+
+  @Test
   public void testDates() {
 
     try (Processor p = new Date.Processor(false)) {

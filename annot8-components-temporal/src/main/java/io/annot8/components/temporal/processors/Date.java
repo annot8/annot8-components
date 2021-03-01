@@ -147,6 +147,7 @@ public class Date extends AbstractProcessorDescriptor<Date.Processor, Date.Setti
         Year y2,
         Collection<SpanBounds> extracted) {
       if (alreadyExtracted(extracted, charBegin, charEnd)) return;
+      if (y1.isAfter(y2)) return;
 
       SpanBounds sb = new SpanBounds(charBegin, charEnd);
 
@@ -238,6 +239,7 @@ public class Date extends AbstractProcessorDescriptor<Date.Processor, Date.Setti
         YearMonth ym2,
         Collection<SpanBounds> extracted) {
       if (alreadyExtracted(extracted, charBegin, charEnd)) return;
+      if (ym1.isAfter(ym2)) return;
 
       SpanBounds sb = new SpanBounds(charBegin, charEnd);
 
@@ -439,6 +441,7 @@ public class Date extends AbstractProcessorDescriptor<Date.Processor, Date.Setti
         LocalDate ld2,
         Collection<SpanBounds> extracted) {
       if (alreadyExtracted(extracted, charBegin, charEnd)) return;
+      if (ld1.isAfter(ld2)) return;
 
       SpanBounds sb = new SpanBounds(charBegin, charEnd);
 
