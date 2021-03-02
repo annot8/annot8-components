@@ -21,8 +21,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.json.Json;
+import javax.json.JsonNumber;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
+import javax.json.JsonString;
 import javax.json.JsonValue;
 
 @ComponentName("Country Gazetteer")
@@ -61,7 +63,7 @@ public class CountryGazetteer
             metadata ->
                 metadata.put(
                     PropertyKeys.PROPERTY_KEY_GEOJSON,
-                    geojsons.get(metadata.get("cca3").toString())));
+                    deJsonifyObject(geojsons.get(metadata.get("cca3").toString()))));
   }
 
   private Map<Set<String>, Map<String, Object>> getCountryData(Settings settings) {
@@ -100,6 +102,41 @@ public class CountryGazetteer
                     feature.asJsonObject().getJsonObject("properties").getString("ISO_A3"),
                     feature.asJsonObject().getJsonObject("geometry")));
     return output;
+  }
+
+  private Map<String, Object> deJsonifyObject(JsonObject jo) {
+    if (jo == null) return null;
+
+    Map<String, Object> m = new HashMap<>();
+
+    jo.forEach(
+        (key, v) -> {
+          Object o = deJsonifyValue(v);
+          if (o != null) m.put(key, o);
+        });
+
+    return m;
+  }
+
+  private Object deJsonifyValue(JsonValue jv) {
+    switch (jv.getValueType()) {
+      case TRUE:
+        return true;
+      case FALSE:
+        return false;
+      case NULL:
+        return null;
+      case STRING:
+        return ((JsonString) jv).getString();
+      case NUMBER:
+        return ((JsonNumber) jv).numberValue();
+      case ARRAY:
+        return jv.asJsonArray().stream().map(this::deJsonifyValue).collect(Collectors.toList());
+      case OBJECT:
+        return deJsonifyObject(jv.asJsonObject());
+    }
+
+    return null;
   }
 
   private void addJsonMetadata(JsonObject jo, Map<String, Object> metadata) {

@@ -5,12 +5,12 @@
   <parent>
     <artifactId>annot8-components</artifactId>
     <groupId>io.annot8</groupId>
-    <version>1.1.0</version>
+    <version>1.2.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>annot8-components-geo</artifactId>
-  <version>1.1.0</version>
+  <version>1.2.0-SNAPSHOT</version>
   <name>Annot8 Geo Components</name>
   <description>Components to deal with geospatial related annotations</description>
 
@@ -23,12 +23,12 @@
     <dependency>
       <groupId>io.annot8</groupId>
       <artifactId>annot8-conventions</artifactId>
-      <version>1.1.0</version>
+      <version>1.2.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>io.annot8</groupId>
       <artifactId>annot8-components-base-text</artifactId>
-      <version>1.1.0</version>
+      <version>1.2.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>io.annot8</groupId>
@@ -66,7 +66,7 @@
     <dependency>
       <groupId>org.apache.johnzon</groupId>
       <artifactId>johnzon-mapper</artifactId>
-      <version>1.2.9</version>
+      <version>1.2.10</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
