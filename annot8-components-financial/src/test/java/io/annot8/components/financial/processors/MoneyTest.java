@@ -76,6 +76,14 @@ public class MoneyTest {
     assertFoundMoney("The price is £1.99p", 1.99, "GBP");
   }
 
+  @Test
+  public void testNotMoney() {
+    assertNotFoundMoney("There were 4 of them");
+    assertNotFoundMoney("There were 4.0 of them");
+    assertNotFoundMoney("There were 4,000 of them");
+    assertNotFoundMoney("There were 4 million of them");
+  }
+
   private void assertFoundMoney(String inputString, double value, String currencyCode) {
     Processor moneyProcessor = new Money.Processor();
     TestItem testItem = new TestItem();
@@ -86,5 +94,15 @@ public class MoneyTest {
         content.getAnnotations().getAll().findAny().orElseThrow().getProperties();
     assertEquals(value, properties.getOrDefault("value", 0.0));
     assertEquals(currencyCode, properties.getOrDefault("currencyCode", ""));
+  }
+
+  private void assertNotFoundMoney(String inputString) {
+    Processor moneyProcessor = new Money.Processor();
+    TestItem testItem = new TestItem();
+    TestStringContent content =
+        testItem.createContent(TestStringContent.class).withData(inputString).save();
+    moneyProcessor.process(testItem);
+
+    assertEquals(0L, content.getAnnotations().getAll().count());
   }
 }

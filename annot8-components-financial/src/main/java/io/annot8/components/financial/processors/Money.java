@@ -141,6 +141,11 @@ public class Money extends AbstractProcessorDescriptor<Money.Processor, NoSettin
     }
 
     @Override
+    protected boolean acceptMatch(Matcher m) {
+      return !getCurrencyCode(m).isEmpty();
+    }
+
+    @Override
     protected void addProperties(Annotation.Builder builder, Matcher m) {
       Double value = calculateValue(m);
       if (value != null) {
