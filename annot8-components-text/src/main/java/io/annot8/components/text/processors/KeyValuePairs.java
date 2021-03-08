@@ -71,6 +71,12 @@ public class KeyValuePairs
           values = List.of(m.group("value").strip());
         }
 
+        if(settings.isIgnoreEmptyValues())
+          values = values.stream().filter(s -> !s.isBlank()).collect(Collectors.toList());
+
+        if(values.isEmpty())
+          continue;
+
         Optional<Map<String, Object>> mergedProperties = Optional.empty();
         String type = null;
         if (values.size() == 1) {
@@ -120,6 +126,7 @@ public class KeyValuePairs
     private String annotationType = AnnotationTypes.ANNOTATION_TYPE_METADATA;
     private String keyValueSeparator = ":";
     private String valueSeparator = ",";
+    private boolean ignoreEmptyValues = true;
 
     @Override
     public boolean validate() {
@@ -153,6 +160,15 @@ public class KeyValuePairs
 
     public void setValueSeparator(String valueSeparator) {
       this.valueSeparator = valueSeparator;
+    }
+
+    @Description("If true, then empty values are ignored")
+    public boolean isIgnoreEmptyValues() {
+      return ignoreEmptyValues;
+    }
+
+    public void setIgnoreEmptyValues(boolean ignoreEmptyValues) {
+      this.ignoreEmptyValues = ignoreEmptyValues;
     }
   }
 }

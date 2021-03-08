@@ -1,8 +1,6 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.text.processors;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import io.annot8.api.annotations.Annotation;
 import io.annot8.api.components.Processor;
 import io.annot8.api.components.responses.ProcessorResponse;
@@ -13,11 +11,14 @@ import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
 import io.annot8.implementations.support.context.SimpleContext;
 import io.annot8.testing.testimpl.TestItem;
+import org.junit.jupiter.api.Test;
+
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class KeyValuePairsTest {
   @Test
@@ -26,7 +27,7 @@ public class KeyValuePairsTest {
     Text text =
         item.createContent(Text.class)
             .withData(
-                "Name: Alice\nAge : 21 \r\nFavourite Food: Pizza, Chips  \nHair Colour: Light Brown\nSocial media: Twitter: @alice")
+                "Name: Alice\nAge : 21 \r\nFavourite Food: Pizza, Chips  \nHair Colour: Light Brown\nSocial media: Twitter: @alice\nEmpty key:  ")
             .save();
 
     text.getAnnotations()
