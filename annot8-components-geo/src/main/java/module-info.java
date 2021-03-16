@@ -14,4 +14,5 @@ open module io.annot8.components.geo {
   requires opencsv;
 
   exports io.annot8.components.geo.processors;
+  exports io.annot8.components.geo.processors.geonames;
 }
