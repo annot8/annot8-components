@@ -83,7 +83,12 @@ public class TextDetection
             try {
               // Process image
               log().debug("Processing image {}", img.getId());
+
+              long start = System.currentTimeMillis();
               processImage(item, img);
+              metrics()
+                  .timer("processImage")
+                  .record(System.currentTimeMillis() - start, TimeUnit.MILLISECONDS);
             } catch (Exception e) {
               exceptions.add(e);
               return;
