@@ -23,7 +23,7 @@
   <dependencies>
     <dependency>
       <groupId>io.annot8</groupId>
-      <artifactId>annot8-common-components</artifactId>
+      <artifactId>annot8-components-base</artifactId>
     </dependency>
 
     <dependency>

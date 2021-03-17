@@ -17,12 +17,7 @@
   <dependencies>
     <dependency>
       <groupId>io.annot8</groupId>
-      <artifactId>annot8-common-components</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>io.annot8</groupId>
-      <artifactId>annot8-conventions</artifactId>
-      <version>1.2.0-SNAPSHOT</version>
+      <artifactId>annot8-components-base</artifactId>
     </dependency>
 
     <dependency>

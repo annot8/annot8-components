@@ -291,6 +291,18 @@
         <version>${annot8-implementation.version}</version>
       </dependency>
 
+      <!-- Components -->
+      <dependency>
+        <groupId>io.annot8</groupId>
+        <artifactId>annot8-components-base</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.annot8</groupId>
+        <artifactId>annot8-components-base-text</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
       <!-- Testing -->
       <dependency>
         <groupId>io.annot8</groupId>
