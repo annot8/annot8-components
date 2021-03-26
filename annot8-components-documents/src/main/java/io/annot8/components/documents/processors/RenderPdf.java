@@ -113,12 +113,12 @@ public class RenderPdf
 
     private void renderPdf(Item item, String parentId, PDDocument document) {
       PDFRenderer pdfRenderer = new PDFRenderer(document);
-      for (int page = 0; page < document.getNumberOfPages(); ++page) {
+      for (int page = 0; page < document.getNumberOfPages(); page++) {
         BufferedImage bImg;
         try {
           bImg = pdfRenderer.renderImageWithDPI(page, dpi, ImageType.RGB);
         } catch (IOException ioe) {
-          log().error("Unable to render page {} from {}", page, parentId, ioe);
+          log().error("Unable to render page {} from {}", page + 1, parentId, ioe);
           continue;
         }
 
@@ -126,7 +126,7 @@ public class RenderPdf
             .withData(bImg)
             .withDescription(
                 "Rendered page "
-                    + page
+                    + (page + 1)
                     + " of "
                     + document.getNumberOfPages()
                     + " from "

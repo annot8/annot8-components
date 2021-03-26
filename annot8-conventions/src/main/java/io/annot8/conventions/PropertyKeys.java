@@ -18,6 +18,7 @@ public class PropertyKeys {
   public static final String PROPERTY_KEY_FIRSTNAME = "firstname";
   public static final String PROPERTY_KEY_GENDER = "gender";
   public static final String PROPERTY_KEY_GEOJSON = "geojson";
+  public static final String PROPERTY_KEY_HEIGHT = "height";
   public static final String PROPERTY_KEY_IDENTIFIER = "identifier";
   public static final String PROPERTY_KEY_INDEX = "index";
   public static final String PROPERTY_KEY_KEY = "key";
@@ -43,6 +44,7 @@ public class PropertyKeys {
   public static final String PROPERTY_KEY_UNIT = "unit";
   public static final String PROPERTY_KEY_VALUE = "value";
   public static final String PROPERTY_KEY_VERSION = "version";
+  public static final String PROPERTY_KEY_WIDTH = "width";
 
   private PropertyKeys() {
     // No constructor - only access to public methods

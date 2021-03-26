@@ -15,6 +15,7 @@ import io.annot8.common.components.capabilities.SimpleCapabilities;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.Image;
 import io.annot8.common.data.content.InputStreamContent;
+import io.annot8.conventions.PropertyKeys;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -73,7 +74,11 @@ public class ExtractImage
 
                 if (discardOriginal) item.removeContent(isc);
 
-                item.createContent(Image.class).withData(img).save();
+                item.createContent(Image.class)
+                    .withData(img)
+                    .withProperty(PropertyKeys.PROPERTY_KEY_HEIGHT, img.getHeight())
+                    .withProperty(PropertyKeys.PROPERTY_KEY_WIDTH, img.getWidth())
+                    .save();
               });
 
       // Process FileContent
@@ -95,7 +100,11 @@ public class ExtractImage
 
                 if (discardOriginal) item.removeContent(fc);
 
-                item.createContent(Image.class).withData(img).save();
+                item.createContent(Image.class)
+                    .withData(img)
+                    .withProperty(PropertyKeys.PROPERTY_KEY_HEIGHT, img.getHeight())
+                    .withProperty(PropertyKeys.PROPERTY_KEY_WIDTH, img.getWidth())
+                    .save();
               });
 
       if (exceptions.isEmpty()) {
