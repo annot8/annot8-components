@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import io.annot8.api.properties.Properties;
 import io.annot8.common.data.content.Image;
+import io.annot8.common.data.content.Row;
+import io.annot8.common.data.content.Table;
 import io.annot8.common.data.content.TableContent;
 import io.annot8.common.data.content.Text;
 import io.annot8.conventions.PropertyKeys;
@@ -12,7 +14,10 @@ import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.Month;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 public class OdtExtractorTest extends AbstractDocumentExtractorTest {
@@ -66,6 +71,32 @@ public class OdtExtractorTest extends AbstractDocumentExtractorTest {
 
   @Override
   protected void validateTables(Collection<TableContent> tableContents) {
-    // Do nothing
+    assertEquals(1, tableContents.size());
+    TableContent tableContent = tableContents.stream().findFirst().get();
+    assertEquals(
+        "ExampleTable", tableContent.getProperties().get(PropertyKeys.PROPERTY_KEY_NAME).get());
+
+    assertNotNull(tableContent.getData());
+
+    Table table = tableContent.getData();
+    assertEquals(3, table.getRowCount());
+    assertEquals(3, table.getColumnCount());
+
+    assertEquals(List.of("ID", "Name", "Birth Date"), table.getColumnNames().get());
+
+    Row r1 = table.getRow(0).get();
+    assertEquals("001", r1.getString(0).get());
+    assertEquals("Alice", r1.getString(1).get());
+    assertEquals(LocalDate.of(1990, Month.JANUARY, 1), r1.getValueAt(2).get());
+
+    Row r2 = table.getRow(1).get();
+    assertEquals("002", r2.getString(0).get());
+    assertEquals("Bob", r2.getString(1).get());
+    assertEquals(LocalDate.of(1995, Month.FEBRUARY, 2), r2.getValueAt(2).get());
+
+    Row r3 = table.getRow(2).get();
+    assertEquals("003", r3.getString(0).get());
+    assertEquals("Charlie", r3.getString(1).get());
+    assertEquals(LocalDate.of(2000, Month.MARCH, 3), r3.getValueAt(2).get());
   }
 }

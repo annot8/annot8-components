@@ -10,23 +10,32 @@ import io.annot8.api.components.annotations.ComponentTags;
 import io.annot8.api.components.annotations.SettingsClass;
 import io.annot8.api.context.Context;
 import io.annot8.api.exceptions.ProcessingException;
+import io.annot8.common.data.content.DefaultRow;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.InputStreamContent;
+import io.annot8.common.data.content.Row;
 import io.annot8.common.data.content.Table;
 import io.annot8.components.documents.data.ExtractionWithProperties;
 import io.annot8.conventions.PropertyKeys;
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.imageio.ImageIO;
 import org.apache.poi.poifs.filesystem.FileMagic;
 import org.odftoolkit.odfdom.doc.OdfTextDocument;
+import org.odftoolkit.odfdom.doc.table.OdfTable;
+import org.odftoolkit.odfdom.doc.table.OdfTableCell;
+import org.odftoolkit.odfdom.doc.table.OdfTableRow;
 import org.odftoolkit.odfdom.incubator.doc.draw.OdfDrawFrame;
 import org.odftoolkit.odfdom.incubator.doc.draw.OdfDrawImage;
 import org.odftoolkit.odfdom.incubator.meta.OdfMetaDocumentStatistic;
@@ -80,7 +89,7 @@ public class OdtExtractor
 
     @Override
     public boolean isTablesSupported() {
-      return false;
+      return true;
     }
 
     @Override
@@ -307,14 +316,120 @@ public class OdtExtractor
     @Override
     public Collection<ExtractionWithProperties<Table>> extractTables(OdfTextDocument doc)
         throws ProcessingException {
-      // TODO: Extract tables from ODT
-      // doc.getTableList();
-      return Collections.emptyList();
+      return doc.getTableList().stream()
+          .map(Processor::transformTable)
+          .collect(Collectors.toList());
+    }
+
+    private static ExtractionWithProperties<Table> transformTable(OdfTable table) {
+      Map<String, Object> props = new HashMap<>();
+
+      String name = table.getTableName();
+      if (name != null && !name.isBlank()) props.put(PropertyKeys.PROPERTY_KEY_NAME, name);
+
+      return new ExtractionWithProperties<>(new OdtTable(table), props);
     }
 
     private String getValueOfFirstElement(NodeList nodeList) {
       if (nodeList.getLength() == 0) return null;
       return nodeList.item(0).getTextContent().strip();
+    }
+  }
+
+  public static class OdtTable implements Table {
+    private final List<Row> rows;
+    private final List<String> columnNames;
+
+    public OdtTable(OdfTable t) {
+      int headerRows = Math.max(1, t.getHeaderRowCount());
+      List<Row> rows = new ArrayList<>(t.getRowCount() - headerRows);
+      List<String> columnNames = Collections.emptyList();
+
+      for (int i = 0; i < t.getRowCount(); i++) {
+        if (i == 0) {
+          OdfTableRow headerRow = t.getRowByIndex(i);
+
+          List<String> header = new ArrayList<>(headerRow.getCellCount());
+          for (int col = 0; col < headerRow.getCellCount(); col++) {
+            OdfTableCell headerCell = headerRow.getCellByIndex(col);
+            header.add(headerCell.getDisplayText());
+          }
+
+          columnNames = header;
+
+          continue;
+        }
+
+        if (i < t.getHeaderRowCount()) {
+          continue;
+        }
+
+        OdfTableRow row = t.getRowByIndex(i);
+
+        List<Object> values = new ArrayList<>(row.getCellCount());
+        for (int col = 0; col < row.getCellCount(); col++) {
+          OdfTableCell cell = row.getCellByIndex(col);
+
+          switch (cell.getValueType()) {
+            case "boolean":
+              values.add(cell.getBooleanValue());
+              break;
+            case "currency":
+              String currencyPrefix = "";
+              if (cell.getCurrencyCode() != null && !cell.getCurrencyCode().isBlank()) {
+                currencyPrefix = cell.getCurrencyCode() + " ";
+              } else if (cell.getCurrencySymbol() != null && !cell.getCurrencySymbol().isBlank()) {
+                currencyPrefix = cell.getCurrencySymbol();
+              }
+              values.add(currencyPrefix + cell.getCurrencyValue());
+              break;
+            case "date":
+              values.add(
+                  cell.getDateValue().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+              break;
+            case "float":
+              values.add(cell.getDoubleValue());
+              break;
+            case "percentage":
+              values.add(cell.getPercentageValue());
+              break;
+            case "string":
+              values.add(cell.getStringValue());
+              break;
+            case "time":
+              values.add(
+                  cell.getDateValue().toInstant().atZone(ZoneId.systemDefault()).toLocalTime());
+              break;
+            default:
+              values.add(cell.getDisplayText());
+          }
+        }
+
+        rows.add(new DefaultRow(i - headerRows, columnNames, values));
+      }
+
+      this.rows = Collections.unmodifiableList(rows);
+      this.columnNames = columnNames;
+    }
+
+    @Override
+    public int getColumnCount() {
+      return columnNames.size();
+    }
+
+    @Override
+    public int getRowCount() {
+      return rows.size();
+    }
+
+    @Override
+    public Optional<List<String>> getColumnNames() {
+      return Optional.of(columnNames);
+    }
+
+    @Override
+    public Stream<Row> getRows() {
+      return rows.stream();
     }
   }
 }
