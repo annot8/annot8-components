@@ -5,7 +5,7 @@ open module io.annot8.components.cyber {
   requires io.annot8.conventions;
   requires com.google.common;
   requires io.annot8.common.components;
-  requires java.json.bind;
+  requires jakarta.json.bind;
 
   exports io.annot8.components.cyber.processors;
 }

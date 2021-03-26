@@ -3,7 +3,7 @@ package io.annot8.components.elasticsearch;
 
 import io.annot8.api.settings.Description;
 import io.annot8.api.settings.Settings;
-import javax.json.bind.annotation.JsonbTransient;
+import jakarta.json.bind.annotation.JsonbTransient;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;

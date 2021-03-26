@@ -6,5 +6,5 @@ module io.annot8.components.tesseract {
   requires org.apache.commons.io;
   requires tess4j;
   requires java.desktop;
-  requires java.json.bind;
+  requires jakarta.json.bind;
 }

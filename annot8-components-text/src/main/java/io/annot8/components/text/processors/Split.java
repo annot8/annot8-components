@@ -14,13 +14,13 @@ import io.annot8.common.components.capabilities.SimpleCapabilities;
 import io.annot8.common.data.content.Text;
 import io.annot8.components.base.text.processors.AbstractTextProcessor;
 import io.annot8.conventions.PropertyKeys;
+import jakarta.json.bind.annotation.JsonbCreator;
+import jakarta.json.bind.annotation.JsonbProperty;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.json.bind.annotation.JsonbCreator;
-import javax.json.bind.annotation.JsonbProperty;
 
 @ComponentName("Split Text")
 @ComponentDescription("Split Text content into separate contents")

@@ -16,6 +16,8 @@ import io.annot8.components.base.text.processors.AbstractTextProcessor;
 import io.annot8.components.temporal.processors.utils.DateTimeUtils;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
+import jakarta.json.bind.annotation.JsonbCreator;
+import jakarta.json.bind.annotation.JsonbProperty;
 import java.time.DayOfWeek;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -39,8 +41,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.json.bind.annotation.JsonbCreator;
-import javax.json.bind.annotation.JsonbProperty;
 
 /**
  * Extract expressions that refer to a relative date, e.g. yesterday. These can be resolved by

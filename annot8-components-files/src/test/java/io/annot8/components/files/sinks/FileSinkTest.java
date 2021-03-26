@@ -32,6 +32,12 @@ import io.annot8.conventions.PropertyKeys;
 import io.annot8.implementations.support.context.SimpleContext;
 import io.annot8.testing.testimpl.TestItem;
 import io.annot8.testing.testimpl.content.TestStringContent;
+import jakarta.json.Json;
+import jakarta.json.JsonArray;
+import jakarta.json.JsonArrayBuilder;
+import jakarta.json.JsonObject;
+import jakarta.json.JsonObjectBuilder;
+import jakarta.json.JsonValue;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -52,12 +58,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 import javax.imageio.ImageIO;
-import javax.json.Json;
-import javax.json.JsonArray;
-import javax.json.JsonArrayBuilder;
-import javax.json.JsonObject;
-import javax.json.JsonObjectBuilder;
-import javax.json.JsonValue;
 import org.junit.jupiter.api.Test;
 
 public class FileSinkTest {

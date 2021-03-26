@@ -32,6 +32,13 @@ import io.annot8.common.data.content.TableContent;
 import io.annot8.common.data.content.Text;
 import io.annot8.common.data.content.UriContent;
 import io.annot8.conventions.PropertyKeys;
+import jakarta.json.Json;
+import jakarta.json.JsonArray;
+import jakarta.json.JsonArrayBuilder;
+import jakarta.json.JsonObject;
+import jakarta.json.JsonObjectBuilder;
+import jakarta.json.JsonValue;
+import jakarta.json.JsonWriter;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -50,13 +57,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.stream.Stream;
-import javax.json.Json;
-import javax.json.JsonArray;
-import javax.json.JsonArrayBuilder;
-import javax.json.JsonObject;
-import javax.json.JsonObjectBuilder;
-import javax.json.JsonValue;
-import javax.json.JsonWriter;
 import org.apache.commons.text.StringEscapeUtils;
 
 @ComponentName("File Sink")

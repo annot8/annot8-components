@@ -16,10 +16,10 @@ import io.annot8.common.data.utils.SortUtils;
 import io.annot8.components.stopwords.resources.NoOpStopwords;
 import io.annot8.components.stopwords.resources.Stopwords;
 import io.annot8.conventions.AnnotationTypes;
+import jakarta.json.bind.annotation.JsonbCreator;
+import jakarta.json.bind.annotation.JsonbProperty;
 import java.util.Map;
 import java.util.Set;
-import javax.json.bind.annotation.JsonbCreator;
-import javax.json.bind.annotation.JsonbProperty;
 
 @ComponentName("Described Word Token")
 @ComponentDescription(

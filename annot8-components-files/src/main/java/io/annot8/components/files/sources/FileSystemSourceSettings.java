@@ -3,12 +3,12 @@ package io.annot8.components.files.sources;
 
 import io.annot8.api.settings.Description;
 import io.annot8.api.settings.Settings;
+import jakarta.json.bind.annotation.JsonbCreator;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
-import javax.json.bind.annotation.JsonbCreator;
 
 public class FileSystemSourceSettings implements Settings {
 

@@ -12,8 +12,8 @@ import io.annot8.api.settings.Description;
 import io.annot8.common.components.AbstractProcessor;
 import io.annot8.common.components.AbstractProcessorDescriptor;
 import io.annot8.common.components.capabilities.SimpleCapabilities;
-import javax.json.bind.annotation.JsonbCreator;
-import javax.json.bind.annotation.JsonbProperty;
+import jakarta.json.bind.annotation.JsonbCreator;
+import jakarta.json.bind.annotation.JsonbProperty;
 
 @ComponentName("Item Property from Parameter")
 @ComponentDescription("Explicitly sets a property on the item")

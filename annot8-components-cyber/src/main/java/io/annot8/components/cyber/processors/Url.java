@@ -13,9 +13,9 @@ import io.annot8.common.data.bounds.SpanBounds;
 import io.annot8.common.data.content.Text;
 import io.annot8.components.base.text.processors.AbstractRegexProcessor;
 import io.annot8.conventions.AnnotationTypes;
+import jakarta.json.bind.annotation.JsonbCreator;
+import jakarta.json.bind.annotation.JsonbProperty;
 import java.util.regex.Pattern;
-import javax.json.bind.annotation.JsonbCreator;
-import javax.json.bind.annotation.JsonbProperty;
 
 /** Extract Urls with the option of doing so in a lenient fashion */
 @ComponentName("URL")

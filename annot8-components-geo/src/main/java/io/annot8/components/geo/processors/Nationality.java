@@ -13,13 +13,13 @@ import io.annot8.common.data.content.Text;
 import io.annot8.components.base.text.processors.AbstractTextProcessor;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
+import jakarta.json.JsonReader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.json.Json;
-import javax.json.JsonObject;
-import javax.json.JsonReader;
 
 @ComponentName("Nationality")
 @ComponentDescription("Extract nationality demonyms, e.g. French, from text")
