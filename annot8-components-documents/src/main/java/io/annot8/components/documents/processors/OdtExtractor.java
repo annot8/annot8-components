@@ -12,6 +12,7 @@ import io.annot8.api.context.Context;
 import io.annot8.api.exceptions.ProcessingException;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.InputStreamContent;
+import io.annot8.common.data.content.Table;
 import io.annot8.components.documents.data.ExtractionWithProperties;
 import io.annot8.conventions.PropertyKeys;
 import java.awt.image.BufferedImage;
@@ -19,6 +20,7 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -74,6 +76,11 @@ public class OdtExtractor
     @Override
     public boolean isImagesSupported() {
       return true;
+    }
+
+    @Override
+    public boolean isTablesSupported() {
+      return false;
     }
 
     @Override
@@ -295,6 +302,14 @@ public class OdtExtractor
       }
 
       return extractedImages;
+    }
+
+    @Override
+    public Collection<ExtractionWithProperties<Table>> extractTables(OdfTextDocument doc)
+        throws ProcessingException {
+      // TODO: Extract tables from ODT
+      // doc.getTableList();
+      return Collections.emptyList();
     }
 
     private String getValueOfFirstElement(NodeList nodeList) {

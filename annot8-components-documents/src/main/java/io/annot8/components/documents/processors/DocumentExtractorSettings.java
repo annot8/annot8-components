@@ -7,6 +7,7 @@ public class DocumentExtractorSettings implements io.annot8.api.settings.Setting
   private boolean extractMetadata = true;
   private boolean extractText = true;
   private boolean extractImages = true;
+  private boolean extractTables = true;
   private boolean discardOriginal = false;
 
   @Override
@@ -41,10 +42,22 @@ public class DocumentExtractorSettings implements io.annot8.api.settings.Setting
     this.extractImages = extractImages;
   }
 
-  @Description(value = "Discard original Content from which content is extracted", defaultValue = "false")
+  @Description(value = "Should tables be extracted from the document", defaultValue = "true")
+  public boolean isExtractTables() {
+    return extractTables;
+  }
+
+  public void setExtractTables(boolean extractTables) {
+    this.extractTables = extractTables;
+  }
+
+  @Description(
+      value = "Discard original Content from which content is extracted",
+      defaultValue = "false")
   public boolean isDiscardOriginal() {
     return discardOriginal;
   }
+
   public void setDiscardOriginal(boolean discardOriginal) {
     this.discardOriginal = discardOriginal;
   }

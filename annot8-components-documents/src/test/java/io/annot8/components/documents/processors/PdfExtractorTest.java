@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import io.annot8.api.properties.Properties;
 import io.annot8.common.data.content.Image;
+import io.annot8.common.data.content.TableContent;
 import io.annot8.common.data.content.Text;
 import io.annot8.conventions.PropertyKeys;
 import java.io.File;
@@ -91,5 +92,10 @@ public class PdfExtractorTest extends AbstractDocumentExtractorTest {
     assertNotNull(s.getParagraphEnd());
     s.setParagraphEnd("PARA END");
     assertEquals("PARA END", s.getParagraphEnd());
+  }
+
+  @Override
+  protected void validateTables(Collection<TableContent> tableContents) {
+    // Do nothing
   }
 }

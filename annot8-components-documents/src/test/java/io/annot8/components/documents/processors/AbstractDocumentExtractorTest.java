@@ -15,6 +15,7 @@ import io.annot8.api.properties.Properties;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.Image;
 import io.annot8.common.data.content.InputStreamContent;
+import io.annot8.common.data.content.TableContent;
 import io.annot8.common.data.content.Text;
 import io.annot8.implementations.support.context.SimpleContext;
 import io.annot8.testing.testimpl.TestItem;
@@ -41,6 +42,8 @@ public abstract class AbstractDocumentExtractorTest {
   protected abstract void validateText(Collection<Text> textContents);
 
   protected abstract void validateImages(Collection<Image> imageContents);
+
+  protected abstract void validateTables(Collection<TableContent> tableContents);
 
   @Test
   public void testForAnnotations() {
@@ -126,6 +129,7 @@ public abstract class AbstractDocumentExtractorTest {
     settings.setExtractMetadata(true);
     settings.setExtractText(false);
     settings.setExtractImages(false);
+    settings.setExtractTables(false);
 
     AbstractDocumentExtractorProcessor<?, DocumentExtractorSettings> processor =
         getInstantiatedProcessor(settings);
@@ -150,6 +154,7 @@ public abstract class AbstractDocumentExtractorTest {
     settings.setExtractMetadata(false);
     settings.setExtractText(true);
     settings.setExtractImages(false);
+    settings.setExtractTables(false);
 
     AbstractDocumentExtractorProcessor<?, ? extends DocumentExtractorSettings> processor =
         getInstantiatedProcessor(settings);
@@ -176,6 +181,7 @@ public abstract class AbstractDocumentExtractorTest {
     settings.setExtractMetadata(false);
     settings.setExtractText(false);
     settings.setExtractImages(true);
+    settings.setExtractTables(false);
 
     AbstractDocumentExtractorProcessor<?, ? extends DocumentExtractorSettings> processor =
         getInstantiatedProcessor(settings);
@@ -197,11 +203,39 @@ public abstract class AbstractDocumentExtractorTest {
   }
 
   @Test
+  public void testTables() {
+    DocumentExtractorSettings settings = getSettings();
+    settings.setExtractMetadata(false);
+    settings.setExtractText(false);
+    settings.setExtractImages(false);
+    settings.setExtractTables(true);
+
+    AbstractDocumentExtractorProcessor<?, ? extends DocumentExtractorSettings> processor =
+        getInstantiatedProcessor(settings);
+
+    Item item = createTestItem();
+
+    ProcessorResponse pr = processor.process(item);
+    if (pr.hasExceptions()) {
+      pr.getExceptions().forEach(Throwable::printStackTrace);
+    }
+    assertEquals(ProcessorResponse.ok(), pr);
+
+    if (!processor.isTablesSupported()) {
+      assertEquals(1, item.getContents().count());
+      assertEquals(0, item.getContents(TableContent.class).count());
+    }
+
+    validateTables(item.getContents(TableContent.class).collect(Collectors.toList()));
+  }
+
+  @Test
   public void testInputStream() {
     DocumentExtractorSettings settings = getSettings();
     settings.setExtractMetadata(false);
     settings.setExtractText(true);
     settings.setExtractImages(true);
+    settings.setExtractTables(true);
 
     AbstractDocumentExtractorProcessor<?, ? extends DocumentExtractorSettings> processor =
         getInstantiatedProcessor(settings);
@@ -225,6 +259,12 @@ public abstract class AbstractDocumentExtractorTest {
     }
 
     validateImages(item.getContents(Image.class).collect(Collectors.toList()));
+
+    if (!processor.isTablesSupported()) {
+      assertEquals(0, item.getContents(TableContent.class).count());
+    }
+
+    validateTables(item.getContents(TableContent.class).collect(Collectors.toList()));
   }
 
   @Test

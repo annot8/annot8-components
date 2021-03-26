@@ -3,7 +3,11 @@ package io.annot8.components.documents.data;
 
 import io.annot8.common.data.content.Row;
 import io.annot8.common.data.content.Table;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Sheet;

@@ -9,8 +9,12 @@ import io.annot8.api.components.annotations.ComponentName;
 import io.annot8.api.components.annotations.ComponentTags;
 import io.annot8.api.components.annotations.SettingsClass;
 import io.annot8.api.context.Context;
+import io.annot8.api.exceptions.ProcessingException;
+import io.annot8.common.data.content.DefaultRow;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.InputStreamContent;
+import io.annot8.common.data.content.Row;
+import io.annot8.common.data.content.Table;
 import io.annot8.components.documents.data.ExtractionWithProperties;
 import io.annot8.conventions.PropertyKeys;
 import java.awt.image.BufferedImage;
@@ -25,15 +29,20 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.imageio.ImageIO;
 import org.apache.poi.poifs.filesystem.FileMagic;
 import org.apache.poi.util.IOUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 
 /** Extracts content from HTML files */
@@ -70,6 +79,11 @@ public class HtmlExtractor
 
     @Override
     public boolean isImagesSupported() {
+      return true;
+    }
+
+    @Override
+    public boolean isTablesSupported() {
       return true;
     }
 
@@ -263,7 +277,7 @@ public class HtmlExtractor
         properties.put(PropertyKeys.PROPERTY_KEY_TITLE, i.attr("title"));
         properties.put(PropertyKeys.PROPERTY_KEY_INDEX, imageNumber);
 
-        if ("figure".equals(i.parent().tagName().toLowerCase())) {
+        if ("figure".equalsIgnoreCase(i.parent().tagName())) {
           Element caption = i.parent().getElementsByTag("figcaption").first();
           if (caption != null) {
             properties.put(PropertyKeys.PROPERTY_KEY_DESCRIPTION, caption.text());
@@ -282,6 +296,81 @@ public class HtmlExtractor
       }
 
       return images;
+    }
+
+    @Override
+    public Collection<ExtractionWithProperties<Table>> extractTables(Document doc)
+        throws ProcessingException {
+      return doc.getElementsByTag("table").stream()
+          .map(Processor::transformTable)
+          .collect(Collectors.toList());
+    }
+
+    private static ExtractionWithProperties<Table> transformTable(Element table) {
+      Map<String, Object> props = new HashMap<>();
+
+      String desc = table.select("caption").text();
+      if (desc != null && !desc.isBlank()) props.put(PropertyKeys.PROPERTY_KEY_DESCRIPTION, desc);
+
+      String lang = table.attr("lang");
+      if (lang != null && !lang.isBlank()) props.put(PropertyKeys.PROPERTY_KEY_LANGUAGE, lang);
+
+      String title = table.attr("title");
+      if (title != null && !title.isBlank()) props.put(PropertyKeys.PROPERTY_KEY_TITLE, title);
+
+      String id = table.attr("id");
+      if (id != null && !id.isBlank()) props.put(PropertyKeys.PROPERTY_KEY_IDENTIFIER, id);
+
+      return new ExtractionWithProperties<>(new HtmlTable(table), props);
+    }
+  }
+
+  public static class HtmlTable implements Table {
+    private final List<Row> rows;
+    private final List<String> columnNames;
+
+    public HtmlTable(Element table) {
+      List<String> columnNames = Collections.emptyList();
+
+      Element headerRow = table.selectFirst("thead > tr");
+      if (headerRow != null) {
+        columnNames =
+            headerRow.getElementsByTag("th").stream()
+                .map(Element::text)
+                .collect(Collectors.toList());
+      }
+
+      List<Row> rows = new ArrayList<>();
+      Elements bodyRows = table.select("tbody > tr");
+      for (int i = 0; i < bodyRows.size(); i++) {
+        // TODO: Handle column spans?
+        List<Object> data =
+            bodyRows.get(i).select("td").stream().map(Element::text).collect(Collectors.toList());
+        rows.add(new DefaultRow(i, columnNames, data));
+      }
+
+      this.columnNames = columnNames;
+      this.rows = rows;
+    }
+
+    @Override
+    public int getColumnCount() {
+      return columnNames.size();
+    }
+
+    @Override
+    public int getRowCount() {
+      return rows.size();
+    }
+
+    @Override
+    public Optional<List<String>> getColumnNames() {
+      return Optional.of(columnNames);
+    }
+
+    @Override
+    public Stream<Row> getRows() {
+      return rows.stream();
     }
   }
 }

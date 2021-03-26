@@ -9,8 +9,12 @@ import io.annot8.api.components.annotations.ComponentName;
 import io.annot8.api.components.annotations.ComponentTags;
 import io.annot8.api.components.annotations.SettingsClass;
 import io.annot8.api.context.Context;
+import io.annot8.api.exceptions.ProcessingException;
+import io.annot8.common.data.content.DefaultRow;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.InputStreamContent;
+import io.annot8.common.data.content.Row;
+import io.annot8.common.data.content.Table;
 import io.annot8.components.documents.data.ExtractionWithProperties;
 import io.annot8.conventions.PropertyKeys;
 import java.awt.image.BufferedImage;
@@ -20,15 +24,22 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.imageio.ImageIO;
 import org.apache.poi.ooxml.POIXMLProperties;
 import org.apache.poi.poifs.filesystem.FileMagic;
 import org.apache.poi.xwpf.extractor.XWPFWordExtractor;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFPictureData;
+import org.apache.poi.xwpf.usermodel.XWPFTable;
+import org.apache.poi.xwpf.usermodel.XWPFTableCell;
+import org.apache.poi.xwpf.usermodel.XWPFTableRow;
 import org.slf4j.Logger;
 
 @ComponentName("Word Document (DOCX) Extractor")
@@ -64,6 +75,11 @@ public class DocxExtractor
 
     @Override
     public boolean isImagesSupported() {
+      return true;
+    }
+
+    @Override
+    public boolean isTablesSupported() {
       return true;
     }
 
@@ -145,6 +161,8 @@ public class DocxExtractor
 
     @Override
     public Collection<ExtractionWithProperties<String>> extractText(XWPFDocument doc) {
+      // TODO: Should we remove Tables from this?
+
       XWPFWordExtractor wordExtractor = new XWPFWordExtractor(doc);
       return List.of(new ExtractionWithProperties<>(wordExtractor.getText()));
     }
@@ -187,6 +205,65 @@ public class DocxExtractor
       }
 
       return extractedImages;
+    }
+
+    @Override
+    public Collection<ExtractionWithProperties<Table>> extractTables(XWPFDocument doc)
+        throws ProcessingException {
+      return doc.getTables().stream().map(Processor::transformTable).collect(Collectors.toList());
+    }
+
+    private static ExtractionWithProperties<Table> transformTable(XWPFTable table) {
+      return new ExtractionWithProperties<>(new DocxTable(table));
+    }
+  }
+
+  public static class DocxTable implements Table {
+    private final List<Row> rows;
+    private final List<String> columnNames;
+
+    public DocxTable(XWPFTable t) {
+      List<Row> rows = new ArrayList<>(t.getNumberOfRows() - 1);
+
+      List<String> columnNames = Collections.emptyList();
+      for (int i = 0; i < t.getNumberOfRows(); i++) {
+        XWPFTableRow r = t.getRow(i);
+
+        // TODO: Can we get content not as a String?
+        List<Object> data =
+            r.getTableCells().stream().map(XWPFTableCell::getText).collect(Collectors.toList());
+
+        if (i == 0) {
+          // Assume header row if first row
+          columnNames = data.stream().map(Object::toString).collect(Collectors.toList());
+        } else {
+          Row row = new DefaultRow(i - 1, columnNames, data);
+          rows.add(row);
+        }
+      }
+
+      this.rows = Collections.unmodifiableList(rows);
+      this.columnNames = columnNames;
+    }
+
+    @Override
+    public int getColumnCount() {
+      return columnNames.size();
+    }
+
+    @Override
+    public int getRowCount() {
+      return rows.size();
+    }
+
+    @Override
+    public Optional<List<String>> getColumnNames() {
+      return Optional.of(columnNames);
+    }
+
+    @Override
+    public Stream<Row> getRows() {
+      return rows.stream();
     }
   }
 }

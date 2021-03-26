@@ -9,8 +9,10 @@ import io.annot8.api.components.annotations.ComponentName;
 import io.annot8.api.components.annotations.ComponentTags;
 import io.annot8.api.components.annotations.SettingsClass;
 import io.annot8.api.context.Context;
+import io.annot8.api.exceptions.ProcessingException;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.InputStreamContent;
+import io.annot8.common.data.content.Table;
 import io.annot8.components.documents.data.ExtractionWithProperties;
 import io.annot8.conventions.PropertyKeys;
 import java.awt.image.BufferedImage;
@@ -19,6 +21,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,6 +73,11 @@ public class PptxExtractor
     @Override
     public boolean isImagesSupported() {
       return true;
+    }
+
+    @Override
+    public boolean isTablesSupported() {
+      return false;
     }
 
     @Override
@@ -261,6 +269,13 @@ public class PptxExtractor
       }
 
       return extractedImages;
+    }
+
+    @Override
+    public Collection<ExtractionWithProperties<Table>> extractTables(XMLSlideShow doc)
+        throws ProcessingException {
+      // TODO: Extract tables from PPTX
+      return Collections.emptyList();
     }
   }
 }

@@ -9,8 +9,10 @@ import io.annot8.api.components.annotations.ComponentName;
 import io.annot8.api.components.annotations.ComponentTags;
 import io.annot8.api.components.annotations.SettingsClass;
 import io.annot8.api.context.Context;
+import io.annot8.api.exceptions.ProcessingException;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.InputStreamContent;
+import io.annot8.common.data.content.Table;
 import io.annot8.components.documents.data.ExtractionWithProperties;
 import io.annot8.conventions.PropertyKeys;
 import java.awt.image.BufferedImage;
@@ -67,6 +69,11 @@ public class PptExtractor
     @Override
     public boolean isImagesSupported() {
       return true;
+    }
+
+    @Override
+    public boolean isTablesSupported() {
+      return false;
     }
 
     @Override
@@ -206,6 +213,13 @@ public class PptExtractor
       }
 
       return extractedImages;
+    }
+
+    @Override
+    public Collection<ExtractionWithProperties<Table>> extractTables(HSLFSlideShow doc)
+        throws ProcessingException {
+      // TODO: Extract tables from PPT
+      return Collections.emptyList();
     }
   }
 }

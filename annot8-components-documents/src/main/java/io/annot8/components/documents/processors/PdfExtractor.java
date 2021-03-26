@@ -13,6 +13,7 @@ import io.annot8.api.exceptions.ProcessingException;
 import io.annot8.api.settings.Description;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.InputStreamContent;
+import io.annot8.common.data.content.Table;
 import io.annot8.components.documents.data.ExtractionWithProperties;
 import io.annot8.conventions.PropertyKeys;
 import java.awt.image.BufferedImage;
@@ -21,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -90,6 +92,11 @@ public class PdfExtractor
     @Override
     public boolean isImagesSupported() {
       return true;
+    }
+
+    @Override
+    public boolean isTablesSupported() {
+      return false;
     }
 
     @Override
@@ -167,6 +174,13 @@ public class PdfExtractor
       }
 
       return extractor.getExtractedImages();
+    }
+
+    @Override
+    public Collection<ExtractionWithProperties<Table>> extractTables(PDDocument doc)
+        throws ProcessingException {
+      // TODO: Extract tables from PDF
+      return Collections.emptyList();
     }
 
     private static class ImageExtractor extends PDFStreamEngine {

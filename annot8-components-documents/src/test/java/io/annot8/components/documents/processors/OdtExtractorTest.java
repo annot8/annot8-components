@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import io.annot8.api.properties.Properties;
 import io.annot8.common.data.content.Image;
+import io.annot8.common.data.content.TableContent;
 import io.annot8.common.data.content.Text;
 import io.annot8.conventions.PropertyKeys;
 import java.io.File;
@@ -61,5 +62,10 @@ public class OdtExtractorTest extends AbstractDocumentExtractorTest {
     assertEquals("Picture 2", image.getProperties().get(PropertyKeys.PROPERTY_KEY_NAME).get());
     assertFalse(image.getProperties().has(PropertyKeys.PROPERTY_KEY_TITLE));
     assertFalse(image.getProperties().has(PropertyKeys.PROPERTY_KEY_DESCRIPTION));
+  }
+
+  @Override
+  protected void validateTables(Collection<TableContent> tableContents) {
+    // Do nothing
   }
 }

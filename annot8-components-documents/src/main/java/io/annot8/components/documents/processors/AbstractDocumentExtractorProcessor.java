@@ -13,6 +13,8 @@ import io.annot8.common.components.logging.Logging;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.Image;
 import io.annot8.common.data.content.InputStreamContent;
+import io.annot8.common.data.content.Table;
+import io.annot8.common.data.content.TableContent;
 import io.annot8.common.data.content.Text;
 import io.annot8.components.documents.data.ExtractionWithProperties;
 import java.awt.image.BufferedImage;
@@ -62,6 +64,10 @@ public abstract class AbstractDocumentExtractorProcessor<T, S extends DocumentEx
     if (!isImagesSupported() && settings.isExtractImages()) {
       logger.warn("This extractor does not support extraction of images");
       this.settings.setExtractImages(false);
+    }
+    if (!isTablesSupported() && settings.isExtractTables()) {
+      logger.warn("This extractor does not support extraction of tables");
+      this.settings.setExtractTables(false);
     }
   }
 
@@ -183,6 +189,22 @@ public abstract class AbstractDocumentExtractorProcessor<T, S extends DocumentEx
       }
     }
 
+    if (settings.isExtractTables()) {
+      try {
+        Collection<ExtractionWithProperties<Table>> extractedTables = extractTables(doc);
+
+        for (ExtractionWithProperties<Table> e : extractedTables) {
+          item.createContent(TableContent.class)
+              .withDescription("Table extracted from " + contentId)
+              .withData(e.getExtractedValue())
+              .withProperties(new InMemoryProperties(e.getProperties()))
+              .save();
+        }
+      } catch (Exception e) {
+        exceptions.add(e);
+      }
+    }
+
     return exceptions;
   }
 
@@ -194,6 +216,8 @@ public abstract class AbstractDocumentExtractorProcessor<T, S extends DocumentEx
   public abstract boolean isTextSupported();
   /** Returns true if this processor supports extracting images, and false otherwise */
   public abstract boolean isImagesSupported();
+  /** Returns true if this processor supports extracting tables, and false otherwise */
+  public abstract boolean isTablesSupported();
 
   /** Returns true if this processor should process the given file, and false otherwise */
   public abstract boolean acceptFile(FileContent file);
@@ -219,6 +243,9 @@ public abstract class AbstractDocumentExtractorProcessor<T, S extends DocumentEx
       throws ProcessingException;
   /** Extract images from the document */
   public abstract Collection<ExtractionWithProperties<BufferedImage>> extractImages(T doc)
+      throws ProcessingException;
+  /** Extract tables from the document */
+  public abstract Collection<ExtractionWithProperties<Table>> extractTables(T doc)
       throws ProcessingException;
 
   // Utility functions below here
