@@ -15,12 +15,16 @@ import io.annot8.common.components.AbstractSourceDescriptor;
 import io.annot8.common.components.capabilities.SimpleCapabilities;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.conventions.PropertyKeys;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @ComponentName("Simple File System Source")
@@ -54,6 +58,7 @@ public class SimpleFileSystemSource
                     Files.walk(p)
                         .filter(Files::isRegularFile)
                         .filter(path -> acceptExtension(settings.getExtensions(), path))
+                        .sorted(sortPaths(settings.getFileOrder()))
                         .forEach(files::add);
                   } catch (Exception e) {
                     log().error("Unable to read files recursively in path {}", p, e);
@@ -68,6 +73,7 @@ public class SimpleFileSystemSource
                     Files.list(p)
                         .filter(Files::isRegularFile)
                         .filter(path -> acceptExtension(settings.getExtensions(), path))
+                        .sorted(sortPaths(settings.getFileOrder()))
                         .forEach(files::add);
                   } catch (Exception e) {
                     log().error("Unable to read files in path {}", p, e);
@@ -83,6 +89,65 @@ public class SimpleFileSystemSource
 
       return extensions.contains(
           com.google.common.io.Files.getFileExtension(p.toString()).toLowerCase());
+    }
+
+    private static Comparator<Path> sortPaths(FileOrder fileOrder) {
+      switch (fileOrder) {
+        case CREATED_DATE_EARLIEST_TO_LATEST:
+          return (p1, p2) -> {
+            try {
+              BasicFileAttributes bfa1 = Files.readAttributes(p1, BasicFileAttributes.class);
+              BasicFileAttributes bfa2 = Files.readAttributes(p2, BasicFileAttributes.class);
+
+              return bfa1.creationTime().compareTo(bfa2.creationTime());
+            } catch (IOException ioe) {
+              return 0;
+            }
+          };
+        case CREATED_DATE_LATEST_TO_EARLIEST:
+          return (p1, p2) -> {
+            try {
+              BasicFileAttributes bfa1 = Files.readAttributes(p1, BasicFileAttributes.class);
+              BasicFileAttributes bfa2 = Files.readAttributes(p2, BasicFileAttributes.class);
+
+              return bfa2.creationTime().compareTo(bfa1.creationTime());
+            } catch (IOException ioe) {
+              return 0;
+            }
+          };
+        case MODIFIED_DATE_EARLIEST_TO_LATEST:
+          return (p1, p2) -> {
+            try {
+              BasicFileAttributes bfa1 = Files.readAttributes(p1, BasicFileAttributes.class);
+              BasicFileAttributes bfa2 = Files.readAttributes(p2, BasicFileAttributes.class);
+
+              return bfa1.lastModifiedTime().compareTo(bfa2.lastModifiedTime());
+            } catch (IOException ioe) {
+              return 0;
+            }
+          };
+        case MODIFIED_DATE_LATEST_TO_EARLIEST:
+          return (p1, p2) -> {
+            try {
+              BasicFileAttributes bfa1 = Files.readAttributes(p1, BasicFileAttributes.class);
+              BasicFileAttributes bfa2 = Files.readAttributes(p2, BasicFileAttributes.class);
+
+              return bfa2.lastModifiedTime().compareTo(bfa1.lastModifiedTime());
+            } catch (IOException ioe) {
+              return 0;
+            }
+          };
+        case NAME_A_TO_Z:
+          return Comparator.comparing(p -> p.getFileName().toString());
+        case NAME_Z_TO_A:
+          return Comparator.comparing((Path p) -> p.getFileName().toString()).reversed();
+        case SIZE_SMALL_TO_LARGE:
+          return Comparator.comparing(p -> p.toFile().length());
+        case SIZE_LARGE_TO_SMALL:
+          return Comparator.comparing((Path p) -> p.toFile().length()).reversed();
+      }
+
+      return Comparator.comparing(Function.identity());
     }
 
     @Override
@@ -108,6 +173,7 @@ public class SimpleFileSystemSource
     private List<Path> paths = new ArrayList<>();
     private List<String> extensions = new ArrayList<>();
     private boolean recursive = true;
+    private FileOrder fileOrder = FileOrder.NAME_A_TO_Z;
 
     @Override
     public boolean validate() {
@@ -140,5 +206,25 @@ public class SimpleFileSystemSource
     public void setRecursive(boolean recursive) {
       this.recursive = recursive;
     }
+
+    @Description("The order in which files will be processed")
+    public FileOrder getFileOrder() {
+      return fileOrder;
+    }
+
+    public void setFileOrder(FileOrder fileOrder) {
+      this.fileOrder = fileOrder;
+    }
+  }
+
+  public enum FileOrder {
+    CREATED_DATE_EARLIEST_TO_LATEST,
+    CREATED_DATE_LATEST_TO_EARLIEST,
+    MODIFIED_DATE_EARLIEST_TO_LATEST,
+    MODIFIED_DATE_LATEST_TO_EARLIEST,
+    NAME_A_TO_Z,
+    NAME_Z_TO_A,
+    SIZE_LARGE_TO_SMALL,
+    SIZE_SMALL_TO_LARGE
   }
 }
