@@ -59,7 +59,7 @@ public class Discard extends AbstractProcessorDescriptor<Discard.Processor, Disc
     private boolean inverse;
 
     public Settings() {
-      discardOn = Pattern.compile(".*discard me.*", Pattern.CASE_INSENSITIVE);
+      discardOn = Pattern.compile(".*discard me.*", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
       inverse = false;
     }
 
