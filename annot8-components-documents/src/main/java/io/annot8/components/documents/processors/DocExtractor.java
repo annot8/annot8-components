@@ -10,8 +10,10 @@ import io.annot8.api.components.annotations.ComponentTags;
 import io.annot8.api.components.annotations.SettingsClass;
 import io.annot8.api.context.Context;
 import io.annot8.api.exceptions.ProcessingException;
+import io.annot8.common.data.content.DefaultRow;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.InputStreamContent;
+import io.annot8.common.data.content.Row;
 import io.annot8.common.data.content.Table;
 import io.annot8.components.documents.data.ExtractionWithProperties;
 import io.annot8.conventions.PropertyKeys;
@@ -26,10 +28,15 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.imageio.ImageIO;
 import org.apache.poi.hwpf.HWPFDocument;
 import org.apache.poi.hwpf.extractor.WordExtractor;
 import org.apache.poi.hwpf.usermodel.Picture;
+import org.apache.poi.hwpf.usermodel.TableIterator;
+import org.apache.poi.hwpf.usermodel.TableRow;
 import org.apache.poi.poifs.filesystem.FileMagic;
 import org.slf4j.Logger;
 
@@ -70,7 +77,7 @@ public class DocExtractor
 
     @Override
     public boolean isTablesSupported() {
-      return false;
+      return true;
     }
 
     @Override
@@ -160,8 +167,69 @@ public class DocExtractor
     @Override
     public Collection<ExtractionWithProperties<Table>> extractTables(HWPFDocument doc)
         throws ProcessingException {
-      // TODO: Extract tables from DOC
-      return Collections.emptyList();
+
+      List<ExtractionWithProperties<Table>> ret = new ArrayList<>();
+
+      TableIterator tableIterator = new TableIterator(doc.getRange());
+      while (tableIterator.hasNext()) {
+        org.apache.poi.hwpf.usermodel.Table tbl = tableIterator.next();
+        ret.add(new ExtractionWithProperties<>(new DocTable(tbl)));
+      }
+
+      return ret;
+    }
+  }
+
+  public static class DocTable implements Table {
+    private final List<Row> rows;
+    private final List<String> columnNames;
+
+    public DocTable(org.apache.poi.hwpf.usermodel.Table t) {
+      List<Row> rows = new ArrayList<>(t.numRows());
+
+      List<String> columnNames = Collections.emptyList();
+      for (int i = 0; i < t.numRows(); i++) {
+        TableRow r = t.getRow(i);
+
+        List<Object> data = new ArrayList<>();
+        for (int j = 0; j < r.numCells(); j++) {
+          data.add(removeControlCharacters(r.getCell(j).text()));
+        }
+
+        if (columnNames.isEmpty() && r.isTableHeader()) {
+          columnNames = data.stream().map(Object::toString).collect(Collectors.toList());
+        } else {
+          Row row = new DefaultRow(i - 1, columnNames, data);
+          rows.add(row);
+        }
+      }
+
+      this.rows = Collections.unmodifiableList(rows);
+      this.columnNames = columnNames;
+    }
+
+    @Override
+    public int getColumnCount() {
+      return columnNames.size();
+    }
+
+    @Override
+    public int getRowCount() {
+      return rows.size();
+    }
+
+    @Override
+    public Optional<List<String>> getColumnNames() {
+      return Optional.of(columnNames);
+    }
+
+    @Override
+    public Stream<Row> getRows() {
+      return rows.stream();
+    }
+
+    private static String removeControlCharacters(String s) {
+      return s.replaceAll("[\u0000-\u001f]", "");
     }
   }
 }
