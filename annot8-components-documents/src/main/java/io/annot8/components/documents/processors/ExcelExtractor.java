@@ -47,12 +47,16 @@ public class ExcelExtractor
 
   @Override
   public Capabilities capabilities() {
-    return new SimpleCapabilities.Builder()
-        .withProcessesContent(FileContent.class)
-        .withProcessesContent(InputStreamContent.class)
-        .withCreatesContent(TableContent.class)
-        .withDeletesContent(FileContent.class)
-        .build();
+    SimpleCapabilities.Builder builder =
+        new SimpleCapabilities.Builder()
+            .withProcessesContent(FileContent.class)
+            .withProcessesContent(InputStreamContent.class)
+            .withCreatesContent(TableContent.class);
+
+    if (getSettings().isRemoveSourceContent())
+      builder = builder.withDeletesContent(FileContent.class);
+
+    return builder.build();
   }
 
   public static class Processor extends AbstractProcessor {
@@ -74,7 +78,7 @@ public class ExcelExtractor
           .forEach(
               f -> {
                 try (InputStream fis = new FileInputStream(f.getData())) {
-                  processInputStream(item, fis);
+                  processInputStream(item, fis, f.getId());
 
                   if (settings.isRemoveSourceContent()) item.removeContent(f);
                 } catch (Exception e) {
@@ -87,7 +91,7 @@ public class ExcelExtractor
           .forEach(
               c -> {
                 try {
-                  processInputStream(item, c.getData());
+                  processInputStream(item, c.getData(), c.getId());
 
                   if (settings.isRemoveSourceContent()) item.removeContent(c);
                 } catch (Exception e) {
@@ -111,7 +115,8 @@ public class ExcelExtractor
       return FileMagic.OOXML == fm;
     }
 
-    private void processInputStream(Item item, InputStream inputStream) throws Exception {
+    private void processInputStream(Item item, InputStream inputStream, String parentId)
+        throws Exception {
       try (Workbook workbook = WorkbookFactory.create(inputStream)) {
         item.getProperties()
             .set(PropertyKeys.PROPERTY_KEY_VERSION, workbook.getSpreadsheetVersion().name());
@@ -127,7 +132,8 @@ public class ExcelExtractor
               workbook.getSheetAt(i),
               i,
               i == workbook.getActiveSheetIndex(),
-              workbook.getSheetVisibility(i) == SheetVisibility.VISIBLE);
+              workbook.getSheetVisibility(i) == SheetVisibility.VISIBLE,
+              parentId);
         }
       }
     }
@@ -139,7 +145,7 @@ public class ExcelExtractor
     }
 
     private void processSheet(
-        Item item, Sheet sheet, int sheetIndex, boolean active, boolean visible) {
+        Item item, Sheet sheet, int sheetIndex, boolean active, boolean visible, String parentId) {
       Table table = new WorksheetTable(sheet, settings.isFirstRowHeader(), settings.getSkipRows());
 
       item.createContent(TableContent.class)
@@ -148,6 +154,7 @@ public class ExcelExtractor
           .withProperty(PropertyKeys.PROPERTY_KEY_PAGE, sheetIndex)
           .withProperty("active", active)
           .withProperty("visible", visible)
+          .withPropertyIfPresent(PropertyKeys.PROPERTY_KEY_PARENT, Optional.ofNullable(parentId))
           .save();
     }
   }

@@ -50,8 +50,10 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -133,13 +135,38 @@ public class FileSink extends AbstractProcessorDescriptor<FileSink.Processor, Fi
         }
       }
 
+      // Calculate nesting structure
+      Map<String, String> parents = new HashMap<>();
+      if (settings.isNestFolders()) {
+        item.getContents()
+            .forEach(
+                c ->
+                    c.getProperties()
+                        .get(PropertyKeys.PROPERTY_KEY_PARENT, String.class)
+                        .ifPresent(s -> parents.put(c.getId(), s)));
+      }
+
       item.getContents()
           .forEach(
               content -> {
+                List<String> parentIds = new ArrayList<>();
+                String id = content.getId();
+                while (id != null) {
+                  parentIds.add(id);
+                  id = parents.get(id);
+                }
+
+                Collections.reverse(parentIds);
+
                 File contentFolder;
                 try {
                   contentFolder =
-                      Files.createDirectories(itemFolder.toPath().resolve(content.getId()))
+                      Files.createDirectories(
+                              itemFolder
+                                  .toPath()
+                                  .resolve(
+                                      Path.of(
+                                          parentIds.remove(0), parentIds.toArray(new String[0]))))
                           .toFile();
                 } catch (IOException e) {
                   log().error("Unable to create directory for content {}", content.getId(), e);
@@ -476,6 +503,7 @@ public class FileSink extends AbstractProcessorDescriptor<FileSink.Processor, Fi
     private List<Path> basePaths = Collections.emptyList();
     private boolean copyOriginalFile = false;
     private String descriptionFilename = "description.txt";
+    private boolean nestFolders = false;
 
     @Override
     public boolean validate() {
@@ -575,6 +603,18 @@ public class FileSink extends AbstractProcessorDescriptor<FileSink.Processor, Fi
 
     public void setDescriptionFilename(String descriptionFilename) {
       this.descriptionFilename = descriptionFilename;
+    }
+
+    @Description(
+        value =
+            "If true, then Content folders will be nested inside their parent folders where the parent is known",
+        defaultValue = "false")
+    public boolean isNestFolders() {
+      return nestFolders;
+    }
+
+    public void setNestFolders(boolean nestFolders) {
+      this.nestFolders = nestFolders;
     }
 
     public enum ImageType {

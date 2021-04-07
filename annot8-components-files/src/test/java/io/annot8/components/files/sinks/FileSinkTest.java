@@ -1058,4 +1058,79 @@ public class FileSinkTest {
         .map(Path::toFile)
         .forEach(File::delete);
   }
+
+  @Test
+  public void testNestedFolders() throws Exception {
+    TestItem item = new TestItem();
+
+    Content<?> c1 = item.createContent(Text.class).withData("Bonjour le monde").save();
+    Content<?> c2 =
+        item.createContent(Text.class)
+            .withData("Hello World")
+            .withProperty(PropertyKeys.PROPERTY_KEY_PARENT, c1.getId())
+            .save();
+    Content<?> c3 =
+        item.createContent(Text.class)
+            .withData("Hello")
+            .withProperty(PropertyKeys.PROPERTY_KEY_PARENT, c2.getId())
+            .save();
+    Content<?> c4 =
+        item.createContent(Text.class)
+            .withData("World")
+            .withProperty(PropertyKeys.PROPERTY_KEY_PARENT, c2.getId())
+            .save();
+
+    Path tempRootDir = Files.createTempDirectory("file-sink-test");
+
+    FileSink.Settings settings = new FileSink.Settings();
+    settings.setRootOutputFolder(tempRootDir);
+    settings.setNestFolders(true);
+
+    FileSink.Processor processor = new FileSink.Processor(settings);
+    processor.process(item);
+
+    Path outputFolder = Path.of(tempRootDir.toString(), item.getId());
+
+    // Content 1
+    assertTrue(
+        outputFolder
+            .resolve(c1.getId())
+            .resolve(settings.getContentFilename() + ".txt")
+            .toFile()
+            .exists());
+
+    // Content 2, nested under Content 1
+    assertTrue(
+        outputFolder
+            .resolve(c1.getId())
+            .resolve(c2.getId())
+            .resolve(settings.getContentFilename() + ".txt")
+            .toFile()
+            .exists());
+
+    // Content 3 and 4, nested under Content 1 and Content 2
+    assertTrue(
+        outputFolder
+            .resolve(c1.getId())
+            .resolve(c2.getId())
+            .resolve(c3.getId())
+            .resolve(settings.getContentFilename() + ".txt")
+            .toFile()
+            .exists());
+
+    assertTrue(
+        outputFolder
+            .resolve(c1.getId())
+            .resolve(c2.getId())
+            .resolve(c4.getId())
+            .resolve(settings.getContentFilename() + ".txt")
+            .toFile()
+            .exists());
+
+    // Delete temp directory
+    Files.walk(tempRootDir)
+        .sorted(Comparator.reverseOrder())
+        .map(Path::toFile)
+        .forEach(File::delete);
+  }
 }

@@ -17,6 +17,7 @@ import io.annot8.common.data.content.Table;
 import io.annot8.common.data.content.TableContent;
 import io.annot8.common.data.content.Text;
 import io.annot8.components.documents.data.ExtractionWithProperties;
+import io.annot8.conventions.PropertyKeys;
 import java.awt.image.BufferedImage;
 import java.io.Closeable;
 import java.io.IOException;
@@ -166,6 +167,7 @@ public abstract class AbstractDocumentExtractorProcessor<T, S extends DocumentEx
               .withDescription("Text extracted from " + contentId)
               .withData(e.getExtractedValue())
               .withProperties(new InMemoryProperties(e.getProperties()))
+              .withProperty(PropertyKeys.PROPERTY_KEY_PARENT, contentId)
               .save();
         }
       } catch (Exception e) {
@@ -182,6 +184,7 @@ public abstract class AbstractDocumentExtractorProcessor<T, S extends DocumentEx
               .withDescription("Image extracted from " + contentId)
               .withData(e.getExtractedValue())
               .withProperties(new InMemoryProperties(e.getProperties()))
+              .withProperty(PropertyKeys.PROPERTY_KEY_PARENT, contentId)
               .save();
         }
       } catch (Exception e) {
@@ -198,6 +201,7 @@ public abstract class AbstractDocumentExtractorProcessor<T, S extends DocumentEx
               .withDescription("Table extracted from " + contentId)
               .withData(e.getExtractedValue())
               .withProperties(new InMemoryProperties(e.getProperties()))
+              .withProperty(PropertyKeys.PROPERTY_KEY_PARENT, contentId)
               .save();
         }
       } catch (Exception e) {

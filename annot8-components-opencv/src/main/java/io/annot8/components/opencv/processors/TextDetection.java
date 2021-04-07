@@ -14,6 +14,7 @@ import io.annot8.common.components.AbstractProcessorDescriptor;
 import io.annot8.common.components.capabilities.SimpleCapabilities;
 import io.annot8.common.data.content.Image;
 import io.annot8.components.opencv.utils.OpenCVUtils;
+import io.annot8.conventions.PropertyKeys;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
@@ -190,6 +191,7 @@ public class TextDetection
           item.createContent(Image.class)
               .withData(OpenCVUtils.matToBufferedImage(frame))
               .withDescription("EAST output (BOX) from " + img.getId())
+              .withProperty(PropertyKeys.PROPERTY_KEY_PARENT, img.getId())
               .save();
 
           break;
@@ -233,6 +235,7 @@ public class TextDetection
                 .withProperty("height", (int) (bounding.height * ratio.y))
                 .withProperty("source", img.getId())
                 .withProperty("angle", rot.angle)
+                .withProperty(PropertyKeys.PROPERTY_KEY_PARENT, img.getId())
                 .save();
           }
 
@@ -261,6 +264,35 @@ public class TextDetection
           item.createContent(Image.class)
               .withData(OpenCVUtils.matToBufferedImage(frame))
               .withDescription("EAST output (MASK) from " + img.getId())
+              .withProperty(PropertyKeys.PROPERTY_KEY_PARENT, img.getId())
+              .save();
+
+          break;
+        case INVERSE_MASK:
+          // Mask out text with black pixels
+
+          // Create mask, which is black by default
+          Mat inverseMask = new Mat(frame.rows(), frame.cols(), CvType.CV_8U);
+          inverseMask.setTo(OpenCVUtils.BLACK);
+
+          // Create unmasked areas, using white
+          for (RotatedRect rot : rotatedRects) {
+            Point[] vertices = OpenCVUtils.scaleRotatedRect(rot, ratio.x, ratio.y);
+
+            Imgproc.fillPoly(inverseMask, List.of(new MatOfPoint(vertices)), OpenCVUtils.WHITE);
+          }
+
+          // Mask out original image by setting any white pixels in the mask to black,
+          // and using the original pixels for black pixels in the mask
+
+          Imgproc.cvtColor(inverseMask, inverseMask, Imgproc.COLOR_GRAY2BGR, 3);
+          frame.setTo(OpenCVUtils.BLACK, inverseMask);
+
+          // Save frame to new Image Content
+          item.createContent(Image.class)
+              .withData(OpenCVUtils.matToBufferedImage(frame))
+              .withDescription("EAST output (INVERSE_MASK) from " + img.getId())
+              .withProperty(PropertyKeys.PROPERTY_KEY_PARENT, img.getId())
               .save();
 
           break;
@@ -421,6 +453,7 @@ public class TextDetection
   public enum OutputMode {
     EXTRACT,
     MASK,
-    BOX
+    BOX,
+    INVERSE_MASK
   }
 }

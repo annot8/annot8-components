@@ -17,6 +17,7 @@ import io.annot8.common.components.capabilities.SimpleCapabilities;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.Image;
 import io.annot8.common.data.content.Text;
+import io.annot8.conventions.PropertyKeys;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -85,7 +86,7 @@ public class OCR extends AbstractProcessorDescriptor<OCR.Processor, OCR.Settings
               fc -> {
                 String content =
                     metrics()
-                        .timer("ocr")
+                        .timer("ocr-file")
                         .record(
                             () -> {
                               try {
@@ -109,7 +110,7 @@ public class OCR extends AbstractProcessorDescriptor<OCR.Processor, OCR.Settings
               image -> {
                 String content =
                     metrics()
-                        .timer("ocr")
+                        .timer("ocr-image")
                         .record(
                             () -> {
                               try {
@@ -138,6 +139,7 @@ public class OCR extends AbstractProcessorDescriptor<OCR.Processor, OCR.Settings
           .withDescription("OCR from " + sourceContent.getId())
           .withData(textContent)
           .withProperties(sourceContent.getProperties())
+          .withProperty(PropertyKeys.PROPERTY_KEY_PARENT, sourceContent.getId())
           .save();
     }
   }
@@ -145,8 +147,7 @@ public class OCR extends AbstractProcessorDescriptor<OCR.Processor, OCR.Settings
   /** Settings class for {@link OCR} */
   public static class Settings implements io.annot8.api.settings.Settings {
     // Processor Settings
-    private List<String> extensions =
-        Arrays.asList("bmp", "gif", "jpg", "jpeg", "pdf", "tif", "tiff");
+    private List<String> extensions = Arrays.asList("bmp", "gif", "jpg", "jpeg", "tif", "tiff");
 
     // Tesseract Settings
     private List<String> configs = new ArrayList<>();

@@ -218,7 +218,7 @@ public class FileSystemSource
               new TimerTask() {
                 @Override
                 public void run() {
-                  log().info("Processing {}", path);
+                  log().info("Creating item from {}", path);
 
                   final Item item = itemFactory.create();
                   try {
