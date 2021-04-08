@@ -157,6 +157,7 @@ public class FileSystemSource
       if (!initialFiles.isEmpty()) {
         read +=
             initialFiles.stream()
+                .filter(queue::add)
                 .peek(file -> createItem(itemFactory, file, settings.getDelay()))
                 .mapToLong(p -> 1L)
                 .sum();
@@ -164,9 +165,10 @@ public class FileSystemSource
         initialFiles.clear();
       }
 
-      // Not watching, so we don't need to check the watch keys and can return DONE at this point
+      // Not watching, so we don't need to check the watch keys and can return DONE at this point if
+      // queue is empty
       if (watchService == null || !settings.isWatching()) {
-        return SourceResponse.done();
+        return queue.isEmpty() ? SourceResponse.done() : SourceResponse.empty();
       }
 
       // Watching, so check the watch keys for more files
@@ -218,27 +220,23 @@ public class FileSystemSource
               new TimerTask() {
                 @Override
                 public void run() {
-                  log().info("Creating item from {}", path);
-
-                  final Item item = itemFactory.create();
-                  try {
-                    item.getProperties().set(PropertyKeys.PROPERTY_KEY_SOURCE, path);
-                    item.getProperties()
-                        .set(PropertyKeys.PROPERTY_KEY_ACCESSEDAT, Instant.now().getEpochSecond());
-
-                    item.createContent(FileContent.class)
-                        .withDescription("File " + path.toString())
-                        .withData(path.toFile())
-                        .save();
-                  } catch (Throwable t) {
-                    log().warn("Unable to create item, discarding", t);
-                    item.discard();
-                  }
-
+                  log().debug("Creating item from {}", path);
+                  itemFactory.create(i -> createFileContent(i, path));
                   queue.remove(path);
                 }
               },
               delay);
+    }
+
+    private void createFileContent(Item item, Path path) {
+      item.getProperties().set(PropertyKeys.PROPERTY_KEY_SOURCE, path);
+      item.getProperties()
+          .set(PropertyKeys.PROPERTY_KEY_ACCESSEDAT, Instant.now().getEpochSecond());
+
+      item.createContent(FileContent.class)
+          .withDescription("File " + path.toString())
+          .withData(path.toFile())
+          .save();
     }
   }
 
