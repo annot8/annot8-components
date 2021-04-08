@@ -80,6 +80,11 @@ public abstract class AbstractDocumentExtractorProcessor<T, S extends DocumentEx
         .filter(this::acceptFile)
         .forEach(
             c -> {
+              log()
+                  .info(
+                      "Extracting content from File Content {} ({})",
+                      c.getId(),
+                      c.getData().getPath());
               T doc;
               try {
                 doc = extractDocument(c);
@@ -105,6 +110,8 @@ public abstract class AbstractDocumentExtractorProcessor<T, S extends DocumentEx
         .filter(this::acceptInputStream)
         .forEach(
             c -> {
+              log().info("Extracting content from InputStream Content {}", c.getId());
+
               T doc;
               try {
                 doc = extractDocument(c);
