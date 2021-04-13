@@ -4,6 +4,7 @@ package io.annot8.components.image.processors;
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
 import io.annot8.api.components.annotations.ComponentName;
+import io.annot8.api.components.annotations.ComponentTags;
 import io.annot8.api.components.annotations.SettingsClass;
 import io.annot8.api.components.responses.ProcessorResponse;
 import io.annot8.api.context.Context;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 
 @ComponentName("Filter Image by Size")
 @ComponentDescription("Filter Image content based on it's size")
+@ComponentTags({"image", "filter"})
 @SettingsClass(FilterImageBySize.Settings.class)
 public class FilterImageBySize
     extends AbstractProcessorDescriptor<FilterImageBySize.Processor, FilterImageBySize.Settings> {

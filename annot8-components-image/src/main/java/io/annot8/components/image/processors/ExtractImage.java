@@ -4,6 +4,7 @@ package io.annot8.components.image.processors;
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
 import io.annot8.api.components.annotations.ComponentName;
+import io.annot8.api.components.annotations.ComponentTags;
 import io.annot8.api.components.annotations.SettingsClass;
 import io.annot8.api.components.responses.ProcessorResponse;
 import io.annot8.api.context.Context;
@@ -25,6 +26,7 @@ import javax.imageio.ImageIO;
 
 @ComponentName("Extract Image")
 @ComponentDescription("Extract image content from InputStreams and Files for processing")
+@ComponentTags({"image"})
 @SettingsClass(ExtractImage.Settings.class)
 public class ExtractImage
     extends AbstractProcessorDescriptor<ExtractImage.Processor, ExtractImage.Settings> {
