@@ -15,7 +15,7 @@
   <description>Components to deal with reading from and writing to MongoDB</description>
 
   <properties>
-    <jackson.version>2.12.2</jackson.version>
+    <jackson.version>2.12.3</jackson.version>
   </properties>
 
   <dependencies>
@@ -32,7 +32,7 @@
     <dependency>
       <groupId>org.mongodb</groupId>
       <artifactId>mongodb-driver-sync</artifactId>
-      <version>4.2.2</version>
+      <version>4.2.3</version>
     </dependency>
 
     <dependency>
