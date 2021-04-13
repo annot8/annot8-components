@@ -198,6 +198,10 @@ public class PdfExtractor
         return extractedImages;
       }
 
+      public ImageExtractor() {
+        //        addOperator(new Concatenate());
+      }
+
       @Override
       protected void processOperator(Operator operator, List<COSBase> operands) throws IOException {
         if ("Do".equals(operator.getName())) {
@@ -210,6 +214,36 @@ public class PdfExtractor
             PDImageXObject image = (PDImageXObject) xobject;
             PDMetadata metadata = image.getMetadata();
 
+            BufferedImage img = image.getImage();
+            //            try {
+            //              //TODO: This could probably do with being more generic (also handling
+            // rotation) - not sure it is correct in all cases
+            //              AffineTransform transform = new AffineTransform();
+            //              Matrix m = getGraphicsState().getCurrentTransformationMatrix();
+            //
+            //              //FIXME: Ought to properly apply the AffineTransformation defined in the
+            // PDF
+            //              //Flip the images where they have negative scale
+            //              transform.scale(m.getScaleX() < 0.0 ? -1.0 : 1.0, m.getScaleY() < 0.0 ?
+            // -1.0 : 1.0);
+            //              transform.translate(m.getScaleX() < 0.0 ? -image.getWidth() : 0.0,
+            // m.getScaleY() < 0.0 ? -image.getHeight() : 0.0);
+            //
+            //              // Apply affine transform
+            //              System.out.println(m.createAffineTransform());
+            //              AffineTransformOp op = new AffineTransformOp(m.createAffineTransform(),
+            // AffineTransformOp.TYPE_BILINEAR);
+            //
+            //              img = op.createCompatibleDestImage(image.getImage(),
+            // image.getImage().getColorModel());
+            //              op.filter(image.getImage(), img);
+            //            } catch (Exception e) {
+            //              //TODO: Log error here
+            //              e.printStackTrace();
+            //              img = image.getImage();
+            //            }
+
+            // Extract metadata
             if (metadata != null) {
               Metadata md = new Metadata();
               XmpReader xmpReader = new XmpReader();
@@ -222,13 +256,20 @@ public class PdfExtractor
             imageMetadata.put(PropertyKeys.PROPERTY_KEY_INDEX, imageNumber);
             imageMetadata.put(PropertyKeys.PROPERTY_KEY_PAGE, pageNumber);
 
-            extractedImages.add(new ExtractionWithProperties<>(image.getImage(), imageMetadata));
+            extractedImages.add(new ExtractionWithProperties<>(img, imageMetadata));
           } else if (xobject instanceof PDFormXObject) {
             PDFormXObject form = (PDFormXObject) xobject;
             showForm(form);
           }
         } else {
+          //          try {
           super.processOperator(operator, operands);
+          //          }catch (Exception e){
+          //            // Catch some exceptions thrown by PDFBox, that are caused by the addition
+          // of Concatenate() processor in the constructor
+          //            // I think we can ignore these, as we're only interested in extracting
+          // images
+          //          }
         }
       }
     }
