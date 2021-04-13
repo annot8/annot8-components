@@ -48,7 +48,7 @@ import org.slf4j.Logger;
 /** Extracts content from HTML files */
 @ComponentName("HTML Extractor")
 @ComponentDescription("Extracts image and text from HTML (*.html) files")
-@ComponentTags({"documents", "html", "extractor", "text", "images", "metadata"})
+@ComponentTags({"documents", "html", "extractor", "text", "images", "metadata", "tables"})
 @SettingsClass(DocumentExtractorSettings.class)
 public class HtmlExtractor
     extends AbstractDocumentExtractorDescriptor<

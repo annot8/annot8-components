@@ -62,7 +62,6 @@ public class PdfExtractorTest extends AbstractDocumentExtractorTest {
     assertTrue(image.getData().getWidth() > 0);
     assertTrue(image.getData().getHeight() > 0);
     assertEquals(1, image.getProperties().get(PropertyKeys.PROPERTY_KEY_INDEX).get());
-    assertEquals(2, image.getProperties().get(PropertyKeys.PROPERTY_KEY_PAGE).get());
   }
 
   @Test

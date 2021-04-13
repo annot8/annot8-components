@@ -54,7 +54,16 @@ import org.w3c.dom.NodeList;
  */
 @ComponentName("Open Document Text (ODT) Extractor")
 @ComponentDescription("Extracts image and text from Open Document Text (*.odt) files")
-@ComponentTags({"documents", "opendocument", "odt", "extractor", "text", "images", "metadata"})
+@ComponentTags({
+  "documents",
+  "opendocument",
+  "odt",
+  "extractor",
+  "text",
+  "images",
+  "metadata",
+  "tables"
+})
 @SettingsClass(DocumentExtractorSettings.class)
 public class OdtExtractor
     extends AbstractDocumentExtractorDescriptor<OdtExtractor.Processor, DocumentExtractorSettings> {

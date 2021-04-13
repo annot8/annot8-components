@@ -26,20 +26,17 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.pdfbox.contentstream.PDFStreamEngine;
-import org.apache.pdfbox.contentstream.operator.Operator;
-import org.apache.pdfbox.cos.COSBase;
+import org.apache.pdfbox.cos.COSDictionary;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDResources;
 import org.apache.pdfbox.pdmodel.common.PDMetadata;
 import org.apache.pdfbox.pdmodel.graphics.PDXObject;
-import org.apache.pdfbox.pdmodel.graphics.form.PDFormXObject;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.poi.poifs.filesystem.FileMagic;
-import org.slf4j.Logger;
 
 @ComponentName("PDF Extractor")
 @ComponentDescription("Extracts image and text from PDF (*.pdf) files")
@@ -55,8 +52,6 @@ public class PdfExtractor
 
   public static class Processor
       extends AbstractDocumentExtractorProcessor<PDDocument, PdfExtractor.Settings> {
-    private final Logger logger = getLogger();
-
     private final PDFTextStripper stripper;
 
     public Processor(Context context, PdfExtractor.Settings settings) {
@@ -159,89 +154,60 @@ public class PdfExtractor
 
     @Override
     public Collection<ExtractionWithProperties<BufferedImage>> extractImages(PDDocument doc) {
-      ImageExtractor extractor = new ImageExtractor();
+      Collection<ExtractionWithProperties<BufferedImage>> images = new ArrayList<>();
+
+      int imageNumber = 0;
+      Collection<COSName> topLevelImages = new ArrayList<>();
+
+      COSDictionary topLevelResources =
+          doc.getPages().getCOSObject().getCOSDictionary(COSName.RESOURCES);
+      if (topLevelResources != null) {
+        PDResources res = new PDResources(topLevelResources);
+
+        Collection<ExtractionWithProperties<BufferedImage>> extracted =
+            getImagesFromResources(res, null, imageNumber, Collections.emptyList());
+        imageNumber += extracted.size();
+
+        extracted.forEach(
+            e -> {
+              String name = e.getProperties().get(PropertyKeys.PROPERTY_KEY_NAME).toString();
+              if (name != null) topLevelImages.add(COSName.getPDFName(name));
+            });
+
+        images.addAll(extracted);
+      }
 
       int pageNumber = 0;
       for (PDPage page : doc.getPages()) {
         pageNumber++;
 
+        PDResources pdResources = page.getResources();
+        Collection<ExtractionWithProperties<BufferedImage>> extracted =
+            getImagesFromResources(pdResources, pageNumber, imageNumber, topLevelImages);
+        imageNumber += extracted.size();
+
+        images.addAll(extracted);
+      }
+
+      return images;
+    }
+
+    private Collection<ExtractionWithProperties<BufferedImage>> getImagesFromResources(
+        PDResources resources, Integer pageNumber, int startingIndex, Collection<COSName> skip) {
+      List<ExtractionWithProperties<BufferedImage>> images = new ArrayList<>();
+      int imageNumber = startingIndex;
+
+      for (COSName name : resources.getXObjectNames()) {
+        if (skip.contains(name)) continue;
+
         try {
-          extractor.setPageNumber(pageNumber);
-          extractor.processPage(page);
-        } catch (IOException e) {
-          logger.warn("Unable to extract images from page {} of PDF", pageNumber, e);
-        }
-      }
+          PDXObject o = resources.getXObject(name);
+          if (o instanceof PDImageXObject) {
+            PDImageXObject image = (PDImageXObject) o;
+            imageNumber++;
 
-      return extractor.getExtractedImages();
-    }
-
-    @Override
-    public Collection<ExtractionWithProperties<Table>> extractTables(PDDocument doc)
-        throws ProcessingException {
-      // TODO: Extract tables from PDF
-      return Collections.emptyList();
-    }
-
-    private static class ImageExtractor extends PDFStreamEngine {
-      private int imageNumber = 0;
-      private final List<ExtractionWithProperties<BufferedImage>> extractedImages =
-          new ArrayList<>();
-
-      private int pageNumber = -1;
-
-      protected void setPageNumber(int pageNumber) {
-        this.pageNumber = pageNumber;
-      }
-
-      protected List<ExtractionWithProperties<BufferedImage>> getExtractedImages() {
-        return extractedImages;
-      }
-
-      public ImageExtractor() {
-        //        addOperator(new Concatenate());
-      }
-
-      @Override
-      protected void processOperator(Operator operator, List<COSBase> operands) throws IOException {
-        if ("Do".equals(operator.getName())) {
-          COSName objectName = (COSName) operands.get(0);
-          PDXObject xobject = getResources().getXObject(objectName);
-
-          if (xobject instanceof PDImageXObject) {
             Map<String, Object> imageMetadata = new HashMap<>();
-
-            PDImageXObject image = (PDImageXObject) xobject;
             PDMetadata metadata = image.getMetadata();
-
-            BufferedImage img = image.getImage();
-            //            try {
-            //              //TODO: This could probably do with being more generic (also handling
-            // rotation) - not sure it is correct in all cases
-            //              AffineTransform transform = new AffineTransform();
-            //              Matrix m = getGraphicsState().getCurrentTransformationMatrix();
-            //
-            //              //FIXME: Ought to properly apply the AffineTransformation defined in the
-            // PDF
-            //              //Flip the images where they have negative scale
-            //              transform.scale(m.getScaleX() < 0.0 ? -1.0 : 1.0, m.getScaleY() < 0.0 ?
-            // -1.0 : 1.0);
-            //              transform.translate(m.getScaleX() < 0.0 ? -image.getWidth() : 0.0,
-            // m.getScaleY() < 0.0 ? -image.getHeight() : 0.0);
-            //
-            //              // Apply affine transform
-            //              System.out.println(m.createAffineTransform());
-            //              AffineTransformOp op = new AffineTransformOp(m.createAffineTransform(),
-            // AffineTransformOp.TYPE_BILINEAR);
-            //
-            //              img = op.createCompatibleDestImage(image.getImage(),
-            // image.getImage().getColorModel());
-            //              op.filter(image.getImage(), img);
-            //            } catch (Exception e) {
-            //              //TODO: Log error here
-            //              e.printStackTrace();
-            //              img = image.getImage();
-            //            }
 
             // Extract metadata
             if (metadata != null) {
@@ -252,26 +218,29 @@ public class PdfExtractor
               imageMetadata.putAll(toMap(md));
             }
 
-            imageNumber++;
-            imageMetadata.put(PropertyKeys.PROPERTY_KEY_INDEX, imageNumber);
-            imageMetadata.put(PropertyKeys.PROPERTY_KEY_PAGE, pageNumber);
+            imageMetadata.put(PropertyKeys.PROPERTY_KEY_NAME, name.getName());
 
-            extractedImages.add(new ExtractionWithProperties<>(img, imageMetadata));
-          } else if (xobject instanceof PDFormXObject) {
-            PDFormXObject form = (PDFormXObject) xobject;
-            showForm(form);
+            // Note that index numbers are the order the images are extracted, and not necessarily
+            // the order in which they appear in the document
+            imageMetadata.put(PropertyKeys.PROPERTY_KEY_INDEX, imageNumber);
+
+            if (pageNumber != null) imageMetadata.put(PropertyKeys.PROPERTY_KEY_PAGE, pageNumber);
+
+            images.add(new ExtractionWithProperties<>(image.getImage(), imageMetadata));
           }
-        } else {
-          //          try {
-          super.processOperator(operator, operands);
-          //          }catch (Exception e){
-          //            // Catch some exceptions thrown by PDFBox, that are caused by the addition
-          // of Concatenate() processor in the constructor
-          //            // I think we can ignore these, as we're only interested in extracting
-          // images
-          //          }
+        } catch (IOException e) {
+          log().warn("Unable to read resource {}", name.getName(), e);
         }
       }
+
+      return images;
+    }
+
+    @Override
+    public Collection<ExtractionWithProperties<Table>> extractTables(PDDocument doc)
+        throws ProcessingException {
+      // TODO: Extract tables from PDF
+      return Collections.emptyList();
     }
   }
 

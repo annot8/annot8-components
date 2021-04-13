@@ -44,7 +44,7 @@ import org.slf4j.Logger;
 
 @ComponentName("Word Document (DOCX) Extractor")
 @ComponentDescription("Extracts image and text from Word Document (*.docx) files")
-@ComponentTags({"documents", "word", "docx", "extractor", "text", "images", "metadata"})
+@ComponentTags({"documents", "word", "docx", "extractor", "text", "images", "metadata", "tables"})
 @SettingsClass(DocumentExtractorSettings.class)
 public class DocxExtractor
     extends AbstractDocumentExtractorDescriptor<
