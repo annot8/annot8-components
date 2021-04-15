@@ -1,4 +1,7 @@
+/* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.audio.processors;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 import io.annot8.api.data.Item;
 import io.annot8.common.data.content.Audio;
@@ -6,20 +9,17 @@ import io.annot8.common.data.content.InputStreamContent;
 import io.annot8.common.data.content.UriContent;
 import io.annot8.conventions.PropertyKeys;
 import io.annot8.testing.testimpl.TestItem;
-import org.junit.jupiter.api.Test;
-
 import java.net.URI;
 import java.net.URISyntaxException;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 public class ExtractAudioTest {
   @Test
-  public void testInputStream(){
+  public void testInputStream() {
     Item i = new TestItem();
     i.createContent(InputStreamContent.class)
-      .withData(() -> ExtractAudioTest.class.getResourceAsStream("test.wav"))
-      .save();
+        .withData(() -> ExtractAudioTest.class.getResourceAsStream("test.wav"))
+        .save();
 
     ExtractAudio.Processor p = new ExtractAudio.Processor(new ExtractAudio.Settings());
     p.process(i);
@@ -36,9 +36,7 @@ public class ExtractAudioTest {
     URI uri = ExtractAudioTest.class.getResource("test.wav").toURI();
 
     Item i = new TestItem();
-    i.createContent(UriContent.class)
-      .withData(uri)
-      .save();
+    i.createContent(UriContent.class).withData(uri).save();
 
     ExtractAudio.Processor p = new ExtractAudio.Processor(new ExtractAudio.Settings());
     p.process(i);

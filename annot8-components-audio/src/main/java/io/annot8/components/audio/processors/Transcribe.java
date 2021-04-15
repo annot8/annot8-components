@@ -1,3 +1,4 @@
+/* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.audio.processors;
 
 import com.google.gson.Gson;
@@ -21,20 +22,20 @@ import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.GroupRoles;
 import io.annot8.conventions.GroupTypes;
 import io.annot8.conventions.PropertyKeys;
-import org.vosk.Model;
-import org.vosk.Recognizer;
-
-import javax.sound.sampled.AudioSystem;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import javax.sound.sampled.AudioSystem;
+import org.vosk.Model;
+import org.vosk.Recognizer;
 
 @ComponentName("Transcribe Audio to Text")
 @ComponentDescription("Transcribe audio to text using the Vosk offline speech-to-text API")
 @ComponentTags({"audio", "transcription"})
 @SettingsClass(Transcribe.Settings.class)
-public class Transcribe extends AbstractProcessorDescriptor<Transcribe.Processor, Transcribe.Settings> {
+public class Transcribe
+    extends AbstractProcessorDescriptor<Transcribe.Processor, Transcribe.Settings> {
   @Override
   protected Processor createComponent(Context context, Transcribe.Settings settings) {
     return new Processor(settings);
@@ -42,12 +43,13 @@ public class Transcribe extends AbstractProcessorDescriptor<Transcribe.Processor
 
   @Override
   public Capabilities capabilities() {
-    SimpleCapabilities.Builder builder = new SimpleCapabilities.Builder()
-      .withProcessesContent(Audio.class)
-      .withCreatesContent(Text.class)
-      .withCreatesAnnotations(AnnotationTypes.ANNOTATION_TYPE_WORDTOKEN, SpanBounds.class);
+    SimpleCapabilities.Builder builder =
+        new SimpleCapabilities.Builder()
+            .withProcessesContent(Audio.class)
+            .withCreatesContent(Text.class)
+            .withCreatesAnnotations(AnnotationTypes.ANNOTATION_TYPE_WORDTOKEN, SpanBounds.class);
 
-    if(getSettings().isAnnotateAudio())
+    if (getSettings().isAnnotateAudio())
       builder = builder.withCreatesGroups(GroupTypes.GROUP_TYPE_SAMEAS);
 
     return builder.build();
@@ -66,80 +68,88 @@ public class Transcribe extends AbstractProcessorDescriptor<Transcribe.Processor
 
     @Override
     public void close() {
-      if(model != null)
-        model.close();
+      if (model != null) model.close();
     }
 
     @Override
     public ProcessorResponse process(Item item) {
       List<Exception> exceptions = new ArrayList<>();
 
-      item.getContents(Audio.class).forEach(audio -> {
-        float asr = audio.getData().getFormat().getSampleRate();
-        if(asr == AudioSystem.NOT_SPECIFIED){
-          log().error("Sample rate of audio stream not specified - skipping {}", audio.getId());
-          return;
-        }
+      item.getContents(Audio.class)
+          .forEach(
+              audio -> {
+                float asr = audio.getData().getFormat().getSampleRate();
+                if (asr == AudioSystem.NOT_SPECIFIED) {
+                  log()
+                      .error(
+                          "Sample rate of audio stream not specified - skipping {}", audio.getId());
+                  return;
+                }
 
-        try (
-          Recognizer recognizer = new Recognizer(model, asr)
-        ) {
-          int nbytes;
-          byte[] b = new byte[4096];
-          while ((nbytes = audio.getData().read(b)) >= 0) {
-            recognizer.acceptWaveForm(b, nbytes);
-          }
+                try (Recognizer recognizer = new Recognizer(model, asr)) {
+                  int nbytes;
+                  byte[] b = new byte[4096];
+                  while ((nbytes = audio.getData().read(b)) >= 0) {
+                    recognizer.acceptWaveForm(b, nbytes);
+                  }
 
-          VoskOutput output = gson.fromJson(recognizer.getFinalResult(), VoskOutput.class);
+                  VoskOutput output = gson.fromJson(recognizer.getFinalResult(), VoskOutput.class);
 
-          Text t = item.createContent(Text.class)
-            .withData(output.getText())
-            .withDescription("Transcribed audio from "+audio.getId())
-            .withProperty(PropertyKeys.PROPERTY_KEY_PARENT, audio.getId())
-            .save();
+                  Text t =
+                      item.createContent(Text.class)
+                          .withData(output.getText())
+                          .withDescription("Transcribed audio from " + audio.getId())
+                          .withProperty(PropertyKeys.PROPERTY_KEY_PARENT, audio.getId())
+                          .save();
 
-          int i = 0;
-          for(VoskOutputResult vor : output.getResult()){
-            String next = output.getText().substring(i);
+                  int i = 0;
+                  for (VoskOutputResult vor : output.getResult()) {
+                    String next = output.getText().substring(i);
 
-            int start = i + next.indexOf(vor.getWord());
-            int end = start + vor.getWord().length();
+                    int start = i + next.indexOf(vor.getWord());
+                    int end = start + vor.getWord().length();
 
-            Annotation aText = t.getAnnotations().create()
-              .withBounds(new SpanBounds(start, end))
-              .withType(AnnotationTypes.ANNOTATION_TYPE_WORDTOKEN)
-              .withProperty(PropertyKeys.PROPERTY_KEY_PROBABILITY, vor.getConf())
-              .save();
+                    Annotation aText =
+                        t.getAnnotations()
+                            .create()
+                            .withBounds(new SpanBounds(start, end))
+                            .withType(AnnotationTypes.ANNOTATION_TYPE_WORDTOKEN)
+                            .withProperty(PropertyKeys.PROPERTY_KEY_PROBABILITY, vor.getConf())
+                            .save();
 
-            if(annotateAudio) {
-              int frameBegin = (int) Math.floor(vor.getStart() * asr);
-              int frameEnd = (int) Math.floor(vor.getEnd() * asr);
+                    if (annotateAudio) {
+                      int frameBegin = (int) Math.floor(vor.getStart() * asr);
+                      int frameEnd = (int) Math.floor(vor.getEnd() * asr);
 
-              Annotation aAudio = audio.getAnnotations().create()
-                .withBounds(new SpanBounds(frameBegin, frameEnd))
-                .withType(AnnotationTypes.ANNOTATION_TYPE_WORDTOKEN)
-                .withProperty(PropertyKeys.PROPERTY_KEY_PROBABILITY, vor.getConf())
-                .withProperty(PropertyKeys.PROPERTY_KEY_VALUE, vor.getWord())
-                .save();
+                      Annotation aAudio =
+                          audio
+                              .getAnnotations()
+                              .create()
+                              .withBounds(new SpanBounds(frameBegin, frameEnd))
+                              .withType(AnnotationTypes.ANNOTATION_TYPE_WORDTOKEN)
+                              .withProperty(PropertyKeys.PROPERTY_KEY_PROBABILITY, vor.getConf())
+                              .withProperty(PropertyKeys.PROPERTY_KEY_VALUE, vor.getWord())
+                              .save();
 
-              item.getGroups().create()
-                .withType(GroupTypes.GROUP_TYPE_SAMEAS)
-                .withAnnotation(GroupRoles.GROUP_ROLE_MENTION, aText)
-                .withAnnotation(GroupRoles.GROUP_ROLE_MENTION, aAudio)
-                .save();
-            }
+                      item.getGroups()
+                          .create()
+                          .withType(GroupTypes.GROUP_TYPE_SAMEAS)
+                          .withAnnotation(GroupRoles.GROUP_ROLE_MENTION, aText)
+                          .withAnnotation(GroupRoles.GROUP_ROLE_MENTION, aAudio)
+                          .save();
+                    }
 
-            i = end;
-          }
-        } catch (IOException e) {
-          log().error("Error reading Audio data", e);
-          exceptions.add(e);
-        }
-      });
+                    i = end;
+                  }
+                } catch (IOException e) {
+                  log().error("Error reading Audio data", e);
+                  exceptions.add(e);
+                }
+              });
 
-      if(exceptions.isEmpty()){
+      if (exceptions.isEmpty()) {
         return ProcessorResponse.ok();
-      }else {
+      } else {
         return ProcessorResponse.itemError(exceptions);
       }
     }
@@ -163,7 +173,8 @@ public class Transcribe extends AbstractProcessorDescriptor<Transcribe.Processor
       this.model = model;
     }
 
-    @Description("If true, then transcribed words will also be annotated in the Audio content and groups created to link word tokens in the text and in the audio")
+    @Description(
+        "If true, then transcribed words will also be annotated in the Audio content and groups created to link word tokens in the text and in the audio")
     public boolean isAnnotateAudio() {
       return annotateAudio;
     }
