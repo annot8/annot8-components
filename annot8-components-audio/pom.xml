@@ -27,6 +27,8 @@
       <groupId>io.annot8</groupId>
       <artifactId>annot8-components-base</artifactId>
     </dependency>
+
+    <!-- Transcription -->
     <dependency>
       <groupId>net.java.dev.jna</groupId>
       <artifactId>jna</artifactId>
@@ -38,6 +40,7 @@
       <version>0.3.21</version>
     </dependency>
 
+    <!-- Utilities -->
     <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>

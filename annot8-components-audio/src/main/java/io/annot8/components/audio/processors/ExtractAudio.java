@@ -221,8 +221,7 @@ public class ExtractAudio
   }
 
   public static class Settings implements io.annot8.api.settings.Settings {
-    private List<String> fileExtensions =
-        List.of("au", "aiff", "wav"); // TODO: What file types do we support? MP3? SND?
+    private List<String> fileExtensions = List.of("au", "aiff", "wav");
     private boolean discardOriginal = true;
 
     @Override
