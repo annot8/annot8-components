@@ -5,6 +5,7 @@ import io.annot8.api.annotations.Annotation;
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
 import io.annot8.api.components.annotations.ComponentName;
+import io.annot8.api.components.annotations.ComponentTags;
 import io.annot8.api.components.annotations.SettingsClass;
 import io.annot8.api.context.Context;
 import io.annot8.api.exceptions.BadConfigurationException;
@@ -29,6 +30,7 @@ import opennlp.tools.postag.POSTaggerME;
 @ComponentName("OpenNLP Part of Speech")
 @ComponentDescription("Annotate parts of speech identified by OpenNLP's POS detector")
 @SettingsClass(POS.Settings.class)
+@ComponentTags({"opennlp", "pos"})
 public class POS extends AbstractProcessorDescriptor<POS.Processor, POS.Settings> {
   @Override
   protected Processor createComponent(Context context, Settings settings) {

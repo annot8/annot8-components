@@ -5,6 +5,7 @@ import io.annot8.api.annotations.Annotation;
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
 import io.annot8.api.components.annotations.ComponentName;
+import io.annot8.api.components.annotations.ComponentTags;
 import io.annot8.api.components.annotations.SettingsClass;
 import io.annot8.api.context.Context;
 import io.annot8.api.exceptions.BadConfigurationException;
@@ -30,6 +31,7 @@ import opennlp.tools.util.Span;
 @ComponentName("OpenNLP Tokens")
 @ComponentDescription("Annotate tokens identified by OpenNLP's token detector")
 @SettingsClass(Tokens.Settings.class)
+@ComponentTags({"opennlp", "tokens"})
 public class Tokens extends AbstractProcessorDescriptor<Tokens.Processor, Tokens.Settings> {
   @Override
   protected Processor createComponent(Context context, Settings settings) {

@@ -6,6 +6,7 @@ import io.annot8.api.annotations.Group;
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
 import io.annot8.api.components.annotations.ComponentName;
+import io.annot8.api.components.annotations.ComponentTags;
 import io.annot8.api.components.annotations.SettingsClass;
 import io.annot8.api.context.Context;
 import io.annot8.api.exceptions.BadConfigurationException;
@@ -35,6 +36,7 @@ import opennlp.tools.util.Span;
 @ComponentName("OpenNLP Phrase Chunks")
 @ComponentDescription("Annotate phrase chunks identified by OpenNLP's chunker")
 @SettingsClass(PhraseChunks.Settings.class)
+@ComponentTags({"opennlp", "phrases"})
 public class PhraseChunks
     extends AbstractProcessorDescriptor<PhraseChunks.Processor, PhraseChunks.Settings> {
   @Override

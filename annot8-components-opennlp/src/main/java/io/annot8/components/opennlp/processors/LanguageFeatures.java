@@ -4,6 +4,7 @@ package io.annot8.components.opennlp.processors;
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
 import io.annot8.api.components.annotations.ComponentName;
+import io.annot8.api.components.annotations.ComponentTags;
 import io.annot8.api.context.Context;
 import io.annot8.api.settings.NoSettings;
 import io.annot8.common.components.AbstractProcessorDescriptor;
@@ -17,6 +18,7 @@ import io.annot8.conventions.GroupTypes;
 @ComponentName("OpenNLP Language Features")
 @ComponentDescription(
     "Uses the Sentences, Tokens, POS and PhraseChunks processors to add language features to Text")
+@ComponentTags({"opennlp", "sentences", "tokens", "pos", "phrases"})
 public class LanguageFeatures
     extends AbstractProcessorDescriptor<LanguageFeatures.Processor, NoSettings> {
   @Override
