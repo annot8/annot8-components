@@ -1,5 +1,5 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
-package io.annot8.components.opennlp.processors;
+package io.annot8.components.annotations.processors;
 
 import io.annot8.api.annotations.Annotation;
 import io.annot8.api.annotations.Group;

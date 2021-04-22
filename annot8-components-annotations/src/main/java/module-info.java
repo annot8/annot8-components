@@ -4,4 +4,5 @@ module annot8.components.annotations {
   requires jakarta.json.bind;
   requires org.slf4j;
   requires io.annot8.components.base;
+  requires io.annot8.conventions;
 }

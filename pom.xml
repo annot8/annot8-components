@@ -483,6 +483,7 @@
   <modules>
     <module>annot8-conventions</module>
     <module>annot8-components-annotations</module>
+    <module>annot8-components-audio</module>
     <module>annot8-components-base</module>
     <module>annot8-components-base-text</module>
     <module>annot8-components-comms</module>
@@ -498,12 +499,16 @@
     <module>annot8-components-groups</module>
     <module>annot8-components-image</module>
     <module>annot8-components-items</module>
+    <module>annot8-components-kafka</module>
     <module>annot8-components-mongo</module>
+    <module>annot8-components-opencv</module>
     <module>annot8-components-opennlp</module>
     <module>annot8-components-print</module>
+    <module>annot8-components-people</module>
     <module>annot8-components-properties</module>
     <module>annot8-components-quantities</module>
     <module>annot8-components-social</module>
+    <module>annot8-components-spacy</module>
     <module>annot8-components-stopwords</module>
     <module>annot8-components-temporal</module>
     <module>annot8-components-tesseract</module>
@@ -514,11 +519,6 @@
     <module>annot8-components-vehicles</module>
     <module>annot8-components-wordnet</module>
     <module>annot8-utils-text</module>
-    <module>annot8-components-people</module>
-    <module>annot8-components-kafka</module>
-    <module>annot8-components-opencv</module>
-    <module>annot8-components-audio</module>
-    <module>annot8-components-spacy</module>
   </modules>
 
 
