@@ -18,11 +18,11 @@ import java.util.regex.Pattern;
 @ComponentName("Usernames")
 @ComponentDescription("Extract usernames beginning with an @ (e.g. @example) from text")
 @ComponentTags({"social media", "username"})
-public class Username extends AbstractProcessorDescriptor<HashTag.Processor, NoSettings> {
+public class Username extends AbstractProcessorDescriptor<Username.Processor, NoSettings> {
 
   @Override
-  protected HashTag.Processor createComponent(Context context, NoSettings settings) {
-    return new HashTag.Processor();
+  protected Username.Processor createComponent(Context context, NoSettings settings) {
+    return new Username.Processor();
   }
 
   @Override
