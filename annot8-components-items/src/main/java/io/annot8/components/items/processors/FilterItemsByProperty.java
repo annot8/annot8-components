@@ -2,6 +2,9 @@
 package io.annot8.components.items.processors;
 
 import io.annot8.api.capabilities.Capabilities;
+import io.annot8.api.components.annotations.ComponentDescription;
+import io.annot8.api.components.annotations.ComponentName;
+import io.annot8.api.components.annotations.SettingsClass;
 import io.annot8.api.components.responses.ProcessorResponse;
 import io.annot8.api.context.Context;
 import io.annot8.api.data.Item;
@@ -11,6 +14,9 @@ import io.annot8.common.components.AbstractProcessorDescriptor;
 import io.annot8.common.components.capabilities.SimpleCapabilities;
 import java.util.Optional;
 
+@ComponentName("Filter Items by Property")
+@ComponentDescription("Discard items that match a specified property")
+@SettingsClass(FilterItemsByProperty.Settings.class)
 public class FilterItemsByProperty
     extends AbstractProcessorDescriptor<
         FilterItemsByProperty.Processor, FilterItemsByProperty.Settings> {
