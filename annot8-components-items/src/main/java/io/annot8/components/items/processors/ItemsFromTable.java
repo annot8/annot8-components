@@ -4,6 +4,7 @@ package io.annot8.components.items.processors;
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
 import io.annot8.api.components.annotations.ComponentName;
+import io.annot8.api.components.annotations.ComponentTags;
 import io.annot8.api.components.annotations.SettingsClass;
 import io.annot8.api.components.responses.ProcessorResponse;
 import io.annot8.api.context.Context;
@@ -22,6 +23,7 @@ import java.util.List;
 @ComponentName("Items from Table")
 @ComponentDescription("Converts TableContent into separate items")
 @SettingsClass(ItemsFromTable.Settings.class)
+@ComponentTags({"item", "table"})
 public class ItemsFromTable
     extends AbstractProcessorDescriptor<ItemsFromTable.Processor, ItemsFromTable.Settings> {
 

@@ -4,6 +4,7 @@ package io.annot8.components.items.processors;
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
 import io.annot8.api.components.annotations.ComponentName;
+import io.annot8.api.components.annotations.ComponentTags;
 import io.annot8.api.components.annotations.SettingsClass;
 import io.annot8.api.components.responses.ProcessorResponse;
 import io.annot8.api.context.Context;
@@ -21,6 +22,7 @@ import java.util.regex.Pattern;
 @ComponentDescription(
     "Applies a regular expression to an existing item property and sets another item property based on the result")
 @SettingsClass(ItemPropertyFromProperty.Settings.class)
+@ComponentTags({"item", "properties"})
 public class ItemPropertyFromProperty
     extends AbstractProcessorDescriptor<
         ItemPropertyFromProperty.Processor, ItemPropertyFromProperty.Settings> {
