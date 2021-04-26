@@ -1,24 +1,23 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.text.processors;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import io.annot8.api.annotations.Annotation;
 import io.annot8.api.components.Processor;
 import io.annot8.api.components.responses.ProcessorResponse;
 import io.annot8.api.data.Item;
 import io.annot8.common.data.bounds.SpanBounds;
 import io.annot8.common.data.content.Text;
+import io.annot8.common.data.utils.SortUtils;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
 import io.annot8.implementations.support.context.SimpleContext;
 import io.annot8.testing.testimpl.TestItem;
-import org.junit.jupiter.api.Test;
-
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 public class KeyValuePairsTest {
   @Test
@@ -79,9 +78,7 @@ public class KeyValuePairsTest {
     List<Annotation> annotations =
         text.getAnnotations()
             .getByType(AnnotationTypes.ANNOTATION_TYPE_METADATA)
-            .sorted(
-                Comparator.comparingInt(
-                    a -> a.getBounds(SpanBounds.class).orElse(new SpanBounds(0, 0)).getBegin()))
+            .sorted(SortUtils.SORT_BY_SPANBOUNDS)
             .collect(Collectors.toList());
 
     assertEquals(
@@ -139,5 +136,52 @@ public class KeyValuePairsTest {
     assertEquals(
         "Twitter: @alice",
         annotations.get(4).getProperties().get(PropertyKeys.PROPERTY_KEY_VALUE).get());
+  }
+
+  @Test
+  public void testMaxKeyLength() {
+    Item item = new TestItem();
+    Text text =
+        item.createContent(Text.class)
+            .withData("short: Hello\n" + "key: World\n" + "longKeyOver5Letters: Goodbye")
+            .save();
+
+    KeyValuePairs.Settings s = new KeyValuePairs.Settings();
+    s.setMaxKeyLength(5);
+
+    KeyValuePairs.Processor p = new KeyValuePairs.Processor(s);
+
+    assertEquals(ProcessorResponse.ok(), p.process(item));
+
+    assertEquals(
+        2, text.getAnnotations().getByType(AnnotationTypes.ANNOTATION_TYPE_METADATA).count());
+
+    assertFalse(
+        text.getAnnotations()
+            .getAll()
+            .anyMatch(
+                a ->
+                    a.getProperties()
+                        .get(PropertyKeys.PROPERTY_KEY_KEY)
+                        .orElseThrow()
+                        .equals("longKeyOver5Letters")));
+    assertTrue(
+        text.getAnnotations()
+            .getAll()
+            .anyMatch(
+                a ->
+                    a.getProperties()
+                        .get(PropertyKeys.PROPERTY_KEY_KEY)
+                        .orElseThrow()
+                        .equals("short")));
+    assertTrue(
+        text.getAnnotations()
+            .getAll()
+            .anyMatch(
+                a ->
+                    a.getProperties()
+                        .get(PropertyKeys.PROPERTY_KEY_KEY)
+                        .orElseThrow()
+                        .equals("key")));
   }
 }

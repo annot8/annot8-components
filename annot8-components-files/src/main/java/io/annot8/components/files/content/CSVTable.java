@@ -40,7 +40,7 @@ public class CSVTable implements Table {
 
     for (CsvRow csvRow : reader) {
       if (index < 0) {
-        headers = csvRow.getFields();
+        headers = csvRow.getFields().stream().map(String::strip).collect(Collectors.toList());
       } else {
         rows.add(
             new DefaultRow(

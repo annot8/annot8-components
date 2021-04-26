@@ -61,6 +61,10 @@ public class KeyValuePairs
       Matcher m = keyValuePattern.matcher(content.getData());
 
       while (m.find()) {
+        String key = m.group("key").strip();
+
+        if (settings.getMaxKeyLength() > 0 && key.length() > settings.getMaxKeyLength()) continue;
+
         List<String> values;
         if (settings.getValueSeparator() != null && !settings.getValueSeparator().isEmpty()) {
           values =
@@ -71,11 +75,10 @@ public class KeyValuePairs
           values = List.of(m.group("value").strip());
         }
 
-        if(settings.isIgnoreEmptyValues())
+        if (settings.isIgnoreEmptyValues())
           values = values.stream().filter(s -> !s.isBlank()).collect(Collectors.toList());
 
-        if(values.isEmpty())
-          continue;
+        if (values.isEmpty()) continue;
 
         Optional<Map<String, Object>> mergedProperties = Optional.empty();
         String type = null;
@@ -114,7 +117,7 @@ public class KeyValuePairs
             .withType(settings.getAnnotationType())
             .withPropertyIfPresent("entity", mergedProperties)
             .withPropertyIfPresent(PropertyKeys.PROPERTY_KEY_TYPE, Optional.ofNullable(type))
-            .withProperty(PropertyKeys.PROPERTY_KEY_KEY, m.group("key").strip())
+            .withProperty(PropertyKeys.PROPERTY_KEY_KEY, key)
             .withProperty(
                 PropertyKeys.PROPERTY_KEY_VALUE, values.size() > 1 ? values : values.get(0))
             .save();
@@ -127,6 +130,7 @@ public class KeyValuePairs
     private String keyValueSeparator = ":";
     private String valueSeparator = ",";
     private boolean ignoreEmptyValues = true;
+    private int maxKeyLength = -1;
 
     @Override
     public boolean validate() {
@@ -169,6 +173,16 @@ public class KeyValuePairs
 
     public void setIgnoreEmptyValues(boolean ignoreEmptyValues) {
       this.ignoreEmptyValues = ignoreEmptyValues;
+    }
+
+    @Description(
+        "The maximum key length (keys longer than this will be ignored), or -1 to accept all keys")
+    public int getMaxKeyLength() {
+      return maxKeyLength;
+    }
+
+    public void setMaxKeyLength(int maxKeyLength) {
+      this.maxKeyLength = maxKeyLength;
     }
   }
 }
