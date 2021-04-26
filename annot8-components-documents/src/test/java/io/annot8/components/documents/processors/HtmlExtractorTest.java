@@ -3,13 +3,18 @@ package io.annot8.components.documents.processors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import io.annot8.api.components.responses.ProcessorResponse;
+import io.annot8.api.data.Item;
 import io.annot8.api.properties.Properties;
+import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.Image;
 import io.annot8.common.data.content.Row;
 import io.annot8.common.data.content.Table;
 import io.annot8.common.data.content.TableContent;
 import io.annot8.common.data.content.Text;
 import io.annot8.conventions.PropertyKeys;
+import io.annot8.implementations.support.context.SimpleContext;
+import io.annot8.testing.testimpl.TestItem;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -19,12 +24,18 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.junit.jupiter.api.Test;
 
 public class HtmlExtractorTest extends AbstractDocumentExtractorTest {
   @Override
-  protected Class<? extends AbstractDocumentExtractorDescriptor<?, DocumentExtractorSettings>>
+  protected Class<? extends AbstractDocumentExtractorDescriptor<?, HtmlExtractor.Settings>>
       getDescriptor() {
     return HtmlExtractor.class;
+  }
+
+  @Override
+  protected DocumentExtractorSettings getSettings() {
+    return new HtmlExtractor.Settings();
   }
 
   @Override
@@ -157,5 +168,61 @@ public class HtmlExtractorTest extends AbstractDocumentExtractorTest {
     assertEquals("003", r3.getString(0).get());
     assertEquals("Charlie", r3.getString(1).get());
     assertEquals("Blue", r3.getString(2).get());
+  }
+
+  @Test
+  public void testCssQuery() {
+    Item item = new TestItem();
+    item.createContent(FileContent.class).withData(getTestFile()).save();
+
+    HtmlExtractor.Settings s = new HtmlExtractor.Settings();
+    s.setExtractText(true);
+    s.setExtractImages(false);
+    s.setExtractMetadata(false);
+    s.setExtractTables(false);
+    s.setDiscardOriginal(true);
+
+    s.setCssQueryText("ul");
+
+    HtmlExtractor.Processor p = new HtmlExtractor.Processor(new SimpleContext(), s);
+
+    assertEquals(ProcessorResponse.ok(), p.process(item));
+
+    assertEquals(1, item.getContents(Text.class).count());
+
+    Text t = item.getContents(Text.class).findFirst().orElseThrow();
+    assertEquals("Lists Bold text Italic text Links", t.getData());
+  }
+
+  @Test
+  public void testCssQueryMultiple() {
+    Item item = new TestItem();
+    item.createContent(FileContent.class).withData(getTestFile()).save();
+
+    HtmlExtractor.Settings s = new HtmlExtractor.Settings();
+    s.setExtractText(true);
+    s.setExtractImages(false);
+    s.setExtractMetadata(false);
+    s.setExtractTables(false);
+    s.setDiscardOriginal(true);
+
+    s.setCssQueryText("ul > li");
+
+    HtmlExtractor.Processor p = new HtmlExtractor.Processor(new SimpleContext(), s);
+
+    assertEquals(ProcessorResponse.ok(), p.process(item));
+
+    assertEquals(4, item.getContents(Text.class).count());
+    assertTrue(
+        item.getContents(Text.class)
+            .allMatch(t -> t.getProperties().has(PropertyKeys.PROPERTY_KEY_INDEX)));
+
+    List<String> contents =
+        item.getContents(Text.class).map(Text::getData).collect(Collectors.toList());
+
+    assertTrue(contents.contains("Lists"));
+    assertTrue(contents.contains("Bold text"));
+    assertTrue(contents.contains("Italic text"));
+    assertTrue(contents.contains("Links"));
   }
 }

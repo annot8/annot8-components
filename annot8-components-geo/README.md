@@ -6,7 +6,7 @@ This repository contains data derived from other data sources.
 
 ### Countries JSON
 
-The `countries.json` file was downloaded from https://github.com/mledoze/countries on the 06/01/2001.
+The `countries.json` file was downloaded from https://github.com/mledoze/countries on the 06/01/2021.
 
 Licensed under the ODC Open Database Licence (ODbL) 1.0 - https://opendatacommons.org/licenses/odbl/1-0/
 

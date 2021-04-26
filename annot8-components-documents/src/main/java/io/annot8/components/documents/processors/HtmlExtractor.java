@@ -10,6 +10,7 @@ import io.annot8.api.components.annotations.ComponentTags;
 import io.annot8.api.components.annotations.SettingsClass;
 import io.annot8.api.context.Context;
 import io.annot8.api.exceptions.ProcessingException;
+import io.annot8.api.settings.Description;
 import io.annot8.common.data.content.DefaultRow;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.InputStreamContent;
@@ -49,21 +50,20 @@ import org.slf4j.Logger;
 @ComponentName("HTML Extractor")
 @ComponentDescription("Extracts image and text from HTML (*.html) files")
 @ComponentTags({"documents", "html", "extractor", "text", "images", "metadata", "tables"})
-@SettingsClass(DocumentExtractorSettings.class)
+@SettingsClass(HtmlExtractor.Settings.class)
 public class HtmlExtractor
-    extends AbstractDocumentExtractorDescriptor<
-        HtmlExtractor.Processor, DocumentExtractorSettings> {
+    extends AbstractDocumentExtractorDescriptor<HtmlExtractor.Processor, HtmlExtractor.Settings> {
 
   @Override
-  protected Processor createComponent(Context context, DocumentExtractorSettings settings) {
+  protected Processor createComponent(Context context, HtmlExtractor.Settings settings) {
     return new Processor(context, settings);
   }
 
   public static class Processor
-      extends AbstractDocumentExtractorProcessor<Document, DocumentExtractorSettings> {
+      extends AbstractDocumentExtractorProcessor<Document, HtmlExtractor.Settings> {
     private final Logger logger = getLogger();
 
-    public Processor(Context context, DocumentExtractorSettings settings) {
+    public Processor(Context context, HtmlExtractor.Settings settings) {
       super(context, settings);
     }
 
@@ -213,7 +213,26 @@ public class HtmlExtractor
 
     @Override
     public Collection<ExtractionWithProperties<String>> extractText(Document doc) {
-      return List.of(new ExtractionWithProperties<>(doc.text()));
+      List<ExtractionWithProperties<String>> extractedText = new ArrayList<>();
+
+      if (settings.getCssQueryText() != null && !settings.getCssQueryText().isBlank()) {
+        int i = 0;
+        for (Element e : doc.select(settings.getCssQueryText())) {
+          if (!e.hasText()) continue;
+
+          Map<String, Object> props = new HashMap<>();
+          props.put(PropertyKeys.PROPERTY_KEY_INDEX, i);
+          if (e.id() != null && !e.id().isBlank())
+            props.put(PropertyKeys.PROPERTY_KEY_IDENTIFIER, e.id());
+
+          extractedText.add(new ExtractionWithProperties<>(e.text(), props));
+
+          i++;
+        }
+      } else {
+        extractedText.add(new ExtractionWithProperties<>(doc.text()));
+      }
+      return extractedText;
     }
 
     @Override
@@ -371,6 +390,20 @@ public class HtmlExtractor
     @Override
     public Stream<Row> getRows() {
       return rows.stream();
+    }
+  }
+
+  public static class Settings extends DocumentExtractorSettings {
+    private String cssQueryText = "";
+
+    @Description(
+        "If set, then the give CSS Query will be used to select text within the document (otherwise text from the whole document is returned)")
+    public String getCssQueryText() {
+      return cssQueryText;
+    }
+
+    public void setCssQueryText(String cssQueryText) {
+      this.cssQueryText = cssQueryText;
     }
   }
 }
