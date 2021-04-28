@@ -14,6 +14,7 @@ import io.annot8.api.settings.Description;
 import io.annot8.common.components.AbstractProcessor;
 import io.annot8.common.components.AbstractProcessorDescriptor;
 import io.annot8.common.components.capabilities.SimpleCapabilities;
+import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -62,22 +63,33 @@ public class ItemPropertyAsDateTime
 
         Temporal temporal = null;
         if (o instanceof TemporalAccessor) {
-          switch (settings.getDateTimeType()) {
-            case DATE:
-              temporal = LocalDate.from((TemporalAccessor) o);
-              break;
-            case TIME:
-              temporal = LocalTime.from((TemporalAccessor) o);
-              break;
-            case DATETIME:
-              temporal = LocalDateTime.from((TemporalAccessor) o);
-              break;
-            case OFFSET_DATETIME:
-              temporal = OffsetDateTime.from((TemporalAccessor) o);
-              break;
-            case ZONED_DATETIME:
-              temporal = ZonedDateTime.from((TemporalAccessor) o);
-              break;
+          try {
+            switch (settings.getDateTimeType()) {
+              case DATE:
+                temporal = LocalDate.from((TemporalAccessor) o);
+                break;
+              case TIME:
+                temporal = LocalTime.from((TemporalAccessor) o);
+                break;
+              case DATETIME:
+                temporal = LocalDateTime.from((TemporalAccessor) o);
+                break;
+              case OFFSET_DATETIME:
+                temporal = OffsetDateTime.from((TemporalAccessor) o);
+                break;
+              case ZONED_DATETIME:
+                temporal = ZonedDateTime.from((TemporalAccessor) o);
+                break;
+            }
+          } catch (DateTimeException e) {
+            log()
+                .warn(
+                    "Could not convert property {} from {} ({})",
+                    settings.getKey(),
+                    o.getClass().getName(),
+                    e.getMessage());
+
+            if (settings.isErrorOnUnparseable()) return ProcessorResponse.itemError(e);
           }
         } else {
           String s = o.toString();
@@ -107,11 +119,16 @@ public class ItemPropertyAsDateTime
                     s,
                     settings.getKey(),
                     e.getMessage());
-            return ProcessorResponse.itemError(e);
+
+            if (settings.isErrorOnUnparseable()) return ProcessorResponse.itemError(e);
           }
         }
 
-        if (temporal != null) item.getProperties().set(settings.getKey(), temporal);
+        if (temporal != null) {
+          item.getProperties().set(settings.getKey(), temporal);
+        } else {
+          item.getProperties().remove(settings.getKey());
+        }
       }
 
       return ProcessorResponse.ok();
@@ -122,6 +139,7 @@ public class ItemPropertyAsDateTime
     private String key = "date";
     private String dateTimeFormat = "yyyy-MM-dd";
     private DateTimeType dateTimeType = DateTimeType.DATETIME;
+    private boolean errorOnUnparseable = true;
 
     @Override
     public boolean validate() {
@@ -153,6 +171,16 @@ public class ItemPropertyAsDateTime
 
     public void setDateTimeType(DateTimeType dateTimeType) {
       this.dateTimeType = dateTimeType;
+    }
+
+    @Description(
+        "If false, then dates that can't be parsed will be discarded. If true, then unparseable dates will cause an item error to be returned.")
+    public boolean isErrorOnUnparseable() {
+      return errorOnUnparseable;
+    }
+
+    public void setErrorOnUnparseable(boolean errorOnUnparseable) {
+      this.errorOnUnparseable = errorOnUnparseable;
     }
   }
 
