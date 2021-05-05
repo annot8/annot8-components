@@ -18,7 +18,6 @@ import io.annot8.common.data.content.Table;
 import io.annot8.components.documents.data.ExtractionWithProperties;
 import io.annot8.conventions.PropertyKeys;
 import java.awt.image.BufferedImage;
-import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -33,14 +32,12 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.imageio.ImageIO;
 import org.apache.poi.ooxml.POIXMLProperties;
-import org.apache.poi.poifs.filesystem.FileMagic;
 import org.apache.poi.xwpf.extractor.XWPFWordExtractor;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFPictureData;
 import org.apache.poi.xwpf.usermodel.XWPFTable;
 import org.apache.poi.xwpf.usermodel.XWPFTableCell;
 import org.apache.poi.xwpf.usermodel.XWPFTableRow;
-import org.slf4j.Logger;
 
 @ComponentName("Word Document (DOCX) Extractor")
 @ComponentDescription("Extracts image and text from Word Document (*.docx) files")
@@ -57,10 +54,16 @@ public class DocxExtractor
 
   public static class Processor
       extends AbstractDocumentExtractorProcessor<XWPFDocument, DocumentExtractorSettings> {
-    private final Logger logger = getLogger();
+
+    private final Map<String, XWPFDocument> cache = new HashMap<>();
 
     public Processor(Context context, DocumentExtractorSettings settings) {
       super(context, settings);
+    }
+
+    @Override
+    public void reset() {
+      cache.clear();
     }
 
     @Override
@@ -85,31 +88,52 @@ public class DocxExtractor
 
     @Override
     public boolean acceptFile(FileContent file) {
-      return file.getData().getName().toLowerCase().endsWith(".docx");
+      XWPFDocument doc;
+      try {
+        doc = new XWPFDocument(new FileInputStream(file.getData()));
+      } catch (Exception e) {
+        log().debug("FileContent {} not accepted due to: {}", file.getId(), e.getMessage());
+        return false;
+      }
+
+      cache.put(file.getId(), doc);
+      return true;
     }
 
     @Override
     public boolean acceptInputStream(InputStreamContent inputStream) {
-      BufferedInputStream bis = new BufferedInputStream(inputStream.getData());
-      FileMagic fm;
+      XWPFDocument doc;
       try {
-        fm = FileMagic.valueOf(bis);
-      } catch (IOException e) {
+        doc = new XWPFDocument(inputStream.getData());
+      } catch (Exception e) {
+        log()
+            .debug(
+                "InputStreamContent {} not accepted due to: {}",
+                inputStream.getId(),
+                e.getMessage());
         return false;
       }
 
-      // FIXME: This only checks whether it is an OOXML, not that it is a Word Document
-      return FileMagic.OOXML == fm;
+      cache.put(inputStream.getId(), doc);
+      return true;
     }
 
     @Override
     public XWPFDocument extractDocument(FileContent file) throws IOException {
-      return new XWPFDocument(new FileInputStream(file.getData()));
+      if (cache.containsKey(file.getId())) {
+        return cache.get(file.getId());
+      } else {
+        return new XWPFDocument(new FileInputStream(file.getData()));
+      }
     }
 
     @Override
     public XWPFDocument extractDocument(InputStreamContent inputStreamContent) throws IOException {
-      return new XWPFDocument(inputStreamContent.getData());
+      if (cache.containsKey(inputStreamContent.getId())) {
+        return cache.get(inputStreamContent.getId());
+      } else {
+        return new XWPFDocument(inputStreamContent.getData());
+      }
     }
 
     @Override
@@ -179,12 +203,12 @@ public class DocxExtractor
         try {
           bImg = ImageIO.read(new ByteArrayInputStream(p.getData()));
         } catch (IOException e) {
-          logger.warn("Unable to extract image {} from document", imageNumber, e);
+          log().warn("Unable to extract image {} from document", imageNumber, e);
           continue;
         }
 
         if (bImg == null) {
-          logger.warn("Null image {} extracted from document", imageNumber);
+          log().warn("Null image {} extracted from document", imageNumber);
           continue;
         }
 
@@ -195,7 +219,7 @@ public class DocxExtractor
               ImageMetadataReader.readMetadata(new ByteArrayInputStream(p.getData()));
           props.putAll(toMap(imageMetadata));
         } catch (ImageProcessingException | IOException e) {
-          logger.warn("Unable to extract metadata from image {}", imageNumber, e);
+          log().warn("Unable to extract metadata from image {}", imageNumber, e);
         }
 
         props.put(PropertyKeys.PROPERTY_KEY_INDEX, imageNumber);

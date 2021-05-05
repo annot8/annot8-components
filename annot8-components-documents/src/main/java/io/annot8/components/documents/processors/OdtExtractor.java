@@ -18,7 +18,6 @@ import io.annot8.common.data.content.Table;
 import io.annot8.components.documents.data.ExtractionWithProperties;
 import io.annot8.conventions.PropertyKeys;
 import java.awt.image.BufferedImage;
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -31,7 +30,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.imageio.ImageIO;
-import org.apache.poi.poifs.filesystem.FileMagic;
 import org.odftoolkit.odfdom.doc.OdfTextDocument;
 import org.odftoolkit.odfdom.doc.table.OdfTable;
 import org.odftoolkit.odfdom.doc.table.OdfTableCell;
@@ -40,7 +38,6 @@ import org.odftoolkit.odfdom.incubator.doc.draw.OdfDrawFrame;
 import org.odftoolkit.odfdom.incubator.doc.draw.OdfDrawImage;
 import org.odftoolkit.odfdom.incubator.meta.OdfMetaDocumentStatistic;
 import org.odftoolkit.odfdom.incubator.meta.OdfOfficeMeta;
-import org.slf4j.Logger;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -75,10 +72,16 @@ public class OdtExtractor
 
   public static class Processor
       extends AbstractDocumentExtractorProcessor<OdfTextDocument, DocumentExtractorSettings> {
-    private final Logger logger = getLogger();
+
+    private final Map<String, OdfTextDocument> cache = new HashMap<>();
 
     public Processor(Context context, DocumentExtractorSettings settings) {
       super(context, settings);
+    }
+
+    @Override
+    public void reset() {
+      cache.clear();
     }
 
     @Override
@@ -103,40 +106,60 @@ public class OdtExtractor
 
     @Override
     public boolean acceptFile(FileContent file) {
-      return file.getData().getName().toLowerCase().endsWith(".odt");
+      OdfTextDocument doc;
+      try {
+        doc = OdfTextDocument.loadDocument(file.getData());
+      } catch (Exception e) {
+        log().debug("FileContent {} not accepted due to: {}", file.getId(), e.getMessage());
+        return false;
+      }
+
+      cache.put(file.getId(), doc);
+      return true;
     }
 
     @Override
     public boolean acceptInputStream(InputStreamContent inputStream) {
-      BufferedInputStream bis = new BufferedInputStream(inputStream.getData());
-      FileMagic fm;
+      OdfTextDocument doc;
       try {
-        fm = FileMagic.valueOf(bis);
-      } catch (IOException e) {
+        doc = OdfTextDocument.loadDocument(inputStream.getData());
+      } catch (Exception e) {
+        log()
+            .debug(
+                "InputStreamContent {} not accepted due to: {}",
+                inputStream.getId(),
+                e.getMessage());
         return false;
       }
 
-      // FIXME: OOXML and ODF have the same container format (ZIP), so have the same code.
-      // Can't determine which it usingFileMagic here, or even if it is a document...
-      return FileMagic.OOXML == fm;
+      cache.put(inputStream.getId(), doc);
+      return true;
     }
 
     @Override
     public OdfTextDocument extractDocument(FileContent file) throws IOException {
-      try {
-        return OdfTextDocument.loadDocument(file.getData());
-      } catch (Exception e) {
-        throw new IOException("Unable to load document", e);
+      if (cache.containsKey(file.getId())) {
+        return cache.get(file.getId());
+      } else {
+        try {
+          return OdfTextDocument.loadDocument(file.getData());
+        } catch (Exception e) {
+          throw new IOException("Unable to read ODT document", e);
+        }
       }
     }
 
     @Override
     public OdfTextDocument extractDocument(InputStreamContent inputStreamContent)
         throws IOException {
-      try {
-        return OdfTextDocument.loadDocument(inputStreamContent.getData());
-      } catch (Exception e) {
-        throw new IOException("Unable to load document", e);
+      if (cache.containsKey(inputStreamContent.getId())) {
+        return cache.get(inputStreamContent.getId());
+      } else {
+        try {
+          return OdfTextDocument.loadDocument(inputStreamContent.getData());
+        } catch (Exception e) {
+          throw new IOException("Unable to read ODT document", e);
+        }
       }
     }
 
@@ -287,12 +310,12 @@ public class OdtExtractor
           try {
             bImg = ImageIO.read(doc.getPackage().getInputStream(href));
           } catch (IOException e) {
-            logger.warn("Unable to extract image {} from document", imageNumber, e);
+            log().warn("Unable to extract image {} from document", imageNumber, e);
             continue;
           }
 
           if (bImg == null) {
-            logger.warn("Null image {} extracted from document", imageNumber);
+            log().warn("Null image {} extracted from document", imageNumber);
             continue;
           }
 
@@ -303,7 +326,7 @@ public class OdtExtractor
                 ImageMetadataReader.readMetadata(doc.getPackage().getInputStream(href));
             properties.putAll(toMap(imageMetadata));
           } catch (ImageProcessingException | IOException e) {
-            logger.warn("Unable to extract metadata from image {}", imageNumber, e);
+            log().warn("Unable to extract metadata from image {}", imageNumber, e);
           }
 
           properties.put(PropertyKeys.PROPERTY_KEY_NAME, frameName);

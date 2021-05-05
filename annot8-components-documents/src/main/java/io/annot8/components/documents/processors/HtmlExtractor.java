@@ -23,8 +23,10 @@ import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,12 +41,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.imageio.ImageIO;
 import org.apache.poi.poifs.filesystem.FileMagic;
-import org.apache.poi.util.IOUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.slf4j.Logger;
 
 /** Extracts content from HTML files */
 @ComponentName("HTML Extractor")
@@ -61,7 +61,8 @@ public class HtmlExtractor
 
   public static class Processor
       extends AbstractDocumentExtractorProcessor<Document, HtmlExtractor.Settings> {
-    private final Logger logger = getLogger();
+
+    private final HttpClient client = HttpClient.newHttpClient();
 
     public Processor(Context context, HtmlExtractor.Settings settings) {
       super(context, settings);
@@ -89,21 +90,20 @@ public class HtmlExtractor
 
     @Override
     public boolean acceptFile(FileContent file) {
-      return file.getData().getName().toLowerCase().endsWith(".htm")
-          || file.getData().getName().toLowerCase().endsWith(".html");
+      try {
+        return FileMagic.valueOf(file.getData()) == FileMagic.HTML;
+      } catch (IOException e) {
+        return false;
+      }
     }
 
     @Override
     public boolean acceptInputStream(InputStreamContent inputStream) {
-      BufferedInputStream bis = new BufferedInputStream(inputStream.getData());
-      FileMagic fm;
-      try {
-        fm = FileMagic.valueOf(bis);
+      try (InputStream is = new BufferedInputStream(inputStream.getData())) {
+        return FileMagic.valueOf(is) == FileMagic.HTML;
       } catch (IOException e) {
         return false;
       }
-
-      return FileMagic.HTML == fm;
     }
 
     @Override
@@ -255,18 +255,20 @@ public class HtmlExtractor
 
           data = Base64.getDecoder().decode(parts[1]);
         } else {
-          URL url;
+          HttpRequest request = HttpRequest.newBuilder().uri(URI.create(src)).build();
           try {
-            url = new URL(src);
-          } catch (MalformedURLException e) {
-            logger.error("Image source '" + src + "' is not a valid URL", e);
-            continue;
-          }
+            HttpResponse<byte[]> response =
+                client.send(request, HttpResponse.BodyHandlers.ofByteArray());
 
-          try (InputStream is = url.openStream()) {
-            data = IOUtils.toByteArray(is);
-          } catch (IOException e) {
-            logger.error("Unable to read image {} from URL", src, e);
+            // TODO: Could follow redirects?
+            if (response.statusCode() != 200) {
+              log().error("Status code {} returned from URL {}", response.statusCode(), src);
+              continue;
+            }
+
+            data = response.body();
+          } catch (Exception e) {
+            log().error("Unable to read image from URL {}", src, e);
             continue;
           }
 
@@ -277,12 +279,12 @@ public class HtmlExtractor
         try (ByteArrayInputStream bais = new ByteArrayInputStream(data)) {
           bImg = ImageIO.read(bais);
         } catch (Exception e) {
-          logger.error("Unable to read image from {}", src, e);
+          log().error("Unable to read image from {}", src, e);
           continue;
         }
 
         if (bImg == null) {
-          logger.warn("Null image {} extracted from document", src);
+          log().warn("Null image {} extracted from document", src);
           continue;
         }
 
@@ -290,7 +292,7 @@ public class HtmlExtractor
           Metadata imageMetadata = ImageMetadataReader.readMetadata(bais);
           properties.putAll(toMap(imageMetadata));
         } catch (ImageProcessingException | IOException e) {
-          logger.warn("Unable to extract metadata from image {}", src, e);
+          log().warn("Unable to extract metadata from image {}", src, e);
         }
 
         properties.put(PropertyKeys.PROPERTY_KEY_TITLE, i.attr("title"));
@@ -395,6 +397,14 @@ public class HtmlExtractor
 
   public static class Settings extends DocumentExtractorSettings {
     private String cssQueryText = "";
+
+    public Settings() {
+      // Default constructor
+    }
+
+    public Settings(DocumentExtractorSettings settings) {
+      super(settings);
+    }
 
     @Description(
         "If set, then the give CSS Query will be used to select text within the document (otherwise text from the whole document is returned)")

@@ -18,7 +18,6 @@ import io.annot8.common.data.content.Table;
 import io.annot8.components.documents.data.ExtractionWithProperties;
 import io.annot8.conventions.PropertyKeys;
 import java.awt.image.BufferedImage;
-import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -37,8 +36,6 @@ import org.apache.poi.hwpf.extractor.WordExtractor;
 import org.apache.poi.hwpf.usermodel.Picture;
 import org.apache.poi.hwpf.usermodel.TableIterator;
 import org.apache.poi.hwpf.usermodel.TableRow;
-import org.apache.poi.poifs.filesystem.FileMagic;
-import org.slf4j.Logger;
 
 @ComponentName("Word Document (DOC) Extractor")
 @ComponentDescription("Extracts image and text from Word Document (*.doc) files")
@@ -54,10 +51,16 @@ public class DocExtractor
 
   public static class Processor
       extends AbstractDocumentExtractorProcessor<HWPFDocument, DocumentExtractorSettings> {
-    private final Logger logger = getLogger();
+
+    private final Map<String, HWPFDocument> cache = new HashMap<>();
 
     public Processor(Context context, DocumentExtractorSettings settings) {
       super(context, settings);
+    }
+
+    @Override
+    public void reset() {
+      cache.clear();
     }
 
     @Override
@@ -82,31 +85,52 @@ public class DocExtractor
 
     @Override
     public boolean acceptFile(FileContent file) {
-      return file.getData().getName().toLowerCase().endsWith(".doc");
+      HWPFDocument doc;
+      try {
+        doc = new HWPFDocument(new FileInputStream(file.getData()));
+      } catch (Exception e) {
+        log().debug("FileContent {} not accepted due to: {}", file.getId(), e.getMessage());
+        return false;
+      }
+
+      cache.put(file.getId(), doc);
+      return true;
     }
 
     @Override
     public boolean acceptInputStream(InputStreamContent inputStream) {
-      BufferedInputStream bis = new BufferedInputStream(inputStream.getData());
-      FileMagic fm;
+      HWPFDocument doc;
       try {
-        fm = FileMagic.valueOf(bis);
-      } catch (IOException e) {
+        doc = new HWPFDocument(inputStream.getData());
+      } catch (Exception e) {
+        log()
+            .debug(
+                "InputStreamContent {} not accepted due to: {}",
+                inputStream.getId(),
+                e.getMessage());
         return false;
       }
 
-      // FIXME: This only checks whether it is an OLE2, not that it is a Word Document
-      return FileMagic.OLE2 == fm;
+      cache.put(inputStream.getId(), doc);
+      return true;
     }
 
     @Override
     public HWPFDocument extractDocument(FileContent file) throws IOException {
-      return new HWPFDocument(new FileInputStream(file.getData()));
+      if (cache.containsKey(file.getId())) {
+        return cache.get(file.getId());
+      } else {
+        return new HWPFDocument(new FileInputStream(file.getData()));
+      }
     }
 
     @Override
     public HWPFDocument extractDocument(InputStreamContent inputStreamContent) throws IOException {
-      return new HWPFDocument(inputStreamContent.getData());
+      if (cache.containsKey(inputStreamContent.getId())) {
+        return cache.get(inputStreamContent.getId());
+      } else {
+        return new HWPFDocument(inputStreamContent.getData());
+      }
     }
 
     @Override
@@ -134,12 +158,12 @@ public class DocExtractor
         try {
           bImg = ImageIO.read(new ByteArrayInputStream(p.getContent()));
         } catch (IOException e) {
-          logger.warn("Unable to extract image {} from document", imageNumber, e);
+          log().warn("Unable to extract image {} from document", imageNumber, e);
           continue;
         }
 
         if (bImg == null) {
-          logger.warn("Null image {} extracted from document", imageNumber);
+          log().warn("Null image {} extracted from document", imageNumber);
           continue;
         }
 
@@ -150,7 +174,7 @@ public class DocExtractor
               ImageMetadataReader.readMetadata(new ByteArrayInputStream(p.getContent()));
           props.putAll(toMap(imageMetadata));
         } catch (ImageProcessingException | IOException e) {
-          logger.warn("Unable to extract metadata from image {}", imageNumber, e);
+          log().warn("Unable to extract metadata from image {}", imageNumber, e);
         }
 
         props.put(PropertyKeys.PROPERTY_KEY_INDEX, imageNumber);

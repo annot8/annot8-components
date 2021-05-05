@@ -96,13 +96,17 @@ public class PdfExtractor
 
     @Override
     public boolean acceptFile(FileContent file) {
-      return file.getData().getName().toLowerCase().endsWith(".pdf");
+      try {
+        return FileMagic.valueOf(file.getData()) == FileMagic.PDF;
+      } catch (IOException ioe) {
+        return false;
+      }
     }
 
     @Override
     public boolean acceptInputStream(InputStreamContent inputStream) {
-      try (InputStream is = inputStream.getData()) {
-        return FileMagic.valueOf(new BufferedInputStream(is)) == FileMagic.PDF;
+      try (InputStream is = new BufferedInputStream(inputStream.getData())) {
+        return FileMagic.valueOf(is) == FileMagic.PDF;
       } catch (IOException ioe) {
         return false;
       }
@@ -251,6 +255,14 @@ public class PdfExtractor
     private String pageEnd = "";
     private String paragraphStart = "";
     private String paragraphEnd = "\n\n";
+
+    public Settings() {
+      // Default constructor
+    }
+
+    public Settings(DocumentExtractorSettings settings) {
+      super(settings);
+    }
 
     @Override
     public boolean validate() {

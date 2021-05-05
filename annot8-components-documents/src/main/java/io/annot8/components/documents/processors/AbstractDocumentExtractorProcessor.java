@@ -9,7 +9,6 @@ import io.annot8.api.context.Context;
 import io.annot8.api.data.Item;
 import io.annot8.api.exceptions.ProcessingException;
 import io.annot8.common.components.AbstractProcessor;
-import io.annot8.common.components.logging.Logging;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.Image;
 import io.annot8.common.data.content.InputStreamContent;
@@ -32,9 +31,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
-import org.slf4j.Logger;
-import org.slf4j.helpers.NOPLogger;
 
 /**
  * Base class for DocumentExtractor processors, handling a lot of the common boilerplate code.
@@ -52,28 +48,28 @@ public abstract class AbstractDocumentExtractorProcessor<T, S extends DocumentEx
     this.context = context;
     this.settings = settings;
 
-    Logger logger = getLogger();
-
     if (!isMetadataSupported() && settings.isExtractMetadata()) {
-      logger.warn("This extractor does not support extraction of metadata");
+      log().warn("This extractor does not support extraction of metadata");
       this.settings.setExtractMetadata(false);
     }
     if (!isTextSupported() && settings.isExtractText()) {
-      logger.warn("This extractor does not support extraction of text");
+      log().warn("This extractor does not support extraction of text");
       this.settings.setExtractText(false);
     }
     if (!isImagesSupported() && settings.isExtractImages()) {
-      logger.warn("This extractor does not support extraction of images");
+      log().warn("This extractor does not support extraction of images");
       this.settings.setExtractImages(false);
     }
     if (!isTablesSupported() && settings.isExtractTables()) {
-      logger.warn("This extractor does not support extraction of tables");
+      log().warn("This extractor does not support extraction of tables");
       this.settings.setExtractTables(false);
     }
   }
 
   @Override
   public ProcessorResponse process(Item item) {
+    reset();
+
     List<Exception> exceptions = new ArrayList<>();
 
     item.getContents(FileContent.class)
@@ -219,6 +215,10 @@ public abstract class AbstractDocumentExtractorProcessor<T, S extends DocumentEx
     return exceptions;
   }
 
+  public void reset() {
+    // Do nothing
+  }
+
   // Abstract functions below here
 
   /** Returns true if this processor supports extracting metadata, and false otherwise */
@@ -318,15 +318,6 @@ public abstract class AbstractDocumentExtractorProcessor<T, S extends DocumentEx
     }
 
     return sb.toString();
-  }
-
-  protected final Logger getLogger() {
-    Optional<Logging> logging = context.getResource(Logging.class);
-    if (logging.isPresent()) {
-      return logging.get().getLogger(this.getClass());
-    } else {
-      return NOPLogger.NOP_LOGGER;
-    }
   }
 
   // TODO: Is there a better way than implementing our own?

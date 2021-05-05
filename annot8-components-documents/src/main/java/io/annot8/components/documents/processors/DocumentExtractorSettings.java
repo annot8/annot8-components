@@ -10,6 +10,18 @@ public class DocumentExtractorSettings implements io.annot8.api.settings.Setting
   private boolean extractTables = true;
   private boolean discardOriginal = false;
 
+  public DocumentExtractorSettings() {
+    // Default constructor
+  }
+
+  public DocumentExtractorSettings(DocumentExtractorSettings settings) {
+    this.discardOriginal = settings.isDiscardOriginal();
+    this.extractImages = settings.isExtractImages();
+    this.extractMetadata = settings.isExtractMetadata();
+    this.extractTables = settings.isExtractTables();
+    this.extractText = settings.isExtractText();
+  }
+
   @Override
   public boolean validate() {
     return extractMetadata | extractText | extractImages;

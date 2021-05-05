@@ -16,8 +16,8 @@ import io.annot8.common.data.content.Table;
 import io.annot8.components.documents.data.ExtractionWithProperties;
 import io.annot8.conventions.PropertyKeys;
 import java.awt.image.BufferedImage;
-import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -27,17 +27,12 @@ import java.util.List;
 import java.util.Map;
 import javax.imageio.ImageIO;
 import org.apache.poi.ooxml.POIXMLProperties;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.openxml4j.opc.OPCPackage;
-import org.apache.poi.poifs.filesystem.FileMagic;
 import org.apache.poi.sl.extractor.SlideShowExtractor;
 import org.apache.poi.xslf.usermodel.XMLSlideShow;
 import org.apache.poi.xslf.usermodel.XSLFPictureData;
 import org.apache.poi.xslf.usermodel.XSLFShape;
 import org.apache.poi.xslf.usermodel.XSLFSlide;
-import org.apache.poi.xslf.usermodel.XSLFSlideShowFactory;
 import org.apache.poi.xslf.usermodel.XSLFTextParagraph;
-import org.slf4j.Logger;
 
 @ComponentName("PowerPoint (PPTX) Extractor")
 @ComponentDescription("Extracts image and text from PowerPoint (*.pptx) files")
@@ -54,10 +49,16 @@ public class PptxExtractor
 
   public static class Processor
       extends AbstractDocumentExtractorProcessor<XMLSlideShow, DocumentExtractorSettings> {
-    private final Logger logger = getLogger();
+
+    private final Map<String, XMLSlideShow> cache = new HashMap<>();
 
     public Processor(Context context, DocumentExtractorSettings settings) {
       super(context, settings);
+    }
+
+    @Override
+    public void reset() {
+      cache.clear();
     }
 
     @Override
@@ -82,43 +83,52 @@ public class PptxExtractor
 
     @Override
     public boolean acceptFile(FileContent file) {
-      return file.getData().getName().toLowerCase().endsWith(".pptx");
+      XMLSlideShow doc;
+      try {
+        doc = new XMLSlideShow(new FileInputStream(file.getData()));
+      } catch (Exception e) {
+        log().debug("FileContent {} not accepted due to: {}", file.getId(), e.getMessage());
+        return false;
+      }
+
+      cache.put(file.getId(), doc);
+      return true;
     }
 
     @Override
     public boolean acceptInputStream(InputStreamContent inputStream) {
-      BufferedInputStream bis = new BufferedInputStream(inputStream.getData());
-      FileMagic fm;
+      XMLSlideShow doc;
       try {
-        fm = FileMagic.valueOf(bis);
-      } catch (IOException e) {
+        doc = new XMLSlideShow(inputStream.getData());
+      } catch (Exception e) {
+        log()
+            .debug(
+                "InputStreamContent {} not accepted due to: {}",
+                inputStream.getId(),
+                e.getMessage());
         return false;
       }
 
-      // FIXME: This only checks whether it is an OOXML, not that it is a PowerPoint Document
-      return FileMagic.OOXML == fm;
+      cache.put(inputStream.getId(), doc);
+      return true;
     }
 
     @Override
     public XMLSlideShow extractDocument(FileContent file) throws IOException {
-      OPCPackage opcPackage;
-      try {
-        opcPackage = OPCPackage.open(file.getData());
-      } catch (InvalidFormatException e) {
-        throw new IOException("Could not read data", e);
+      if (cache.containsKey(file.getId())) {
+        return cache.get(file.getId());
+      } else {
+        return new XMLSlideShow(new FileInputStream(file.getData()));
       }
-      return XSLFSlideShowFactory.createSlideShow(opcPackage);
     }
 
     @Override
     public XMLSlideShow extractDocument(InputStreamContent inputStreamContent) throws IOException {
-      OPCPackage opcPackage;
-      try {
-        opcPackage = OPCPackage.open(inputStreamContent.getData());
-      } catch (InvalidFormatException e) {
-        throw new IOException("Could not read data", e);
+      if (cache.containsKey(inputStreamContent.getId())) {
+        return cache.get(inputStreamContent.getId());
+      } else {
+        return new XMLSlideShow(inputStreamContent.getData());
       }
-      return XSLFSlideShowFactory.createSlideShow(opcPackage);
     }
 
     @Override
@@ -242,12 +252,12 @@ public class PptxExtractor
         try {
           bImg = ImageIO.read(new ByteArrayInputStream(picture.getData()));
         } catch (IOException e) {
-          logger.warn("Unable to extract image {} from document", picture.getIndex() + 1, e);
+          log().warn("Unable to extract image {} from document", picture.getIndex() + 1, e);
           continue;
         }
 
         if (bImg == null) {
-          logger.warn("Null image {} extracted from document", picture.getIndex() + 1);
+          log().warn("Null image {} extracted from document", picture.getIndex() + 1);
           continue;
         }
 
@@ -258,7 +268,7 @@ public class PptxExtractor
               ImageMetadataReader.readMetadata(new ByteArrayInputStream(picture.getData()));
           properties.putAll(toMap(imageMetadata));
         } catch (ImageProcessingException | IOException e) {
-          logger.warn("Unable to extract metadata from image {}", picture.getIndex() + 1, e);
+          log().warn("Unable to extract metadata from image {}", picture.getIndex() + 1, e);
         }
 
         properties.put(PropertyKeys.PROPERTY_KEY_INDEX, picture.getIndex() + 1);

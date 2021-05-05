@@ -26,6 +26,12 @@
       <version>2.15.0</version>
     </dependency>
 
+    <dependency>
+      <groupId>com.flipkart.utils</groupId>
+      <artifactId>javatuples</artifactId>
+      <version>3.0</version>
+    </dependency>
+
     <!-- DOC support -->
     <dependency>
       <groupId>org.apache.poi</groupId>
