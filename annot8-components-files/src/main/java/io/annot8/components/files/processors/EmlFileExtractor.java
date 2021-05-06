@@ -19,12 +19,23 @@ import io.annot8.common.components.capabilities.SimpleCapabilities;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.InputStreamContent;
 import io.annot8.common.data.content.Text;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import org.apache.james.mime4j.dom.*;
+import org.apache.james.mime4j.dom.BinaryBody;
+import org.apache.james.mime4j.dom.Body;
+import org.apache.james.mime4j.dom.Entity;
+import org.apache.james.mime4j.dom.Message;
+import org.apache.james.mime4j.dom.Multipart;
+import org.apache.james.mime4j.dom.SingleBody;
+import org.apache.james.mime4j.dom.TextBody;
 
 @ComponentName("Eml File Extractor")
 @ComponentDescription("Extract text and attachments from *.eml files and create new Content")
@@ -66,6 +77,8 @@ public class EmlFileExtractor
 
     @Override
     public ProcessorResponse process(Item item) {
+      List<Exception> exceptions = new ArrayList<>();
+
       item.getContents(FileContent.class)
           .filter(
               f ->
@@ -102,6 +115,8 @@ public class EmlFileExtractor
                   // If processed, then remove it our item so it doesn't get reprocessed
                   if (removeSourceContent) item.removeContent(f);
                 } catch (IOException e) {
+                  exceptions.add(e);
+
                   log()
                       .error(
                           "Could not read file {} in content {}",
@@ -111,8 +126,11 @@ public class EmlFileExtractor
                 }
               });
 
-      return ProcessorResponse
-          .ok(); // TODO: If we weren't able to process successfully, should return an error!
+      if (exceptions.isEmpty()) {
+        return ProcessorResponse.ok();
+      } else {
+        return ProcessorResponse.itemError(exceptions);
+      }
     }
 
     private Optional<String> getExtension(String filename) {

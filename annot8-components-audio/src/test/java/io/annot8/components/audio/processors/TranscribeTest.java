@@ -71,7 +71,6 @@ public class TranscribeTest {
     p.close();
   }
 
-  // TODO: Test settings
   @Test
   public void testDescriptor() {
     Transcribe.Settings s = new Transcribe.Settings();
@@ -86,5 +85,23 @@ public class TranscribeTest {
     try (Transcribe.Processor p = t.createComponent(new SimpleContext(), s)) {
       assertNotNull(p);
     }
+  }
+
+  @Test
+  public void testSettings() {
+    Transcribe.Settings s = new Transcribe.Settings();
+    assertFalse(s.validate());
+
+    s.setAnnotateAudio(true);
+    assertTrue(s.isAnnotateAudio());
+    s.setAnnotateAudio(false);
+    assertFalse(s.isAnnotateAudio());
+
+    s.setModel("my-model");
+    assertEquals("my-model", s.getModel());
+
+    assertTrue(s.validate());
+    s.setModel(null);
+    assertFalse(s.validate());
   }
 }
