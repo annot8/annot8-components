@@ -16,6 +16,7 @@ import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.InputStreamContent;
 import io.annot8.common.data.content.Row;
 import io.annot8.common.data.content.Table;
+import io.annot8.common.utils.java.ConversionUtils;
 import io.annot8.components.documents.data.ExtractionWithProperties;
 import io.annot8.conventions.PropertyKeys;
 import java.awt.image.BufferedImage;
@@ -62,10 +63,18 @@ public class HtmlExtractor
   public static class Processor
       extends AbstractDocumentExtractorProcessor<Document, HtmlExtractor.Settings> {
 
-    private final HttpClient client = HttpClient.newHttpClient();
+    private final HttpClient client;
 
     public Processor(Context context, HtmlExtractor.Settings settings) {
       super(context, settings);
+
+      client =
+          HttpClient.newBuilder()
+              .followRedirects(
+                  settings.isFollowImageRedirects()
+                      ? HttpClient.Redirect.NORMAL
+                      : HttpClient.Redirect.NEVER)
+              .build();
     }
 
     @Override
@@ -260,9 +269,8 @@ public class HtmlExtractor
             HttpResponse<byte[]> response =
                 client.send(request, HttpResponse.BodyHandlers.ofByteArray());
 
-            // TODO: Could follow redirects?
             if (response.statusCode() != 200) {
-              log().error("Status code {} returned from URL {}", response.statusCode(), src);
+              log().warn("Status code {} returned from URL {}", response.statusCode(), src);
               continue;
             }
 
@@ -366,7 +374,10 @@ public class HtmlExtractor
       for (int i = 0; i < bodyRows.size(); i++) {
         // TODO: Handle column spans?
         List<Object> data =
-            bodyRows.get(i).select("td").stream().map(Element::text).collect(Collectors.toList());
+            bodyRows.get(i).select("td").stream()
+                .map(Element::text)
+                .map(ConversionUtils::parseString)
+                .collect(Collectors.toList());
         rows.add(new DefaultRow(i, columnNames, data));
       }
 
@@ -397,6 +408,7 @@ public class HtmlExtractor
 
   public static class Settings extends DocumentExtractorSettings {
     private String cssQueryText = "";
+    private boolean followImageRedirects = false;
 
     public Settings() {
       // Default constructor
@@ -414,6 +426,15 @@ public class HtmlExtractor
 
     public void setCssQueryText(String cssQueryText) {
       this.cssQueryText = cssQueryText;
+    }
+
+    @Description("If true, then redirects will be followed when attempting to download images")
+    public boolean isFollowImageRedirects() {
+      return followImageRedirects;
+    }
+
+    public void setFollowImageRedirects(boolean followImageRedirects) {
+      this.followImageRedirects = followImageRedirects;
     }
   }
 }

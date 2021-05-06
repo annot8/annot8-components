@@ -15,6 +15,7 @@ import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.InputStreamContent;
 import io.annot8.common.data.content.Row;
 import io.annot8.common.data.content.Table;
+import io.annot8.common.utils.java.ConversionUtils;
 import io.annot8.components.documents.data.ExtractionWithProperties;
 import io.annot8.conventions.PropertyKeys;
 import java.awt.image.BufferedImage;
@@ -253,9 +254,11 @@ public class DocxExtractor
       for (int i = 0; i < t.getNumberOfRows(); i++) {
         XWPFTableRow r = t.getRow(i);
 
-        // TODO: Can we get content not as a String?
         List<Object> data =
-            r.getTableCells().stream().map(XWPFTableCell::getText).collect(Collectors.toList());
+            r.getTableCells().stream()
+                .map(XWPFTableCell::getText)
+                .map(ConversionUtils::parseString)
+                .collect(Collectors.toList());
 
         if (i == 0) {
           // Assume header row if first row

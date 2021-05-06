@@ -77,8 +77,6 @@ public class DocumentExtractor
       pdfProcessor = new PdfExtractor.Processor(context, new PdfExtractor.Settings(settings));
       pptProcessor = new PptExtractor.Processor(context, new DocumentExtractorSettings(settings));
       pptxProcessor = new PptxExtractor.Processor(context, new DocumentExtractorSettings(settings));
-
-      // TODO: Should we add in Excel?
     }
 
     @Override

@@ -36,7 +36,9 @@ public class PptExtractorTest extends AbstractDocumentExtractorTest {
 
   @Override
   protected void validateMetadata(Properties itemProperties) {
-    assertEquals(0, itemProperties.getAll().size());
+    assertFalse(itemProperties.getAll().isEmpty());
+
+    assertEquals("James Baker", itemProperties.get(DocumentProperties.AUTHOR).orElseThrow());
   }
 
   @Override

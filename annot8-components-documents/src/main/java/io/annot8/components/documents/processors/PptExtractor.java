@@ -26,6 +26,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.imageio.ImageIO;
+import org.apache.poi.hpsf.DocumentSummaryInformation;
+import org.apache.poi.hpsf.SummaryInformation;
+import org.apache.poi.hpsf.extractor.HPSFPropertiesExtractor;
 import org.apache.poi.hslf.usermodel.HSLFPictureData;
 import org.apache.poi.hslf.usermodel.HSLFShape;
 import org.apache.poi.hslf.usermodel.HSLFSlide;
@@ -35,7 +38,7 @@ import org.apache.poi.sl.extractor.SlideShowExtractor;
 
 @ComponentName("PowerPoint (PPT) Extractor")
 @ComponentDescription("Extracts image and text from PowerPoint (*.ppt) files")
-@ComponentTags({"documents", "powerpoint", "ppt", "extractor", "text", "images"})
+@ComponentTags({"documents", "powerpoint", "ppt", "extractor", "text", "images", "metadata"})
 @SettingsClass(DocumentExtractorSettings.class)
 public class PptExtractor
     extends AbstractDocumentExtractorDescriptor<PptExtractor.Processor, DocumentExtractorSettings> {
@@ -61,7 +64,7 @@ public class PptExtractor
 
     @Override
     public boolean isMetadataSupported() {
-      return false;
+      return true;
     }
 
     @Override
@@ -131,9 +134,69 @@ public class PptExtractor
 
     @Override
     public Map<String, Object> extractMetadata(HSLFSlideShow doc) {
-      // TODO: Work out best way to extract metadata, as it's not straightforwards
+      Map<String, Object> props = new HashMap<>();
 
-      return Collections.emptyMap();
+      HPSFPropertiesExtractor propsEx = new HPSFPropertiesExtractor(doc);
+      SummaryInformation si = propsEx.getSummaryInformation();
+
+      props.put(DocumentProperties.APPLICATION, si.getApplicationName());
+      props.put(DocumentProperties.AUTHOR, si.getAuthor());
+      props.put(DocumentProperties.CHARACTER_COUNT, si.getCharCount());
+      props.put(DocumentProperties.KEYWORDS, si.getKeywords());
+      props.put(DocumentProperties.COMMENTS, si.getComments());
+      props.put(DocumentProperties.CREATION_DATE, toTemporal(si.getCreateDateTime()));
+      props.put(DocumentProperties.EDITING_DURATION, si.getEditTime());
+      props.put(DocumentProperties.LAST_MODIFIED_BY, si.getLastAuthor());
+      props.put(DocumentProperties.LAST_PRINTED_DATE, toTemporal(si.getLastPrinted()));
+      props.put(DocumentProperties.LAST_MODIFIED_DATE, toTemporal(si.getLastSaveDateTime()));
+      props.put(DocumentProperties.PAGE_COUNT, si.getPageCount());
+      props.put(DocumentProperties.REVISION, si.getRevNumber());
+      switch (si.getSecurity()) {
+          // 0 = No security, so let's ignore
+        case 1:
+          props.put(DocumentProperties.SECURITY, "passwordProtected");
+          break;
+        case 2:
+          props.put(DocumentProperties.SECURITY, "readOnlyRecommended");
+          break;
+        case 4:
+          props.put(DocumentProperties.SECURITY, "readOnlyEnforced");
+          break;
+        case 8:
+          props.put(DocumentProperties.SECURITY, "lockedForAnnotations");
+          break;
+      }
+      props.put(DocumentProperties.SUBJECT, si.getSubject());
+      props.put(PropertyKeys.PROPERTY_KEY_TITLE, si.getTitle());
+      props.put(DocumentProperties.TEMPLATE, si.getTemplate());
+      props.put(DocumentProperties.WORD_COUNT, si.getWordCount());
+
+      DocumentSummaryInformation di = propsEx.getDocSummaryInformation();
+      props.put(DocumentProperties.APPLICATION_VERSION, di.getApplicationVersion());
+      props.put(DocumentProperties.CATEGORY, di.getCategory());
+      props.put(DocumentProperties.COMPANY, di.getCompany());
+      props.put(DocumentProperties.CONTENT_STATUS, di.getContentStatus());
+      props.put(DocumentProperties.CONTENT_TYPE, di.getContentType());
+      props.put(DocumentProperties.BYTE_COUNT, di.getByteCount());
+      props.put(DocumentProperties.CHARACTER_COUNT_WS, di.getCharCountWithSpaces());
+      props.put(DocumentProperties.DOCUMENT_VERSION, di.getDocumentVersion());
+      props.put(DocumentProperties.HIDDEN_COUNT, di.getHiddenCount());
+      props.put(PropertyKeys.PROPERTY_KEY_LANGUAGE, di.getLanguage());
+      props.put(DocumentProperties.LINE_COUNT, di.getLineCount());
+      props.put(DocumentProperties.MANAGER, di.getManager());
+      props.put(DocumentProperties.MULTIMEDIA_CLIP_COUNT, di.getMMClipCount());
+      props.put(DocumentProperties.NOTE_COUNT, di.getNoteCount());
+      props.put(DocumentProperties.PARAGRAPH_COUNT, di.getParCount());
+      props.put(DocumentProperties.PRESENTATION_FORMAT, di.getPresentationFormat());
+      props.put(DocumentProperties.SLIDE_COUNT, di.getSlideCount());
+
+      di.getCustomProperties()
+          .forEach((k, v) -> props.put(DocumentProperties.CUSTOM_PREFIX + k, v));
+
+      // Remove any values that are 0, which POI uses to indicate null for integers
+      props.values().removeIf(o -> Integer.valueOf(0).equals(o));
+
+      return props;
     }
 
     @Override
