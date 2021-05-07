@@ -45,6 +45,8 @@ public class PropertyKeys {
   public static final String PROPERTY_KEY_VALUE = "value";
   public static final String PROPERTY_KEY_VERSION = "version";
   public static final String PROPERTY_KEY_WIDTH = "width";
+  public static final String PROPERTY_KEY_X = "x";
+  public static final String PROPERTY_KEY_Y = "y";
 
   private PropertyKeys() {
     // No constructor - only access to public methods

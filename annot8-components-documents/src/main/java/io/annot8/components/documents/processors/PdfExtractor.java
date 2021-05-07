@@ -11,9 +11,12 @@ import io.annot8.api.context.Context;
 import io.annot8.api.exceptions.Annot8RuntimeException;
 import io.annot8.api.exceptions.ProcessingException;
 import io.annot8.api.settings.Description;
+import io.annot8.common.data.content.DefaultRow;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.InputStreamContent;
+import io.annot8.common.data.content.Row;
 import io.annot8.common.data.content.Table;
+import io.annot8.common.utils.java.ConversionUtils;
 import io.annot8.components.documents.data.ExtractionWithProperties;
 import io.annot8.conventions.PropertyKeys;
 import java.awt.image.BufferedImage;
@@ -26,6 +29,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.apache.pdfbox.cos.COSDictionary;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -37,10 +43,20 @@ import org.apache.pdfbox.pdmodel.graphics.PDXObject;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.poi.poifs.filesystem.FileMagic;
+import technology.tabula.ObjectExtractor;
+import technology.tabula.Page;
+import technology.tabula.PageIterator;
+import technology.tabula.Rectangle;
+import technology.tabula.RectangularTextContainer;
+import technology.tabula.detectors.DetectionAlgorithm;
+import technology.tabula.detectors.NurminenDetectionAlgorithm;
+import technology.tabula.detectors.SpreadsheetDetectionAlgorithm;
+import technology.tabula.extractors.BasicExtractionAlgorithm;
+import technology.tabula.extractors.SpreadsheetExtractionAlgorithm;
 
 @ComponentName("PDF Extractor")
 @ComponentDescription("Extracts image and text from PDF (*.pdf) files")
-@ComponentTags({"documents", "pdf", "extractor", "text", "images", "metadata"})
+@ComponentTags({"documents", "pdf", "extractor", "text", "images", "metadata", "tables"})
 @SettingsClass(PdfExtractor.Settings.class)
 public class PdfExtractor
     extends AbstractDocumentExtractorDescriptor<PdfExtractor.Processor, PdfExtractor.Settings> {
@@ -53,6 +69,13 @@ public class PdfExtractor
   public static class Processor
       extends AbstractDocumentExtractorProcessor<PDDocument, PdfExtractor.Settings> {
     private final PDFTextStripper stripper;
+
+    private final DetectionAlgorithm detectionAlgorithm;
+
+    private static final BasicExtractionAlgorithm basicExtractionAlgorithm =
+        new BasicExtractionAlgorithm();
+    private static final SpreadsheetExtractionAlgorithm spreadsheetExtractionAlgorithm =
+        new SpreadsheetExtractionAlgorithm();
 
     public Processor(Context context, PdfExtractor.Settings settings) {
       super(context, settings);
@@ -71,6 +94,16 @@ public class PdfExtractor
         }
       } else {
         stripper = null;
+      }
+
+      switch (settings.getTableDetectionAlgorithm()) {
+        case LATTICE:
+          detectionAlgorithm = new SpreadsheetDetectionAlgorithm();
+          break;
+        case NURMINEN:
+        default:
+          detectionAlgorithm = new NurminenDetectionAlgorithm();
+          break;
       }
     }
 
@@ -91,7 +124,7 @@ public class PdfExtractor
 
     @Override
     public boolean isTablesSupported() {
-      return false;
+      return true;
     }
 
     @Override
@@ -243,8 +276,53 @@ public class PdfExtractor
     @Override
     public Collection<ExtractionWithProperties<Table>> extractTables(PDDocument doc)
         throws ProcessingException {
-      // TODO: Extract tables from PDF
-      return Collections.emptyList();
+      List<ExtractionWithProperties<Table>> t = new ArrayList<>();
+
+      ObjectExtractor extractor = new ObjectExtractor(doc);
+
+      PageIterator pages = extractor.extract();
+      while (pages.hasNext()) {
+        Page page = pages.next();
+
+        // extract text from the table after detecting
+        List<Rectangle> tablesOnPage = detectionAlgorithm.detect(page);
+
+        log().debug("{} tables found on page {}", tablesOnPage.size(), page.getPageNumber());
+        for (Rectangle r : tablesOnPage) {
+          Page p = page.getArea(r);
+
+          List<? extends technology.tabula.Table> tables;
+          switch (settings.getTableExtractionAlgorithm()) {
+            case STREAM:
+              tables = basicExtractionAlgorithm.extract(p);
+              break;
+            case LATTICE:
+              tables = spreadsheetExtractionAlgorithm.extract(p);
+              break;
+            case DETERMINE:
+            default:
+              tables =
+                  spreadsheetExtractionAlgorithm.isTabular(p)
+                      ? spreadsheetExtractionAlgorithm.extract(p)
+                      : basicExtractionAlgorithm.extract(p);
+          }
+
+          for (technology.tabula.Table table : tables) {
+            Map<String, Object> properties = new HashMap<>();
+            properties.put(PropertyKeys.PROPERTY_KEY_X, table.getX());
+            properties.put(PropertyKeys.PROPERTY_KEY_Y, table.getY());
+            properties.put(PropertyKeys.PROPERTY_KEY_WIDTH, table.getWidth());
+            properties.put(PropertyKeys.PROPERTY_KEY_HEIGHT, table.getHeight());
+            properties.put("extractionMethod", table.getExtractionMethod());
+
+            ExtractionWithProperties<Table> e =
+                new ExtractionWithProperties<>(new PdfTable(table), properties);
+            t.add(e);
+          }
+        }
+      }
+
+      return t;
     }
   }
 
@@ -255,6 +333,9 @@ public class PdfExtractor
     private String pageEnd = "";
     private String paragraphStart = "";
     private String paragraphEnd = "\n\n";
+
+    private DetectionAlgorithmType tableDetectionAlgorithm = DetectionAlgorithmType.LATTICE;
+    private ExtractionAlgorithmType tableExtractionAlgorithm = ExtractionAlgorithmType.LATTICE;
 
     public Settings() {
       // Default constructor
@@ -327,6 +408,87 @@ public class PdfExtractor
 
     public void setParagraphEnd(String paragraphEnd) {
       this.paragraphEnd = paragraphEnd;
+    }
+
+    @Description("The algorithm to use for detecting table content")
+    public DetectionAlgorithmType getTableDetectionAlgorithm() {
+      return tableDetectionAlgorithm;
+    }
+
+    public void setTableDetectionAlgorithm(DetectionAlgorithmType tableDetectionAlgorithm) {
+      this.tableDetectionAlgorithm = tableDetectionAlgorithm;
+    }
+
+    @Description("The algorithm to use for extracting table content")
+    public ExtractionAlgorithmType getTableExtractionAlgorithm() {
+      return tableExtractionAlgorithm;
+    }
+
+    public void setTableExtractionAlgorithm(ExtractionAlgorithmType tableExtractionAlgorithm) {
+      this.tableExtractionAlgorithm = tableExtractionAlgorithm;
+    }
+  }
+
+  public enum DetectionAlgorithmType {
+    NURMINEN,
+    LATTICE
+  }
+
+  public enum ExtractionAlgorithmType {
+    STREAM,
+    LATTICE,
+    DETERMINE
+  }
+
+  public static class PdfTable implements Table {
+    private final List<Row> rows;
+    private final List<String> columnNames;
+
+    public PdfTable(technology.tabula.Table t) {
+      List<Row> rows = new ArrayList<>(t.getRowCount() - 1);
+
+      List<List<Object>> objRows =
+          t.getRows().stream()
+              .map(
+                  cells ->
+                      cells.stream()
+                          .map(RectangularTextContainer::getText)
+                          .map(ConversionUtils::parseString)
+                          .collect(Collectors.toList()))
+              .collect(Collectors.toList());
+
+      if (objRows.size() > 1) {
+        columnNames = objRows.remove(0).stream().map(Object::toString).collect(Collectors.toList());
+      } else {
+        columnNames = Collections.emptyList();
+      }
+
+      for (int i = 0; i < objRows.size(); i++) {
+        Row row = new DefaultRow(i, columnNames, objRows.get(i));
+        rows.add(row);
+      }
+
+      this.rows = Collections.unmodifiableList(rows);
+    }
+
+    @Override
+    public int getColumnCount() {
+      return columnNames.size();
+    }
+
+    @Override
+    public int getRowCount() {
+      return rows.size();
+    }
+
+    @Override
+    public Optional<List<String>> getColumnNames() {
+      return Optional.of(columnNames);
+    }
+
+    @Override
+    public Stream<Row> getRows() {
+      return rows.stream();
     }
   }
 }

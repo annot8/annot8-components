@@ -18,4 +18,5 @@ module io.annot8.components.documents {
   requires org.apache.commons.compress;
   requires java.net.http;
   requires javatuples;
+  requires tabula;
 }

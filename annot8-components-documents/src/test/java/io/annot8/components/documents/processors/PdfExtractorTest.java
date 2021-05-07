@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import io.annot8.api.properties.Properties;
 import io.annot8.common.data.content.Image;
+import io.annot8.common.data.content.Row;
+import io.annot8.common.data.content.Table;
 import io.annot8.common.data.content.TableContent;
 import io.annot8.common.data.content.Text;
 import io.annot8.conventions.PropertyKeys;
@@ -13,6 +15,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
@@ -95,6 +98,30 @@ public class PdfExtractorTest extends AbstractDocumentExtractorTest {
 
   @Override
   protected void validateTables(Collection<TableContent> tableContents) {
-    // Do nothing
+    assertEquals(1, tableContents.size());
+    TableContent tableContent = tableContents.stream().findFirst().get();
+
+    assertNotNull(tableContent.getData());
+
+    Table table = tableContent.getData();
+    assertEquals(3, table.getRowCount());
+    assertEquals(3, table.getColumnCount());
+
+    assertEquals(List.of("ID", "Name", "Colour"), table.getColumnNames().get());
+
+    Row r1 = table.getRow(0).get();
+    assertEquals("001", r1.getString(0).get());
+    assertEquals("Alice", r1.getString(1).get());
+    assertEquals("Red", r1.getString(2).get());
+
+    Row r2 = table.getRow(1).get();
+    assertEquals("002", r2.getString(0).get());
+    assertEquals("Bob", r2.getString(1).get());
+    assertEquals("Green", r2.getString(2).get());
+
+    Row r3 = table.getRow(2).get();
+    assertEquals("003", r3.getString(0).get());
+    assertEquals("Charlie", r3.getString(1).get());
+    assertEquals("Blue", r3.getString(2).get());
   }
 }
