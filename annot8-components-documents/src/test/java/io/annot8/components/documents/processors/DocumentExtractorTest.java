@@ -62,6 +62,12 @@ public class DocumentExtractorTest {
     testFile("testPresentation.pptx", new PptxExtractorTest());
   }
 
+  @Test
+  public void testPlainText() {
+    testInputStream("badFile.txt", new PlainTextExtractorTest());
+    testFile("badFile.txt", new PlainTextExtractorTest());
+  }
+
   private void testInputStream(String fileName, AbstractDocumentExtractorTest t) {
     DocumentExtractor.Processor p =
         new DocumentExtractor.Processor(new SimpleContext(), new DocumentExtractorSettings());

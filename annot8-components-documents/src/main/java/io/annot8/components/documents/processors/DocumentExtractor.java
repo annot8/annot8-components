@@ -64,6 +64,7 @@ public class DocumentExtractor
     private final PdfExtractor.Processor pdfProcessor;
     private final PptExtractor.Processor pptProcessor;
     private final PptxExtractor.Processor pptxProcessor;
+    private final PlainTextExtractor.Processor plainTextProcessor;
 
     private final Map<String, DocumentType> contentToType = new HashMap<>();
 
@@ -77,6 +78,8 @@ public class DocumentExtractor
       pdfProcessor = new PdfExtractor.Processor(context, new PdfExtractor.Settings(settings));
       pptProcessor = new PptExtractor.Processor(context, new DocumentExtractorSettings(settings));
       pptxProcessor = new PptxExtractor.Processor(context, new DocumentExtractorSettings(settings));
+      plainTextProcessor =
+          new PlainTextExtractor.Processor(context, new DocumentExtractorSettings(settings));
     }
 
     @Override
@@ -110,86 +113,57 @@ public class DocumentExtractor
       pdfProcessor.reset();
       pptProcessor.reset();
       pptxProcessor.reset();
+      plainTextProcessor.reset();
     }
 
     @Override
     public boolean acceptFile(FileContent file) {
+      DocumentType documentType =
+          DocumentType.PLAIN_TEXT; // Accepts any document, so use it as our default
+
       if (docProcessor.acceptFile(file)) {
-        contentToType.put(file.getId(), DocumentType.DOC);
-        return true;
+        documentType = DocumentType.DOC;
+      } else if (docxProcessor.acceptFile(file)) {
+        documentType = DocumentType.DOCX;
+      } else if (htmlProcessor.acceptFile(file)) {
+        documentType = DocumentType.HTML;
+      } else if (odtProcessor.acceptFile(file)) {
+        documentType = DocumentType.ODT;
+      } else if (pdfProcessor.acceptFile(file)) {
+        documentType = DocumentType.PDF;
+      } else if (pptProcessor.acceptFile(file)) {
+        documentType = DocumentType.PPT;
+      } else if (pptxProcessor.acceptFile(file)) {
+        documentType = DocumentType.PPTX;
       }
 
-      if (docxProcessor.acceptFile(file)) {
-        contentToType.put(file.getId(), DocumentType.DOCX);
-        return true;
-      }
-
-      if (htmlProcessor.acceptFile(file)) {
-        contentToType.put(file.getId(), DocumentType.HTML);
-        return true;
-      }
-
-      if (odtProcessor.acceptFile(file)) {
-        contentToType.put(file.getId(), DocumentType.ODT);
-        return true;
-      }
-
-      if (pdfProcessor.acceptFile(file)) {
-        contentToType.put(file.getId(), DocumentType.PDF);
-        return true;
-      }
-
-      if (pptProcessor.acceptFile(file)) {
-        contentToType.put(file.getId(), DocumentType.PPT);
-        return true;
-      }
-
-      if (pptxProcessor.acceptFile(file)) {
-        contentToType.put(file.getId(), DocumentType.PPTX);
-        return true;
-      }
-
-      return false;
+      contentToType.put(file.getId(), documentType);
+      return true;
     }
 
     @Override
     public boolean acceptInputStream(InputStreamContent inputStream) {
+      DocumentType documentType =
+          DocumentType.PLAIN_TEXT; // Accepts any document, so use it as our default
+
       if (docProcessor.acceptInputStream(inputStream)) {
-        contentToType.put(inputStream.getId(), DocumentType.DOC);
-        return true;
+        documentType = DocumentType.DOC;
+      } else if (docxProcessor.acceptInputStream(inputStream)) {
+        documentType = DocumentType.DOCX;
+      } else if (htmlProcessor.acceptInputStream(inputStream)) {
+        documentType = DocumentType.HTML;
+      } else if (odtProcessor.acceptInputStream(inputStream)) {
+        documentType = DocumentType.ODT;
+      } else if (pdfProcessor.acceptInputStream(inputStream)) {
+        documentType = DocumentType.PDF;
+      } else if (pptProcessor.acceptInputStream(inputStream)) {
+        documentType = DocumentType.PPT;
+      } else if (pptxProcessor.acceptInputStream(inputStream)) {
+        documentType = DocumentType.PPTX;
       }
 
-      if (docxProcessor.acceptInputStream(inputStream)) {
-        contentToType.put(inputStream.getId(), DocumentType.DOCX);
-        return true;
-      }
-
-      if (htmlProcessor.acceptInputStream(inputStream)) {
-        contentToType.put(inputStream.getId(), DocumentType.HTML);
-        return true;
-      }
-
-      if (odtProcessor.acceptInputStream(inputStream)) {
-        contentToType.put(inputStream.getId(), DocumentType.ODT);
-        return true;
-      }
-
-      if (pdfProcessor.acceptInputStream(inputStream)) {
-        contentToType.put(inputStream.getId(), DocumentType.PDF);
-        return true;
-      }
-
-      if (pptProcessor.acceptInputStream(inputStream)) {
-        contentToType.put(inputStream.getId(), DocumentType.PPT);
-        return true;
-      }
-
-      if (pptxProcessor.acceptInputStream(inputStream)) {
-        contentToType.put(inputStream.getId(), DocumentType.PPTX);
-        return true;
-      }
-
-      return false;
+      contentToType.put(inputStream.getId(), documentType);
+      return true;
     }
 
     @Override
@@ -212,6 +186,8 @@ public class DocumentExtractor
           return new DocumentObjectWithType(pptProcessor.extractDocument(file), type);
         case PPTX:
           return new DocumentObjectWithType(pptxProcessor.extractDocument(file), type);
+        case PLAIN_TEXT:
+          return new DocumentObjectWithType(plainTextProcessor.extractDocument(file), type);
       }
 
       throw new ProcessingException("Unsupported type " + type);
@@ -242,6 +218,9 @@ public class DocumentExtractor
         case PPTX:
           return new DocumentObjectWithType(
               pptxProcessor.extractDocument(inputStreamContent), type);
+        case PLAIN_TEXT:
+          return new DocumentObjectWithType(
+              plainTextProcessor.extractDocument(inputStreamContent), type);
       }
 
       throw new ProcessingException("Unsupported type " + type);
@@ -264,6 +243,8 @@ public class DocumentExtractor
           return pptProcessor.extractMetadata((HSLFSlideShow) doc.getDocument());
         case PPTX:
           return pptxProcessor.extractMetadata((XMLSlideShow) doc.getDocument());
+        case PLAIN_TEXT:
+          return plainTextProcessor.extractMetadata((String) doc.getDocument());
       }
 
       return Collections.emptyMap();
@@ -286,6 +267,8 @@ public class DocumentExtractor
           return pptProcessor.extractText((HSLFSlideShow) doc.getDocument());
         case PPTX:
           return pptxProcessor.extractText((XMLSlideShow) doc.getDocument());
+        case PLAIN_TEXT:
+          return plainTextProcessor.extractText((String) doc.getDocument());
       }
 
       return Collections.emptyList();
@@ -309,6 +292,8 @@ public class DocumentExtractor
           return pptProcessor.extractImages((HSLFSlideShow) doc.getDocument());
         case PPTX:
           return pptxProcessor.extractImages((XMLSlideShow) doc.getDocument());
+        case PLAIN_TEXT:
+          return plainTextProcessor.extractImages((String) doc.getDocument());
       }
 
       return Collections.emptyList();
@@ -333,6 +318,8 @@ public class DocumentExtractor
           return pptProcessor.extractTables((HSLFSlideShow) doc.getDocument());
         case PPTX:
           return pptxProcessor.extractTables((XMLSlideShow) doc.getDocument());
+        case PLAIN_TEXT:
+          return plainTextProcessor.extractTables((String) doc.getDocument());
       }
 
       return Collections.emptyList();
@@ -364,6 +351,7 @@ public class DocumentExtractor
     ODT,
     PDF,
     PPT,
-    PPTX
+    PPTX,
+    PLAIN_TEXT
   }
 }
