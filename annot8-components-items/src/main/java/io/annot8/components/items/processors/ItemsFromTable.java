@@ -23,7 +23,7 @@ import java.util.List;
 @ComponentName("Items from Table")
 @ComponentDescription("Converts TableContent into separate items")
 @SettingsClass(ItemsFromTable.Settings.class)
-@ComponentTags({"item", "table"})
+@ComponentTags({"item", "tables"})
 public class ItemsFromTable
     extends AbstractProcessorDescriptor<ItemsFromTable.Processor, ItemsFromTable.Settings> {
 
