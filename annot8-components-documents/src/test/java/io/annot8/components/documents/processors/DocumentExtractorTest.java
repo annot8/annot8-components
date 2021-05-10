@@ -70,7 +70,7 @@ public class DocumentExtractorTest {
 
   private void testInputStream(String fileName, AbstractDocumentExtractorTest t) {
     DocumentExtractor.Processor p =
-        new DocumentExtractor.Processor(new SimpleContext(), new DocumentExtractorSettings());
+        new DocumentExtractor.Processor(new SimpleContext(), new DocumentExtractor.Settings());
 
     Item item = new TestItem();
     item.createContent(InputStreamContent.class)
@@ -87,7 +87,7 @@ public class DocumentExtractorTest {
 
   private void testFile(String fileName, AbstractDocumentExtractorTest t) {
     DocumentExtractor.Processor p =
-        new DocumentExtractor.Processor(new SimpleContext(), new DocumentExtractorSettings());
+        new DocumentExtractor.Processor(new SimpleContext(), new DocumentExtractor.Settings());
 
     URL resource = DocumentExtractorTest.class.getResource(fileName);
     File file;

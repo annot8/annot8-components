@@ -14,25 +14,30 @@ import io.annot8.common.components.capabilities.SimpleCapabilities;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.InputStreamContent;
 import io.annot8.conventions.PropertyKeys;
+import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.attribute.FileTime;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
+import org.apache.commons.compress.archivers.ArchiveEntry;
+import org.apache.commons.compress.archivers.ArchiveException;
+import org.apache.commons.compress.archivers.ArchiveInputStream;
+import org.apache.commons.compress.archivers.ArchiveStreamFactory;
+import org.apache.commons.compress.compressors.CompressorException;
+import org.apache.commons.compress.compressors.CompressorStreamFactory;
 
 @ComponentName("Archive Extractor")
-@ComponentDescription("Extract archive files (*.zip) and create new items from each file")
+@ComponentDescription(
+    "Extract archive files (*.zip, *.tar.gz, etc.) and create new items from each file")
 @SettingsClass(RemoveSourceContentSettings.class)
 public class ArchiveExtractor
     extends AbstractProcessorDescriptor<ArchiveExtractor.Processor, RemoveSourceContentSettings> {
@@ -57,7 +62,9 @@ public class ArchiveExtractor
   }
 
   public static class Processor extends AbstractProcessor {
-    private static final byte[] ZIP_MAGIC_NUMBER = new byte[] {0x50, 0x4B, 0x03, 0x04};
+    private final ArchiveStreamFactory archiveStreamFactory = new ArchiveStreamFactory();
+    private final CompressorStreamFactory compressorStreamFactory = new CompressorStreamFactory();
+
     private final boolean removeSourceContent;
 
     public Processor(boolean removeSourceContent) {
@@ -68,51 +75,29 @@ public class ArchiveExtractor
     public ProcessorResponse process(Item item) {
       List<Exception> exceptions = new ArrayList<>();
 
-      // TODO: Support for other archives (tar? 7z?)
+      // TODO: Support for other archives (7z?)
 
       item.getContents(FileContent.class)
-          .filter(
-              fc -> {
-                try (FileInputStream fis = new FileInputStream(fc.getData())) {
-                  byte[] magicNumber = fis.readNBytes(4);
-
-                  return Arrays.equals(ZIP_MAGIC_NUMBER, magicNumber);
-                } catch (IOException ioe) {
-                  log().warn("Could not read file {}", fc.getData().getPath(), ioe);
-                  return false;
-                }
-              })
           .forEach(
               fc -> {
-                try (FileInputStream fis = new FileInputStream(fc.getData())) {
-                  handleInputStream(item, fis, fc.getData().getPath());
+                try (InputStream is = new BufferedInputStream(new FileInputStream(fc.getData()))) {
+                  decompress(item, is, fc.getData().getPath());
                 } catch (IOException ioe) {
                   exceptions.add(ioe);
-                  log().error("Unable to read zip file", ioe);
+                  log().error("Unable to read archive file", ioe);
                 }
 
                 if (removeSourceContent) item.removeContent(fc);
               });
 
       item.getContents(InputStreamContent.class)
-          .filter(
-              isc -> {
-                try (InputStream is = isc.getData()) {
-                  byte[] magicNumber = is.readNBytes(4);
-
-                  return Arrays.equals(ZIP_MAGIC_NUMBER, magicNumber);
-                } catch (IOException ioe) {
-                  log().warn("Could not read InputStream {}", isc.getId(), ioe);
-                  return false;
-                }
-              })
           .forEach(
               isc -> {
-                try (InputStream is = isc.getData()) {
-                  handleInputStream(item, is, null);
+                try (InputStream is = new BufferedInputStream(isc.getData())) {
+                  decompress(item, is, null);
                 } catch (IOException ioe) {
                   exceptions.add(ioe);
-                  log().error("Unable to read zip file", ioe);
+                  log().error("Unable to read archive file", ioe);
                 }
 
                 if (removeSourceContent) item.removeContent(isc);
@@ -125,22 +110,31 @@ public class ArchiveExtractor
       }
     }
 
-    private void handleInputStream(Item item, InputStream inputStream, String source)
-        throws IOException {
-      try (ZipInputStream zis = new ZipInputStream(inputStream)) {
-        ZipEntry zipEntry = zis.getNextEntry();
-        while (zipEntry != null) {
-          if (!zipEntry.isDirectory()) {
+    private void decompress(Item item, InputStream inputStream, String source) throws IOException {
+      InputStream is;
+      try {
+        is =
+            new BufferedInputStream(
+                compressorStreamFactory.createCompressorInputStream(inputStream));
+      } catch (CompressorException ce) {
+        log().debug("No suitable compressor found, or stream is not compressed", ce);
+        is = inputStream;
+      }
+
+      try (ArchiveInputStream ais = archiveStreamFactory.createArchiveInputStream(is)) {
+        if (ais == null) return;
+
+        ArchiveEntry archiveEntry = null;
+        while ((archiveEntry = ais.getNextEntry()) != null) {
+          if (!archiveEntry.isDirectory()) {
             Item childItem = item.createChild();
 
             // Set properties
             Map<String, Object> props = new HashMap<>();
-            if (source != null) props.put(PropertyKeys.PROPERTY_KEY_SOURCE, source);
-            props.put(PropertyKeys.PROPERTY_KEY_NAME, zipEntry.getName());
-            props.put("comment", zipEntry.getComment());
-            props.put("creationDate", toLocalDateTime(zipEntry.getCreationTime()));
-            props.put("lastAccessedDate", toLocalDateTime(zipEntry.getLastAccessTime()));
-            props.put("lastModifiedDate", toLocalDateTime(zipEntry.getLastModifiedTime()));
+            props.put(PropertyKeys.PROPERTY_KEY_SOURCE, source);
+            props.put(PropertyKeys.PROPERTY_KEY_NAME, archiveEntry.getName());
+            props.put("lastModifiedDate", toLocalDateTime(archiveEntry.getLastModifiedDate()));
+            props.put("size", archiveEntry.getSize());
 
             props.values().removeIf(Objects::isNull);
             childItem.getProperties().set(props);
@@ -149,7 +143,7 @@ public class ArchiveExtractor
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             byte[] buffer = new byte[1024];
             int len;
-            while ((len = zis.read(buffer)) > 0) {
+            while ((len = ais.read(buffer)) > 0) {
               baos.write(buffer, 0, len);
             }
             baos.flush();
@@ -157,19 +151,21 @@ public class ArchiveExtractor
             childItem
                 .createContent(InputStreamContent.class)
                 .withData(() -> new ByteArrayInputStream(baos.toByteArray()))
-                .withDescription("Content extracted from ZIP")
+                .withDescription("Content extracted from archive")
                 .save();
           }
-          zipEntry = zis.getNextEntry();
         }
-        zis.closeEntry();
+      } catch (ArchiveException e) {
+        log().debug("No suitable archiver found, or stream is not archived", e);
+      } finally {
+        is.close();
       }
     }
 
-    private LocalDateTime toLocalDateTime(FileTime fileTime) {
-      if (fileTime == null) return null;
+    private LocalDateTime toLocalDateTime(Date date) {
+      if (date == null) return null;
 
-      return LocalDateTime.ofInstant(fileTime.toInstant(), ZoneId.systemDefault());
+      return LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
     }
   }
 }

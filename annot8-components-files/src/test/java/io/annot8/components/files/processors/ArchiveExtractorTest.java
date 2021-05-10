@@ -13,18 +13,33 @@ import io.annot8.testing.testimpl.TestItem;
 import io.annot8.testing.testimpl.TestItemFactory;
 import java.io.File;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.file.Paths;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
 public class ArchiveExtractorTest {
   @Test
-  public void testFile() {
+  public void testFileZip() {
+    testFile("testArchive.zip");
+  }
+
+  @Test
+  public void testFileTarXz() {
+    testFile("testArchive.tar.xz");
+  }
+
+  public void testFile(String file) {
     TestItem item = new TestItem();
     TestItemFactory itemFactory = (TestItemFactory) item.getItemFactory();
 
-    item.createContent(FileContent.class).withData(getFile()).save();
+    File f;
+    try {
+      f = Paths.get(ArchiveExtractorTest.class.getResource(file).toURI()).toFile();
+    } catch (URISyntaxException e) {
+      throw new RuntimeException(e);
+    }
+
+    item.createContent(FileContent.class).withData(f).save();
 
     ArchiveExtractor.Processor p = new ArchiveExtractor.Processor(true);
     assertEquals(ProcessorResponse.ok(), p.process(item));
@@ -42,12 +57,21 @@ public class ArchiveExtractorTest {
   }
 
   @Test
-  public void testInputstream() {
+  public void testInputStreamZip() {
+    testInputStream("testArchive.zip");
+  }
+
+  @Test
+  public void testInputStreamTarXz() {
+    testInputStream("testArchive.tar.xz");
+  }
+
+  public void testInputStream(String file) {
     TestItem item = new TestItem();
     TestItemFactory itemFactory = (TestItemFactory) item.getItemFactory();
 
     item.createContent(InputStreamContent.class)
-        .withData(() -> ArchiveExtractorTest.class.getResourceAsStream("testArchive.zip"))
+        .withData(() -> ArchiveExtractorTest.class.getResourceAsStream(file))
         .save();
 
     ArchiveExtractor.Processor p = new ArchiveExtractor.Processor(true);
@@ -63,14 +87,5 @@ public class ArchiveExtractorTest {
     assertTrue(
         createdItems.stream()
             .noneMatch(i -> i.getProperties().has(PropertyKeys.PROPERTY_KEY_SOURCE)));
-  }
-
-  private File getFile() {
-    URL resource = ArchiveExtractorTest.class.getResource("testArchive.zip");
-    try {
-      return Paths.get(resource.toURI()).toFile();
-    } catch (URISyntaxException e) {
-      throw new RuntimeException(e);
-    }
   }
 }
