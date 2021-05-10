@@ -15,6 +15,7 @@ import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Collection;
 import java.util.Collections;
@@ -74,12 +75,14 @@ public class PlainTextExtractor
 
     @Override
     public String extractDocument(FileContent file) throws IOException {
-      return Files.lines(file.getData().toPath()).collect(Collectors.joining("\n"));
+      return Files.lines(file.getData().toPath(), StandardCharsets.UTF_8)
+          .collect(Collectors.joining("\n"));
     }
 
     @Override
     public String extractDocument(InputStreamContent inputStreamContent) throws IOException {
-      return new BufferedReader(new InputStreamReader(inputStreamContent.getData()))
+      return new BufferedReader(
+              new InputStreamReader(inputStreamContent.getData(), StandardCharsets.UTF_8))
           .lines()
           .collect(Collectors.joining("\n"));
     }

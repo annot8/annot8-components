@@ -7,6 +7,7 @@ import io.annot8.api.components.annotations.ComponentTags;
 import io.annot8.api.components.annotations.SettingsClass;
 import io.annot8.api.context.Context;
 import io.annot8.api.exceptions.ProcessingException;
+import io.annot8.api.settings.Description;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.InputStreamContent;
 import io.annot8.common.data.content.Table;
@@ -43,19 +44,19 @@ import org.odftoolkit.odfdom.doc.OdfTextDocument;
   "ppt",
   "pptx"
 })
-@SettingsClass(DocumentExtractorSettings.class)
+@SettingsClass(DocumentExtractor.Settings.class)
 public class DocumentExtractor
     extends AbstractDocumentExtractorDescriptor<
-        DocumentExtractor.Processor, DocumentExtractorSettings> {
+        DocumentExtractor.Processor, DocumentExtractor.Settings> {
 
   @Override
-  protected Processor createComponent(Context context, DocumentExtractorSettings settings) {
+  protected Processor createComponent(Context context, DocumentExtractor.Settings settings) {
     return new Processor(context, settings);
   }
 
   public static class Processor
       extends AbstractDocumentExtractorProcessor<
-          DocumentObjectWithType, DocumentExtractorSettings> {
+          DocumentObjectWithType, DocumentExtractor.Settings> {
 
     private final DocExtractor.Processor docProcessor;
     private final DocxExtractor.Processor docxProcessor;
@@ -68,7 +69,7 @@ public class DocumentExtractor
 
     private final Map<String, DocumentType> contentToType = new HashMap<>();
 
-    public Processor(Context context, DocumentExtractorSettings settings) {
+    public Processor(Context context, DocumentExtractor.Settings settings) {
       super(context, settings);
 
       docProcessor = new DocExtractor.Processor(context, new DocumentExtractorSettings(settings));
@@ -135,6 +136,8 @@ public class DocumentExtractor
         documentType = DocumentType.PPT;
       } else if (pptxProcessor.acceptFile(file)) {
         documentType = DocumentType.PPTX;
+      } else if (!settings.isExtractPlainText()) {
+        return false;
       }
 
       contentToType.put(file.getId(), documentType);
@@ -160,6 +163,8 @@ public class DocumentExtractor
         documentType = DocumentType.PPT;
       } else if (pptxProcessor.acceptInputStream(inputStream)) {
         documentType = DocumentType.PPTX;
+      } else if (!settings.isExtractPlainText()) {
+        return false;
       }
 
       contentToType.put(inputStream.getId(), documentType);
@@ -323,6 +328,20 @@ public class DocumentExtractor
       }
 
       return Collections.emptyList();
+    }
+  }
+
+  public static class Settings extends DocumentExtractorSettings {
+    private boolean extractPlainText = false;
+
+    @Description(
+        "If true, then any files that can't be extracted via a different processor will be extracted as plain text")
+    public boolean isExtractPlainText() {
+      return extractPlainText;
+    }
+
+    public void setExtractPlainText(boolean extractPlainText) {
+      this.extractPlainText = extractPlainText;
     }
   }
 
