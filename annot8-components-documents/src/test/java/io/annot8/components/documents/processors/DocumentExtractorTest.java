@@ -64,13 +64,20 @@ public class DocumentExtractorTest {
 
   @Test
   public void testPlainText() {
-    testInputStream("badFile.txt", new PlainTextExtractorTest());
-    testFile("badFile.txt", new PlainTextExtractorTest());
+    DocumentExtractor.Settings s = new DocumentExtractor.Settings();
+    s.setExtractPlainText(true);
+
+    testInputStream("badFile.txt", new PlainTextExtractorTest(), s);
+    testFile("badFile.txt", new PlainTextExtractorTest(), s);
   }
 
   private void testInputStream(String fileName, AbstractDocumentExtractorTest t) {
-    DocumentExtractor.Processor p =
-        new DocumentExtractor.Processor(new SimpleContext(), new DocumentExtractor.Settings());
+    testInputStream(fileName, t, new DocumentExtractor.Settings());
+  }
+
+  private void testInputStream(
+      String fileName, AbstractDocumentExtractorTest t, DocumentExtractor.Settings s) {
+    DocumentExtractor.Processor p = new DocumentExtractor.Processor(new SimpleContext(), s);
 
     Item item = new TestItem();
     item.createContent(InputStreamContent.class)
@@ -86,8 +93,12 @@ public class DocumentExtractorTest {
   }
 
   private void testFile(String fileName, AbstractDocumentExtractorTest t) {
-    DocumentExtractor.Processor p =
-        new DocumentExtractor.Processor(new SimpleContext(), new DocumentExtractor.Settings());
+    testFile(fileName, t, new DocumentExtractor.Settings());
+  }
+
+  private void testFile(
+      String fileName, AbstractDocumentExtractorTest t, DocumentExtractor.Settings s) {
+    DocumentExtractor.Processor p = new DocumentExtractor.Processor(new SimpleContext(), s);
 
     URL resource = DocumentExtractorTest.class.getResource(fileName);
     File file;
