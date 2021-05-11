@@ -455,6 +455,10 @@
                   <artifactSet>
                     <excludes>
                       <exclude>io.annot8:annot8-api</exclude>
+                      <exclude>io.annot8:annot8-implementations</exclude>
+                      <exclude>io.annot8:annot8-implementations-support</exclude>
+                      <exclude>io.annot8:annot8-pipeline-implementation</exclude>
+                      <exclude>io.annot8:annot8-reference-implementation</exclude>
                     </excludes>
                   </artifactSet>
                   <shadedArtifactAttached>true</shadedArtifactAttached>

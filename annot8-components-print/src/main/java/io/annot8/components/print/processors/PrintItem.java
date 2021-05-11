@@ -55,7 +55,7 @@ public class PrintItem extends AbstractProcessorDescriptor<PrintItem.Processor, 
     }
 
     private void print(Content<?> content) {
-      println(content.getId(), 1);
+      println(content.getId() + " [" + content.getClass().getName() + "]", 1);
       println("Properties:", 2);
       print(content.getProperties(), 3);
       println("Annotations:", 2);

@@ -24,6 +24,11 @@ public class ArchiveExtractorTest {
   }
 
   @Test
+  public void testFileTarGz() {
+    testFile("testArchive.tar.gz");
+  }
+
+  @Test
   public void testFileTarXz() {
     testFile("testArchive.tar.xz");
   }
@@ -41,7 +46,7 @@ public class ArchiveExtractorTest {
 
     item.createContent(FileContent.class).withData(f).save();
 
-    ArchiveExtractor.Processor p = new ArchiveExtractor.Processor(true);
+    ArchiveExtractor.Processor p = new ArchiveExtractor.Processor(new ArchiveExtractor.Settings());
     assertEquals(ProcessorResponse.ok(), p.process(item));
 
     assertEquals(0, item.getContents().count());
@@ -62,6 +67,11 @@ public class ArchiveExtractorTest {
   }
 
   @Test
+  public void testInputStreamTarGz() {
+    testInputStream("testArchive.tar.gz");
+  }
+
+  @Test
   public void testInputStreamTarXz() {
     testInputStream("testArchive.tar.xz");
   }
@@ -74,7 +84,7 @@ public class ArchiveExtractorTest {
         .withData(() -> ArchiveExtractorTest.class.getResourceAsStream(file))
         .save();
 
-    ArchiveExtractor.Processor p = new ArchiveExtractor.Processor(true);
+    ArchiveExtractor.Processor p = new ArchiveExtractor.Processor(new ArchiveExtractor.Settings());
     assertEquals(ProcessorResponse.ok(), p.process(item));
 
     assertEquals(0, item.getContents().count());

@@ -20,4 +20,5 @@ module io.annot8.components.files {
   requires org.apache.commons.text;
   requires fastcsv;
   requires org.apache.commons.compress;
+  requires simplemagic;
 }
