@@ -7,11 +7,11 @@
   <parent>
     <groupId>io.annot8</groupId>
     <artifactId>annot8-components</artifactId>
-    <version>1.2.0-SNAPSHOT</version>
+    <version>1.2.0</version>
   </parent>
 
   <artifactId>annot8-conventions</artifactId>
-  <version>1.2.0-SNAPSHOT</version>
+  <version>1.2.0</version>
   <name>Annot8 Conventions</name>
   <description>Naming conventions for Annot8 projects, recommended for compatibility</description>
 

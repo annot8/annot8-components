@@ -1,6 +1,6 @@
 # Annot8 spaCy Components
 
-This module is based on the [spaCy Server](https://github.com/neelkamath/spacy-server) project,
+This module is based on the [spaCy Server](https://github.com/neelkamath/spacy-server) project (tested with v2),
 and uses the APIs exposed by that Docker image to integrate spaCy into Annot8.
 
 The client library for interacting with spaCy Server has been generated using [OpenAPI Generator](https://openapi-generator.tech/).
