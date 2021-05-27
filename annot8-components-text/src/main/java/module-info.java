@@ -5,7 +5,7 @@ open module io.annot8.components.text {
   requires io.annot8.conventions;
   requires lingua;
   requires io.annot8.common.components;
-  requires java.json.bind;
+  requires jakarta.json.bind;
 
   exports io.annot8.components.text.processors;
 }

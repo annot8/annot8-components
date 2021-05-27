@@ -5,7 +5,7 @@ module io.annot8.components.vehicles {
   requires io.annot8.components.base.text;
   requires io.annot8.conventions;
   requires io.annot8.components.stopwords;
-  requires java.json.bind;
+  requires jakarta.json.bind;
   requires io.annot8.utils.text;
   requires io.annot8.components.base;
 

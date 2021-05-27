@@ -19,19 +19,18 @@ import io.annot8.common.data.content.Table;
 import io.annot8.common.data.content.TableContent;
 import io.annot8.components.documents.data.WorksheetTable;
 import io.annot8.conventions.PropertyKeys;
-import java.io.BufferedInputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import org.apache.poi.poifs.filesystem.FileMagic;
+import java.util.stream.Stream;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.SheetVisibility;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.javatuples.Pair;
 
 @ComponentName("Excel (XLS and XLSX) Extractor")
 @ComponentDescription("Extracts content from Excel (*.xls and *.xlsx) files into a table")
@@ -47,12 +46,16 @@ public class ExcelExtractor
 
   @Override
   public Capabilities capabilities() {
-    return new SimpleCapabilities.Builder()
-        .withProcessesContent(FileContent.class)
-        .withProcessesContent(InputStreamContent.class)
-        .withCreatesContent(TableContent.class)
-        .withDeletesContent(FileContent.class)
-        .build();
+    SimpleCapabilities.Builder builder =
+        new SimpleCapabilities.Builder()
+            .withProcessesContent(FileContent.class)
+            .withProcessesContent(InputStreamContent.class)
+            .withCreatesContent(TableContent.class);
+
+    if (getSettings().isRemoveSourceContent())
+      builder = builder.withDeletesContent(FileContent.class);
+
+    return builder.build();
   }
 
   public static class Processor extends AbstractProcessor {
@@ -64,82 +67,60 @@ public class ExcelExtractor
 
     @Override
     public ProcessorResponse process(Item item) {
-      item.getContents(FileContent.class)
-          .filter(
-              f ->
-                  settings.getExtensions().isEmpty()
-                      || settings
-                          .getExtensions()
-                          .contains(getExtension(f.getData().getName()).orElse("")))
+      Stream.concat(
+              item.getContents(FileContent.class).map(this::mapToWorkbook),
+              item.getContents(InputStreamContent.class).map(this::mapToWorkbook))
+          .filter(Objects::nonNull)
           .forEach(
               f -> {
-                try (InputStream fis = new FileInputStream(f.getData())) {
-                  processInputStream(item, fis);
+                processWorkbook(item, f.getValue0(), f.getValue1());
 
-                  if (settings.isRemoveSourceContent()) item.removeContent(f);
-                } catch (Exception e) {
-                  log().warn("Unable to process file {}", f.getData().getAbsolutePath(), e);
-                }
-              });
-
-      item.getContents(InputStreamContent.class)
-          .filter(this::acceptInputStream)
-          .forEach(
-              c -> {
-                try {
-                  processInputStream(item, c.getData());
-
-                  if (settings.isRemoveSourceContent()) item.removeContent(c);
-                } catch (Exception e) {
-                  log().warn("Unable to process InputStream {}", c.getId(), e);
-                }
+                if (settings.isRemoveSourceContent()) item.removeContent(f.getValue1());
               });
 
       return ProcessorResponse.ok();
     }
 
-    public boolean acceptInputStream(InputStreamContent inputStream) {
-      BufferedInputStream bis = new BufferedInputStream(inputStream.getData());
-      FileMagic fm;
+    public Pair<Workbook, String> mapToWorkbook(FileContent fileContent) {
       try {
-        fm = FileMagic.valueOf(bis);
+        return new Pair<>(WorkbookFactory.create(fileContent.getData()), fileContent.getId());
       } catch (IOException e) {
-        return false;
+        log().warn("Unable to process file {}", fileContent.getData().getAbsolutePath(), e);
+        return null;
       }
-
-      // FIXME: This only checks whether it is an OOXML, not that it is a Spreadsheet
-      return FileMagic.OOXML == fm;
     }
 
-    private void processInputStream(Item item, InputStream inputStream) throws Exception {
-      try (Workbook workbook = WorkbookFactory.create(inputStream)) {
-        item.getProperties()
-            .set(PropertyKeys.PROPERTY_KEY_VERSION, workbook.getSpreadsheetVersion().name());
+    public Pair<Workbook, String> mapToWorkbook(InputStreamContent inputStream) {
+      try {
+        return new Pair<>(WorkbookFactory.create(inputStream.getData()), inputStream.getId());
+      } catch (IOException e) {
+        log().warn("Unable to process InputStream {}", inputStream.getId(), e);
+        return null;
+      }
+    }
 
-        for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
-          if (settings.getSkipSheets().contains(workbook.getSheetName(i))) {
-            log().info("Skipping sheet {}", workbook.getSheetName(i));
-            continue;
-          }
+    private void processWorkbook(Item item, Workbook workbook, String parentId) {
+      item.getProperties()
+          .set(PropertyKeys.PROPERTY_KEY_VERSION, workbook.getSpreadsheetVersion().name());
 
-          processSheet(
-              item,
-              workbook.getSheetAt(i),
-              i,
-              i == workbook.getActiveSheetIndex(),
-              workbook.getSheetVisibility(i) == SheetVisibility.VISIBLE);
+      for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
+        if (settings.getSkipSheets().contains(workbook.getSheetName(i))) {
+          log().info("Skipping sheet {}", workbook.getSheetName(i));
+          continue;
         }
-      }
-    }
 
-    private Optional<String> getExtension(String filename) {
-      return Optional.ofNullable(filename)
-          .filter(f -> f.contains("."))
-          .map(f -> f.substring(filename.lastIndexOf(".") + 1).toLowerCase());
+        processSheet(
+            item,
+            workbook.getSheetAt(i),
+            i,
+            i == workbook.getActiveSheetIndex(),
+            workbook.getSheetVisibility(i) == SheetVisibility.VISIBLE,
+            parentId);
+      }
     }
 
     private void processSheet(
-        Item item, Sheet sheet, int sheetIndex, boolean active, boolean visible) {
+        Item item, Sheet sheet, int sheetIndex, boolean active, boolean visible, String parentId) {
       Table table = new WorksheetTable(sheet, settings.isFirstRowHeader(), settings.getSkipRows());
 
       item.createContent(TableContent.class)
@@ -148,6 +129,7 @@ public class ExcelExtractor
           .withProperty(PropertyKeys.PROPERTY_KEY_PAGE, sheetIndex)
           .withProperty("active", active)
           .withProperty("visible", visible)
+          .withPropertyIfPresent(PropertyKeys.PROPERTY_KEY_PARENT, Optional.ofNullable(parentId))
           .save();
     }
   }

@@ -5,6 +5,7 @@ import io.annot8.api.annotations.Annotation;
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
 import io.annot8.api.components.annotations.ComponentName;
+import io.annot8.api.components.annotations.ComponentTags;
 import io.annot8.api.components.annotations.SettingsClass;
 import io.annot8.api.context.Context;
 import io.annot8.api.exceptions.BadConfigurationException;
@@ -31,6 +32,7 @@ import opennlp.tools.util.Span;
 @ComponentDescription(
     "Use OpenNLP Named Entity Recognition (NER) models to extract named entities as annotations")
 @SettingsClass(NER.Settings.class)
+@ComponentTags({"opennlp", "ner"})
 public class NER extends AbstractProcessorDescriptor<NER.Processor, NER.Settings> {
 
   @Override

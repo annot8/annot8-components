@@ -17,19 +17,48 @@ import io.annot8.api.settings.Description;
 import io.annot8.common.components.AbstractProcessor;
 import io.annot8.common.components.AbstractProcessorDescriptor;
 import io.annot8.common.components.capabilities.SimpleCapabilities;
-import io.annot8.common.data.bounds.*;
-import io.annot8.common.data.content.*;
+import io.annot8.common.data.bounds.CellBounds;
+import io.annot8.common.data.bounds.ContentBounds;
+import io.annot8.common.data.bounds.MultiCellBounds;
+import io.annot8.common.data.bounds.NoBounds;
+import io.annot8.common.data.bounds.PositionBounds;
+import io.annot8.common.data.bounds.RectangleBounds;
+import io.annot8.common.data.bounds.SpanBounds;
+import io.annot8.common.data.content.FileContent;
+import io.annot8.common.data.content.Image;
+import io.annot8.common.data.content.InputStreamContent;
+import io.annot8.common.data.content.Table;
+import io.annot8.common.data.content.TableContent;
+import io.annot8.common.data.content.Text;
+import io.annot8.common.data.content.UriContent;
 import io.annot8.conventions.PropertyKeys;
-import java.io.*;
+import jakarta.json.Json;
+import jakarta.json.JsonArray;
+import jakarta.json.JsonArrayBuilder;
+import jakarta.json.JsonObject;
+import jakarta.json.JsonObjectBuilder;
+import jakarta.json.JsonValue;
+import jakarta.json.JsonWriter;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.StringJoiner;
 import java.util.stream.Stream;
-import javax.json.*;
 import org.apache.commons.text.StringEscapeUtils;
 
 @ComponentName("File Sink")
@@ -106,13 +135,38 @@ public class FileSink extends AbstractProcessorDescriptor<FileSink.Processor, Fi
         }
       }
 
+      // Calculate nesting structure
+      Map<String, String> parents = new HashMap<>();
+      if (settings.isNestFolders()) {
+        item.getContents()
+            .forEach(
+                c ->
+                    c.getProperties()
+                        .get(PropertyKeys.PROPERTY_KEY_PARENT, String.class)
+                        .ifPresent(s -> parents.put(c.getId(), s)));
+      }
+
       item.getContents()
           .forEach(
               content -> {
+                List<String> parentIds = new ArrayList<>();
+                String id = content.getId();
+                while (id != null) {
+                  parentIds.add(id);
+                  id = parents.get(id);
+                }
+
+                Collections.reverse(parentIds);
+
                 File contentFolder;
                 try {
                   contentFolder =
-                      Files.createDirectories(itemFolder.toPath().resolve(content.getId()))
+                      Files.createDirectories(
+                              itemFolder
+                                  .toPath()
+                                  .resolve(
+                                      Path.of(
+                                          parentIds.remove(0), parentIds.toArray(new String[0]))))
                           .toFile();
                 } catch (IOException e) {
                   log().error("Unable to create directory for content {}", content.getId(), e);
@@ -153,6 +207,20 @@ public class FileSink extends AbstractProcessorDescriptor<FileSink.Processor, Fi
                     log()
                         .error(
                             "Unable to write annotations file for content {}", content.getId(), e);
+                  }
+                }
+
+                // Output description for each content
+                if (!Strings.isNullOrEmpty(settings.getDescriptionFilename())
+                    && !Strings.isNullOrEmpty(content.getDescription())) {
+                  try {
+                    Files.writeString(
+                        new File(contentFolder, settings.getDescriptionFilename()).toPath(),
+                        content.getDescription());
+                  } catch (IOException e) {
+                    log()
+                        .error(
+                            "Unable to write description file for content {}", content.getId(), e);
                   }
                 }
               });
@@ -230,13 +298,8 @@ public class FileSink extends AbstractProcessorDescriptor<FileSink.Processor, Fi
       } else if (content instanceof InputStreamContent) {
         f = new File(contentFolder, settings.getContentFilename());
 
-        byte[] bytes = new byte[8192];
-        int read;
-
         try (FileOutputStream fos = new FileOutputStream(f)) {
-          while ((read = ((InputStreamContent) content).getData().read(bytes)) != -1) {
-            fos.write(bytes, 0, read);
-          }
+          ((InputStreamContent) content).getData().transferTo(fos);
         }
       } else if (content instanceof Image) {
         String extension;
@@ -439,6 +502,8 @@ public class FileSink extends AbstractProcessorDescriptor<FileSink.Processor, Fi
     private String groupsFilename = "groups.json";
     private List<Path> basePaths = Collections.emptyList();
     private boolean copyOriginalFile = false;
+    private String descriptionFilename = "description.txt";
+    private boolean nestFolders = false;
 
     @Override
     public boolean validate() {
@@ -527,6 +592,29 @@ public class FileSink extends AbstractProcessorDescriptor<FileSink.Processor, Fi
 
     public void setCopyOriginalFile(boolean copyOriginalFile) {
       this.copyOriginalFile = copyOriginalFile;
+    }
+
+    @Description(
+        value = "The file name for the description of Content",
+        defaultValue = "description.txt")
+    public String getDescriptionFilename() {
+      return descriptionFilename;
+    }
+
+    public void setDescriptionFilename(String descriptionFilename) {
+      this.descriptionFilename = descriptionFilename;
+    }
+
+    @Description(
+        value =
+            "If true, then Content folders will be nested inside their parent folders where the parent is known",
+        defaultValue = "false")
+    public boolean isNestFolders() {
+      return nestFolders;
+    }
+
+    public void setNestFolders(boolean nestFolders) {
+      this.nestFolders = nestFolders;
     }
 
     public enum ImageType {

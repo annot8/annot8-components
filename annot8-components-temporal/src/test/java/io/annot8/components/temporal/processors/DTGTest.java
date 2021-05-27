@@ -10,7 +10,6 @@ import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.capabilities.ContentCapability;
 import io.annot8.api.components.Processor;
 import io.annot8.api.data.Item;
-import io.annot8.api.exceptions.Annot8Exception;
 import io.annot8.api.settings.NoSettings;
 import io.annot8.api.stores.AnnotationStore;
 import io.annot8.common.data.bounds.SpanBounds;
@@ -40,10 +39,8 @@ public class DTGTest {
 
     // Check that we're creating an Annotation and that it has the correct definitions
     AnnotationCapability annotCap = c.creates(AnnotationCapability.class).findFirst().get();
-    assertEquals(SpanBounds.class, ((AnnotationCapability) annotCap).getBounds());
-    assertEquals(
-        AnnotationTypes.ANNOTATION_TYPE_TEMPORAL_INSTANT,
-        ((AnnotationCapability) annotCap).getType());
+    assertEquals(SpanBounds.class, annotCap.getBounds());
+    assertEquals(AnnotationTypes.ANNOTATION_TYPE_TEMPORAL_INSTANT, annotCap.getType());
 
     // Check that we're processing a Content and that it has the correct definitions
     ContentCapability contentCap = c.processes(ContentCapability.class).findFirst().get();
@@ -60,11 +57,10 @@ public class DTGTest {
   }
 
   @Test
-  public void testProcess1() throws Annot8Exception {
+  public void testProcess1() {
     try (Processor p = new DTG.Processor()) {
       Item item = new TestItem();
 
-      //    Item item = new SimpleItem(itemFactory, contentBuilderFactoryRegistry);
       Text content =
           item.createContent(TestStringContent.class)
               .withData("This test was written at 251137Z FEB 13")
@@ -91,11 +87,10 @@ public class DTGTest {
   }
 
   @Test
-  public void testProcess2() throws Annot8Exception {
+  public void testProcess2() {
     try (Processor p = new DTG.Processor()) {
       Item item = new TestItem();
 
-      //    Item item = new SimpleItem(itemFactory, contentBuilderFactoryRegistry);
       Text content =
           item.createContent(TestStringContent.class)
               .withData("Report Title: An example report\nDTG: 04 1558D Sep 10")
@@ -122,11 +117,10 @@ public class DTGTest {
   }
 
   @Test
-  public void testProcess3() throws Annot8Exception {
+  public void testProcess3() {
     try (Processor p = new DTG.Processor()) {
       Item item = new TestItem();
 
-      //    Item item = new SimpleItem(itemFactory, contentBuilderFactoryRegistry);
       Text content =
           item.createContent(TestStringContent.class)
               .withData("Report Title: An example report\nDTG: 04 1558D*SEP 10")
@@ -154,11 +148,40 @@ public class DTGTest {
   }
 
   @Test
-  public void testInvalid() throws Annot8Exception {
+  public void testProcess4() {
     try (Processor p = new DTG.Processor()) {
       Item item = new TestItem();
 
-      //    Item item = new SimpleItem(itemFactory, contentBuilderFactoryRegistry);
+      Text content =
+          item.createContent(TestStringContent.class)
+              .withData("Report Title: An example report\nDTG: 04/1558/Z/SEP/10")
+              .save();
+
+      p.process(item);
+
+      AnnotationStore store = content.getAnnotations();
+
+      List<Annotation> annotations = store.getAll().collect(Collectors.toList());
+      Assertions.assertEquals(1, annotations.size());
+
+      Annotation a = annotations.get(0);
+      Assertions.assertEquals(AnnotationTypes.ANNOTATION_TYPE_TEMPORAL_INSTANT, a.getType());
+      Assertions.assertEquals(content.getId(), a.getContentId());
+      Assertions.assertEquals("04/1558/Z/SEP/10", a.getBounds().getData(content).get());
+      Assertions.assertEquals(1, a.getProperties().getAll().size());
+      Object val = a.getProperties().get(PropertyKeys.PROPERTY_KEY_VALUE).get();
+      Assertions.assertTrue(val instanceof ZonedDateTime);
+      ZonedDateTime zdt = (ZonedDateTime) val;
+      ZonedDateTime date = ZonedDateTime.of(2010, 9, 4, 15, 58, 0, 0, ZoneOffset.UTC);
+      Assertions.assertEquals(date, zdt);
+    }
+  }
+
+  @Test
+  public void testInvalid() {
+    try (Processor p = new DTG.Processor()) {
+      Item item = new TestItem();
+
       Text content =
           item.createContent(TestStringContent.class)
               .withData("This data is invalid:  31 1558D*SEP 10")

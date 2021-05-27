@@ -6,7 +6,7 @@ This repository contains data derived from other data sources.
 
 ### Countries JSON
 
-The `countries.json` file was downloaded from https://github.com/mledoze/countries on the 06/01/2001.
+The `countries.json` file was downloaded from https://github.com/mledoze/countries on the 06/01/2021.
 
 Licensed under the ODC Open Database Licence (ODbL) 1.0 - https://opendatacommons.org/licenses/odbl/1-0/
 
@@ -20,15 +20,15 @@ Licensed under the ODC Public Domain and Dedication Licence (PDDL) 1.0) - https:
 
 ### UK Postcodes CSV
 
-The `ukpostcodes.csv` file is derived from the Ordnance Survey CodePoint Open dataset, using data retrieved on 06/01/2021.
+The `ukpostcodes.csv` file is derived from the Ordnance Survey CodePoint Open dataset, using data retrieved on 24/05/2021.
 
 Licensed under the Ordnance Survey Data Licence -  www.ordnancesurvey.co.uk/opendata/licence.
 
-Contains Ordnance Survey data (c) Crown copyright and database right 2020.
+Contains OS data (c) Crown copyright and database right 2021.
 
-Contains Royal Mail data (c) Royal Mail copyright and database right 2020.
+Contains Royal Mail data (c) Royal Mail copyright and Database right 2021.
 
-Contains National Statistics data (c) Crown copyright and database right 2020.
+Contains National Statistics data (c) Crown copyright and database right 2021.
 
 #### Reproducing data
 

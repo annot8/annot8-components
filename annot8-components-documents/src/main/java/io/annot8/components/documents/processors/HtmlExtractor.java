@@ -9,8 +9,14 @@ import io.annot8.api.components.annotations.ComponentName;
 import io.annot8.api.components.annotations.ComponentTags;
 import io.annot8.api.components.annotations.SettingsClass;
 import io.annot8.api.context.Context;
+import io.annot8.api.exceptions.ProcessingException;
+import io.annot8.api.settings.Description;
+import io.annot8.common.data.content.DefaultRow;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.InputStreamContent;
+import io.annot8.common.data.content.Row;
+import io.annot8.common.data.content.Table;
+import io.annot8.common.utils.java.ConversionUtils;
 import io.annot8.components.documents.data.ExtractionWithProperties;
 import io.annot8.conventions.PropertyKeys;
 import java.awt.image.BufferedImage;
@@ -18,41 +24,57 @@ import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.imageio.ImageIO;
 import org.apache.poi.poifs.filesystem.FileMagic;
-import org.apache.poi.util.IOUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.slf4j.Logger;
+import org.jsoup.select.Elements;
 
 /** Extracts content from HTML files */
 @ComponentName("HTML Extractor")
 @ComponentDescription("Extracts image and text from HTML (*.html) files")
-@ComponentTags({"documents", "html", "extractor", "text", "images", "metadata"})
-@SettingsClass(DocumentExtractorSettings.class)
-public class HtmlExtractor extends AbstractDocumentExtractorDescriptor<HtmlExtractor.Processor> {
+@ComponentTags({"documents", "html", "extractor", "text", "images", "metadata", "tables"})
+@SettingsClass(HtmlExtractor.Settings.class)
+public class HtmlExtractor
+    extends AbstractDocumentExtractorDescriptor<HtmlExtractor.Processor, HtmlExtractor.Settings> {
 
   @Override
-  protected Processor createComponent(Context context, DocumentExtractorSettings settings) {
+  protected Processor createComponent(Context context, HtmlExtractor.Settings settings) {
     return new Processor(context, settings);
   }
 
-  public static class Processor extends AbstractDocumentExtractorProcessor<Document> {
-    private final Logger logger = getLogger();
+  public static class Processor
+      extends AbstractDocumentExtractorProcessor<Document, HtmlExtractor.Settings> {
 
-    public Processor(Context context, DocumentExtractorSettings settings) {
+    private final HttpClient client;
+
+    public Processor(Context context, HtmlExtractor.Settings settings) {
       super(context, settings);
+
+      client =
+          HttpClient.newBuilder()
+              .followRedirects(
+                  settings.isFollowImageRedirects()
+                      ? HttpClient.Redirect.NORMAL
+                      : HttpClient.Redirect.NEVER)
+              .build();
     }
 
     @Override
@@ -71,22 +93,26 @@ public class HtmlExtractor extends AbstractDocumentExtractorDescriptor<HtmlExtra
     }
 
     @Override
+    public boolean isTablesSupported() {
+      return true;
+    }
+
+    @Override
     public boolean acceptFile(FileContent file) {
-      return file.getData().getName().toLowerCase().endsWith(".htm")
-          || file.getData().getName().toLowerCase().endsWith(".html");
+      try {
+        return FileMagic.valueOf(file.getData()) == FileMagic.HTML;
+      } catch (IOException e) {
+        return false;
+      }
     }
 
     @Override
     public boolean acceptInputStream(InputStreamContent inputStream) {
-      BufferedInputStream bis = new BufferedInputStream(inputStream.getData());
-      FileMagic fm;
-      try {
-        fm = FileMagic.valueOf(bis);
+      try (InputStream is = new BufferedInputStream(inputStream.getData())) {
+        return FileMagic.valueOf(is) == FileMagic.HTML;
       } catch (IOException e) {
         return false;
       }
-
-      return FileMagic.HTML == fm;
     }
 
     @Override
@@ -196,7 +222,26 @@ public class HtmlExtractor extends AbstractDocumentExtractorDescriptor<HtmlExtra
 
     @Override
     public Collection<ExtractionWithProperties<String>> extractText(Document doc) {
-      return List.of(new ExtractionWithProperties<>(doc.text()));
+      List<ExtractionWithProperties<String>> extractedText = new ArrayList<>();
+
+      if (settings.getCssQueryText() != null && !settings.getCssQueryText().isBlank()) {
+        int i = 0;
+        for (Element e : doc.select(settings.getCssQueryText())) {
+          if (!e.hasText()) continue;
+
+          Map<String, Object> props = new HashMap<>();
+          props.put(PropertyKeys.PROPERTY_KEY_INDEX, i);
+          if (e.id() != null && !e.id().isBlank())
+            props.put(PropertyKeys.PROPERTY_KEY_IDENTIFIER, e.id());
+
+          extractedText.add(new ExtractionWithProperties<>(e.text(), props));
+
+          i++;
+        }
+      } else {
+        extractedText.add(new ExtractionWithProperties<>(doc.text()));
+      }
+      return extractedText;
     }
 
     @Override
@@ -219,18 +264,19 @@ public class HtmlExtractor extends AbstractDocumentExtractorDescriptor<HtmlExtra
 
           data = Base64.getDecoder().decode(parts[1]);
         } else {
-          URL url;
+          HttpRequest request = HttpRequest.newBuilder().uri(URI.create(src)).build();
           try {
-            url = new URL(src);
-          } catch (MalformedURLException e) {
-            logger.error("Image source '" + src + "' is not a valid URL", e);
-            continue;
-          }
+            HttpResponse<byte[]> response =
+                client.send(request, HttpResponse.BodyHandlers.ofByteArray());
 
-          try (InputStream is = url.openStream()) {
-            data = IOUtils.toByteArray(is);
-          } catch (IOException e) {
-            logger.error("Unable to read image {} from URL", src, e);
+            if (response.statusCode() != 200) {
+              log().warn("Status code {} returned from URL {}", response.statusCode(), src);
+              continue;
+            }
+
+            data = response.body();
+          } catch (Exception e) {
+            log().error("Unable to read image from URL {}", src, e);
             continue;
           }
 
@@ -241,12 +287,12 @@ public class HtmlExtractor extends AbstractDocumentExtractorDescriptor<HtmlExtra
         try (ByteArrayInputStream bais = new ByteArrayInputStream(data)) {
           bImg = ImageIO.read(bais);
         } catch (Exception e) {
-          logger.error("Unable to read image from {}", src, e);
+          log().error("Unable to read image from {}", src, e);
           continue;
         }
 
         if (bImg == null) {
-          logger.warn("Null image {} extracted from document", src);
+          log().warn("Null image {} extracted from document", src);
           continue;
         }
 
@@ -254,13 +300,13 @@ public class HtmlExtractor extends AbstractDocumentExtractorDescriptor<HtmlExtra
           Metadata imageMetadata = ImageMetadataReader.readMetadata(bais);
           properties.putAll(toMap(imageMetadata));
         } catch (ImageProcessingException | IOException e) {
-          logger.warn("Unable to extract metadata from image {}", src, e);
+          log().warn("Unable to extract metadata from image {}", src, e);
         }
 
         properties.put(PropertyKeys.PROPERTY_KEY_TITLE, i.attr("title"));
         properties.put(PropertyKeys.PROPERTY_KEY_INDEX, imageNumber);
 
-        if ("figure".equals(i.parent().tagName().toLowerCase())) {
+        if ("figure".equalsIgnoreCase(i.parent().tagName())) {
           Element caption = i.parent().getElementsByTag("figcaption").first();
           if (caption != null) {
             properties.put(PropertyKeys.PROPERTY_KEY_DESCRIPTION, caption.text());
@@ -279,6 +325,116 @@ public class HtmlExtractor extends AbstractDocumentExtractorDescriptor<HtmlExtra
       }
 
       return images;
+    }
+
+    @Override
+    public Collection<ExtractionWithProperties<Table>> extractTables(Document doc)
+        throws ProcessingException {
+      return doc.getElementsByTag("table").stream()
+          .map(Processor::transformTable)
+          .collect(Collectors.toList());
+    }
+
+    private static ExtractionWithProperties<Table> transformTable(Element table) {
+      Map<String, Object> props = new HashMap<>();
+
+      String desc = table.select("caption").text();
+      if (desc != null && !desc.isBlank()) props.put(PropertyKeys.PROPERTY_KEY_DESCRIPTION, desc);
+
+      String lang = table.attr("lang");
+      if (lang != null && !lang.isBlank()) props.put(PropertyKeys.PROPERTY_KEY_LANGUAGE, lang);
+
+      String title = table.attr("title");
+      if (title != null && !title.isBlank()) props.put(PropertyKeys.PROPERTY_KEY_TITLE, title);
+
+      String id = table.attr("id");
+      if (id != null && !id.isBlank()) props.put(PropertyKeys.PROPERTY_KEY_IDENTIFIER, id);
+
+      return new ExtractionWithProperties<>(new HtmlTable(table), props);
+    }
+  }
+
+  public static class HtmlTable implements Table {
+    private final List<Row> rows;
+    private final List<String> columnNames;
+
+    public HtmlTable(Element table) {
+      List<String> columnNames = Collections.emptyList();
+
+      Element headerRow = table.selectFirst("thead > tr");
+      if (headerRow != null) {
+        columnNames =
+            headerRow.getElementsByTag("th").stream()
+                .map(Element::text)
+                .collect(Collectors.toList());
+      }
+
+      List<Row> rows = new ArrayList<>();
+      Elements bodyRows = table.select("tbody > tr");
+      for (int i = 0; i < bodyRows.size(); i++) {
+        // TODO: Handle column spans?
+        List<Object> data =
+            bodyRows.get(i).select("td").stream()
+                .map(Element::text)
+                .map(ConversionUtils::parseString)
+                .collect(Collectors.toList());
+        rows.add(new DefaultRow(i, columnNames, data));
+      }
+
+      this.columnNames = columnNames;
+      this.rows = rows;
+    }
+
+    @Override
+    public int getColumnCount() {
+      return columnNames.size();
+    }
+
+    @Override
+    public int getRowCount() {
+      return rows.size();
+    }
+
+    @Override
+    public Optional<List<String>> getColumnNames() {
+      return Optional.of(columnNames);
+    }
+
+    @Override
+    public Stream<Row> getRows() {
+      return rows.stream();
+    }
+  }
+
+  public static class Settings extends DocumentExtractorSettings {
+    private String cssQueryText = "";
+    private boolean followImageRedirects = false;
+
+    public Settings() {
+      // Default constructor
+    }
+
+    public Settings(DocumentExtractorSettings settings) {
+      super(settings);
+    }
+
+    @Description(
+        "If set, then the give CSS Query will be used to select text within the document (otherwise text from the whole document is returned)")
+    public String getCssQueryText() {
+      return cssQueryText;
+    }
+
+    public void setCssQueryText(String cssQueryText) {
+      this.cssQueryText = cssQueryText;
+    }
+
+    @Description("If true, then redirects will be followed when attempting to download images")
+    public boolean isFollowImageRedirects() {
+      return followImageRedirects;
+    }
+
+    public void setFollowImageRedirects(boolean followImageRedirects) {
+      this.followImageRedirects = followImageRedirects;
     }
   }
 }

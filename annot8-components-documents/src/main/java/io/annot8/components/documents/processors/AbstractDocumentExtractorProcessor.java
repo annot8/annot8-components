@@ -9,60 +9,78 @@ import io.annot8.api.context.Context;
 import io.annot8.api.data.Item;
 import io.annot8.api.exceptions.ProcessingException;
 import io.annot8.common.components.AbstractProcessor;
-import io.annot8.common.components.logging.Logging;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.Image;
 import io.annot8.common.data.content.InputStreamContent;
+import io.annot8.common.data.content.Table;
+import io.annot8.common.data.content.TableContent;
 import io.annot8.common.data.content.Text;
 import io.annot8.components.documents.data.ExtractionWithProperties;
+import io.annot8.conventions.PropertyKeys;
 import java.awt.image.BufferedImage;
+import java.io.Closeable;
 import java.io.IOException;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.time.temporal.TemporalAccessor;
-import java.util.*;
-import org.slf4j.Logger;
-import org.slf4j.helpers.NOPLogger;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * Base class for DocumentExtractor processors, handling a lot of the common boilerplate code.
  *
  * @param <T> The document type
  */
-public abstract class AbstractDocumentExtractorProcessor<T> extends AbstractProcessor {
+public abstract class AbstractDocumentExtractorProcessor<T, S extends DocumentExtractorSettings>
+    extends AbstractProcessor {
   private final Context context;
-  private final DocumentExtractorSettings settings;
+  protected final S settings;
 
   protected static final String METADATA_SEPARATOR = "/";
 
-  public AbstractDocumentExtractorProcessor(Context context, DocumentExtractorSettings settings) {
+  public AbstractDocumentExtractorProcessor(Context context, S settings) {
     this.context = context;
     this.settings = settings;
 
-    Logger logger = getLogger();
-
     if (!isMetadataSupported() && settings.isExtractMetadata()) {
-      logger.warn("This extractor does not support extraction of metadata");
+      log().warn("This extractor does not support extraction of metadata");
       this.settings.setExtractMetadata(false);
     }
     if (!isTextSupported() && settings.isExtractText()) {
-      logger.warn("This extractor does not support extraction of text");
+      log().warn("This extractor does not support extraction of text");
       this.settings.setExtractText(false);
     }
     if (!isImagesSupported() && settings.isExtractImages()) {
-      logger.warn("This extractor does not support extraction of images");
+      log().warn("This extractor does not support extraction of images");
       this.settings.setExtractImages(false);
+    }
+    if (!isTablesSupported() && settings.isExtractTables()) {
+      log().warn("This extractor does not support extraction of tables");
+      this.settings.setExtractTables(false);
     }
   }
 
   @Override
   public ProcessorResponse process(Item item) {
+    reset();
+
     List<Exception> exceptions = new ArrayList<>();
 
     item.getContents(FileContent.class)
         .filter(this::acceptFile)
         .forEach(
             c -> {
+              log()
+                  .info(
+                      "Extracting content from File Content {} ({})",
+                      c.getId(),
+                      c.getData().getPath());
               T doc;
               try {
                 doc = extractDocument(c);
@@ -72,12 +90,24 @@ public abstract class AbstractDocumentExtractorProcessor<T> extends AbstractProc
               }
 
               exceptions.addAll(extract(item, c.getId(), doc));
+
+              if (doc instanceof Closeable) {
+                try {
+                  ((Closeable) doc).close();
+                } catch (IOException e) {
+                  // Do nothing
+                }
+              }
+
+              if (settings.isDiscardOriginal()) item.removeContent(c);
             });
 
     item.getContents(InputStreamContent.class)
         .filter(this::acceptInputStream)
         .forEach(
             c -> {
+              log().info("Extracting content from InputStream Content {}", c.getId());
+
               T doc;
               try {
                 doc = extractDocument(c);
@@ -87,6 +117,16 @@ public abstract class AbstractDocumentExtractorProcessor<T> extends AbstractProc
               }
 
               exceptions.addAll(extract(item, c.getId(), doc));
+
+              if (doc instanceof Closeable) {
+                try {
+                  ((Closeable) doc).close();
+                } catch (IOException e) {
+                  // Do nothing
+                }
+              }
+
+              if (settings.isDiscardOriginal()) item.removeContent(c);
             });
 
     if (exceptions.isEmpty()) {
@@ -130,6 +170,7 @@ public abstract class AbstractDocumentExtractorProcessor<T> extends AbstractProc
               .withDescription("Text extracted from " + contentId)
               .withData(e.getExtractedValue())
               .withProperties(new InMemoryProperties(e.getProperties()))
+              .withProperty(PropertyKeys.PROPERTY_KEY_PARENT, contentId)
               .save();
         }
       } catch (Exception e) {
@@ -146,6 +187,24 @@ public abstract class AbstractDocumentExtractorProcessor<T> extends AbstractProc
               .withDescription("Image extracted from " + contentId)
               .withData(e.getExtractedValue())
               .withProperties(new InMemoryProperties(e.getProperties()))
+              .withProperty(PropertyKeys.PROPERTY_KEY_PARENT, contentId)
+              .save();
+        }
+      } catch (Exception e) {
+        exceptions.add(e);
+      }
+    }
+
+    if (settings.isExtractTables()) {
+      try {
+        Collection<ExtractionWithProperties<Table>> extractedTables = extractTables(doc);
+
+        for (ExtractionWithProperties<Table> e : extractedTables) {
+          item.createContent(TableContent.class)
+              .withDescription("Table extracted from " + contentId)
+              .withData(e.getExtractedValue())
+              .withProperties(new InMemoryProperties(e.getProperties()))
+              .withProperty(PropertyKeys.PROPERTY_KEY_PARENT, contentId)
               .save();
         }
       } catch (Exception e) {
@@ -156,6 +215,10 @@ public abstract class AbstractDocumentExtractorProcessor<T> extends AbstractProc
     return exceptions;
   }
 
+  public void reset() {
+    // Do nothing
+  }
+
   // Abstract functions below here
 
   /** Returns true if this processor supports extracting metadata, and false otherwise */
@@ -164,6 +227,8 @@ public abstract class AbstractDocumentExtractorProcessor<T> extends AbstractProc
   public abstract boolean isTextSupported();
   /** Returns true if this processor supports extracting images, and false otherwise */
   public abstract boolean isImagesSupported();
+  /** Returns true if this processor supports extracting tables, and false otherwise */
+  public abstract boolean isTablesSupported();
 
   /** Returns true if this processor should process the given file, and false otherwise */
   public abstract boolean acceptFile(FileContent file);
@@ -189,6 +254,9 @@ public abstract class AbstractDocumentExtractorProcessor<T> extends AbstractProc
       throws ProcessingException;
   /** Extract images from the document */
   public abstract Collection<ExtractionWithProperties<BufferedImage>> extractImages(T doc)
+      throws ProcessingException;
+  /** Extract tables from the document */
+  public abstract Collection<ExtractionWithProperties<Table>> extractTables(T doc)
       throws ProcessingException;
 
   // Utility functions below here
@@ -250,15 +318,6 @@ public abstract class AbstractDocumentExtractorProcessor<T> extends AbstractProc
     }
 
     return sb.toString();
-  }
-
-  protected final Logger getLogger() {
-    Optional<Logging> logging = context.getResource(Logging.class);
-    if (logging.isPresent()) {
-      return logging.get().getLogger(this.getClass());
-    } else {
-      return NOPLogger.NOP_LOGGER;
-    }
   }
 
   // TODO: Is there a better way than implementing our own?

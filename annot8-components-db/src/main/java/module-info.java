@@ -5,7 +5,7 @@ module io.annot8.components.db {
   requires com.google.common;
   requires sqlite.jdbc;
   requires java.sql;
-  requires java.json.bind;
+  requires jakarta.json.bind;
 
   exports io.annot8.components.db.content;
   exports io.annot8.components.db.processors;

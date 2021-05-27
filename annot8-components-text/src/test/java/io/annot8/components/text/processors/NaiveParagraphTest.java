@@ -21,7 +21,7 @@ public class NaiveParagraphTest {
 
   @Test
   public void test() throws Annot8Exception {
-    Processor processor = new NaiveParagraph.Processor();
+    Processor processor = new NaiveParagraph.Processor(2);
 
     Item item = new TestItem();
     Text content =

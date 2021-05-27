@@ -3,9 +3,9 @@ package io.annot8.components.base.text.processors;
 
 import io.annot8.api.settings.Description;
 import io.annot8.api.settings.Settings;
+import jakarta.json.bind.annotation.JsonbCreator;
+import jakarta.json.bind.annotation.JsonbProperty;
 import java.util.regex.Pattern;
-import javax.json.bind.annotation.JsonbCreator;
-import javax.json.bind.annotation.JsonbProperty;
 
 public class RegexSettings implements Settings {
   private final Pattern regex;

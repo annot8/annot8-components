@@ -20,6 +20,8 @@ public class ElasticsearchSettingsTest {
     assertEquals("baleen", es.getIndex());
     assertFalse(es.isDeleteIndex());
     assertFalse(es.isForceString());
+    assertNull(es.getUsername());
+    assertNull(es.getPassword());
 
     assertEquals(new HttpHost("localhost", 9200, "http"), es.host());
   }
@@ -37,6 +39,27 @@ public class ElasticsearchSettingsTest {
     assertEquals("test", es.getIndex());
     assertTrue(es.isDeleteIndex());
     assertTrue(es.isForceString());
+    assertNull(es.getUsername());
+    assertNull(es.getPassword());
+
+    assertEquals(new HttpHost("myhost.com", 9090, "https"), es.host());
+  }
+
+  @Test
+  public void testCustom2() {
+    ElasticsearchSettings es =
+        new ElasticsearchSettings("myhost.com", 9090, "https", "test", true, true, "user", "pass");
+
+    assertTrue(es.validate());
+
+    assertEquals("myhost.com", es.getHostname());
+    assertEquals(9090, es.getPort());
+    assertEquals("https", es.getScheme());
+    assertEquals("test", es.getIndex());
+    assertTrue(es.isDeleteIndex());
+    assertTrue(es.isForceString());
+    assertEquals("user", es.getUsername());
+    assertEquals("pass", es.getPassword());
 
     assertEquals(new HttpHost("myhost.com", 9090, "https"), es.host());
   }
@@ -62,5 +85,22 @@ public class ElasticsearchSettingsTest {
 
     es.setForceString(true);
     assertTrue(es.isForceString());
+  }
+
+  @Test
+  public void testCredentials() {
+    ElasticsearchSettings es = new ElasticsearchSettings();
+    assertNull(es.getUsername());
+    assertNull(es.getPassword());
+    assertNull(es.credentials());
+
+    es.setUsername("user");
+    assertNull(es.credentials());
+
+    es.setPassword("pass");
+    assertNotNull(es.credentials());
+
+    es.setUsername(null);
+    assertNull(es.credentials());
   }
 }

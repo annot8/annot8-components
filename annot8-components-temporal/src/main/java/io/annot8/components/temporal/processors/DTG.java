@@ -30,7 +30,7 @@ import java.util.regex.Pattern;
  * the following regular expression:
  *
  * <pre>
- * ([0-9]{2})\\s*([0-9]{2})([0-9]{2})([A-IK-Z]|D\\*)\\s*(JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)\\s*([0-9]{2})
+ * ([0-9]{2})[/\s]*([0-9]{2})([0-9]{2})[/\s]*([A-IK-Z]|D\*)[/\s]*(JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)[/\s]*([0-9]{2})
  * </pre>
  *
  * <p>Matched DTGs are parsed as a date and annotated as Temporal entities.
@@ -58,7 +58,7 @@ public class DTG extends AbstractProcessorDescriptor<DTG.Processor, NoSettings> 
     public Processor() {
       super(
           Pattern.compile(
-              "([0-9]{2})\\s*([0-9]{2})([0-9]{2})([A-IK-Z]|D\\*)\\s*(JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)\\s*([0-9]{2})",
+              "([0-9]{2})[/\\s]*([0-9]{2})([0-9]{2})[/\\s]*([A-IK-Z]|D\\*)[/\\s]*(JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)[/\\s]*([0-9]{2})",
               Pattern.CASE_INSENSITIVE),
           0,
           AnnotationTypes.ANNOTATION_TYPE_TEMPORAL_INSTANT);

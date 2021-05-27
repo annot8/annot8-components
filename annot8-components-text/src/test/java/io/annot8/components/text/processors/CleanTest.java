@@ -20,6 +20,7 @@ public class CleanTest {
     s.setTrimLines(false);
     s.setReplaceSmartCharacters(false);
     s.setRemoveRepeatedWhitespace(false);
+    s.setCopyProperties(false);
 
     return s;
   }
@@ -112,5 +113,25 @@ public class CleanTest {
     assertEquals(1L, item.getContents().count());
 
     assertEquals("A B\tC\tD\tE\tF\tG\tH", item.getContents(Text.class).findFirst().get().getData());
+  }
+
+  @Test
+  public void testCopyProperties() {
+    Clean.Settings s = getFalseSettings();
+    s.setCopyProperties(true);
+
+    Clean.Processor p = new Clean.Processor(s);
+
+    Item item = new TestItem();
+    item.createContent(TestStringContent.class)
+        .withData("Hello World!")
+        .withProperty("lang", "en")
+        .save();
+
+    p.process(item);
+    assertEquals(1L, item.getContents().count());
+
+    assertEquals(
+        "en", item.getContents(Text.class).findFirst().get().getProperties().get("lang").get());
   }
 }

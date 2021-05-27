@@ -147,6 +147,7 @@ public class Date extends AbstractProcessorDescriptor<Date.Processor, Date.Setti
         Year y2,
         Collection<SpanBounds> extracted) {
       if (alreadyExtracted(extracted, charBegin, charEnd)) return;
+      if (y1.isAfter(y2)) return;
 
       SpanBounds sb = new SpanBounds(charBegin, charEnd);
 
@@ -238,6 +239,7 @@ public class Date extends AbstractProcessorDescriptor<Date.Processor, Date.Setti
         YearMonth ym2,
         Collection<SpanBounds> extracted) {
       if (alreadyExtracted(extracted, charBegin, charEnd)) return;
+      if (ym1.isAfter(ym2)) return;
 
       SpanBounds sb = new SpanBounds(charBegin, charEnd);
 
@@ -439,6 +441,7 @@ public class Date extends AbstractProcessorDescriptor<Date.Processor, Date.Setti
         LocalDate ld2,
         Collection<SpanBounds> extracted) {
       if (alreadyExtracted(extracted, charBegin, charEnd)) return;
+      if (ld1.isAfter(ld2)) return;
 
       SpanBounds sb = new SpanBounds(charBegin, charEnd);
 
@@ -729,9 +732,10 @@ public class Date extends AbstractProcessorDescriptor<Date.Processor, Date.Setti
   }
 
   public static class Settings implements io.annot8.api.settings.Settings {
-    private boolean americanDates = true;
+    private boolean americanDates = false;
 
-    @Description("Should we use American dates where applicable (i.e. mm-dd-yy)?")
+    @Description(
+        "If true, then where the day and month fields of a date are ambiguous (e.g. 01/03/2021) then the American ordering (e.g. mm-dd-yyyy) will be used")
     public boolean getAmericanDates() {
       return americanDates;
     }

@@ -5,12 +5,12 @@
   <parent>
     <artifactId>annot8-components</artifactId>
     <groupId>io.annot8</groupId>
-    <version>1.1.0</version>
+    <version>1.2.0</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>annot8-components-vehicles</artifactId>
-  <version>1.1.0</version>
+  <version>1.2.0</version>
   <name>Annot8 Vehicle Components</name>
   <description>Annot8 processors focussing on extracting vehicle information</description>
 
@@ -18,13 +18,11 @@
     <dependency>
       <groupId>io.annot8</groupId>
       <artifactId>annot8-components-base-text</artifactId>
-      <version>1.1.0</version>
     </dependency>
     <dependency>
       <groupId>io.annot8</groupId>
       <artifactId>annot8-utils-text</artifactId>
-      <version>1.1.0</version>
-      <scope>compile</scope>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
 </project>

@@ -9,48 +9,56 @@ import io.annot8.api.components.annotations.ComponentName;
 import io.annot8.api.components.annotations.ComponentTags;
 import io.annot8.api.components.annotations.SettingsClass;
 import io.annot8.api.context.Context;
+import io.annot8.api.exceptions.ProcessingException;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.InputStreamContent;
+import io.annot8.common.data.content.Table;
 import io.annot8.components.documents.data.ExtractionWithProperties;
 import io.annot8.conventions.PropertyKeys;
 import java.awt.image.BufferedImage;
-import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.imageio.ImageIO;
 import org.apache.poi.ooxml.POIXMLProperties;
-import org.apache.poi.poifs.filesystem.FileMagic;
 import org.apache.poi.sl.extractor.SlideShowExtractor;
 import org.apache.poi.xslf.usermodel.XMLSlideShow;
 import org.apache.poi.xslf.usermodel.XSLFPictureData;
 import org.apache.poi.xslf.usermodel.XSLFShape;
 import org.apache.poi.xslf.usermodel.XSLFSlide;
-import org.apache.poi.xslf.usermodel.XSLFSlideShowFactory;
 import org.apache.poi.xslf.usermodel.XSLFTextParagraph;
-import org.slf4j.Logger;
 
 @ComponentName("PowerPoint (PPTX) Extractor")
 @ComponentDescription("Extracts image and text from PowerPoint (*.pptx) files")
 @ComponentTags({"documents", "powerpoint", "pptx", "extractor", "text", "images", "metadata"})
 @SettingsClass(DocumentExtractorSettings.class)
-public class PptxExtractor extends AbstractDocumentExtractorDescriptor<PptxExtractor.Processor> {
+public class PptxExtractor
+    extends AbstractDocumentExtractorDescriptor<
+        PptxExtractor.Processor, DocumentExtractorSettings> {
 
   @Override
   protected Processor createComponent(Context context, DocumentExtractorSettings settings) {
     return new Processor(context, settings);
   }
 
-  public static class Processor extends AbstractDocumentExtractorProcessor<XMLSlideShow> {
-    private final Logger logger = getLogger();
+  public static class Processor
+      extends AbstractDocumentExtractorProcessor<XMLSlideShow, DocumentExtractorSettings> {
+
+    private final Map<String, XMLSlideShow> cache = new HashMap<>();
 
     public Processor(Context context, DocumentExtractorSettings settings) {
       super(context, settings);
+    }
+
+    @Override
+    public void reset() {
+      cache.clear();
     }
 
     @Override
@@ -69,32 +77,58 @@ public class PptxExtractor extends AbstractDocumentExtractorDescriptor<PptxExtra
     }
 
     @Override
+    public boolean isTablesSupported() {
+      return false;
+    }
+
+    @Override
     public boolean acceptFile(FileContent file) {
-      return file.getData().getName().toLowerCase().endsWith(".pptx");
+      XMLSlideShow doc;
+      try {
+        doc = new XMLSlideShow(new FileInputStream(file.getData()));
+      } catch (Exception e) {
+        log().debug("FileContent {} not accepted due to: {}", file.getId(), e.getMessage());
+        return false;
+      }
+
+      cache.put(file.getId(), doc);
+      return true;
     }
 
     @Override
     public boolean acceptInputStream(InputStreamContent inputStream) {
-      BufferedInputStream bis = new BufferedInputStream(inputStream.getData());
-      FileMagic fm;
+      XMLSlideShow doc;
       try {
-        fm = FileMagic.valueOf(bis);
-      } catch (IOException e) {
+        doc = new XMLSlideShow(inputStream.getData());
+      } catch (Exception e) {
+        log()
+            .debug(
+                "InputStreamContent {} not accepted due to: {}",
+                inputStream.getId(),
+                e.getMessage());
         return false;
       }
 
-      // FIXME: This only checks whether it is an OOXML, not that it is a PowerPoint Document
-      return FileMagic.OOXML == fm;
+      cache.put(inputStream.getId(), doc);
+      return true;
     }
 
     @Override
     public XMLSlideShow extractDocument(FileContent file) throws IOException {
-      return XSLFSlideShowFactory.createSlideShow(new FileInputStream(file.getData()));
+      if (cache.containsKey(file.getId())) {
+        return cache.get(file.getId());
+      } else {
+        return new XMLSlideShow(new FileInputStream(file.getData()));
+      }
     }
 
     @Override
     public XMLSlideShow extractDocument(InputStreamContent inputStreamContent) throws IOException {
-      return XSLFSlideShowFactory.createSlideShow(inputStreamContent.getData());
+      if (cache.containsKey(inputStreamContent.getId())) {
+        return cache.get(inputStreamContent.getId());
+      } else {
+        return new XMLSlideShow(inputStreamContent.getData());
+      }
     }
 
     @Override
@@ -218,12 +252,12 @@ public class PptxExtractor extends AbstractDocumentExtractorDescriptor<PptxExtra
         try {
           bImg = ImageIO.read(new ByteArrayInputStream(picture.getData()));
         } catch (IOException e) {
-          logger.warn("Unable to extract image {} from document", picture.getIndex() + 1, e);
+          log().warn("Unable to extract image {} from document", picture.getIndex() + 1, e);
           continue;
         }
 
         if (bImg == null) {
-          logger.warn("Null image {} extracted from document", picture.getIndex() + 1);
+          log().warn("Null image {} extracted from document", picture.getIndex() + 1);
           continue;
         }
 
@@ -234,7 +268,7 @@ public class PptxExtractor extends AbstractDocumentExtractorDescriptor<PptxExtra
               ImageMetadataReader.readMetadata(new ByteArrayInputStream(picture.getData()));
           properties.putAll(toMap(imageMetadata));
         } catch (ImageProcessingException | IOException e) {
-          logger.warn("Unable to extract metadata from image {}", picture.getIndex() + 1, e);
+          log().warn("Unable to extract metadata from image {}", picture.getIndex() + 1, e);
         }
 
         properties.put(PropertyKeys.PROPERTY_KEY_INDEX, picture.getIndex() + 1);
@@ -245,6 +279,13 @@ public class PptxExtractor extends AbstractDocumentExtractorDescriptor<PptxExtra
       }
 
       return extractedImages;
+    }
+
+    @Override
+    public Collection<ExtractionWithProperties<Table>> extractTables(XMLSlideShow doc)
+        throws ProcessingException {
+      // TODO: Extract tables from PPTX
+      return Collections.emptyList();
     }
   }
 }

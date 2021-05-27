@@ -15,6 +15,8 @@ import io.annot8.common.components.capabilities.SimpleCapabilities;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.Text;
 import io.annot8.conventions.PropertyKeys;
+import jakarta.json.*;
+import jakarta.json.stream.JsonParsingException;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -23,8 +25,6 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.util.*;
-import javax.json.*;
-import javax.json.stream.JsonParsingException;
 
 @ComponentName("JSON File Extractor")
 @ComponentDescription("Extract content from *.json and *.jsonl files")

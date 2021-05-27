@@ -16,7 +16,17 @@ import io.annot8.components.base.text.processors.AbstractTextProcessor;
 import io.annot8.components.temporal.processors.utils.DateTimeUtils;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
-import java.time.*;
+import jakarta.json.bind.annotation.JsonbCreator;
+import jakarta.json.bind.annotation.JsonbProperty;
+import java.time.DayOfWeek;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Month;
+import java.time.Year;
+import java.time.YearMonth;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.time.chrono.ChronoLocalDate;
 import java.time.chrono.ChronoLocalDateTime;
 import java.time.chrono.ChronoZonedDateTime;
@@ -26,11 +36,11 @@ import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
 import java.time.temporal.TemporalUnit;
 import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.json.bind.annotation.JsonbCreator;
-import javax.json.bind.annotation.JsonbProperty;
 
 /**
  * Extract expressions that refer to a relative date, e.g. yesterday. These can be resolved by
@@ -88,7 +98,7 @@ public class RelativeDate
   @Override
   protected Processor createComponent(Context context, Settings settings) {
     return new Processor(
-        settings.getDateFormatter(), settings.getDateProperties(), settings.isUseTodayAsRelative());
+        settings.dateFormatter(), settings.getDateProperties(), settings.isUseTodayAsRelative());
   }
 
   public static class Processor extends AbstractTextProcessor {
@@ -543,7 +553,7 @@ public class RelativeDate
      *
      * <p>e.g. yyyy-MM-dd
      */
-    private final DateTimeFormatter dateTimeFormatter;
+    private final String datePattern;
 
     /**
      * List of property names, in order of precedence, to use when looking for a date to make other
@@ -557,34 +567,42 @@ public class RelativeDate
 
     @JsonbCreator
     public Settings(
-        @JsonbProperty("dateFormatter") DateTimeFormatter dateTimeFormatter,
+        @JsonbProperty("datePattern") String datePattern,
         @JsonbProperty("dateProperties") Collection<String> dateProperties,
         @JsonbProperty("useTodayAsRelative") boolean useTodayAsRelative) {
-      this.dateTimeFormatter = dateTimeFormatter;
-      this.dateProperties = dateProperties;
+      this.datePattern = Objects.requireNonNullElse(datePattern, "yyyy-MM-dd");
+      this.dateProperties = Objects.requireNonNullElse(dateProperties, List.of());
       this.useTodayAsRelative = useTodayAsRelative;
     }
 
-    @Description("The format of dates in the metadata fields")
-    public DateTimeFormatter getDateFormatter() {
-      return dateTimeFormatter;
+    @Description(value = "The format of dates in the metadata fields", defaultValue = "yyyy-MM-dd")
+    public String getDatePattern() {
+      return datePattern;
+    }
+
+    public DateTimeFormatter dateFormatter() {
+      return DateTimeFormatter.ofPattern(datePattern);
     }
 
     @Description(
-        "List of field names, in order of precedence, to use when looking for a date to make other dates relative to")
+        value =
+            "List of field names, in order of precedence, to use when looking for a date to make other dates relative to",
+        defaultValue = "")
     public Collection<String> getDateProperties() {
       return dateProperties;
     }
 
     @Description(
-        "If true, then use today's date as the reference point for relative dates where an alternative can't be found in properties")
+        value =
+            "If true, then use today's date as the reference point for relative dates where an alternative can't be found in properties",
+        defaultValue = "false")
     public boolean isUseTodayAsRelative() {
       return useTodayAsRelative;
     }
 
     @Override
     public boolean validate() {
-      return dateTimeFormatter != null && dateProperties != null;
+      return datePattern != null && dateProperties != null;
     }
   }
 }

@@ -134,7 +134,8 @@ public class ElasticsearchUtils {
     mc.put(ID, c.getId());
     mc.put(CONTENT_TYPE, c.getDataClass().getName());
 
-    if (!c.getDescription().isBlank()) mc.put(DESCRIPTION, c.getDescription());
+    if (c.getDescription() != null && !c.getDescription().isBlank())
+      mc.put(DESCRIPTION, c.getDescription());
 
     if (shouldPersistData(c.getDataClass())) mc.put(CONTENT, c.getData());
 
