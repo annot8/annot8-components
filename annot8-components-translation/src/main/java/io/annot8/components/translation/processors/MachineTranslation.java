@@ -23,8 +23,6 @@ import uk.gov.dstl.machinetranslation.connector.api.exceptions.ConfigurationExce
 import uk.gov.dstl.machinetranslation.connector.api.exceptions.ConnectorException;
 import uk.gov.dstl.machinetranslation.connector.api.utils.ConnectorUtils;
 
-// TODO: Implement logging
-
 /**
  * Uses the MT API (see https://github.com/dstl/machinetranslation) to perform translation of Text
  * content objects. The relevant connector must be on the class path
@@ -94,7 +92,7 @@ public class MachineTranslation
                 "Unsupported language pair (" + sourceLanguage + " -> " + targetLanguage + ")");
           }
         } catch (ConnectorException e) {
-          // TODO: Log error
+          log().error("Unable to retrieve supported languages", e);
         }
       }
     }
@@ -103,6 +101,8 @@ public class MachineTranslation
     protected void process(Text content) {
       Translation translatedText;
       try {
+        log()
+            .debug("Translating {} from {} to {}", content.getId(), sourceLanguage, targetLanguage);
         translatedText = connector.translate(sourceLanguage, targetLanguage, content.getData());
       } catch (ConnectorException e) {
         throw new ProcessingException("Unable to translate text", e);

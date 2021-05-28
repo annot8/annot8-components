@@ -5,44 +5,49 @@
   <parent>
     <artifactId>annot8-components</artifactId>
     <groupId>io.annot8</groupId>
-    <version>1.1.0</version>
+    <version>1.2.0</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>annot8-components-documents</artifactId>
-  <version>1.1.0</version>
+  <version>1.2.0</version>
   <name>Annot8 Document Components</name>
   <description>Components to extract information from documents</description>
 
   <dependencies>
     <dependency>
       <groupId>io.annot8</groupId>
-      <artifactId>annot8-common-components</artifactId>
+      <artifactId>annot8-components-base</artifactId>
     </dependency>
     <dependency>
       <groupId>io.annot8</groupId>
-      <artifactId>annot8-conventions</artifactId>
-      <version>1.1.0</version>
+      <artifactId>annot8-common-utils</artifactId>
     </dependency>
 
     <dependency>
       <groupId>com.drewnoakes</groupId>
       <artifactId>metadata-extractor</artifactId>
-      <version>2.15.0</version>
+      <version>2.16.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.flipkart.utils</groupId>
+      <artifactId>javatuples</artifactId>
+      <version>3.0</version>
     </dependency>
 
     <!-- DOC support -->
     <dependency>
       <groupId>org.apache.poi</groupId>
       <artifactId>poi-scratchpad</artifactId>
-      <version>4.1.2</version>
+      <version>5.0.0</version>
     </dependency>
 
     <!-- DOCX support -->
     <dependency>
       <groupId>org.apache.poi</groupId>
       <artifactId>poi-ooxml</artifactId>
-      <version>4.1.2</version>
+      <version>5.0.0</version>
     </dependency>
 
     <!-- HTML support -->
@@ -63,12 +68,17 @@
     <dependency>
       <groupId>org.apache.pdfbox</groupId>
       <artifactId>pdfbox</artifactId>
-      <version>2.0.22</version>
+      <version>2.0.23</version>
     </dependency>
     <dependency>
       <groupId>org.apache.pdfbox</groupId>
       <artifactId>jbig2-imageio</artifactId>
       <version>3.0.3</version>
+    </dependency>
+    <dependency>
+      <groupId>technology.tabula</groupId>
+      <artifactId>tabula</artifactId>
+      <version>1.0.4</version>
     </dependency>
   </dependencies>
 </project>

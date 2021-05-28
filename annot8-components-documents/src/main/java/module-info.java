@@ -4,6 +4,7 @@ module io.annot8.components.documents {
   requires transitive io.annot8.api;
   requires io.annot8.common.components;
   requires io.annot8.common.data;
+  requires io.annot8.common.utils;
   requires io.annot8.conventions;
   requires java.desktop;
   requires metadata.extractor;
@@ -11,7 +12,11 @@ module io.annot8.components.documents {
   requires org.apache.pdfbox;
   requires org.jsoup;
   requires org.slf4j;
-  requires poi;
-  requires poi.ooxml;
-  requires poi.scratchpad;
+  requires org.apache.poi.poi;
+  requires org.apache.poi.ooxml;
+  requires org.apache.poi.scratchpad;
+  requires org.apache.commons.compress;
+  requires java.net.http;
+  requires javatuples;
+  requires tabula;
 }

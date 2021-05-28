@@ -19,6 +19,8 @@ import io.annot8.common.data.content.Text;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.AutoDetectParser;
@@ -63,6 +65,8 @@ public class TikaExtractor
     }
 
     public ProcessorResponse process(Item item) {
+      List<Exception> exceptions = new ArrayList<>();
+
       // Process InputStream
       item.getContents(InputStreamContent.class)
           .forEach(
@@ -80,10 +84,15 @@ public class TikaExtractor
                   if (removeSourceContent) item.removeContent(c);
                 } catch (IOException e) {
                   this.log().error("Unable to read File Content {}", c.getId(), e);
+                  exceptions.add(e);
                 }
               });
 
-      return ProcessorResponse.ok();
+      if (exceptions.isEmpty()) {
+        return ProcessorResponse.ok();
+      } else {
+        return ProcessorResponse.itemError(exceptions);
+      }
     }
 
     private void createText(Item item, String originalContentName, InputStream inputStream) {

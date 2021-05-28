@@ -1,36 +1,74 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.files.content;
 
-import io.annot8.api.exceptions.Annot8RuntimeException;
+import de.siegmar.fastcsv.reader.CsvReader;
+import de.siegmar.fastcsv.reader.CsvRow;
+import io.annot8.api.exceptions.ProcessingException;
 import io.annot8.common.data.content.ColumnMetadata;
+import io.annot8.common.data.content.DefaultRow;
 import io.annot8.common.data.content.Row;
 import io.annot8.common.data.content.Table;
 import io.annot8.common.data.content.TableMetadata;
-import io.annot8.components.files.utils.BufferedReaderIterator;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 public class CSVTable implements Table {
-
-  public static final String PATTERN = ",(?=([^\\\"]*\\\"[^\\\"]*\\\")*[^\\\"]*$)";
-  private final File file;
-  private boolean hasHeaders;
-  private TableMetadata metadata;
+  private final TableMetadata metadata;
+  private final List<Row> rows = new ArrayList<>();
 
   public CSVTable(File file, boolean hasHeaders) {
-    this.file = file;
-    this.hasHeaders = hasHeaders;
-    this.metadata = init();
+    CsvReader reader;
+    try {
+      reader = CsvReader.builder().build(file.toPath(), Charset.defaultCharset());
+    } catch (IOException e) {
+      throw new ProcessingException("Unable to read CSV file", e);
+    }
+
+    int index = (hasHeaders ? -1 : 0);
+
+    int maxCols = 0;
+    List<String> headers = Collections.emptyList();
+
+    for (CsvRow csvRow : reader) {
+      if (index < 0) {
+        headers = csvRow.getFields().stream().map(String::strip).collect(Collectors.toList());
+      } else {
+        rows.add(
+            new DefaultRow(
+                index,
+                getHeaders(headers, csvRow.getFieldCount()),
+                new ArrayList<>(csvRow.getFields())));
+      }
+
+      maxCols = Math.max(maxCols, csvRow.getFieldCount());
+      index++;
+    }
+
+    metadata =
+        new TableMetadata(
+            file.getName(), "CSV", toColumnMetadata(getHeaders(headers, maxCols)), index);
+  }
+
+  public static List<String> getHeaders(List<String> knownHeaders, int colCount) {
+    if (colCount == knownHeaders.size()) {
+      return knownHeaders;
+    } else if (colCount < knownHeaders.size()) {
+      return knownHeaders.subList(0, colCount);
+    } else {
+      return Stream.concat(
+              knownHeaders.stream(),
+              IntStream.range(knownHeaders.size(), colCount).mapToObj(i -> "Column " + (i + 1)))
+          .collect(Collectors.toList());
+    }
   }
 
   @Override
@@ -52,61 +90,10 @@ public class CSVTable implements Table {
 
   @Override
   public Stream<Row> getRows() {
-    final FileReader fileReader;
-    final BufferedReader bufferedReader;
-    try {
-      fileReader = new FileReader(file);
-      bufferedReader = new BufferedReader(fileReader);
-    } catch (FileNotFoundException e) {
-      throw new Annot8RuntimeException("Failed to read file ", e);
-    }
-    BufferedReaderIterator iterator =
-        new BufferedReaderIterator(bufferedReader, metadata, hasHeaders);
-    Iterable<Row> iterable = () -> iterator;
-    Stream<Row> stream = StreamSupport.stream(iterable.spliterator(), false);
-    stream.onClose(
-        () -> {
-          try {
-            bufferedReader.close();
-            fileReader.close();
-          } catch (IOException e) {
-            throw new Annot8RuntimeException("Failed to close resources", e);
-          }
-        });
-    return stream;
+    return rows.stream();
   }
 
-  private TableMetadata init() {
-    List<String> columnNames = null;
-    int rowCount = 0;
-    int columnCount = -1;
-    try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-      String line = null;
-      if (hasHeaders) {
-        String[] data = reader.readLine().split(PATTERN);
-        columnNames = Arrays.asList(data);
-      }
-      while ((line = reader.readLine()) != null) {
-        rowCount++;
-        if (columnCount == -1) {
-          String[] data = line.split(PATTERN);
-          columnCount = data.length;
-        } else if (columnCount != line.split(PATTERN).length) {
-          throw new Annot8RuntimeException(
-              "CSV file an irregular number of columns at line " + rowCount);
-        }
-      }
-    } catch (IOException e) {
-      throw new Annot8RuntimeException("Failed to read csv file", e);
-    }
-
-    if (!hasHeaders) {
-      columnNames = new ArrayList<>(columnCount);
-    }
-    return new TableMetadata(file.getName(), "CSV", toColumnMetadata(columnNames), rowCount);
-  }
-
-  private List<ColumnMetadata> toColumnMetadata(List<String> columnNames) {
+  private List<ColumnMetadata> toColumnMetadata(Collection<String> columnNames) {
     return columnNames.stream().map(s -> new ColumnMetadata(s, 0)).collect(Collectors.toList());
   }
 }

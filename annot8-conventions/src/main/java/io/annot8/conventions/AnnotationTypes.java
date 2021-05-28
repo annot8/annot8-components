@@ -4,8 +4,8 @@ package io.annot8.conventions;
 /** Standard names for common annotation types */
 public class AnnotationTypes {
 
-  // TODO: CF entity is perhaps wrong word here
-  public static final String ENTITY_PREFIX = "entity" + PathUtils.SEPARATOR;
+  public static final String ANNOTATION_TYPE_ENTITY = "entity";
+  public static final String ENTITY_PREFIX = ANNOTATION_TYPE_ENTITY + PathUtils.SEPARATOR;
 
   public static final String ANNOTATION_TYPE_QUANTITY = ENTITY_PREFIX + "quantity";
   public static final String QUANTITY_PREFIX = ANNOTATION_TYPE_QUANTITY + PathUtils.SEPARATOR;

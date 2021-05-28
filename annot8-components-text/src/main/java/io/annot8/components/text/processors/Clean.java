@@ -7,10 +7,12 @@ import io.annot8.api.components.annotations.ComponentName;
 import io.annot8.api.components.annotations.SettingsClass;
 import io.annot8.api.context.Context;
 import io.annot8.api.data.Item;
+import io.annot8.api.properties.Properties;
 import io.annot8.api.settings.Description;
 import io.annot8.common.components.AbstractProcessorDescriptor;
 import io.annot8.common.components.capabilities.SimpleCapabilities;
 import io.annot8.common.data.content.Text;
+import io.annot8.common.data.properties.EmptyImmutableProperties;
 import io.annot8.components.base.text.processors.AbstractTextProcessor;
 
 @ComponentName("Clean Text")
@@ -83,9 +85,17 @@ public class Clean extends AbstractProcessorDescriptor<Clean.Processor, Clean.Se
       if (!clean.equalsIgnoreCase(content.getData())) {
         Item item = content.getItem();
 
+        Properties props;
+        if (settings.isCopyProperties()) {
+          props = content.getProperties();
+        } else {
+          props = EmptyImmutableProperties.getInstance();
+        }
+
         item.createContent(Text.class)
             .withDescription("Cleaned content from " + content.getId())
             .withData(clean)
+            .withProperties(props)
             .save();
 
         // Remove source content, but only if we've made changes
@@ -101,6 +111,7 @@ public class Clean extends AbstractProcessorDescriptor<Clean.Processor, Clean.Se
     private boolean removeSingleNewLines = true;
     private boolean replaceSmartCharacters = true;
     private boolean removeRepeatedWhitespace = true;
+    private boolean copyProperties = true;
 
     @Override
     public boolean validate() {
@@ -175,6 +186,17 @@ public class Clean extends AbstractProcessorDescriptor<Clean.Processor, Clean.Se
 
     public void setRemoveRepeatedWhitespace(boolean removeRepeatedWhitespace) {
       this.removeRepeatedWhitespace = removeRepeatedWhitespace;
+    }
+
+    @Description(
+        value = "Should properties be copied from the source Content to the cleaned Content?",
+        defaultValue = "true")
+    public boolean isCopyProperties() {
+      return copyProperties;
+    }
+
+    public void setCopyProperties(boolean copyProperties) {
+      this.copyProperties = copyProperties;
     }
   }
 }

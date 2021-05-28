@@ -8,47 +8,103 @@ import io.annot8.api.components.annotations.ComponentName;
 import io.annot8.api.components.annotations.ComponentTags;
 import io.annot8.api.components.annotations.SettingsClass;
 import io.annot8.api.context.Context;
+import io.annot8.api.exceptions.Annot8RuntimeException;
 import io.annot8.api.exceptions.ProcessingException;
+import io.annot8.api.settings.Description;
+import io.annot8.common.data.content.DefaultRow;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.InputStreamContent;
+import io.annot8.common.data.content.Row;
+import io.annot8.common.data.content.Table;
+import io.annot8.common.utils.java.ConversionUtils;
 import io.annot8.components.documents.data.ExtractionWithProperties;
 import io.annot8.conventions.PropertyKeys;
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
-import org.apache.pdfbox.contentstream.PDFStreamEngine;
-import org.apache.pdfbox.contentstream.operator.Operator;
-import org.apache.pdfbox.cos.COSBase;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import org.apache.pdfbox.cos.COSDictionary;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDResources;
 import org.apache.pdfbox.pdmodel.common.PDMetadata;
 import org.apache.pdfbox.pdmodel.graphics.PDXObject;
-import org.apache.pdfbox.pdmodel.graphics.form.PDFormXObject;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.poi.poifs.filesystem.FileMagic;
-import org.slf4j.Logger;
+import technology.tabula.ObjectExtractor;
+import technology.tabula.Page;
+import technology.tabula.PageIterator;
+import technology.tabula.Rectangle;
+import technology.tabula.RectangularTextContainer;
+import technology.tabula.detectors.DetectionAlgorithm;
+import technology.tabula.detectors.NurminenDetectionAlgorithm;
+import technology.tabula.detectors.SpreadsheetDetectionAlgorithm;
+import technology.tabula.extractors.BasicExtractionAlgorithm;
+import technology.tabula.extractors.SpreadsheetExtractionAlgorithm;
 
 @ComponentName("PDF Extractor")
 @ComponentDescription("Extracts image and text from PDF (*.pdf) files")
-@ComponentTags({"documents", "pdf", "extractor", "text", "images", "metadata"})
-@SettingsClass(DocumentExtractorSettings.class)
-public class PdfExtractor extends AbstractDocumentExtractorDescriptor<PdfExtractor.Processor> {
+@ComponentTags({"documents", "pdf", "extractor", "text", "images", "metadata", "tables"})
+@SettingsClass(PdfExtractor.Settings.class)
+public class PdfExtractor
+    extends AbstractDocumentExtractorDescriptor<PdfExtractor.Processor, PdfExtractor.Settings> {
 
   @Override
-  protected Processor createComponent(Context context, DocumentExtractorSettings settings) {
+  protected Processor createComponent(Context context, PdfExtractor.Settings settings) {
     return new Processor(context, settings);
   }
 
-  public static class Processor extends AbstractDocumentExtractorProcessor<PDDocument> {
-    private final Logger logger = getLogger();
+  public static class Processor
+      extends AbstractDocumentExtractorProcessor<PDDocument, PdfExtractor.Settings> {
+    private final PDFTextStripper stripper;
 
-    public Processor(Context context, DocumentExtractorSettings settings) {
+    private final DetectionAlgorithm detectionAlgorithm;
+
+    private static final BasicExtractionAlgorithm basicExtractionAlgorithm =
+        new BasicExtractionAlgorithm();
+    private static final SpreadsheetExtractionAlgorithm spreadsheetExtractionAlgorithm =
+        new SpreadsheetExtractionAlgorithm();
+
+    public Processor(Context context, PdfExtractor.Settings settings) {
       super(context, settings);
+
+      if (settings.isExtractText()) {
+        try {
+          stripper = new PDFTextStripper();
+          stripper.setPageStart(settings.getPageStart());
+          stripper.setPageEnd(settings.getPageEnd());
+          stripper.setParagraphStart(settings.getParagraphStart());
+          stripper.setParagraphEnd(settings.getParagraphEnd());
+          stripper.setArticleStart(settings.getArticleStart());
+          stripper.setArticleEnd(settings.getArticleEnd());
+        } catch (IOException ioe) {
+          throw new Annot8RuntimeException("Unable to create PDFTextStripper", ioe);
+        }
+      } else {
+        stripper = null;
+      }
+
+      switch (settings.getTableDetectionAlgorithm()) {
+        case LATTICE:
+          detectionAlgorithm = new SpreadsheetDetectionAlgorithm();
+          break;
+        case NURMINEN:
+        default:
+          detectionAlgorithm = new NurminenDetectionAlgorithm();
+          break;
+      }
     }
 
     @Override
@@ -67,14 +123,23 @@ public class PdfExtractor extends AbstractDocumentExtractorDescriptor<PdfExtract
     }
 
     @Override
+    public boolean isTablesSupported() {
+      return true;
+    }
+
+    @Override
     public boolean acceptFile(FileContent file) {
-      return file.getData().getName().toLowerCase().endsWith(".pdf");
+      try {
+        return FileMagic.valueOf(file.getData()) == FileMagic.PDF;
+      } catch (IOException ioe) {
+        return false;
+      }
     }
 
     @Override
     public boolean acceptInputStream(InputStreamContent inputStream) {
-      try (InputStream is = inputStream.getData()) {
-        return FileMagic.valueOf(new BufferedInputStream(is)) == FileMagic.PDF;
+      try (InputStream is = new BufferedInputStream(inputStream.getData())) {
+        return FileMagic.valueOf(is) == FileMagic.PDF;
       } catch (IOException ioe) {
         return false;
       }
@@ -118,7 +183,7 @@ public class PdfExtractor extends AbstractDocumentExtractorDescriptor<PdfExtract
     public Collection<ExtractionWithProperties<String>> extractText(PDDocument doc)
         throws ProcessingException {
       try {
-        return List.of(new ExtractionWithProperties<>(new PDFTextStripper().getText(doc)));
+        return List.of(new ExtractionWithProperties<>(stripper.getText(doc)));
       } catch (IOException e) {
         throw new ProcessingException("Unable to extract text from PDF", e);
       }
@@ -126,50 +191,62 @@ public class PdfExtractor extends AbstractDocumentExtractorDescriptor<PdfExtract
 
     @Override
     public Collection<ExtractionWithProperties<BufferedImage>> extractImages(PDDocument doc) {
-      ImageExtractor extractor = new ImageExtractor();
+      Collection<ExtractionWithProperties<BufferedImage>> images = new ArrayList<>();
+
+      int imageNumber = 0;
+      Collection<COSName> topLevelImages = new ArrayList<>();
+
+      COSDictionary topLevelResources =
+          doc.getPages().getCOSObject().getCOSDictionary(COSName.RESOURCES);
+      if (topLevelResources != null) {
+        PDResources res = new PDResources(topLevelResources);
+
+        Collection<ExtractionWithProperties<BufferedImage>> extracted =
+            getImagesFromResources(res, null, imageNumber, Collections.emptyList());
+        imageNumber += extracted.size();
+
+        extracted.forEach(
+            e -> {
+              String name = e.getProperties().get(PropertyKeys.PROPERTY_KEY_NAME).toString();
+              if (name != null) topLevelImages.add(COSName.getPDFName(name));
+            });
+
+        images.addAll(extracted);
+      }
 
       int pageNumber = 0;
       for (PDPage page : doc.getPages()) {
         pageNumber++;
 
-        try {
-          extractor.setPageNumber(pageNumber);
-          extractor.processPage(page);
-        } catch (IOException e) {
-          logger.warn("Unable to extract images from page {} of PDF", pageNumber, e);
-        }
+        PDResources pdResources = page.getResources();
+        Collection<ExtractionWithProperties<BufferedImage>> extracted =
+            getImagesFromResources(pdResources, pageNumber, imageNumber, topLevelImages);
+        imageNumber += extracted.size();
+
+        images.addAll(extracted);
       }
 
-      return extractor.getExtractedImages();
+      return images;
     }
 
-    private static class ImageExtractor extends PDFStreamEngine {
-      private int imageNumber = 0;
-      private final List<ExtractionWithProperties<BufferedImage>> extractedImages =
-          new ArrayList<>();
+    private Collection<ExtractionWithProperties<BufferedImage>> getImagesFromResources(
+        PDResources resources, Integer pageNumber, int startingIndex, Collection<COSName> skip) {
+      List<ExtractionWithProperties<BufferedImage>> images = new ArrayList<>();
+      int imageNumber = startingIndex;
 
-      private int pageNumber = -1;
+      for (COSName name : resources.getXObjectNames()) {
+        if (skip.contains(name)) continue;
 
-      protected void setPageNumber(int pageNumber) {
-        this.pageNumber = pageNumber;
-      }
+        try {
+          PDXObject o = resources.getXObject(name);
+          if (o instanceof PDImageXObject) {
+            PDImageXObject image = (PDImageXObject) o;
+            imageNumber++;
 
-      protected List<ExtractionWithProperties<BufferedImage>> getExtractedImages() {
-        return extractedImages;
-      }
-
-      @Override
-      protected void processOperator(Operator operator, List<COSBase> operands) throws IOException {
-        if ("Do".equals(operator.getName())) {
-          COSName objectName = (COSName) operands.get(0);
-          PDXObject xobject = getResources().getXObject(objectName);
-
-          if (xobject instanceof PDImageXObject) {
             Map<String, Object> imageMetadata = new HashMap<>();
-
-            PDImageXObject image = (PDImageXObject) xobject;
             PDMetadata metadata = image.getMetadata();
 
+            // Extract metadata
             if (metadata != null) {
               Metadata md = new Metadata();
               XmpReader xmpReader = new XmpReader();
@@ -178,19 +255,240 @@ public class PdfExtractor extends AbstractDocumentExtractorDescriptor<PdfExtract
               imageMetadata.putAll(toMap(md));
             }
 
-            imageNumber++;
-            imageMetadata.put(PropertyKeys.PROPERTY_KEY_INDEX, imageNumber);
-            imageMetadata.put(PropertyKeys.PROPERTY_KEY_PAGE, pageNumber);
+            imageMetadata.put(PropertyKeys.PROPERTY_KEY_NAME, name.getName());
 
-            extractedImages.add(new ExtractionWithProperties<>(image.getImage(), imageMetadata));
-          } else if (xobject instanceof PDFormXObject) {
-            PDFormXObject form = (PDFormXObject) xobject;
-            showForm(form);
+            // Note that index numbers are the order the images are extracted, and not necessarily
+            // the order in which they appear in the document
+            imageMetadata.put(PropertyKeys.PROPERTY_KEY_INDEX, imageNumber);
+
+            if (pageNumber != null) imageMetadata.put(PropertyKeys.PROPERTY_KEY_PAGE, pageNumber);
+
+            images.add(new ExtractionWithProperties<>(image.getImage(), imageMetadata));
           }
-        } else {
-          super.processOperator(operator, operands);
+        } catch (IOException e) {
+          log().warn("Unable to read resource {}", name.getName(), e);
         }
       }
+
+      return images;
+    }
+
+    @Override
+    public Collection<ExtractionWithProperties<Table>> extractTables(PDDocument doc)
+        throws ProcessingException {
+      List<ExtractionWithProperties<Table>> t = new ArrayList<>();
+
+      ObjectExtractor extractor = new ObjectExtractor(doc);
+
+      PageIterator pages = extractor.extract();
+      while (pages.hasNext()) {
+        Page page = pages.next();
+
+        // extract text from the table after detecting
+        List<Rectangle> tablesOnPage = detectionAlgorithm.detect(page);
+
+        log().debug("{} tables found on page {}", tablesOnPage.size(), page.getPageNumber());
+        for (Rectangle r : tablesOnPage) {
+          Page p = page.getArea(r);
+
+          List<? extends technology.tabula.Table> tables;
+          switch (settings.getTableExtractionAlgorithm()) {
+            case STREAM:
+              tables = basicExtractionAlgorithm.extract(p);
+              break;
+            case LATTICE:
+              tables = spreadsheetExtractionAlgorithm.extract(p);
+              break;
+            case DETERMINE:
+            default:
+              tables =
+                  spreadsheetExtractionAlgorithm.isTabular(p)
+                      ? spreadsheetExtractionAlgorithm.extract(p)
+                      : basicExtractionAlgorithm.extract(p);
+          }
+
+          for (technology.tabula.Table table : tables) {
+            Map<String, Object> properties = new HashMap<>();
+            properties.put(PropertyKeys.PROPERTY_KEY_X, table.getX());
+            properties.put(PropertyKeys.PROPERTY_KEY_Y, table.getY());
+            properties.put(PropertyKeys.PROPERTY_KEY_WIDTH, table.getWidth());
+            properties.put(PropertyKeys.PROPERTY_KEY_HEIGHT, table.getHeight());
+            properties.put("extractionMethod", table.getExtractionMethod());
+
+            ExtractionWithProperties<Table> e =
+                new ExtractionWithProperties<>(new PdfTable(table), properties);
+            t.add(e);
+          }
+        }
+      }
+
+      return t;
+    }
+  }
+
+  public static class Settings extends DocumentExtractorSettings {
+    private String articleStart = "";
+    private String articleEnd = "";
+    private String pageStart = "";
+    private String pageEnd = "";
+    private String paragraphStart = "";
+    private String paragraphEnd = "\n\n";
+
+    private DetectionAlgorithmType tableDetectionAlgorithm = DetectionAlgorithmType.LATTICE;
+    private ExtractionAlgorithmType tableExtractionAlgorithm = ExtractionAlgorithmType.LATTICE;
+
+    public Settings() {
+      // Default constructor
+    }
+
+    public Settings(DocumentExtractorSettings settings) {
+      super(settings);
+    }
+
+    @Override
+    public boolean validate() {
+      return super.validate()
+          && articleStart != null
+          && articleEnd != null
+          && pageStart != null
+          && pageEnd != null
+          && paragraphStart != null
+          && paragraphEnd != null;
+    }
+
+    @Description("String to add at the start of each article")
+    public String getArticleStart() {
+      return articleStart;
+    }
+
+    public void setArticleStart(String articleStart) {
+      this.articleStart = articleStart;
+    }
+
+    @Description("String to add at the end of each article")
+    public String getArticleEnd() {
+      return articleEnd;
+    }
+
+    public void setArticleEnd(String articleEnd) {
+      this.articleEnd = articleEnd;
+    }
+
+    @Description("String to add at the start of each article")
+    public String getPageStart() {
+      return pageStart;
+    }
+
+    public void setPageStart(String pageStart) {
+      this.pageStart = pageStart;
+    }
+
+    @Description("String to add at the end of each page")
+    public String getPageEnd() {
+      return pageEnd;
+    }
+
+    public void setPageEnd(String pageEnd) {
+      this.pageEnd = pageEnd;
+    }
+
+    @Description("String to add at the start of each paragraph")
+    public String getParagraphStart() {
+      return paragraphStart;
+    }
+
+    public void setParagraphStart(String paragraphStart) {
+      this.paragraphStart = paragraphStart;
+    }
+
+    @Description("String to add at the end of each paragraph")
+    public String getParagraphEnd() {
+      return paragraphEnd;
+    }
+
+    public void setParagraphEnd(String paragraphEnd) {
+      this.paragraphEnd = paragraphEnd;
+    }
+
+    @Description("The algorithm to use for detecting table content")
+    public DetectionAlgorithmType getTableDetectionAlgorithm() {
+      return tableDetectionAlgorithm;
+    }
+
+    public void setTableDetectionAlgorithm(DetectionAlgorithmType tableDetectionAlgorithm) {
+      this.tableDetectionAlgorithm = tableDetectionAlgorithm;
+    }
+
+    @Description("The algorithm to use for extracting table content")
+    public ExtractionAlgorithmType getTableExtractionAlgorithm() {
+      return tableExtractionAlgorithm;
+    }
+
+    public void setTableExtractionAlgorithm(ExtractionAlgorithmType tableExtractionAlgorithm) {
+      this.tableExtractionAlgorithm = tableExtractionAlgorithm;
+    }
+  }
+
+  public enum DetectionAlgorithmType {
+    NURMINEN,
+    LATTICE
+  }
+
+  public enum ExtractionAlgorithmType {
+    STREAM,
+    LATTICE,
+    DETERMINE
+  }
+
+  public static class PdfTable implements Table {
+    private final List<Row> rows;
+    private final List<String> columnNames;
+
+    public PdfTable(technology.tabula.Table t) {
+      List<Row> rows = new ArrayList<>(t.getRowCount() - 1);
+
+      List<List<Object>> objRows =
+          t.getRows().stream()
+              .map(
+                  cells ->
+                      cells.stream()
+                          .map(RectangularTextContainer::getText)
+                          .map(ConversionUtils::parseString)
+                          .collect(Collectors.toList()))
+              .collect(Collectors.toList());
+
+      if (objRows.size() > 1) {
+        columnNames = objRows.remove(0).stream().map(Object::toString).collect(Collectors.toList());
+      } else {
+        columnNames = Collections.emptyList();
+      }
+
+      for (int i = 0; i < objRows.size(); i++) {
+        Row row = new DefaultRow(i, columnNames, objRows.get(i));
+        rows.add(row);
+      }
+
+      this.rows = Collections.unmodifiableList(rows);
+    }
+
+    @Override
+    public int getColumnCount() {
+      return columnNames.size();
+    }
+
+    @Override
+    public int getRowCount() {
+      return rows.size();
+    }
+
+    @Override
+    public Optional<List<String>> getColumnNames() {
+      return Optional.of(columnNames);
+    }
+
+    @Override
+    public Stream<Row> getRows() {
+      return rows.stream();
     }
   }
 }

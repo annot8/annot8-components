@@ -4,7 +4,7 @@
 
   <groupId>io.annot8</groupId>
   <artifactId>annot8-components</artifactId>
-  <version>1.1.0</version>
+  <version>1.2.0</version>
   <packaging>pom</packaging>
 
   <name>Annot8 Components</name>
@@ -69,28 +69,28 @@
     <maven.compiler.target>${java.version}</maven.compiler.target>
 
     <!-- Annot8 versions -->
-    <annot8-api.version>1.0</annot8-api.version>
-    <annot8-implementation.version>1.0.2</annot8-implementation.version>
+    <annot8-api.version>1.1</annot8-api.version>
+    <annot8-implementation.version>1.1.0</annot8-implementation.version>
 
     <!-- Utils -->
-    <guava.version>30.1-jre</guava.version>
+    <guava.version>30.1.1-jre</guava.version>
 
     <!-- Testing -->
-    <junit.version>5.7.0</junit.version>
-    <mockito.version>3.7.0</mockito.version>
-    <assertj-core.version>3.18.1</assertj-core.version>
+    <junit.version>5.7.2</junit.version>
+    <mockito.version>3.10.0</mockito.version>
+    <assertj-core.version>3.19.0</assertj-core.version>
     <assertj-guava.version>3.4.0</assertj-guava.version>
 
     <!-- Plugins -->
     <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
     <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
     <junit-platform-surefire-provider.version>1.3.2</junit-platform-surefire-provider.version>
-    <speedy-spotless-maven-plugin.version>0.1.1</speedy-spotless-maven-plugin.version>
+    <speedy-spotless-maven-plugin.version>0.1.3</speedy-spotless-maven-plugin.version>
     <nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>
-    <jacoco-maven-plugin.version>0.8.6</jacoco-maven-plugin.version>
-    <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
+    <jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
+    <maven-gpg-plugin.version>3.0.1</maven-gpg-plugin.version>
     <maven-source-plugin.version>3.2.1</maven-source-plugin.version>
-    <maven-javadoc-plugin.version>3.2.0</maven-javadoc-plugin.version>
+    <maven-javadoc-plugin.version>3.3.0</maven-javadoc-plugin.version>
     <maven-shade-plugin.version>3.2.4</maven-shade-plugin.version>
     <githook-maven-plugin.version>1.0.5</githook-maven-plugin.version>
     <!-- Logging -->
@@ -291,6 +291,18 @@
         <version>${annot8-implementation.version}</version>
       </dependency>
 
+      <!-- Components -->
+      <dependency>
+        <groupId>io.annot8</groupId>
+        <artifactId>annot8-components-base</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.annot8</groupId>
+        <artifactId>annot8-components-base-text</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
       <!-- Testing -->
       <dependency>
         <groupId>io.annot8</groupId>
@@ -443,6 +455,10 @@
                   <artifactSet>
                     <excludes>
                       <exclude>io.annot8:annot8-api</exclude>
+                      <exclude>io.annot8:annot8-implementations</exclude>
+                      <exclude>io.annot8:annot8-implementations-support</exclude>
+                      <exclude>io.annot8:annot8-pipeline-implementation</exclude>
+                      <exclude>io.annot8:annot8-reference-implementation</exclude>
                     </excludes>
                   </artifactSet>
                   <shadedArtifactAttached>true</shadedArtifactAttached>
@@ -471,6 +487,7 @@
   <modules>
     <module>annot8-conventions</module>
     <module>annot8-components-annotations</module>
+    <module>annot8-components-audio</module>
     <module>annot8-components-base</module>
     <module>annot8-components-base-text</module>
     <module>annot8-components-comms</module>
@@ -486,12 +503,16 @@
     <module>annot8-components-groups</module>
     <module>annot8-components-image</module>
     <module>annot8-components-items</module>
+    <module>annot8-components-kafka</module>
     <module>annot8-components-mongo</module>
+    <module>annot8-components-opencv</module>
     <module>annot8-components-opennlp</module>
     <module>annot8-components-print</module>
+    <module>annot8-components-people</module>
     <module>annot8-components-properties</module>
     <module>annot8-components-quantities</module>
     <module>annot8-components-social</module>
+    <module>annot8-components-spacy</module>
     <module>annot8-components-stopwords</module>
     <module>annot8-components-temporal</module>
     <module>annot8-components-tesseract</module>
@@ -502,9 +523,5 @@
     <module>annot8-components-vehicles</module>
     <module>annot8-components-wordnet</module>
     <module>annot8-utils-text</module>
-    <module>annot8-components-people</module>
-    <module>annot8-components-kafka</module>
   </modules>
-
-
 </project>

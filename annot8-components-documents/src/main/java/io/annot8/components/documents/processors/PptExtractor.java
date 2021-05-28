@@ -9,12 +9,13 @@ import io.annot8.api.components.annotations.ComponentName;
 import io.annot8.api.components.annotations.ComponentTags;
 import io.annot8.api.components.annotations.SettingsClass;
 import io.annot8.api.context.Context;
+import io.annot8.api.exceptions.ProcessingException;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.InputStreamContent;
+import io.annot8.common.data.content.Table;
 import io.annot8.components.documents.data.ExtractionWithProperties;
 import io.annot8.conventions.PropertyKeys;
 import java.awt.image.BufferedImage;
-import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -25,36 +26,45 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.imageio.ImageIO;
+import org.apache.poi.hpsf.DocumentSummaryInformation;
+import org.apache.poi.hpsf.SummaryInformation;
+import org.apache.poi.hpsf.extractor.HPSFPropertiesExtractor;
 import org.apache.poi.hslf.usermodel.HSLFPictureData;
 import org.apache.poi.hslf.usermodel.HSLFShape;
 import org.apache.poi.hslf.usermodel.HSLFSlide;
 import org.apache.poi.hslf.usermodel.HSLFSlideShow;
 import org.apache.poi.hslf.usermodel.HSLFTextParagraph;
-import org.apache.poi.poifs.filesystem.FileMagic;
 import org.apache.poi.sl.extractor.SlideShowExtractor;
-import org.slf4j.Logger;
 
 @ComponentName("PowerPoint (PPT) Extractor")
 @ComponentDescription("Extracts image and text from PowerPoint (*.ppt) files")
-@ComponentTags({"documents", "powerpoint", "ppt", "extractor", "text", "images"})
+@ComponentTags({"documents", "powerpoint", "ppt", "extractor", "text", "images", "metadata"})
 @SettingsClass(DocumentExtractorSettings.class)
-public class PptExtractor extends AbstractDocumentExtractorDescriptor<PptExtractor.Processor> {
+public class PptExtractor
+    extends AbstractDocumentExtractorDescriptor<PptExtractor.Processor, DocumentExtractorSettings> {
 
   @Override
   protected Processor createComponent(Context context, DocumentExtractorSettings settings) {
     return new Processor(context, settings);
   }
 
-  public static class Processor extends AbstractDocumentExtractorProcessor<HSLFSlideShow> {
-    private final Logger logger = getLogger();
+  public static class Processor
+      extends AbstractDocumentExtractorProcessor<HSLFSlideShow, DocumentExtractorSettings> {
+
+    private final Map<String, HSLFSlideShow> cache = new HashMap<>();
 
     public Processor(Context context, DocumentExtractorSettings settings) {
       super(context, settings);
     }
 
     @Override
+    public void reset() {
+      cache.clear();
+    }
+
+    @Override
     public boolean isMetadataSupported() {
-      return false;
+      return true;
     }
 
     @Override
@@ -68,39 +78,125 @@ public class PptExtractor extends AbstractDocumentExtractorDescriptor<PptExtract
     }
 
     @Override
+    public boolean isTablesSupported() {
+      return false;
+    }
+
+    @Override
     public boolean acceptFile(FileContent file) {
-      return file.getData().getName().toLowerCase().endsWith(".ppt");
+      HSLFSlideShow doc;
+      try {
+        doc = new HSLFSlideShow(new FileInputStream(file.getData()));
+      } catch (Exception e) {
+        log().debug("FileContent {} not accepted due to: {}", file.getId(), e.getMessage());
+        return false;
+      }
+
+      cache.put(file.getId(), doc);
+      return true;
     }
 
     @Override
     public boolean acceptInputStream(InputStreamContent inputStream) {
-      BufferedInputStream bis = new BufferedInputStream(inputStream.getData());
-      FileMagic fm;
+      HSLFSlideShow doc;
       try {
-        fm = FileMagic.valueOf(bis);
-      } catch (IOException e) {
+        doc = new HSLFSlideShow(inputStream.getData());
+      } catch (Exception e) {
+        log()
+            .debug(
+                "InputStreamContent {} not accepted due to: {}",
+                inputStream.getId(),
+                e.getMessage());
         return false;
       }
 
-      // FIXME: This only checks whether it is an OLE2, not that it is a PowerPoint Document
-      return FileMagic.OLE2 == fm;
+      cache.put(inputStream.getId(), doc);
+      return true;
     }
 
     @Override
     public HSLFSlideShow extractDocument(FileContent file) throws IOException {
-      return new HSLFSlideShow(new FileInputStream(file.getData()));
+      if (cache.containsKey(file.getId())) {
+        return cache.get(file.getId());
+      } else {
+        return new HSLFSlideShow(new FileInputStream(file.getData()));
+      }
     }
 
     @Override
     public HSLFSlideShow extractDocument(InputStreamContent inputStreamContent) throws IOException {
-      return new HSLFSlideShow(inputStreamContent.getData());
+      if (cache.containsKey(inputStreamContent.getId())) {
+        return cache.get(inputStreamContent.getId());
+      } else {
+        return new HSLFSlideShow(inputStreamContent.getData());
+      }
     }
 
     @Override
     public Map<String, Object> extractMetadata(HSLFSlideShow doc) {
-      // TODO: Work out best way to extract metadata, as it's not straightforwards
+      Map<String, Object> props = new HashMap<>();
 
-      return Collections.emptyMap();
+      HPSFPropertiesExtractor propsEx = new HPSFPropertiesExtractor(doc);
+      SummaryInformation si = propsEx.getSummaryInformation();
+
+      props.put(DocumentProperties.APPLICATION, si.getApplicationName());
+      props.put(DocumentProperties.AUTHOR, si.getAuthor());
+      props.put(DocumentProperties.CHARACTER_COUNT, si.getCharCount());
+      props.put(DocumentProperties.KEYWORDS, si.getKeywords());
+      props.put(DocumentProperties.COMMENTS, si.getComments());
+      props.put(DocumentProperties.CREATION_DATE, toTemporal(si.getCreateDateTime()));
+      props.put(DocumentProperties.EDITING_DURATION, si.getEditTime());
+      props.put(DocumentProperties.LAST_MODIFIED_BY, si.getLastAuthor());
+      props.put(DocumentProperties.LAST_PRINTED_DATE, toTemporal(si.getLastPrinted()));
+      props.put(DocumentProperties.LAST_MODIFIED_DATE, toTemporal(si.getLastSaveDateTime()));
+      props.put(DocumentProperties.PAGE_COUNT, si.getPageCount());
+      props.put(DocumentProperties.REVISION, si.getRevNumber());
+      switch (si.getSecurity()) {
+          // 0 = No security, so let's ignore
+        case 1:
+          props.put(DocumentProperties.SECURITY, "passwordProtected");
+          break;
+        case 2:
+          props.put(DocumentProperties.SECURITY, "readOnlyRecommended");
+          break;
+        case 4:
+          props.put(DocumentProperties.SECURITY, "readOnlyEnforced");
+          break;
+        case 8:
+          props.put(DocumentProperties.SECURITY, "lockedForAnnotations");
+          break;
+      }
+      props.put(DocumentProperties.SUBJECT, si.getSubject());
+      props.put(PropertyKeys.PROPERTY_KEY_TITLE, si.getTitle());
+      props.put(DocumentProperties.TEMPLATE, si.getTemplate());
+      props.put(DocumentProperties.WORD_COUNT, si.getWordCount());
+
+      DocumentSummaryInformation di = propsEx.getDocSummaryInformation();
+      props.put(DocumentProperties.APPLICATION_VERSION, di.getApplicationVersion());
+      props.put(DocumentProperties.CATEGORY, di.getCategory());
+      props.put(DocumentProperties.COMPANY, di.getCompany());
+      props.put(DocumentProperties.CONTENT_STATUS, di.getContentStatus());
+      props.put(DocumentProperties.CONTENT_TYPE, di.getContentType());
+      props.put(DocumentProperties.BYTE_COUNT, di.getByteCount());
+      props.put(DocumentProperties.CHARACTER_COUNT_WS, di.getCharCountWithSpaces());
+      props.put(DocumentProperties.DOCUMENT_VERSION, di.getDocumentVersion());
+      props.put(DocumentProperties.HIDDEN_COUNT, di.getHiddenCount());
+      props.put(PropertyKeys.PROPERTY_KEY_LANGUAGE, di.getLanguage());
+      props.put(DocumentProperties.LINE_COUNT, di.getLineCount());
+      props.put(DocumentProperties.MANAGER, di.getManager());
+      props.put(DocumentProperties.MULTIMEDIA_CLIP_COUNT, di.getMMClipCount());
+      props.put(DocumentProperties.NOTE_COUNT, di.getNoteCount());
+      props.put(DocumentProperties.PARAGRAPH_COUNT, di.getParCount());
+      props.put(DocumentProperties.PRESENTATION_FORMAT, di.getPresentationFormat());
+      props.put(DocumentProperties.SLIDE_COUNT, di.getSlideCount());
+
+      di.getCustomProperties()
+          .forEach((k, v) -> props.put(DocumentProperties.CUSTOM_PREFIX + k, v));
+
+      // Remove any values that are 0, which POI uses to indicate null for integers
+      props.values().removeIf(o -> Integer.valueOf(0).equals(o));
+
+      return props;
     }
 
     @Override
@@ -178,12 +274,12 @@ public class PptExtractor extends AbstractDocumentExtractorDescriptor<PptExtract
         try {
           bImg = ImageIO.read(new ByteArrayInputStream(picture.getData()));
         } catch (IOException e) {
-          logger.warn("Unable to extract image {} from document", picture.getIndex() + 1, e);
+          log().warn("Unable to extract image {} from document", picture.getIndex(), e);
           continue;
         }
 
         if (bImg == null) {
-          logger.warn("Null image {} extracted from document", picture.getIndex() + 1);
+          log().warn("Null image {} extracted from document", picture.getIndex());
           continue;
         }
 
@@ -194,16 +290,23 @@ public class PptExtractor extends AbstractDocumentExtractorDescriptor<PptExtract
               ImageMetadataReader.readMetadata(new ByteArrayInputStream(picture.getData()));
           properties.putAll(toMap(imageMetadata));
         } catch (ImageProcessingException | IOException e) {
-          logger.warn("Unable to extract metadata from image {}", picture.getIndex() + 1, e);
+          log().warn("Unable to extract metadata from image {}", picture.getIndex(), e);
         }
 
-        properties.put(PropertyKeys.PROPERTY_KEY_INDEX, picture.getIndex() + 1);
+        properties.put(PropertyKeys.PROPERTY_KEY_INDEX, picture.getIndex());
         properties.put(PropertyKeys.PROPERTY_KEY_MIMETYPE, picture.getContentType());
 
         extractedImages.add(new ExtractionWithProperties<>(bImg, properties));
       }
 
       return extractedImages;
+    }
+
+    @Override
+    public Collection<ExtractionWithProperties<Table>> extractTables(HSLFSlideShow doc)
+        throws ProcessingException {
+      // TODO: Extract tables from PPT
+      return Collections.emptyList();
     }
   }
 }

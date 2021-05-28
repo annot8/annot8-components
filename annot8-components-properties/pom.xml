@@ -5,19 +5,19 @@
   <parent>
     <artifactId>annot8-components</artifactId>
     <groupId>io.annot8</groupId>
-    <version>1.1.0</version>
+    <version>1.2.0</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>annot8-components-properties</artifactId>
-  <version>1.1.0</version>
+  <version>1.2.0</version>
   <name>Annot8 Properties Components</name>
   <description>Components to work with properties</description>
 
   <dependencies>
     <dependency>
       <groupId>io.annot8</groupId>
-      <artifactId>annot8-common-components</artifactId>
+      <artifactId>annot8-components-base</artifactId>
     </dependency>
   </dependencies>
 

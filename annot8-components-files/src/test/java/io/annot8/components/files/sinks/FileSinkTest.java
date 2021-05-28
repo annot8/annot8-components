@@ -32,6 +32,12 @@ import io.annot8.conventions.PropertyKeys;
 import io.annot8.implementations.support.context.SimpleContext;
 import io.annot8.testing.testimpl.TestItem;
 import io.annot8.testing.testimpl.content.TestStringContent;
+import jakarta.json.Json;
+import jakarta.json.JsonArray;
+import jakarta.json.JsonArrayBuilder;
+import jakarta.json.JsonObject;
+import jakarta.json.JsonObjectBuilder;
+import jakarta.json.JsonValue;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -52,12 +58,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 import javax.imageio.ImageIO;
-import javax.json.Json;
-import javax.json.JsonArray;
-import javax.json.JsonArrayBuilder;
-import javax.json.JsonObject;
-import javax.json.JsonObjectBuilder;
-import javax.json.JsonValue;
 import org.junit.jupiter.api.Test;
 
 public class FileSinkTest {
@@ -926,6 +926,7 @@ public class FileSinkTest {
     Content<?> c1 =
         item.createContent(Text.class)
             .withData("Test Content")
+            .withDescription("Test Content Description")
             .withProperty("val", "Text content property")
             .save();
 
@@ -1034,6 +1035,95 @@ public class FileSinkTest {
         outputFolder
             .resolve(c2.getId())
             .resolve(settings.getAnnotationsFilename())
+            .toFile()
+            .exists());
+
+    // Description
+    assertTrue(
+        outputFolder
+            .resolve(c1.getId())
+            .resolve(settings.getDescriptionFilename())
+            .toFile()
+            .exists());
+    assertFalse(
+        outputFolder
+            .resolve(c2.getId())
+            .resolve(settings.getDescriptionFilename())
+            .toFile()
+            .exists());
+
+    // Delete temp directory
+    Files.walk(tempRootDir)
+        .sorted(Comparator.reverseOrder())
+        .map(Path::toFile)
+        .forEach(File::delete);
+  }
+
+  @Test
+  public void testNestedFolders() throws Exception {
+    TestItem item = new TestItem();
+
+    Content<?> c1 = item.createContent(Text.class).withData("Bonjour le monde").save();
+    Content<?> c2 =
+        item.createContent(Text.class)
+            .withData("Hello World")
+            .withProperty(PropertyKeys.PROPERTY_KEY_PARENT, c1.getId())
+            .save();
+    Content<?> c3 =
+        item.createContent(Text.class)
+            .withData("Hello")
+            .withProperty(PropertyKeys.PROPERTY_KEY_PARENT, c2.getId())
+            .save();
+    Content<?> c4 =
+        item.createContent(Text.class)
+            .withData("World")
+            .withProperty(PropertyKeys.PROPERTY_KEY_PARENT, c2.getId())
+            .save();
+
+    Path tempRootDir = Files.createTempDirectory("file-sink-test");
+
+    FileSink.Settings settings = new FileSink.Settings();
+    settings.setRootOutputFolder(tempRootDir);
+    settings.setNestFolders(true);
+
+    FileSink.Processor processor = new FileSink.Processor(settings);
+    processor.process(item);
+
+    Path outputFolder = Path.of(tempRootDir.toString(), item.getId());
+
+    // Content 1
+    assertTrue(
+        outputFolder
+            .resolve(c1.getId())
+            .resolve(settings.getContentFilename() + ".txt")
+            .toFile()
+            .exists());
+
+    // Content 2, nested under Content 1
+    assertTrue(
+        outputFolder
+            .resolve(c1.getId())
+            .resolve(c2.getId())
+            .resolve(settings.getContentFilename() + ".txt")
+            .toFile()
+            .exists());
+
+    // Content 3 and 4, nested under Content 1 and Content 2
+    assertTrue(
+        outputFolder
+            .resolve(c1.getId())
+            .resolve(c2.getId())
+            .resolve(c3.getId())
+            .resolve(settings.getContentFilename() + ".txt")
+            .toFile()
+            .exists());
+
+    assertTrue(
+        outputFolder
+            .resolve(c1.getId())
+            .resolve(c2.getId())
+            .resolve(c4.getId())
+            .resolve(settings.getContentFilename() + ".txt")
             .toFile()
             .exists());
 

@@ -10,26 +10,34 @@ import io.annot8.api.components.annotations.ComponentTags;
 import io.annot8.api.components.annotations.SettingsClass;
 import io.annot8.api.context.Context;
 import io.annot8.api.exceptions.ProcessingException;
+import io.annot8.common.data.content.DefaultRow;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.InputStreamContent;
+import io.annot8.common.data.content.Row;
+import io.annot8.common.data.content.Table;
 import io.annot8.components.documents.data.ExtractionWithProperties;
 import io.annot8.conventions.PropertyKeys;
 import java.awt.image.BufferedImage;
-import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.imageio.ImageIO;
-import org.apache.poi.poifs.filesystem.FileMagic;
 import org.odftoolkit.odfdom.doc.OdfTextDocument;
+import org.odftoolkit.odfdom.doc.table.OdfTable;
+import org.odftoolkit.odfdom.doc.table.OdfTableCell;
+import org.odftoolkit.odfdom.doc.table.OdfTableRow;
 import org.odftoolkit.odfdom.incubator.doc.draw.OdfDrawFrame;
 import org.odftoolkit.odfdom.incubator.doc.draw.OdfDrawImage;
 import org.odftoolkit.odfdom.incubator.meta.OdfMetaDocumentStatistic;
 import org.odftoolkit.odfdom.incubator.meta.OdfOfficeMeta;
-import org.slf4j.Logger;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -43,20 +51,37 @@ import org.w3c.dom.NodeList;
  */
 @ComponentName("Open Document Text (ODT) Extractor")
 @ComponentDescription("Extracts image and text from Open Document Text (*.odt) files")
-@ComponentTags({"documents", "opendocument", "odt", "extractor", "text", "images", "metadata"})
+@ComponentTags({
+  "documents",
+  "opendocument",
+  "odt",
+  "extractor",
+  "text",
+  "images",
+  "metadata",
+  "tables"
+})
 @SettingsClass(DocumentExtractorSettings.class)
-public class OdtExtractor extends AbstractDocumentExtractorDescriptor<OdtExtractor.Processor> {
+public class OdtExtractor
+    extends AbstractDocumentExtractorDescriptor<OdtExtractor.Processor, DocumentExtractorSettings> {
 
   @Override
   protected Processor createComponent(Context context, DocumentExtractorSettings settings) {
     return new Processor(context, settings);
   }
 
-  public static class Processor extends AbstractDocumentExtractorProcessor<OdfTextDocument> {
-    private final Logger logger = getLogger();
+  public static class Processor
+      extends AbstractDocumentExtractorProcessor<OdfTextDocument, DocumentExtractorSettings> {
+
+    private final Map<String, OdfTextDocument> cache = new HashMap<>();
 
     public Processor(Context context, DocumentExtractorSettings settings) {
       super(context, settings);
+    }
+
+    @Override
+    public void reset() {
+      cache.clear();
     }
 
     @Override
@@ -75,41 +100,66 @@ public class OdtExtractor extends AbstractDocumentExtractorDescriptor<OdtExtract
     }
 
     @Override
+    public boolean isTablesSupported() {
+      return true;
+    }
+
+    @Override
     public boolean acceptFile(FileContent file) {
-      return file.getData().getName().toLowerCase().endsWith(".odt");
+      OdfTextDocument doc;
+      try {
+        doc = OdfTextDocument.loadDocument(file.getData());
+      } catch (Exception e) {
+        log().debug("FileContent {} not accepted due to: {}", file.getId(), e.getMessage());
+        return false;
+      }
+
+      cache.put(file.getId(), doc);
+      return true;
     }
 
     @Override
     public boolean acceptInputStream(InputStreamContent inputStream) {
-      BufferedInputStream bis = new BufferedInputStream(inputStream.getData());
-      FileMagic fm;
+      OdfTextDocument doc;
       try {
-        fm = FileMagic.valueOf(bis);
-      } catch (IOException e) {
+        doc = OdfTextDocument.loadDocument(inputStream.getData());
+      } catch (Exception e) {
+        log()
+            .debug(
+                "InputStreamContent {} not accepted due to: {}",
+                inputStream.getId(),
+                e.getMessage());
         return false;
       }
 
-      // FIXME: OOXML and ODF have the same container format (ZIP), so have the same code.
-      // Can't determine which it usingFileMagic here, or even if it is a document...
-      return FileMagic.OOXML == fm;
+      cache.put(inputStream.getId(), doc);
+      return true;
     }
 
     @Override
     public OdfTextDocument extractDocument(FileContent file) throws IOException {
-      try {
-        return OdfTextDocument.loadDocument(file.getData());
-      } catch (Exception e) {
-        throw new IOException("Unable to load document", e);
+      if (cache.containsKey(file.getId())) {
+        return cache.get(file.getId());
+      } else {
+        try {
+          return OdfTextDocument.loadDocument(file.getData());
+        } catch (Exception e) {
+          throw new IOException("Unable to read ODT document", e);
+        }
       }
     }
 
     @Override
     public OdfTextDocument extractDocument(InputStreamContent inputStreamContent)
         throws IOException {
-      try {
-        return OdfTextDocument.loadDocument(inputStreamContent.getData());
-      } catch (Exception e) {
-        throw new IOException("Unable to load document", e);
+      if (cache.containsKey(inputStreamContent.getId())) {
+        return cache.get(inputStreamContent.getId());
+      } else {
+        try {
+          return OdfTextDocument.loadDocument(inputStreamContent.getData());
+        } catch (Exception e) {
+          throw new IOException("Unable to read ODT document", e);
+        }
       }
     }
 
@@ -260,12 +310,12 @@ public class OdtExtractor extends AbstractDocumentExtractorDescriptor<OdtExtract
           try {
             bImg = ImageIO.read(doc.getPackage().getInputStream(href));
           } catch (IOException e) {
-            logger.warn("Unable to extract image {} from document", imageNumber, e);
+            log().warn("Unable to extract image {} from document", imageNumber, e);
             continue;
           }
 
           if (bImg == null) {
-            logger.warn("Null image {} extracted from document", imageNumber);
+            log().warn("Null image {} extracted from document", imageNumber);
             continue;
           }
 
@@ -276,7 +326,7 @@ public class OdtExtractor extends AbstractDocumentExtractorDescriptor<OdtExtract
                 ImageMetadataReader.readMetadata(doc.getPackage().getInputStream(href));
             properties.putAll(toMap(imageMetadata));
           } catch (ImageProcessingException | IOException e) {
-            logger.warn("Unable to extract metadata from image {}", imageNumber, e);
+            log().warn("Unable to extract metadata from image {}", imageNumber, e);
           }
 
           properties.put(PropertyKeys.PROPERTY_KEY_NAME, frameName);
@@ -295,9 +345,123 @@ public class OdtExtractor extends AbstractDocumentExtractorDescriptor<OdtExtract
       return extractedImages;
     }
 
+    @Override
+    public Collection<ExtractionWithProperties<Table>> extractTables(OdfTextDocument doc)
+        throws ProcessingException {
+      return doc.getTableList().stream()
+          .map(Processor::transformTable)
+          .collect(Collectors.toList());
+    }
+
+    private static ExtractionWithProperties<Table> transformTable(OdfTable table) {
+      Map<String, Object> props = new HashMap<>();
+
+      String name = table.getTableName();
+      if (name != null && !name.isBlank()) props.put(PropertyKeys.PROPERTY_KEY_NAME, name);
+
+      return new ExtractionWithProperties<>(new OdtTable(table), props);
+    }
+
     private String getValueOfFirstElement(NodeList nodeList) {
       if (nodeList.getLength() == 0) return null;
       return nodeList.item(0).getTextContent().strip();
+    }
+  }
+
+  public static class OdtTable implements Table {
+    private final List<Row> rows;
+    private final List<String> columnNames;
+
+    public OdtTable(OdfTable t) {
+      int headerRows = Math.max(1, t.getHeaderRowCount());
+      List<Row> rows = new ArrayList<>(t.getRowCount() - headerRows);
+      List<String> columnNames = Collections.emptyList();
+
+      for (int i = 0; i < t.getRowCount(); i++) {
+        if (i == 0) {
+          OdfTableRow headerRow = t.getRowByIndex(i);
+
+          List<String> header = new ArrayList<>(headerRow.getCellCount());
+          for (int col = 0; col < headerRow.getCellCount(); col++) {
+            OdfTableCell headerCell = headerRow.getCellByIndex(col);
+            header.add(headerCell.getDisplayText());
+          }
+
+          columnNames = header;
+
+          continue;
+        }
+
+        if (i < t.getHeaderRowCount()) {
+          continue;
+        }
+
+        OdfTableRow row = t.getRowByIndex(i);
+
+        List<Object> values = new ArrayList<>(row.getCellCount());
+        for (int col = 0; col < row.getCellCount(); col++) {
+          OdfTableCell cell = row.getCellByIndex(col);
+
+          switch (cell.getValueType()) {
+            case "boolean":
+              values.add(cell.getBooleanValue());
+              break;
+            case "currency":
+              String currencyPrefix = "";
+              if (cell.getCurrencyCode() != null && !cell.getCurrencyCode().isBlank()) {
+                currencyPrefix = cell.getCurrencyCode() + " ";
+              } else if (cell.getCurrencySymbol() != null && !cell.getCurrencySymbol().isBlank()) {
+                currencyPrefix = cell.getCurrencySymbol();
+              }
+              values.add(currencyPrefix + cell.getCurrencyValue());
+              break;
+            case "date":
+              values.add(
+                  cell.getDateValue().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+              break;
+            case "float":
+              values.add(cell.getDoubleValue());
+              break;
+            case "percentage":
+              values.add(cell.getPercentageValue());
+              break;
+            case "string":
+              values.add(cell.getStringValue());
+              break;
+            case "time":
+              values.add(
+                  cell.getDateValue().toInstant().atZone(ZoneId.systemDefault()).toLocalTime());
+              break;
+            default:
+              values.add(cell.getDisplayText());
+          }
+        }
+
+        rows.add(new DefaultRow(i - headerRows, columnNames, values));
+      }
+
+      this.rows = Collections.unmodifiableList(rows);
+      this.columnNames = columnNames;
+    }
+
+    @Override
+    public int getColumnCount() {
+      return columnNames.size();
+    }
+
+    @Override
+    public int getRowCount() {
+      return rows.size();
+    }
+
+    @Override
+    public Optional<List<String>> getColumnNames() {
+      return Optional.of(columnNames);
+    }
+
+    @Override
+    public Stream<Row> getRows() {
+      return rows.stream();
     }
   }
 }

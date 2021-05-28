@@ -4,7 +4,7 @@ module io.annot8.components.base.text {
   requires io.annot8.components.base;
   requires io.annot8.components.stopwords;
   requires io.annot8.conventions;
-  requires java.json.bind;
+  requires jakarta.json.bind;
 
   exports io.annot8.components.base.text.processors;
 }

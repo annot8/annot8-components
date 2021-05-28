@@ -7,6 +7,7 @@ import io.annot8.api.annotations.Annotation;
 import io.annot8.api.components.Processor;
 import io.annot8.api.data.Item;
 import io.annot8.common.data.content.Text;
+import io.annot8.components.geo.processors.geonames.GeoNamesAdditionalProperties;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
 import io.annot8.testing.testimpl.TestItem;
@@ -25,7 +26,7 @@ public class GeoNamesGazetteerTest {
             .save();
 
     GeoNamesGazetteer.Settings s = new GeoNamesGazetteer.Settings();
-    s.setAdditionalProperties(GeoNamesGazetteer.Settings.GeoNamesAdditionalProperties.ALL);
+    s.setAdditionalProperties(GeoNamesAdditionalProperties.ALL);
     s.setGeoJson(true);
     s.setGeonamesFile(
         Paths.get(GeoNamesGazetteerTest.class.getResource("AI.txt").toURI()).toFile());

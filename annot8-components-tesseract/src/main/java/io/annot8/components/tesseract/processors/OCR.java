@@ -17,6 +17,7 @@ import io.annot8.common.components.capabilities.SimpleCapabilities;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.Image;
 import io.annot8.common.data.content.Text;
+import io.annot8.conventions.PropertyKeys;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -83,31 +84,62 @@ public class OCR extends AbstractProcessorDescriptor<OCR.Processor, OCR.Settings
                       FilenameUtils.getExtension(fc.getData().getName()).toLowerCase()))
           .forEach(
               fc -> {
-                try {
-                  createTextContent(item, instance.doOCR(fc.getData()), fc);
-                } catch (TesseractException e) {
-                  log().error("Unable to extract text from content {}", fc.getId(), e);
-                }
+                String content =
+                    metrics()
+                        .timer("ocr-file")
+                        .record(
+                            () -> {
+                              try {
+                                return instance.doOCR(fc.getData());
+                              } catch (TesseractException e) {
+                                log()
+                                    .error(
+                                        "Unable to extract text from File content {}",
+                                        fc.getId(),
+                                        e);
+                              }
+
+                              return null;
+                            });
+
+                createTextContent(item, content, fc);
               });
 
       item.getContents(Image.class)
           .forEach(
               image -> {
-                try {
-                  createTextContent(item, instance.doOCR(image.getData()), image);
-                } catch (TesseractException e) {
-                  log().error("Unable to extract text from content {}", image.getId(), e);
-                }
+                String content =
+                    metrics()
+                        .timer("ocr-image")
+                        .record(
+                            () -> {
+                              try {
+                                return instance.doOCR(image.getData());
+                              } catch (TesseractException e) {
+                                log()
+                                    .error(
+                                        "Unable to extract text from Image content {}",
+                                        image.getId(),
+                                        e);
+                              }
+
+                              return null;
+                            });
+
+                createTextContent(item, content, image);
               });
 
       return ProcessorResponse.ok();
     }
 
     private Text createTextContent(Item item, String textContent, Content<?> sourceContent) {
+      if (textContent == null || textContent.isBlank()) return null;
+
       return item.createContent(Text.class)
           .withDescription("OCR from " + sourceContent.getId())
           .withData(textContent)
           .withProperties(sourceContent.getProperties())
+          .withProperty(PropertyKeys.PROPERTY_KEY_PARENT, sourceContent.getId())
           .save();
     }
   }
@@ -115,8 +147,7 @@ public class OCR extends AbstractProcessorDescriptor<OCR.Processor, OCR.Settings
   /** Settings class for {@link OCR} */
   public static class Settings implements io.annot8.api.settings.Settings {
     // Processor Settings
-    private List<String> extensions =
-        Arrays.asList("bmp", "gif", "jpg", "jpeg", "pdf", "tif", "tiff");
+    private List<String> extensions = Arrays.asList("bmp", "gif", "jpg", "jpeg", "tif", "tiff");
 
     // Tesseract Settings
     private List<String> configs = new ArrayList<>();

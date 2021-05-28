@@ -14,11 +14,11 @@ import io.annot8.common.data.content.Text;
 import io.annot8.components.base.text.processors.AbstractTextProcessor;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.PropertyKeys;
+import jakarta.json.bind.annotation.JsonbCreator;
+import jakarta.json.bind.annotation.JsonbProperty;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.json.bind.annotation.JsonbCreator;
-import javax.json.bind.annotation.JsonbProperty;
 import org.opensextant.geodesy.MGRS;
 
 /** Extract MGRS coordinates, optionally ignoring MGRS coordinates that could be dates */

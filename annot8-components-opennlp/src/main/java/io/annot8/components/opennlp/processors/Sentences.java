@@ -4,6 +4,7 @@ package io.annot8.components.opennlp.processors;
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
 import io.annot8.api.components.annotations.ComponentName;
+import io.annot8.api.components.annotations.ComponentTags;
 import io.annot8.api.components.annotations.SettingsClass;
 import io.annot8.api.context.Context;
 import io.annot8.api.exceptions.BadConfigurationException;
@@ -26,6 +27,7 @@ import opennlp.tools.util.Span;
 @ComponentName("OpenNLP Sentences")
 @ComponentDescription("Annotate sentences identified by OpenNLP's sentence detector")
 @SettingsClass(Sentences.Settings.class)
+@ComponentTags({"opennlp", "sentences"})
 public class Sentences
     extends AbstractProcessorDescriptor<Sentences.Processor, Sentences.Settings> {
   @Override

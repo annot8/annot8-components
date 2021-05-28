@@ -13,6 +13,8 @@ public class GroupTypes {
   public static final String GROUP_TYPE_EVENT = GROUP_PREFIX + "event";
   public static final String EVENT_PREFIX = GROUP_TYPE_EVENT + PathUtils.SEPARATOR;
 
+  public static final String GROUP_TYPE_SAMEAS = GROUP_PREFIX + "sameAs";
+
   public static final String GROUP_TYPE_GRAMMAR_COREFERENCE = GRAMMAR_PREFIX + "coreference";
   public static final String GROUP_TYPE_GRAMMAR_PHRASE = GRAMMAR_PREFIX + "phrase";
   public static final String GROUP_TYPE_RELATION_OWNS = RELATION_PREFIX + "owns";

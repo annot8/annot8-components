@@ -4,7 +4,7 @@ open module io.annot8.components.types {
   requires io.annot8.components.base;
   requires io.annot8.conventions;
   requires io.annot8.common.components;
-  requires java.json.bind;
+  requires jakarta.json.bind;
   requires org.slf4j;
 
   exports io.annot8.components.types.processors;

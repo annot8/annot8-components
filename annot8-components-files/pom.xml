@@ -5,12 +5,12 @@
   <parent>
     <artifactId>annot8-components</artifactId>
     <groupId>io.annot8</groupId>
-    <version>1.1.0</version>
+    <version>1.2.0</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>annot8-components-files</artifactId>
-  <version>1.1.0</version>
+  <version>1.2.0</version>
   <name>Annot8 File Components</name>
   <description>Components to process files</description>
 
@@ -18,16 +18,6 @@
     <dependency>
       <groupId>io.annot8</groupId>
       <artifactId>annot8-components-base</artifactId>
-      <version>1.1.0</version>
-    </dependency>
-    <dependency>
-      <groupId>io.annot8</groupId>
-      <artifactId>annot8-conventions</artifactId>
-      <version>1.1.0</version>
-    </dependency>
-    <dependency>
-      <groupId>io.annot8</groupId>
-      <artifactId>annot8-common-components</artifactId>
     </dependency>
 
     <dependency>
@@ -40,15 +30,35 @@
       <version>1.9</version>
     </dependency>
     <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-compress</artifactId>
+      <version>1.20</version>
+    </dependency>
+    <dependency>
+      <groupId>org.tukaani</groupId>
+      <artifactId>xz</artifactId>
+      <version>1.9</version>
+    </dependency>
+    <dependency>
       <groupId>org.apache.james</groupId>
       <artifactId>apache-mime4j-dom</artifactId>
-      <version>0.8.3</version>
+      <version>0.8.4</version>
+    </dependency>
+    <dependency>
+      <groupId>de.siegmar</groupId>
+      <artifactId>fastcsv</artifactId>
+      <version>2.0.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.j256.simplemagic</groupId>
+      <artifactId>simplemagic</artifactId>
+      <version>1.16</version>
     </dependency>
 
     <dependency>
-      <groupId>org.apache.johnzon</groupId>
-      <artifactId>johnzon-mapper</artifactId>
-      <version>1.2.9</version>
+      <groupId>org.eclipse</groupId>
+      <artifactId>yasson</artifactId>
+      <version>2.0.2</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

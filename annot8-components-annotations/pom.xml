@@ -5,21 +5,16 @@
   <parent>
     <artifactId>annot8-components</artifactId>
     <groupId>io.annot8</groupId>
-    <version>1.1.0</version>
+    <version>1.2.0</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>annot8-components-annotations</artifactId>
-  <version>1.1.0</version>
+  <version>1.2.0</version>
   <name>Annot8 Annotations Components</name>
   <description>Components to work with annotations</description>
 
   <dependencies>
-    <dependency>
-      <groupId>io.annot8</groupId>
-      <artifactId>annot8-common-components</artifactId>
-    </dependency>
-
     <dependency>
       <groupId>javax.json.bind</groupId>
       <artifactId>javax.json.bind-api</artifactId>
@@ -28,12 +23,7 @@
 
     <dependency>
       <groupId>io.annot8</groupId>
-      <artifactId>annot8-common-data</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>io.annot8</groupId>
       <artifactId>annot8-components-base</artifactId>
-      <version>1.1.0</version>
     </dependency>
   </dependencies>
 

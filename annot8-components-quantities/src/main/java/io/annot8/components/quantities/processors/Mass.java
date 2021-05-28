@@ -61,7 +61,7 @@ public class Mass extends AbstractProcessorDescriptor<Mass.Processor, NoSettings
             Pattern.CASE_INSENSITIVE);
     private final Pattern lbPattern =
         Pattern.compile(
-            "\\b([0-9]+([0-9\\.,]+[0-9])?)[ ]?(thousand|million|billion|trillion)?[ ]?(lb)(s)?\\b",
+            "\\b([0-9]+([0-9\\.,]+[0-9])?)[ ]?(thousand|million|billion|trillion)?[ ]?(pound|lb)(s)?\\b",
             Pattern.CASE_INSENSITIVE);
     private final Pattern stonePattern =
         Pattern.compile(

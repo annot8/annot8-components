@@ -77,17 +77,17 @@ public class JsonExtractorTest {
 
       assertFalse(mProps.containsKey("nullValue"));
       assertEquals("Howdy y'all", mProps.get("stringValue3"));
-      assertEquals(42L, mProps.get("intValue"));
+      assertEquals(42, mProps.get("intValue"));
       assertEquals(new BigDecimal("1.234"), mProps.get("doubleValue"));
       assertEquals(true, mProps.get("trueValue"));
       assertEquals(false, mProps.get("falseValue"));
       assertEquals(List.of("A", "B", "C"), mProps.get("arrayOfStrings"));
-      assertEquals(List.of(1L, 2L, 3L), mProps.get("arrayOfNumbers"));
-      assertEquals(List.of("A", 1L), mProps.get("mixedArray"));
+      assertEquals(List.of(1, 2, 3), mProps.get("arrayOfNumbers"));
+      assertEquals(List.of("A", 1), mProps.get("mixedArray"));
 
       Map<String, Object> mObject = new HashMap<>();
       mObject.put("stringValue", "Hello");
-      mObject.put("intValue", 100L);
+      mObject.put("intValue", 100);
 
       assertEquals(mObject, mProps.get("object"));
 
@@ -227,10 +227,11 @@ public class JsonExtractorTest {
             Text t = i.getContents(Text.class).findFirst().orElseThrow();
 
             assertTrue(i.getProperties().has("line"));
-            long line = i.getProperties().get("line", Long.class).orElse(-1L);
-            if (line == 1L) {
+
+            int line = i.getProperties().get("line", Integer.class).orElse(-1);
+            if (line == 1) {
               assertEquals("Line 1", t.getData());
-            } else if (line == 2L) {
+            } else if (line == 2) {
               assertEquals("Line 2", t.getData());
             } else {
               fail("Unexpected property value");

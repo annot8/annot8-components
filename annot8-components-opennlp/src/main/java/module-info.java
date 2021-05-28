@@ -6,6 +6,7 @@ module io.annot8.components.opennlp {
   requires org.apache.opennlp.tools;
   requires io.annot8.common.utils;
   requires io.annot8.common.components;
+  requires io.annot8.components.base;
 
   exports io.annot8.components.opennlp.processors;
 }

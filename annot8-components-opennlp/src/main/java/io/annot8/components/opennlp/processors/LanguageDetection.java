@@ -4,6 +4,7 @@ package io.annot8.components.opennlp.processors;
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
 import io.annot8.api.components.annotations.ComponentName;
+import io.annot8.api.components.annotations.ComponentTags;
 import io.annot8.api.components.annotations.SettingsClass;
 import io.annot8.api.context.Context;
 import io.annot8.api.exceptions.BadConfigurationException;
@@ -27,6 +28,7 @@ import opennlp.tools.langdetect.LanguageDetectorModel;
 @ComponentName("OpenNLP Language Detection")
 @ComponentDescription("Annotate tokens identified by OpenNLP's language detector")
 @SettingsClass(LanguageDetection.Settings.class)
+@ComponentTags({"opennlp", "language"})
 public class LanguageDetection
     extends AbstractProcessorDescriptor<LanguageDetection.Processor, LanguageDetection.Settings> {
   @Override

@@ -12,9 +12,9 @@ import io.annot8.common.components.AbstractProcessorDescriptor;
 import io.annot8.common.components.capabilities.SimpleCapabilities;
 import io.annot8.common.data.content.Text;
 import io.annot8.components.base.text.processors.AbstractTextProcessor;
+import jakarta.json.bind.annotation.JsonbCreator;
+import jakarta.json.bind.annotation.JsonbProperty;
 import java.util.regex.Pattern;
-import javax.json.bind.annotation.JsonbCreator;
-import javax.json.bind.annotation.JsonbProperty;
 
 @ComponentName("Discard Text")
 @ComponentDescription("Discard text content if it matches a regular expression")
@@ -59,7 +59,7 @@ public class Discard extends AbstractProcessorDescriptor<Discard.Processor, Disc
     private boolean inverse;
 
     public Settings() {
-      discardOn = Pattern.compile(".*discard me.*", Pattern.CASE_INSENSITIVE);
+      discardOn = Pattern.compile(".*discard me.*", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
       inverse = false;
     }
 

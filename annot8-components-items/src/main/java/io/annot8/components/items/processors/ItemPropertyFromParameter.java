@@ -4,6 +4,7 @@ package io.annot8.components.items.processors;
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
 import io.annot8.api.components.annotations.ComponentName;
+import io.annot8.api.components.annotations.ComponentTags;
 import io.annot8.api.components.annotations.SettingsClass;
 import io.annot8.api.components.responses.ProcessorResponse;
 import io.annot8.api.context.Context;
@@ -12,12 +13,13 @@ import io.annot8.api.settings.Description;
 import io.annot8.common.components.AbstractProcessor;
 import io.annot8.common.components.AbstractProcessorDescriptor;
 import io.annot8.common.components.capabilities.SimpleCapabilities;
-import javax.json.bind.annotation.JsonbCreator;
-import javax.json.bind.annotation.JsonbProperty;
+import jakarta.json.bind.annotation.JsonbCreator;
+import jakarta.json.bind.annotation.JsonbProperty;
 
 @ComponentName("Item Property from Parameter")
 @ComponentDescription("Explicitly sets a property on the item")
 @SettingsClass(ItemPropertyFromParameter.Settings.class)
+@ComponentTags({"item", "properties"})
 public class ItemPropertyFromParameter
     extends AbstractProcessorDescriptor<
         ItemPropertyFromParameter.Processor, ItemPropertyFromParameter.Settings> {
