@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test;
 public class PhraseToCSVTest {
 
   @AfterAll
-  static void deletePhrasesCsv() throws IOException {
+  public static void deletePhrasesCsv() throws IOException {
     Files.deleteIfExists(Path.of("phrases.csv"));
   }
 
