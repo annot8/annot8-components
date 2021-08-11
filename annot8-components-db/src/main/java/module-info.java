@@ -3,7 +3,7 @@ module io.annot8.components.db {
   requires io.annot8.common.components;
   requires io.annot8.common.data;
   requires com.google.common;
-  requires sqlite.jdbc;
+  requires org.xerial.sqlitejdbc;
   requires java.sql;
   requires jakarta.json.bind;
 

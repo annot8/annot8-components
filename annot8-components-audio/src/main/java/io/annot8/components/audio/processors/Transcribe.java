@@ -87,6 +87,8 @@ public class Transcribe
                 }
 
                 try (Recognizer recognizer = new Recognizer(model, asr)) {
+                  recognizer.setWords(true);
+
                   int nbytes;
                   byte[] b = new byte[4096];
                   while ((nbytes = audio.getData().read(b)) >= 0) {

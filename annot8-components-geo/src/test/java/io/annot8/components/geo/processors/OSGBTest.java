@@ -49,10 +49,10 @@ public class OSGBTest {
       Assertions.assertEquals(
           "osgb", a1.getProperties().get(PropertyKeys.PROPERTY_KEY_COORDINATETYPE).get());
       Assertions.assertEquals(
-          "{\"type\": \"Point\", \"coordinates\": [-5.004712,56.794800]}",
+          "{\"type\": \"Point\", \"coordinates\": [-5.004712,56.796088]}",
           a1.getProperties().get(PropertyKeys.PROPERTY_KEY_GEOJSON).get());
       Assertions.assertEquals(
-          56.794800,
+          56.796088,
           a1.getProperties().get(PropertyKeys.PROPERTY_KEY_LATITUDE, Double.class).get(),
           0.00001);
       Assertions.assertEquals(
@@ -67,14 +67,14 @@ public class OSGBTest {
       Assertions.assertEquals(
           "osgb", a2.getProperties().get(PropertyKeys.PROPERTY_KEY_COORDINATETYPE).get());
       Assertions.assertEquals(
-          "{\"type\": \"Point\", \"coordinates\": [-5.071352,56.808457]}",
+          "{\"type\": \"Point\", \"coordinates\": [-5.071353,56.809745]}",
           a2.getProperties().get(PropertyKeys.PROPERTY_KEY_GEOJSON).get());
       Assertions.assertEquals(
-          56.808457,
+          56.809745,
           a2.getProperties().get(PropertyKeys.PROPERTY_KEY_LATITUDE, Double.class).get(),
           0.00001);
       Assertions.assertEquals(
-          -5.071352,
+          -5.071353,
           a2.getProperties().get(PropertyKeys.PROPERTY_KEY_LONGITUDE, Double.class).get(),
           0.00001);
 
@@ -85,10 +85,10 @@ public class OSGBTest {
       Assertions.assertEquals(
           "osgb", a3.getProperties().get(PropertyKeys.PROPERTY_KEY_COORDINATETYPE).get());
       Assertions.assertEquals(
-          "{\"type\": \"Point\", \"coordinates\": [-1.969975,51.206197]}",
+          "{\"type\": \"Point\", \"coordinates\": [-1.969975,51.207570]}",
           a3.getProperties().get(PropertyKeys.PROPERTY_KEY_GEOJSON).get());
       Assertions.assertEquals(
-          51.206197,
+          51.207570,
           a3.getProperties().get(PropertyKeys.PROPERTY_KEY_LATITUDE, Double.class).get(),
           0.00001);
       Assertions.assertEquals(
