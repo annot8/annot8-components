@@ -5,17 +5,17 @@
   <parent>
     <artifactId>annot8-components</artifactId>
     <groupId>io.annot8</groupId>
-    <version>1.2.0</version>
+    <version>1.3.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>annot8-components-elasticsearch</artifactId>
-  <version>1.2.0</version>
+  <version>1.3.0-SNAPSHOT</version>
   <name>Annot8 Elasticsearch Components</name>
   <description>Components to deal with reading from and writing to Elasticsearch</description>
 
   <properties>
-    <elasticsearch.version>7.12.1</elasticsearch.version>
+    <elasticsearch.version>7.14.0</elasticsearch.version>
   </properties>
 
   <dependencies>

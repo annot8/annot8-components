@@ -4,7 +4,7 @@
 
   <groupId>io.annot8</groupId>
   <artifactId>annot8-components</artifactId>
-  <version>1.2.0</version>
+  <version>1.3.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Annot8 Components</name>
@@ -77,8 +77,8 @@
 
     <!-- Testing -->
     <junit.version>5.7.2</junit.version>
-    <mockito.version>3.10.0</mockito.version>
-    <assertj-core.version>3.19.0</assertj-core.version>
+    <mockito.version>3.11.2</mockito.version>
+    <assertj-core.version>3.20.2</assertj-core.version>
     <assertj-guava.version>3.4.0</assertj-guava.version>
 
     <!-- Plugins -->
@@ -94,7 +94,7 @@
     <maven-shade-plugin.version>3.2.4</maven-shade-plugin.version>
     <githook-maven-plugin.version>1.0.5</githook-maven-plugin.version>
     <!-- Logging -->
-    <slf4j.version>1.7.30</slf4j.version>
+    <slf4j.version>1.7.32</slf4j.version>
   </properties>
 
   <dependencies>
