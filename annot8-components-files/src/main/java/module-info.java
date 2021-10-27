@@ -18,7 +18,7 @@ module io.annot8.components.files {
   requires jakarta.json;
   requires java.desktop;
   requires org.apache.commons.text;
-  requires fastcsv;
+  requires de.siegmar.fastcsv;
   requires org.apache.commons.compress;
   requires simplemagic;
 }

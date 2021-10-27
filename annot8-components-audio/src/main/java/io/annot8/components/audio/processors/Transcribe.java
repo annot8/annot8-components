@@ -11,6 +11,7 @@ import io.annot8.api.components.annotations.SettingsClass;
 import io.annot8.api.components.responses.ProcessorResponse;
 import io.annot8.api.context.Context;
 import io.annot8.api.data.Item;
+import io.annot8.api.exceptions.BadConfigurationException;
 import io.annot8.api.settings.Description;
 import io.annot8.common.components.AbstractProcessor;
 import io.annot8.common.components.AbstractProcessorDescriptor;
@@ -62,7 +63,12 @@ public class Transcribe
     private static final Gson gson = new Gson();
 
     public Processor(Settings settings) {
-      model = new Model(settings.getModel());
+      try {
+        model = new Model(settings.getModel());
+      } catch (IOException ioe) {
+        throw new BadConfigurationException(
+            "Could not load transcription model " + settings.getModel(), ioe);
+      }
       annotateAudio = settings.isAnnotateAudio();
     }
 
