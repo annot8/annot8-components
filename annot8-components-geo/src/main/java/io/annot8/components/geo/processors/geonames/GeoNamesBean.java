@@ -75,7 +75,7 @@ public class GeoNamesBean {
   private String admin4Code;
 
   @CsvBindByPosition(position = 14)
-  private Integer population;
+  private Long population;
 
   @CsvBindByPosition(position = 15)
   private Integer elevation;
@@ -202,11 +202,11 @@ public class GeoNamesBean {
     this.admin4Code = admin4Code;
   }
 
-  public Integer getPopulation() {
+  public Long getPopulation() {
     return population;
   }
 
-  public void setPopulation(Integer population) {
+  public void setPopulation(Long population) {
     this.population = population;
   }
 
