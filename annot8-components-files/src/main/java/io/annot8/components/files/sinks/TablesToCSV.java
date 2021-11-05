@@ -76,6 +76,7 @@ public class TablesToCSV
 
                             return s;
                           })
+                      .filter(l -> !l.stream().allMatch(String::isBlank))
                       .forEach(writer::writeRow);
 
                 } catch (IOException ioe) {
