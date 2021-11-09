@@ -7,6 +7,7 @@ module io.annot8.components.gazetteers {
   requires ahocorasick;
   requires evo.inflector;
   requires io.annot8.utils.text;
+  requires de.siegmar.fastcsv;
 
   exports io.annot8.components.gazetteers.processors;
   exports io.annot8.components.gazetteers.processors.impl;
