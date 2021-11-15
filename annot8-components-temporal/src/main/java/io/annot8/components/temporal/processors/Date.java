@@ -80,7 +80,7 @@ public class Date extends AbstractProcessorDescriptor<Date.Processor, Date.Setti
         "(?:(?:Mon|Monday|Tue|Tues|Tuesday|Wed|Wednesday|Thu|Thurs|Thursday|Fri|Friday|Sat|Saturday|Sun|Sunday)\\s+)?";
     private static final String MONTHS =
         "(Jan(\\.|uary)?|Feb(\\.|ruary)?|Mar(\\.|ch)?|Apr(\\.|il)?|May|Jun([.e])?|Jul([.y])?|Aug(\\.|ust)?|Sep(\\.|t(\\.|ember)?)?|Oct(\\.|ober)?|Nov(\\.|ember)?|Dec(\\.|ember)?)";
-    private static final String DATES = "([1-9]|[12][0-9]|3[01])\\s*";
+    private static final String DATES = "(0?[1-9]|[12][0-9]|3[01])\\s*";
     private static final String DATE_SUFFIXES = "(st|nd|rd|th)";
 
     private static final String INVALID_DATE_FOUND = "Invalid date found";
