@@ -91,12 +91,14 @@ public class FilterAnnotationsByNumericalProperty
                             })
                         .collect(Collectors.toList());
 
-                log()
-                    .info(
-                        "Removing {} annotations from Content {}",
-                        toRemove.size(),
-                        c.getDescription());
-                c.getAnnotations().delete(toRemove);
+                if (!toRemove.isEmpty()) {
+                  log()
+                      .info(
+                          "Removing {} annotations from Content {}",
+                          toRemove.size(),
+                          c.getDescription());
+                  c.getAnnotations().delete(toRemove);
+                }
               });
 
       return ProcessorResponse.ok();
