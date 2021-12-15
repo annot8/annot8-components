@@ -76,8 +76,8 @@
     <guava.version>31.0.1-jre</guava.version>
 
     <!-- Testing -->
-    <junit.version>5.8.1</junit.version>
-    <mockito.version>4.0.0</mockito.version>
+    <junit.version>5.8.2</junit.version>
+    <mockito.version>4.1.0</mockito.version>
     <assertj-core.version>3.21.0</assertj-core.version>
     <assertj-guava.version>3.4.0</assertj-guava.version>
 
