@@ -15,7 +15,7 @@
   <description>Components to deal with reading from and writing to MongoDB</description>
 
   <properties>
-    <jackson.version>2.13.0</jackson.version>
+    <jackson.version>2.13.1</jackson.version>
   </properties>
 
   <dependencies>
