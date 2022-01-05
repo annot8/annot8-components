@@ -9,7 +9,6 @@ import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.elasticsearch.common.Strings;
 
 public class ElasticsearchSettings implements Settings {
   private String hostname = "localhost";
@@ -159,11 +158,15 @@ public class ElasticsearchSettings implements Settings {
   }
 
   public CredentialsProvider credentials() {
-    if (Strings.isNullOrEmpty(getUsername()) || Strings.isNullOrEmpty(getPassword())) return null;
+    if (isNullOrEmpty(getUsername()) || isNullOrEmpty(getPassword())) return null;
 
     CredentialsProvider cp = new BasicCredentialsProvider();
     cp.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(getUsername(), getPassword()));
 
     return cp;
+  }
+
+  private static final boolean isNullOrEmpty(String s) {
+    return s == null || s.isEmpty();
   }
 }
