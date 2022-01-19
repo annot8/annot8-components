@@ -8,4 +8,6 @@ module io.annot8.components.tesseract {
   requires java.desktop;
   requires jakarta.json.bind;
   requires io.annot8.conventions;
+
+  exports io.annot8.components.tesseract.processors;
 }
