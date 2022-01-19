@@ -2,12 +2,10 @@
 package io.annot8.components.files.sources;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.annot8.api.components.responses.SourceResponse;
 import io.annot8.api.data.Item;
 import io.annot8.conventions.PropertyKeys;
-import io.annot8.testing.testimpl.TestItem;
 import io.annot8.testing.testimpl.TestItemFactory;
 import java.io.File;
 import java.io.IOException;
@@ -36,16 +34,8 @@ public class FolderSourceTest {
       }
 
       assertEquals(SourceResponse.Status.DONE, sr.getStatus());
-      assertEquals(3, tif.getCreatedItems().size());
-      tif.getCreatedItems()
-          .forEach(
-              item -> {
-                assertEquals(
-                    2,
-                    ((TestItemFactory) ((TestItem) item).getItemFactory())
-                        .getCreatedItems()
-                        .size());
-              });
+      assertEquals(9, tif.getCreatedItems().size());
+      assertEquals(6, tif.getCreatedItems().stream().filter(Item::hasParent).count());
     } finally {
       deleteTestFiles(root);
     }
@@ -69,16 +59,8 @@ public class FolderSourceTest {
       }
 
       assertEquals(SourceResponse.Status.DONE, sr.getStatus());
-      assertEquals(2, tif.getCreatedItems().size());
-      tif.getCreatedItems()
-          .forEach(
-              item -> {
-                assertEquals(
-                    2,
-                    ((TestItemFactory) ((TestItem) item).getItemFactory())
-                        .getCreatedItems()
-                        .size());
-              });
+      assertEquals(6, tif.getCreatedItems().size());
+      assertEquals(4, tif.getCreatedItems().stream().filter(Item::hasParent).count());
     } finally {
       deleteTestFiles(root);
     }
@@ -102,21 +84,17 @@ public class FolderSourceTest {
       }
 
       assertEquals(SourceResponse.Status.DONE, sr.getStatus());
-      assertEquals(3, tif.getCreatedItems().size());
-      tif.getCreatedItems()
+      assertEquals(6, tif.getCreatedItems().size());
+      assertEquals(3, tif.getCreatedItems().stream().filter(Item::hasParent).count());
+      tif.getCreatedItems().stream()
+          .filter(Item::hasParent)
           .forEach(
               item -> {
-                List<Item> createdItems =
-                    ((TestItemFactory) ((TestItem) item).getItemFactory()).getCreatedItems();
-                assertEquals(1, createdItems.size());
-                assertTrue(
-                    createdItems
-                        .get(0)
-                        .getProperties()
-                        .get(PropertyKeys.PROPERTY_KEY_SOURCE)
-                        .orElseThrow()
-                        .toString()
-                        .endsWith("txt"));
+                item.getProperties()
+                    .get(PropertyKeys.PROPERTY_KEY_SOURCE)
+                    .orElseThrow()
+                    .toString()
+                    .endsWith("txt");
               });
     } finally {
       deleteTestFiles(root);
@@ -139,16 +117,8 @@ public class FolderSourceTest {
         sr = source.read(tif);
       }
       assertEquals(SourceResponse.Status.DONE, sr.getStatus());
-      assertEquals(3, tif.getCreatedItems().size());
-      tif.getCreatedItems()
-          .forEach(
-              item -> {
-                assertEquals(
-                    2,
-                    ((TestItemFactory) ((TestItem) item).getItemFactory())
-                        .getCreatedItems()
-                        .size());
-              });
+      assertEquals(9, tif.getCreatedItems().size());
+      assertEquals(6, tif.getCreatedItems().stream().filter(Item::hasParent).count());
     } finally {
       deleteTestFiles(root);
     }

@@ -7,7 +7,6 @@ import io.annot8.api.components.annotations.ComponentName;
 import io.annot8.api.components.annotations.SettingsClass;
 import io.annot8.api.components.responses.SourceResponse;
 import io.annot8.api.context.Context;
-import io.annot8.api.data.Item;
 import io.annot8.api.data.ItemFactory;
 import io.annot8.api.settings.Description;
 import io.annot8.common.components.AbstractSource;
@@ -95,23 +94,27 @@ public class FolderSource
       Path p = folders.poll();
       log().info("Processing {}", p);
 
-      Item item = itemFactory.create();
+      itemFactory.create(
+          item -> {
+            item.getProperties().set(PropertyKeys.PROPERTY_KEY_SOURCE, p);
 
-      item.getProperties().set(PropertyKeys.PROPERTY_KEY_SOURCE, p);
-
-      try {
-        Files.list(p)
-            .filter(Files::isRegularFile)
-            .filter(this::acceptExtension)
-            .forEach(
-                file -> {
-                  Item child = item.createChild();
-                  child.getProperties().set(PropertyKeys.PROPERTY_KEY_SOURCE, file);
-                  child.createContent(FileContent.class).withData(file.toFile()).save();
-                });
-      } catch (Exception e) {
-        log().error("Unable to read files in folder {}", p, e);
-      }
+            try {
+              Files.list(p)
+                  .filter(Files::isRegularFile)
+                  .filter(this::acceptExtension)
+                  .forEach(
+                      file -> {
+                        itemFactory.create(
+                            item,
+                            child -> {
+                              child.getProperties().set(PropertyKeys.PROPERTY_KEY_SOURCE, file);
+                              child.createContent(FileContent.class).withData(file.toFile()).save();
+                            });
+                      });
+            } catch (Exception e) {
+              log().error("Unable to read files in folder {}", p, e);
+            }
+          });
 
       return SourceResponse.ok();
     }
