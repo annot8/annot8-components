@@ -16,7 +16,13 @@ import io.annot8.common.components.AbstractProcessor;
 import io.annot8.common.components.AbstractProcessorDescriptor;
 import io.annot8.common.components.capabilities.SimpleCapabilities;
 import io.annot8.common.data.bounds.SpanBounds;
-import java.util.*;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @ComponentName("Merge Adjacent Annotations")
@@ -86,7 +92,7 @@ public class MergeAdjacentSpanBounds
                   if (annotations.size() < 2) continue;
 
                   Annotation aCurr = annotations.get(0);
-                  for (int i = 1; i < annotations.size() - 1; i++) {
+                  for (int i = 1; i < annotations.size(); i++) {
                     Annotation a2 = annotations.get(i);
 
                     SpanBounds s1 = aCurr.getBounds(SpanBounds.class).get();
