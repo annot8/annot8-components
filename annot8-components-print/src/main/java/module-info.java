@@ -3,7 +3,7 @@ open module io.annot8.components.print {
   requires io.annot8.common.data;
   requires io.annot8.common.components;
   requires io.annot8.components.base.text;
-  requires org.slf4j;
+  requires transitive org.slf4j;
 
   exports io.annot8.components.print.processors;
 }

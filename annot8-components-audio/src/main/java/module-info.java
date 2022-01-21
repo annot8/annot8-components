@@ -1,4 +1,4 @@
-module annot8.components.audio {
+module io.annot8.components.audio {
   requires io.annot8.api;
   requires io.annot8.common.components;
   requires io.annot8.common.data;

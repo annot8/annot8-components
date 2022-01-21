@@ -1,6 +1,6 @@
 module io.annot8.components.spacy {
   requires transitive io.annot8.api;
-  requires io.annot8.common.data;
+  requires transitive io.annot8.common.data;
   requires io.annot8.components.base.text;
   requires io.annot8.conventions;
   requires io.annot8.common.utils;
