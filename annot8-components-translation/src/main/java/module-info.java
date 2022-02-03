@@ -5,7 +5,7 @@ open module io.annot8.components.translation {
   requires io.annot8.components.base.text;
   requires io.annot8.conventions;
   requires io.annot8.common.components;
-  requires connector.api;
+  requires transitive connector.api;
 
   exports io.annot8.components.translation.processors;
 }
