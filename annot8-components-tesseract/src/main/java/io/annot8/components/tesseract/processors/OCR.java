@@ -69,7 +69,7 @@ public class OCR extends AbstractProcessorDescriptor<OCR.Processor, OCR.Settings
     private final ITesseract instance;
     private final List<String> extensions;
 
-    public Processor(List<String> extensions, ITesseract tesseract) {
+    private Processor(List<String> extensions, ITesseract tesseract) {
       this.extensions = extensions;
       this.instance = tesseract;
     }

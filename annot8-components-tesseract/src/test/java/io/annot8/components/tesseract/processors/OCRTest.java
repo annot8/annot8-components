@@ -14,9 +14,8 @@ import org.junit.jupiter.api.Test;
 
 public class OCRTest {
 
-  // Disabled as it requires tesseract to be installed
   @Test
-  @Disabled
+  @Disabled("Disabled as it requires tesseract to be installed")
   public void test() throws Exception {
     OCR desc = new OCR();
     Processor ocr = desc.createComponent(null, new OCR.Settings());

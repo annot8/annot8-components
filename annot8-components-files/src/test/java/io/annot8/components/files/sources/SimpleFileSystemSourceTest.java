@@ -24,18 +24,20 @@ public class SimpleFileSystemSourceTest {
     SimpleFileSystemSource.Settings settings = new SimpleFileSystemSource.Settings();
     settings.setPaths(List.of(root));
 
-    SimpleFileSystemSource.Source source = new SimpleFileSystemSource.Source(settings);
-    TestItemFactory tif = new TestItemFactory();
+    try (SimpleFileSystemSource.Source source = new SimpleFileSystemSource.Source(settings)) {
+      TestItemFactory tif = new TestItemFactory();
 
-    SourceResponse sr = source.read(tif);
-    while (sr.getStatus() == SourceResponse.Status.OK) {
-      sr = source.read(tif);
+      SourceResponse sr = source.read(tif);
+      while (sr.getStatus() == SourceResponse.Status.OK) {
+        sr = source.read(tif);
+      }
+
+      assertEquals(SourceResponse.Status.DONE, sr.getStatus());
+      assertEquals(3, tif.getCreatedItems().size());
+
+    } finally {
+      deleteTestFiles(root);
     }
-
-    assertEquals(SourceResponse.Status.DONE, sr.getStatus());
-    assertEquals(3, tif.getCreatedItems().size());
-
-    deleteTestFiles(root);
   }
 
   @Test
@@ -47,18 +49,20 @@ public class SimpleFileSystemSourceTest {
     settings.setPaths(List.of(root));
     settings.setRecursive(false);
 
-    SimpleFileSystemSource.Source source = new SimpleFileSystemSource.Source(settings);
-    TestItemFactory tif = new TestItemFactory();
+    try (SimpleFileSystemSource.Source source = new SimpleFileSystemSource.Source(settings)) {
+      TestItemFactory tif = new TestItemFactory();
 
-    SourceResponse sr = source.read(tif);
-    while (sr.getStatus() == SourceResponse.Status.OK) {
-      sr = source.read(tif);
+      SourceResponse sr = source.read(tif);
+      while (sr.getStatus() == SourceResponse.Status.OK) {
+        sr = source.read(tif);
+      }
+
+      assertEquals(SourceResponse.Status.DONE, sr.getStatus());
+      assertEquals(2, tif.getCreatedItems().size());
+
+    } finally {
+      deleteTestFiles(root);
     }
-
-    assertEquals(SourceResponse.Status.DONE, sr.getStatus());
-    assertEquals(2, tif.getCreatedItems().size());
-
-    deleteTestFiles(root);
   }
 
   @Test
@@ -70,18 +74,20 @@ public class SimpleFileSystemSourceTest {
     settings.setPaths(List.of(root));
     settings.setExtensions(List.of("TXT"));
 
-    SimpleFileSystemSource.Source source = new SimpleFileSystemSource.Source(settings);
-    TestItemFactory tif = new TestItemFactory();
+    try (SimpleFileSystemSource.Source source = new SimpleFileSystemSource.Source(settings)) {
+      TestItemFactory tif = new TestItemFactory();
 
-    SourceResponse sr = source.read(tif);
-    while (sr.getStatus() == SourceResponse.Status.OK) {
-      sr = source.read(tif);
+      SourceResponse sr = source.read(tif);
+      while (sr.getStatus() == SourceResponse.Status.OK) {
+        sr = source.read(tif);
+      }
+
+      assertEquals(SourceResponse.Status.DONE, sr.getStatus());
+      assertEquals(2, tif.getCreatedItems().size());
+
+    } finally {
+      deleteTestFiles(root);
     }
-
-    assertEquals(SourceResponse.Status.DONE, sr.getStatus());
-    assertEquals(2, tif.getCreatedItems().size());
-
-    deleteTestFiles(root);
   }
 
   @Test
@@ -92,18 +98,20 @@ public class SimpleFileSystemSourceTest {
     SimpleFileSystemSource.Settings settings = new SimpleFileSystemSource.Settings();
     settings.setPaths(List.of(root));
 
-    SimpleFileSystemSource.Source source = new SimpleFileSystemSource.Source(settings);
-    TestItemFactory tif = new TestItemFactory();
+    try (SimpleFileSystemSource.Source source = new SimpleFileSystemSource.Source(settings)) {
+      TestItemFactory tif = new TestItemFactory();
 
-    SourceResponse sr = source.read(tif);
-    while (sr.getStatus() == SourceResponse.Status.OK) {
-      sr = source.read(tif);
+      SourceResponse sr = source.read(tif);
+      while (sr.getStatus() == SourceResponse.Status.OK) {
+        sr = source.read(tif);
+      }
+
+      assertEquals(SourceResponse.Status.DONE, sr.getStatus());
+      assertEquals(3, tif.getCreatedItems().size());
+
+    } finally {
+      deleteTestFiles(root);
     }
-
-    assertEquals(SourceResponse.Status.DONE, sr.getStatus());
-    assertEquals(3, tif.getCreatedItems().size());
-
-    deleteTestFiles(root);
   }
 
   @Test
@@ -115,30 +123,32 @@ public class SimpleFileSystemSourceTest {
     settings.setPaths(List.of(root));
     settings.setFileOrder(SimpleFileSystemSource.FileOrder.NAME_A_TO_Z);
 
-    SimpleFileSystemSource.Source source = new SimpleFileSystemSource.Source(settings);
-    TestItemFactory tif = new TestItemFactory();
+    try (SimpleFileSystemSource.Source source = new SimpleFileSystemSource.Source(settings)) {
+      TestItemFactory tif = new TestItemFactory();
 
-    SourceResponse sr = source.read(tif);
-    while (sr.getStatus() == SourceResponse.Status.OK) {
-      sr = source.read(tif);
+      SourceResponse sr = source.read(tif);
+      while (sr.getStatus() == SourceResponse.Status.OK) {
+        sr = source.read(tif);
+      }
+
+      assertEquals(SourceResponse.Status.DONE, sr.getStatus());
+      assertEquals(3, tif.getCreatedItems().size());
+
+      assertEquals(
+          List.of("file1.txt", "file2.pdf", "file3.txt"),
+          tif.getCreatedItems().stream()
+              .map(
+                  i ->
+                      i.getProperties()
+                          .get(PropertyKeys.PROPERTY_KEY_SOURCE, Path.class)
+                          .get()
+                          .getFileName()
+                          .toString())
+              .collect(Collectors.toList()));
+
+    } finally {
+      deleteTestFiles(root);
     }
-
-    assertEquals(SourceResponse.Status.DONE, sr.getStatus());
-    assertEquals(3, tif.getCreatedItems().size());
-
-    assertEquals(
-        List.of("file1.txt", "file2.pdf", "file3.txt"),
-        tif.getCreatedItems().stream()
-            .map(
-                i ->
-                    i.getProperties()
-                        .get(PropertyKeys.PROPERTY_KEY_SOURCE, Path.class)
-                        .get()
-                        .getFileName()
-                        .toString())
-            .collect(Collectors.toList()));
-
-    deleteTestFiles(root);
   }
 
   @Test
@@ -150,30 +160,32 @@ public class SimpleFileSystemSourceTest {
     settings.setPaths(List.of(root));
     settings.setFileOrder(SimpleFileSystemSource.FileOrder.NAME_Z_TO_A);
 
-    SimpleFileSystemSource.Source source = new SimpleFileSystemSource.Source(settings);
-    TestItemFactory tif = new TestItemFactory();
+    try (SimpleFileSystemSource.Source source = new SimpleFileSystemSource.Source(settings)) {
+      TestItemFactory tif = new TestItemFactory();
 
-    SourceResponse sr = source.read(tif);
-    while (sr.getStatus() == SourceResponse.Status.OK) {
-      sr = source.read(tif);
+      SourceResponse sr = source.read(tif);
+      while (sr.getStatus() == SourceResponse.Status.OK) {
+        sr = source.read(tif);
+      }
+
+      assertEquals(SourceResponse.Status.DONE, sr.getStatus());
+      assertEquals(3, tif.getCreatedItems().size());
+
+      assertEquals(
+          List.of("file3.txt", "file2.pdf", "file1.txt"),
+          tif.getCreatedItems().stream()
+              .map(
+                  i ->
+                      i.getProperties()
+                          .get(PropertyKeys.PROPERTY_KEY_SOURCE, Path.class)
+                          .get()
+                          .getFileName()
+                          .toString())
+              .collect(Collectors.toList()));
+
+    } finally {
+      deleteTestFiles(root);
     }
-
-    assertEquals(SourceResponse.Status.DONE, sr.getStatus());
-    assertEquals(3, tif.getCreatedItems().size());
-
-    assertEquals(
-        List.of("file3.txt", "file2.pdf", "file1.txt"),
-        tif.getCreatedItems().stream()
-            .map(
-                i ->
-                    i.getProperties()
-                        .get(PropertyKeys.PROPERTY_KEY_SOURCE, Path.class)
-                        .get()
-                        .getFileName()
-                        .toString())
-            .collect(Collectors.toList()));
-
-    deleteTestFiles(root);
   }
 
   @Test
@@ -185,30 +197,32 @@ public class SimpleFileSystemSourceTest {
     settings.setPaths(List.of(root));
     settings.setFileOrder(SimpleFileSystemSource.FileOrder.SIZE_SMALL_TO_LARGE);
 
-    SimpleFileSystemSource.Source source = new SimpleFileSystemSource.Source(settings);
-    TestItemFactory tif = new TestItemFactory();
+    try (SimpleFileSystemSource.Source source = new SimpleFileSystemSource.Source(settings)) {
+      TestItemFactory tif = new TestItemFactory();
 
-    SourceResponse sr = source.read(tif);
-    while (sr.getStatus() == SourceResponse.Status.OK) {
-      sr = source.read(tif);
+      SourceResponse sr = source.read(tif);
+      while (sr.getStatus() == SourceResponse.Status.OK) {
+        sr = source.read(tif);
+      }
+
+      assertEquals(SourceResponse.Status.DONE, sr.getStatus());
+      assertEquals(3, tif.getCreatedItems().size());
+
+      assertEquals(
+          List.of("file2.pdf", "file1.txt", "file3.txt"),
+          tif.getCreatedItems().stream()
+              .map(
+                  i ->
+                      i.getProperties()
+                          .get(PropertyKeys.PROPERTY_KEY_SOURCE, Path.class)
+                          .get()
+                          .getFileName()
+                          .toString())
+              .collect(Collectors.toList()));
+
+    } finally {
+      deleteTestFiles(root);
     }
-
-    assertEquals(SourceResponse.Status.DONE, sr.getStatus());
-    assertEquals(3, tif.getCreatedItems().size());
-
-    assertEquals(
-        List.of("file2.pdf", "file1.txt", "file3.txt"),
-        tif.getCreatedItems().stream()
-            .map(
-                i ->
-                    i.getProperties()
-                        .get(PropertyKeys.PROPERTY_KEY_SOURCE, Path.class)
-                        .get()
-                        .getFileName()
-                        .toString())
-            .collect(Collectors.toList()));
-
-    deleteTestFiles(root);
   }
 
   @Test
@@ -220,30 +234,32 @@ public class SimpleFileSystemSourceTest {
     settings.setPaths(List.of(root));
     settings.setFileOrder(SimpleFileSystemSource.FileOrder.SIZE_LARGE_TO_SMALL);
 
-    SimpleFileSystemSource.Source source = new SimpleFileSystemSource.Source(settings);
-    TestItemFactory tif = new TestItemFactory();
+    try (SimpleFileSystemSource.Source source = new SimpleFileSystemSource.Source(settings)) {
+      TestItemFactory tif = new TestItemFactory();
 
-    SourceResponse sr = source.read(tif);
-    while (sr.getStatus() == SourceResponse.Status.OK) {
-      sr = source.read(tif);
+      SourceResponse sr = source.read(tif);
+      while (sr.getStatus() == SourceResponse.Status.OK) {
+        sr = source.read(tif);
+      }
+
+      assertEquals(SourceResponse.Status.DONE, sr.getStatus());
+      assertEquals(3, tif.getCreatedItems().size());
+
+      assertEquals(
+          List.of("file3.txt", "file1.txt", "file2.pdf"),
+          tif.getCreatedItems().stream()
+              .map(
+                  i ->
+                      i.getProperties()
+                          .get(PropertyKeys.PROPERTY_KEY_SOURCE, Path.class)
+                          .get()
+                          .getFileName()
+                          .toString())
+              .collect(Collectors.toList()));
+
+    } finally {
+      deleteTestFiles(root);
     }
-
-    assertEquals(SourceResponse.Status.DONE, sr.getStatus());
-    assertEquals(3, tif.getCreatedItems().size());
-
-    assertEquals(
-        List.of("file3.txt", "file1.txt", "file2.pdf"),
-        tif.getCreatedItems().stream()
-            .map(
-                i ->
-                    i.getProperties()
-                        .get(PropertyKeys.PROPERTY_KEY_SOURCE, Path.class)
-                        .get()
-                        .getFileName()
-                        .toString())
-            .collect(Collectors.toList()));
-
-    deleteTestFiles(root);
   }
 
   @Test
@@ -255,30 +271,32 @@ public class SimpleFileSystemSourceTest {
     settings.setPaths(List.of(root));
     settings.setFileOrder(SimpleFileSystemSource.FileOrder.CREATED_DATE_EARLIEST_TO_LATEST);
 
-    SimpleFileSystemSource.Source source = new SimpleFileSystemSource.Source(settings);
-    TestItemFactory tif = new TestItemFactory();
+    try (SimpleFileSystemSource.Source source = new SimpleFileSystemSource.Source(settings)) {
+      TestItemFactory tif = new TestItemFactory();
 
-    SourceResponse sr = source.read(tif);
-    while (sr.getStatus() == SourceResponse.Status.OK) {
-      sr = source.read(tif);
+      SourceResponse sr = source.read(tif);
+      while (sr.getStatus() == SourceResponse.Status.OK) {
+        sr = source.read(tif);
+      }
+
+      assertEquals(SourceResponse.Status.DONE, sr.getStatus());
+      assertEquals(3, tif.getCreatedItems().size());
+
+      assertEquals(
+          List.of("file1.txt", "file2.pdf", "file3.txt"),
+          tif.getCreatedItems().stream()
+              .map(
+                  i ->
+                      i.getProperties()
+                          .get(PropertyKeys.PROPERTY_KEY_SOURCE, Path.class)
+                          .get()
+                          .getFileName()
+                          .toString())
+              .collect(Collectors.toList()));
+
+    } finally {
+      deleteTestFiles(root);
     }
-
-    assertEquals(SourceResponse.Status.DONE, sr.getStatus());
-    assertEquals(3, tif.getCreatedItems().size());
-
-    assertEquals(
-        List.of("file1.txt", "file2.pdf", "file3.txt"),
-        tif.getCreatedItems().stream()
-            .map(
-                i ->
-                    i.getProperties()
-                        .get(PropertyKeys.PROPERTY_KEY_SOURCE, Path.class)
-                        .get()
-                        .getFileName()
-                        .toString())
-            .collect(Collectors.toList()));
-
-    deleteTestFiles(root);
   }
 
   @Test
@@ -290,30 +308,32 @@ public class SimpleFileSystemSourceTest {
     settings.setPaths(List.of(root));
     settings.setFileOrder(SimpleFileSystemSource.FileOrder.CREATED_DATE_LATEST_TO_EARLIEST);
 
-    SimpleFileSystemSource.Source source = new SimpleFileSystemSource.Source(settings);
-    TestItemFactory tif = new TestItemFactory();
+    try (SimpleFileSystemSource.Source source = new SimpleFileSystemSource.Source(settings)) {
+      TestItemFactory tif = new TestItemFactory();
 
-    SourceResponse sr = source.read(tif);
-    while (sr.getStatus() == SourceResponse.Status.OK) {
-      sr = source.read(tif);
+      SourceResponse sr = source.read(tif);
+      while (sr.getStatus() == SourceResponse.Status.OK) {
+        sr = source.read(tif);
+      }
+
+      assertEquals(SourceResponse.Status.DONE, sr.getStatus());
+      assertEquals(3, tif.getCreatedItems().size());
+
+      assertEquals(
+          List.of("file3.txt", "file2.pdf", "file1.txt"),
+          tif.getCreatedItems().stream()
+              .map(
+                  i ->
+                      i.getProperties()
+                          .get(PropertyKeys.PROPERTY_KEY_SOURCE, Path.class)
+                          .get()
+                          .getFileName()
+                          .toString())
+              .collect(Collectors.toList()));
+
+    } finally {
+      deleteTestFiles(root);
     }
-
-    assertEquals(SourceResponse.Status.DONE, sr.getStatus());
-    assertEquals(3, tif.getCreatedItems().size());
-
-    assertEquals(
-        List.of("file3.txt", "file2.pdf", "file1.txt"),
-        tif.getCreatedItems().stream()
-            .map(
-                i ->
-                    i.getProperties()
-                        .get(PropertyKeys.PROPERTY_KEY_SOURCE, Path.class)
-                        .get()
-                        .getFileName()
-                        .toString())
-            .collect(Collectors.toList()));
-
-    deleteTestFiles(root);
   }
 
   private void createTestFiles(Path p) throws IOException {
