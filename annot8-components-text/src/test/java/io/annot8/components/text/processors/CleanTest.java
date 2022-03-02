@@ -134,4 +134,25 @@ public class CleanTest {
     assertEquals(
         "en", item.getContents(Text.class).findFirst().get().getProperties().get("lang").get());
   }
+
+  @Test
+  public void testCanRetainSingleSpacesButReduceRepeatedNewLines() {
+    Clean.Settings s = getFalseSettings();
+    s.setRemoveSingleNewLines(false);
+    s.setRemoveRepeatedNewLines(true);
+
+    Processor p = new Clean.Processor(s);
+    Item item = new TestItem();
+
+    item.createContent(TestStringContent.class)
+        .withData("Hello\neveryone;\n\n\n\nHello world!\n")
+        .save();
+
+    p.process(item);
+    assertEquals(1L, item.getContents().count());
+
+    assertEquals(
+        "Hello\neveryone;\n\nHello world!\n",
+        item.getContents(Text.class).findFirst().get().getData());
+  }
 }

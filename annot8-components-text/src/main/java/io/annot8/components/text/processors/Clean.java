@@ -74,6 +74,9 @@ public class Clean extends AbstractProcessorDescriptor<Clean.Processor, Clean.Se
       if (settings.isRemoveSingleNewLines()) {
         clean = clean.replaceAll(SPLIT_LINES, "-");
         clean = clean.replaceAll(SINGLE_NEW_LINES, " ");
+      }
+
+      if (settings.isRemoveRepeatedNewLines()) {
         clean = clean.replaceAll(REPEATED_NEW_LINES, "\n\n");
       }
 
@@ -109,6 +112,7 @@ public class Clean extends AbstractProcessorDescriptor<Clean.Processor, Clean.Se
     private boolean trim = true;
     private boolean trimLines = true;
     private boolean removeSingleNewLines = true;
+    private boolean removeRepeatedNewLines = true;
     private boolean replaceSmartCharacters = true;
     private boolean removeRepeatedWhitespace = true;
     private boolean copyProperties = true;
@@ -152,16 +156,25 @@ public class Clean extends AbstractProcessorDescriptor<Clean.Processor, Clean.Se
       this.trimLines = trimLines;
     }
 
-    @Description(
-        value =
-            "Should single new lines within text be removed? This will also reduce repeated new lines to 2 new lines.",
-        defaultValue = "true")
+    @Description(value = "Should single new lines within text be removed?", defaultValue = "true")
     public boolean isRemoveSingleNewLines() {
       return removeSingleNewLines;
     }
 
     public void setRemoveSingleNewLines(boolean removeSingleNewLines) {
       this.removeSingleNewLines = removeSingleNewLines;
+    }
+
+    @Description(
+        value =
+            "Should repeated new lines within text be removed? This will reduce repeated new lines to 2 new lines.",
+        defaultValue = "true")
+    public boolean isRemoveRepeatedNewLines() {
+      return removeRepeatedNewLines;
+    }
+
+    public void setRemoveRepeatedNewLines(boolean removeRepeatedNewLines) {
+      this.removeRepeatedNewLines = removeRepeatedNewLines;
     }
 
     @Description(
