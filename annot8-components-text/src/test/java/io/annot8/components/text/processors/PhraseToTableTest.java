@@ -1,5 +1,5 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
-package io.annot8.components.files.sinks;
+package io.annot8.components.text.processors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -7,6 +7,7 @@ import io.annot8.api.annotations.Annotation;
 import io.annot8.api.annotations.Group;
 import io.annot8.api.data.Item;
 import io.annot8.common.data.bounds.SpanBounds;
+import io.annot8.common.data.content.TableContent;
 import io.annot8.common.data.content.Text;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.GroupRoles;
@@ -14,57 +15,39 @@ import io.annot8.conventions.GroupTypes;
 import io.annot8.conventions.PropertyKeys;
 import io.annot8.implementations.support.context.SimpleContext;
 import io.annot8.testing.testimpl.TestItem;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
-import org.junit.jupiter.api.AfterAll;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
-public class PhraseToCSVTest {
-
-  @AfterAll
-  public static void deletePhrasesCsv() throws IOException {
-    Files.deleteIfExists(Path.of("phrases.csv"));
-  }
+public class PhraseToTableTest {
 
   @Test
   public void testSettings() {
-    PhraseToCSV.Settings s = new PhraseToCSV.Settings();
+    PhraseToTable.Settings s = new PhraseToTable.Settings();
 
     assertNotNull(s.getPhraseTypes());
     assertTrue(s.getPhraseTypes().isEmpty());
     s.setPhraseTypes(List.of("NP", "VP"));
     assertEquals(List.of("NP", "VP"), s.getPhraseTypes());
 
-    s.setDeleteOnStart(true);
-    assertTrue(s.isDeleteOnStart());
-    s.setDeleteOnStart(false);
-    assertFalse(s.isDeleteOnStart());
-
-    assertNotNull(s.getOutputFile());
-    s.setOutputFile(Path.of("test.txt"));
-    assertEquals(Path.of("test.txt"), s.getOutputFile());
-
     assertTrue(s.validate());
   }
 
   @Test
   public void testDescriptor() {
-    PhraseToCSV desc = new PhraseToCSV();
+    PhraseToTable desc = new PhraseToTable();
     assertNotNull(desc.capabilities());
 
-    desc.setSettings(new PhraseToCSV.Settings());
+    desc.setSettings(new PhraseToTable.Settings());
 
-    PhraseToCSV.Processor p = desc.create(new SimpleContext());
+    PhraseToTable.Processor p = desc.create(new SimpleContext());
     assertNotNull(p);
 
     p.close();
   }
 
   @Test
-  public void testGroupToCsv() {
+  public void testGroupToTable() {
     Item item = createTestItem();
     Group g1 = item.getGroups().getById("group1").orElseThrow();
     Group g2 = item.getGroups().getById("group2").orElseThrow();
@@ -73,37 +56,41 @@ public class PhraseToCSVTest {
     Group emptyGroup = item.getGroups().getById("emptyGroup").orElseThrow();
     Group multipleContent = item.getGroups().getById("multipleContent").orElseThrow();
 
-    PhraseToCSV.Processor p = new PhraseToCSV.Processor(new PhraseToCSV.Settings());
+    PhraseToTable.Processor p = new PhraseToTable.Processor(new PhraseToTable.Settings());
 
     assertEquals(
-        List.of("foobar.txt", "NP", "The bakery on the corner", "0", "24"),
-        p.groupToCsvRow(item, g1));
-    assertEquals(List.of("foobar.txt", "VP", "sells", "25", "30"), p.groupToCsvRow(item, g2));
+        new PhraseToTable.PhraseRow(
+            "foobar.txt", "textContent", "NP", "The bakery on the corner", 0, 24),
+        p.groupToRow(item, g1).orElseThrow());
     assertEquals(
-        List.of("foobar.txt", "NP", "lots of pastries", "31", "47"), p.groupToCsvRow(item, g3));
+        new PhraseToTable.PhraseRow("foobar.txt", "textContent", "VP", "sells", 25, 30),
+        p.groupToRow(item, g2).orElseThrow());
+    assertEquals(
+        new PhraseToTable.PhraseRow("foobar.txt", "textContent", "NP", "lots of pastries", 31, 47),
+        p.groupToRow(item, g3).orElseThrow());
 
-    assertEquals(Collections.emptyList(), p.groupToCsvRow(item, emptyGroup));
-    assertEquals(Collections.emptyList(), p.groupToCsvRow(item, multipleContent));
+    assertEquals(Optional.empty(), p.groupToRow(item, emptyGroup));
+    assertEquals(Optional.empty(), p.groupToRow(item, multipleContent));
   }
 
   @Test
-  public void testProcess() throws IOException {
-    Path tempFile = Files.createTempFile("test", ".csv");
-    tempFile.toFile().deleteOnExit();
-
-    PhraseToCSV.Settings s = new PhraseToCSV.Settings();
-    s.setOutputFile(tempFile);
-    s.setDeleteOnStart(true);
+  public void testProcess() {
+    PhraseToTable.Settings s = new PhraseToTable.Settings();
     s.setPhraseTypes(List.of("NP"));
 
-    PhraseToCSV.Processor p = new PhraseToCSV.Processor(s);
-    p.process(createTestItem());
+    Item item = createTestItem();
 
-    List<String> output = Files.readAllLines(tempFile);
+    PhraseToTable.Processor p = new PhraseToTable.Processor(s);
+    p.process(item);
 
-    assertEquals(2, output.size());
-    assertTrue(output.contains("foobar.txt,NP,The bakery on the corner,0,24"));
-    assertTrue(output.contains("foobar.txt,NP,lots of pastries,31,47"));
+    assertEquals(1L, item.getContents(TableContent.class).count());
+    TableContent tc = item.getContents(TableContent.class).findFirst().orElseThrow();
+
+    assertNotNull(tc.getDescription());
+    assertEquals(2, tc.getData().getRowCount());
+
+    assertEquals("document", tc.getData().getColumnNames().orElseThrow().get(0));
+    assertEquals("foobar.txt", tc.getData().getRow(0).orElseThrow().getValueAt(0).orElseThrow());
   }
 
   private Item createTestItem() {
@@ -113,6 +100,7 @@ public class PhraseToCSVTest {
     Text text =
         item.createContent(Text.class)
             .withData("The bakery on the corner sells lots of pastries.")
+            .withId("textContent")
             .save();
 
     text.getAnnotations()
