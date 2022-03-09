@@ -152,7 +152,7 @@ public class TableToProperties
     }
 
     @Description(
-        "If null, then any values with the same key will be returned as a list. Otherwise, then values will be converted to strings and joint with this value.")
+        "If null, then any values with the same key will be returned as a list. Otherwise, then values will be converted to strings and joined with this value.")
     public String getJoin() {
       return join;
     }
