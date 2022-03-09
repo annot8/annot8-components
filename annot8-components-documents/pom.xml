@@ -40,14 +40,14 @@
     <dependency>
       <groupId>org.apache.poi</groupId>
       <artifactId>poi-scratchpad</artifactId>
-      <version>5.2.0</version>
+      <version>5.2.1</version>
     </dependency>
 
     <!-- DOCX support -->
     <dependency>
       <groupId>org.apache.poi</groupId>
       <artifactId>poi-ooxml</artifactId>
-      <version>5.2.0</version>
+      <version>5.2.1</version>
     </dependency>
 
     <!-- HTML support -->
@@ -73,7 +73,7 @@
     <dependency>
       <groupId>org.apache.pdfbox</groupId>
       <artifactId>jbig2-imageio</artifactId>
-      <version>3.0.3</version>
+      <version>3.0.4</version>
     </dependency>
     <dependency>
       <groupId>technology.tabula</groupId>

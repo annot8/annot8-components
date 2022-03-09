@@ -15,8 +15,8 @@
   <description>Components to deal with reading from and writing to Elasticsearch</description>
 
   <properties>
-    <elasticsearch.version>7.17.0</elasticsearch.version>
-    <jackson.version>2.13.1</jackson.version>
+    <elasticsearch.version>7.17.1</elasticsearch.version>
+    <jackson.version>2.13.2</jackson.version>
   </properties>
 
   <dependencies>

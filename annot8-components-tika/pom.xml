@@ -15,7 +15,7 @@
     <description>Components that use Apache Tika to extract content from files</description>
 
     <properties>
-        <tika.version>2.2.1</tika.version>
+        <tika.version>2.3.0</tika.version>
     </properties>
 
     <dependencies>

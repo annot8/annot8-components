@@ -142,8 +142,13 @@ public class PhraseToTable
       }
 
       // Get the beginning of the first annotation and the end of the last annotation
-      int begin = annotations.get(0).getBounds(SpanBounds.class).get().getBegin();
-      int end = annotations.get(annotations.size() - 1).getBounds(SpanBounds.class).get().getEnd();
+      int begin = annotations.get(0).getBounds(SpanBounds.class).orElseThrow().getBegin();
+      int end =
+          annotations
+              .get(annotations.size() - 1)
+              .getBounds(SpanBounds.class)
+              .orElseThrow()
+              .getEnd();
 
       SpanBounds sb = new SpanBounds(begin, end);
 
