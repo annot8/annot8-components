@@ -7,5 +7,7 @@ module io.annot8.components.audio {
   requires com.google.gson;
   requires vosk;
 
+  opens io.annot8.components.audio.processors.data;
+
   exports io.annot8.components.audio.processors;
 }
