@@ -5,19 +5,16 @@ import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
 import io.annot8.api.components.annotations.ComponentName;
 import io.annot8.api.components.annotations.SettingsClass;
-import io.annot8.api.components.responses.ProcessorResponse;
 import io.annot8.api.context.Context;
-import io.annot8.api.data.Item;
+import io.annot8.api.exceptions.ProcessingException;
 import io.annot8.api.settings.Description;
-import io.annot8.common.components.AbstractProcessor;
 import io.annot8.common.components.AbstractProcessorDescriptor;
 import io.annot8.common.components.capabilities.SimpleCapabilities;
 import io.annot8.common.data.content.Text;
+import io.annot8.components.base.text.processors.AbstractTextProcessor;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
 
 @ComponentName("Text to File")
 @ComponentDescription("Save Text Content to a file on disk")
@@ -35,7 +32,7 @@ public class TextToFile
     return new Processor(settings);
   }
 
-  public static class Processor extends AbstractProcessor {
+  public static class Processor extends AbstractTextProcessor {
     private final Settings settings;
 
     public Processor(Settings settings) {
@@ -43,33 +40,24 @@ public class TextToFile
     }
 
     @Override
-    public ProcessorResponse process(Item item) {
-      List<Exception> exceptions = new ArrayList<>();
+    protected void process(Text content) {
+      Path p =
+          settings
+              .getOutputFolder()
+              .resolve(content.getItem().getId())
+              .resolve(content.getId() + ".txt");
+      try {
+        Files.createDirectories(p.getParent());
+      } catch (IOException e) {
+        log().error("Could not create directory {}", p.getParent());
+        throw new ProcessingException("Could not create directory", e);
+      }
 
-      item.getContents(Text.class)
-          .forEach(
-              t -> {
-                Path p =
-                    settings.getOutputFolder().resolve(item.getId()).resolve(t.getId() + ".txt");
-                try {
-                  Files.createDirectories(p.getParent());
-                } catch (IOException e) {
-                  log().error("Could not create directory {}", p.getParent());
-                  exceptions.add(e);
-                }
-
-                try {
-                  Files.writeString(p, t.getData());
-                } catch (IOException ioe) {
-                  log().error("Unable to write text file for {}", t.getId(), ioe);
-                  exceptions.add(ioe);
-                }
-              });
-
-      if (exceptions.isEmpty()) {
-        return ProcessorResponse.ok();
-      } else {
-        return ProcessorResponse.itemError(exceptions);
+      try {
+        Files.writeString(p, content.getData());
+      } catch (IOException e) {
+        log().error("Unable to write text file for {}", content.getId(), e);
+        throw new ProcessingException("Unable to write text file", e);
       }
     }
   }

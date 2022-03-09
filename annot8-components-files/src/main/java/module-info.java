@@ -4,6 +4,7 @@ module io.annot8.components.files {
   requires io.annot8.conventions;
   requires io.annot8.common.components;
   requires transitive io.annot8.components.base;
+  requires transitive io.annot8.components.base.text;
 
   exports io.annot8.components.files.sources;
   exports io.annot8.components.files.processors;
