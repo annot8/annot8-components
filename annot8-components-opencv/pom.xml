@@ -5,7 +5,7 @@
   <parent>
     <artifactId>annot8-components</artifactId>
     <groupId>io.annot8</groupId>
-    <version>1.2.0</version>
+    <version>1.3.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -13,7 +13,7 @@
 
   <name>Annot8 OpenCV Components</name>
   <description>Components for using OpenCV within Annot8</description>
-  <version>1.2.0</version>
+  <version>1.3.0-SNAPSHOT</version>
 
   <properties>
     <maven.compiler.source>11</maven.compiler.source>

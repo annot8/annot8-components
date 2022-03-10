@@ -1,9 +1,10 @@
 module io.annot8.components.files {
   requires transitive io.annot8.api;
-  requires io.annot8.common.data;
+  requires transitive io.annot8.common.data;
   requires io.annot8.conventions;
   requires io.annot8.common.components;
   requires transitive io.annot8.components.base;
+  requires transitive io.annot8.components.base.text;
 
   exports io.annot8.components.files.sources;
   exports io.annot8.components.files.processors;
@@ -18,7 +19,7 @@ module io.annot8.components.files {
   requires jakarta.json;
   requires java.desktop;
   requires org.apache.commons.text;
-  requires fastcsv;
+  requires de.siegmar.fastcsv;
   requires org.apache.commons.compress;
-  requires simplemagic;
+  requires transitive simplemagic;
 }

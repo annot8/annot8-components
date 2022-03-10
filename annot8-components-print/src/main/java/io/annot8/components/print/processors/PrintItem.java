@@ -46,6 +46,7 @@ public class PrintItem extends AbstractProcessorDescriptor<PrintItem.Processor, 
     public ProcessorResponse process(Item item) {
 
       println("---", 0);
+      println("ID: " + item.getId(), 0);
       println("Properties:", 0);
       print(item.getProperties(), 1);
       println("Content:", 0);

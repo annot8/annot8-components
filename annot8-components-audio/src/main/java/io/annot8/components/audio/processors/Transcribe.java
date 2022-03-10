@@ -11,6 +11,7 @@ import io.annot8.api.components.annotations.SettingsClass;
 import io.annot8.api.components.responses.ProcessorResponse;
 import io.annot8.api.context.Context;
 import io.annot8.api.data.Item;
+import io.annot8.api.exceptions.BadConfigurationException;
 import io.annot8.api.settings.Description;
 import io.annot8.common.components.AbstractProcessor;
 import io.annot8.common.components.AbstractProcessorDescriptor;
@@ -18,13 +19,14 @@ import io.annot8.common.components.capabilities.SimpleCapabilities;
 import io.annot8.common.data.bounds.SpanBounds;
 import io.annot8.common.data.content.Audio;
 import io.annot8.common.data.content.Text;
+import io.annot8.components.audio.processors.data.VoskOutput;
+import io.annot8.components.audio.processors.data.VoskOutputResult;
 import io.annot8.conventions.AnnotationTypes;
 import io.annot8.conventions.GroupRoles;
 import io.annot8.conventions.GroupTypes;
 import io.annot8.conventions.PropertyKeys;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import javax.sound.sampled.AudioSystem;
 import org.vosk.Model;
@@ -62,7 +64,12 @@ public class Transcribe
     private static final Gson gson = new Gson();
 
     public Processor(Settings settings) {
-      model = new Model(settings.getModel());
+      try {
+        model = new Model(settings.getModel());
+      } catch (IOException ioe) {
+        throw new BadConfigurationException(
+            "Could not load transcription model " + settings.getModel(), ioe);
+      }
       annotateAudio = settings.isAnnotateAudio();
     }
 
@@ -87,6 +94,8 @@ public class Transcribe
                 }
 
                 try (Recognizer recognizer = new Recognizer(model, asr)) {
+                  recognizer.setWords(true);
+
                   int nbytes;
                   byte[] b = new byte[4096];
                   while ((nbytes = audio.getData().read(b)) >= 0) {
@@ -181,66 +190,6 @@ public class Transcribe
 
     public void setAnnotateAudio(boolean annotateAudio) {
       this.annotateAudio = annotateAudio;
-    }
-  }
-
-  private static class VoskOutput {
-    private List<VoskOutputResult> result = Collections.emptyList();
-    private String text = null;
-
-    public List<VoskOutputResult> getResult() {
-      return result;
-    }
-
-    public void setResult(List<VoskOutputResult> result) {
-      this.result = result;
-    }
-
-    public String getText() {
-      return text;
-    }
-
-    public void setText(String text) {
-      this.text = text;
-    }
-  }
-
-  private static class VoskOutputResult {
-    float conf = 0.0f;
-    float start = 0.0f;
-    float end = 0.0f;
-    String word = "";
-
-    public float getConf() {
-      return conf;
-    }
-
-    public void setConf(float conf) {
-      this.conf = conf;
-    }
-
-    public float getStart() {
-      return start;
-    }
-
-    public void setStart(float start) {
-      this.start = start;
-    }
-
-    public float getEnd() {
-      return end;
-    }
-
-    public void setEnd(float end) {
-      this.end = end;
-    }
-
-    public String getWord() {
-      return word;
-    }
-
-    public void setWord(String word) {
-      this.word = word;
     }
   }
 }

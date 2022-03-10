@@ -119,8 +119,8 @@ public class DocumentExtractor
 
     @Override
     public boolean acceptFile(FileContent file) {
-      DocumentType documentType =
-          DocumentType.PLAIN_TEXT; // Accepts any document, so use it as our default
+      DocumentType documentType = DocumentType.PLAIN_TEXT; // Accepts any document, so use it as our
+      // default
 
       if (docProcessor.acceptFile(file)) {
         documentType = DocumentType.DOC;
@@ -146,8 +146,8 @@ public class DocumentExtractor
 
     @Override
     public boolean acceptInputStream(InputStreamContent inputStream) {
-      DocumentType documentType =
-          DocumentType.PLAIN_TEXT; // Accepts any document, so use it as our default
+      DocumentType documentType = DocumentType.PLAIN_TEXT; // Accepts any document, so use it as our
+      // default
 
       if (docProcessor.acceptInputStream(inputStream)) {
         documentType = DocumentType.DOC;
@@ -345,7 +345,7 @@ public class DocumentExtractor
     }
   }
 
-  protected static class DocumentObjectWithType {
+  public static class DocumentObjectWithType {
     private final Object document;
     private final DocumentType type;
 
@@ -363,7 +363,7 @@ public class DocumentExtractor
     }
   }
 
-  protected enum DocumentType {
+  public enum DocumentType {
     DOC,
     DOCX,
     HTML,

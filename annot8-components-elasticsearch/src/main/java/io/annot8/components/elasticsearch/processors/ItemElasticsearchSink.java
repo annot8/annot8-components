@@ -1,6 +1,8 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.elasticsearch.processors;
 
+import co.elastic.clients.elasticsearch._types.mapping.Property;
+import co.elastic.clients.elasticsearch.core.bulk.IndexOperation;
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
 import io.annot8.api.components.annotations.ComponentName;
@@ -15,7 +17,6 @@ import io.annot8.components.elasticsearch.ElasticsearchUtils;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import org.elasticsearch.action.index.IndexRequest;
 
 @ComponentName("Elasticsearch Sink - Item")
 @ComponentDescription("Persists items into Elasticsearch")
@@ -40,17 +41,18 @@ public class ItemElasticsearchSink
     }
 
     @Override
-    protected List<IndexRequest> itemToIndexRequests(Item item) {
+    protected List<IndexOperation<?>> itemToIndexRequests(Item item) {
       return List.of(
-          new IndexRequest(index)
+          new IndexOperation.Builder<>()
+              .index(index)
               .id(item.getId())
-              .source(ElasticsearchUtils.itemToMap(item, forceString)));
+              .document(ElasticsearchUtils.itemToMap(item, forceString))
+              .build());
     }
 
     @Override
-    protected Optional<Map<String, Object>> getMapping() {
-      return Optional.of(
-          ElasticsearchUtils.wrapWithProperties(ElasticsearchUtils.contentMapping()));
+    protected Optional<Map<String, Property>> getMapping() {
+      return Optional.of(ElasticsearchUtils.itemMapping());
     }
   }
 }

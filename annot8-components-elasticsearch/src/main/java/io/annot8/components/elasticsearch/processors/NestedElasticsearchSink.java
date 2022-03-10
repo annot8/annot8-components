@@ -1,6 +1,11 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.elasticsearch.processors;
 
+import co.elastic.clients.elasticsearch._types.mapping.DynamicTemplate;
+import co.elastic.clients.elasticsearch._types.mapping.Property;
+import co.elastic.clients.elasticsearch.core.bulk.IndexOperation;
+import co.elastic.clients.elasticsearch.indices.CreateIndexResponse;
+import co.elastic.clients.elasticsearch.indices.PutMappingResponse;
 import io.annot8.api.bounds.Bounds;
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
@@ -15,21 +20,11 @@ import io.annot8.common.components.AbstractProcessorDescriptor;
 import io.annot8.common.components.capabilities.SimpleCapabilities;
 import io.annot8.components.elasticsearch.ElasticsearchSettings;
 import io.annot8.components.elasticsearch.ElasticsearchUtils;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.action.support.master.AcknowledgedResponse;
-import org.elasticsearch.client.RequestOptions;
-import org.elasticsearch.client.indices.CreateIndexRequest;
-import org.elasticsearch.client.indices.CreateIndexResponse;
-import org.elasticsearch.client.indices.GetIndexRequest;
-import org.elasticsearch.client.indices.PutMappingRequest;
-import org.elasticsearch.common.xcontent.XContentType;
 
 @ComponentName("Elasticsearch Sink - Nested")
 @ComponentDescription("Persists processed items into Elasticsearch, using a nested structure")
@@ -63,14 +58,13 @@ public class NestedElasticsearchSink
 
       // Create mapping
       try {
-        if (client.indices().exists(new GetIndexRequest(index), RequestOptions.DEFAULT)) {
+        if (client.indices().exists(r -> r.index(index)).value()) {
           log().warn("Index {} already exists - mapping will not be applied", index);
         } else {
           log().info("Creating index {}", index);
-          CreateIndexResponse createResponse =
-              client.indices().create(new CreateIndexRequest(index), RequestOptions.DEFAULT);
+          CreateIndexResponse createResponse = client.indices().create(r -> r.index(index));
 
-          if (!createResponse.isAcknowledged()) {
+          if (Boolean.FALSE.equals(createResponse.acknowledged())) {
             log().warn("Server did not acknowledge creation index {}", index);
           }
 
@@ -80,24 +74,18 @@ public class NestedElasticsearchSink
 
           log().info("Creating mapping for index {}", index);
 
-          String file = settings.isUseNested() ? "nesNestedMapping" : "nesMapping";
-          file += settings.isForceString() ? "String.json" : ".json";
-
-          String mapping =
-              new BufferedReader(
-                      new InputStreamReader(
-                          NestedElasticsearchSink.class.getResourceAsStream(file)))
-                  .lines()
-                  .collect(Collectors.joining("\n"));
-
-          AcknowledgedResponse mappingResponse =
+          PutMappingResponse mappingResponse =
               client
                   .indices()
                   .putMapping(
-                      new PutMappingRequest(index).source(mapping, XContentType.JSON),
-                      RequestOptions.DEFAULT);
+                      r ->
+                          r.index(index)
+                              .properties(createMapping(settings.isUseNested()))
+                              .dynamicTemplates(
+                                  createDynamicTemplate(
+                                      settings.isUseNested(), settings.isForceString())));
 
-          if (!mappingResponse.isAcknowledged()) {
+          if (!mappingResponse.acknowledged()) {
             log().warn("Server did not acknowledge creation of mapping for index {}", index);
           }
         }
@@ -107,11 +95,13 @@ public class NestedElasticsearchSink
     }
 
     @Override
-    protected List<IndexRequest> itemToIndexRequests(Item item) {
-      IndexRequest ir =
-          new IndexRequest(index).source(transformItem(item, forceString)).id(item.getId());
-
-      return List.of(ir);
+    protected List<IndexOperation<?>> itemToIndexRequests(Item item) {
+      return List.of(
+          new IndexOperation.Builder<>()
+              .index(index)
+              .id(item.getId())
+              .document(transformItem(item, forceString))
+              .build());
     }
 
     /**
@@ -192,6 +182,159 @@ public class NestedElasticsearchSink
 
       return m;
     }
+  }
+
+  private static Map<String, Property> createMapping(boolean nested) {
+    Map<String, Property> mapping = new HashMap<>();
+
+    mapping.put(ElasticsearchUtils.ID, ElasticsearchUtils.TYPE_KEYWORD);
+
+    Property contents;
+    Property groups;
+    if (nested) {
+      contents =
+          Property.of(
+              p ->
+                  p.nested(
+                      n ->
+                          n.properties(ElasticsearchUtils.CONTENT, ElasticsearchUtils.TYPE_TEXT)
+                              .properties(
+                                  ElasticsearchUtils.CONTENT_TYPE, ElasticsearchUtils.TYPE_KEYWORD)
+                              .properties(
+                                  ElasticsearchUtils.DESCRIPTION, ElasticsearchUtils.TYPE_TEXT)
+                              .properties(ElasticsearchUtils.ID, ElasticsearchUtils.TYPE_KEYWORD)
+                              .properties(
+                                  "annotations",
+                                  a ->
+                                      a.nested(
+                                          na ->
+                                              na.properties(
+                                                      ElasticsearchUtils.BEGIN,
+                                                      ElasticsearchUtils.TYPE_LONG)
+                                                  .properties(
+                                                      ElasticsearchUtils.END,
+                                                      ElasticsearchUtils.TYPE_LONG)
+                                                  .properties(
+                                                      ElasticsearchUtils.BOUNDS_TYPE,
+                                                      ElasticsearchUtils.TYPE_KEYWORD)
+                                                  .properties(
+                                                      ElasticsearchUtils.ID,
+                                                      ElasticsearchUtils.TYPE_KEYWORD)
+                                                  .properties(
+                                                      ElasticsearchUtils.TYPE,
+                                                      ElasticsearchUtils.TYPE_KEYWORD)
+                                                  .properties(
+                                                      ElasticsearchUtils.GEO,
+                                                      ElasticsearchUtils.TYPE_GEOSHAPE)
+                                                  .properties(
+                                                      ElasticsearchUtils.VALUE,
+                                                      ElasticsearchUtils
+                                                          .TYPE_TEXT_WITH_KEYWORD)))));
+
+      groups =
+          Property.of(
+              p ->
+                  p.nested(
+                      n ->
+                          n.properties(ElasticsearchUtils.ID, ElasticsearchUtils.TYPE_KEYWORD)
+                              .properties(
+                                  ElasticsearchUtils.TYPE, ElasticsearchUtils.TYPE_KEYWORD)));
+    } else {
+      contents =
+          Property.of(
+              p ->
+                  p.object(
+                      o ->
+                          o.properties(ElasticsearchUtils.CONTENT, ElasticsearchUtils.TYPE_TEXT)
+                              .properties(
+                                  ElasticsearchUtils.CONTENT_TYPE, ElasticsearchUtils.TYPE_KEYWORD)
+                              .properties(
+                                  ElasticsearchUtils.DESCRIPTION, ElasticsearchUtils.TYPE_TEXT)
+                              .properties(ElasticsearchUtils.ID, ElasticsearchUtils.TYPE_KEYWORD)
+                              .properties(
+                                  "annotations",
+                                  a ->
+                                      a.object(
+                                          oa ->
+                                              oa.properties(
+                                                      ElasticsearchUtils.BEGIN,
+                                                      ElasticsearchUtils.TYPE_LONG)
+                                                  .properties(
+                                                      ElasticsearchUtils.END,
+                                                      ElasticsearchUtils.TYPE_LONG)
+                                                  .properties(
+                                                      ElasticsearchUtils.BOUNDS_TYPE,
+                                                      ElasticsearchUtils.TYPE_KEYWORD)
+                                                  .properties(
+                                                      ElasticsearchUtils.ID,
+                                                      ElasticsearchUtils.TYPE_KEYWORD)
+                                                  .properties(
+                                                      ElasticsearchUtils.TYPE,
+                                                      ElasticsearchUtils.TYPE_KEYWORD)
+                                                  .properties(
+                                                      ElasticsearchUtils.GEO,
+                                                      ElasticsearchUtils.TYPE_GEOSHAPE)
+                                                  .properties(
+                                                      ElasticsearchUtils.VALUE,
+                                                      ElasticsearchUtils
+                                                          .TYPE_TEXT_WITH_KEYWORD)))));
+
+      groups =
+          Property.of(
+              p ->
+                  p.object(
+                      o ->
+                          o.properties(ElasticsearchUtils.ID, ElasticsearchUtils.TYPE_KEYWORD)
+                              .properties(
+                                  ElasticsearchUtils.TYPE, ElasticsearchUtils.TYPE_KEYWORD)));
+    }
+
+    mapping.put("contents", contents);
+    mapping.put("groups", groups);
+
+    return mapping;
+  }
+
+  private static List<Map<String, DynamicTemplate>> createDynamicTemplate(
+      boolean nested, boolean forceString) {
+    List<Map<String, DynamicTemplate>> l = new ArrayList<>();
+    Map<String, DynamicTemplate> groupRolesContent = new HashMap<>();
+    groupRolesContent.put(
+        "group_roles_content",
+        DynamicTemplate.of(
+            d -> d.pathMatch("groups.roles.*.contentId").mapping(ElasticsearchUtils.TYPE_KEYWORD)));
+    l.add(groupRolesContent);
+
+    Map<String, DynamicTemplate> groupRolesAnnotation = new HashMap<>();
+    groupRolesAnnotation.put(
+        "group_roles_annotation",
+        DynamicTemplate.of(
+            d ->
+                d.pathMatch("groups.roles.*.annotationId")
+                    .mapping(ElasticsearchUtils.TYPE_KEYWORD)));
+    l.add(groupRolesAnnotation);
+
+    if (forceString) {
+      Map<String, DynamicTemplate> stringProperties = new HashMap<>();
+      stringProperties.put(
+          "string_properties",
+          DynamicTemplate.of(
+              d -> d.pathMatch("*.properties.*").mapping(ElasticsearchUtils.TYPE_TEXT)));
+      l.add(stringProperties);
+    }
+
+    if (nested) {
+      Map<String, DynamicTemplate> groupRoles = new HashMap<>();
+      groupRoles.put(
+          "group_roles",
+          DynamicTemplate.of(
+              d ->
+                  d.pathMatch("groups.roles.*.annotationId")
+                      .mapping(ElasticsearchUtils.TYPE_KEYWORD)));
+      l.add(groupRoles);
+    }
+
+    return l;
   }
 
   public static class Settings extends ElasticsearchSettings {

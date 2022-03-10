@@ -165,14 +165,16 @@ public abstract class AbstractDocumentExtractorProcessor<T, S extends DocumentEx
       try {
         Collection<ExtractionWithProperties<String>> extractedText = extractText(doc);
 
-        for (ExtractionWithProperties<String> e : extractedText) {
-          item.createContent(Text.class)
-              .withDescription("Text extracted from " + contentId)
-              .withData(e.getExtractedValue())
-              .withProperties(new InMemoryProperties(e.getProperties()))
-              .withProperty(PropertyKeys.PROPERTY_KEY_PARENT, contentId)
-              .save();
-        }
+        extractedText.stream()
+            .filter(e -> !e.getExtractedValue().isEmpty())
+            .forEach(
+                e ->
+                    item.createContent(Text.class)
+                        .withDescription("Text extracted from " + contentId)
+                        .withData(e.getExtractedValue())
+                        .withProperties(new InMemoryProperties(e.getProperties()))
+                        .withProperty(PropertyKeys.PROPERTY_KEY_PARENT, contentId)
+                        .save());
       } catch (Exception e) {
         exceptions.add(e);
       }

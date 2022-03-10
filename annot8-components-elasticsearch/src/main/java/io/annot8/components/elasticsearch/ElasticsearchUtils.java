@@ -1,6 +1,9 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.elasticsearch;
 
+import co.elastic.clients.elasticsearch._types.mapping.Property;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.annot8.api.annotations.Annotation;
 import io.annot8.api.annotations.Group;
 import io.annot8.api.data.Content;
@@ -13,11 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.elasticsearch.common.geo.GeoUtils;
-import org.elasticsearch.common.xcontent.LoggingDeprecationHandler;
-import org.elasticsearch.common.xcontent.NamedXContentRegistry;
-import org.elasticsearch.common.xcontent.XContentParser;
-import org.elasticsearch.common.xcontent.json.JsonXContent;
 
 /**
  * Contains common constants and utilities for manipulating Annot8 items ready for persisting in to
@@ -42,6 +40,19 @@ public class ElasticsearchUtils {
   public static final String TYPE = "type";
   public static final String VALUE = "value";
 
+  public static final Property TYPE_GEOSHAPE = Property.of(p -> p.geoShape(g -> g));
+  public static final Property TYPE_INTEGER = Property.of(p -> p.integer(i -> i));
+  public static final Property TYPE_KEYWORD = Property.of(p -> p.keyword(k -> k));
+  public static final Property TYPE_LONG = Property.of(p -> p.long_(l -> l));
+  public static final Property TYPE_TEXT = Property.of(p -> p.text(t -> t));
+  public static final Property TYPE_TEXT_WITH_KEYWORD =
+      Property.of(
+          p ->
+              p.text(
+                  t -> t.fields("keyword", Property.of(q -> q.keyword(k -> k.ignoreAbove(256))))));
+
+  private static final ObjectMapper mapper = new ObjectMapper();
+
   private ElasticsearchUtils() {
     // Private constructor for utility class
   }
@@ -62,13 +73,12 @@ public class ElasticsearchUtils {
 
     if (a.getProperties().has(PropertyKeys.PROPERTY_KEY_GEOJSON, String.class)) {
       try {
-        XContentParser parser =
-            JsonXContent.jsonXContent.createParser(
-                NamedXContentRegistry.EMPTY,
-                LoggingDeprecationHandler.INSTANCE,
-                a.getProperties().get(PropertyKeys.PROPERTY_KEY_GEOJSON, String.class).get());
+        Map<String, Object> json =
+            mapper.readValue(
+                a.getProperties().get(PropertyKeys.PROPERTY_KEY_GEOJSON, String.class).get(),
+                new TypeReference<>() {});
 
-        ma.put(GEO, parser.map());
+        ma.put(GEO, json);
 
         geoJsonSucceeded = true;
       } catch (Exception e) {
@@ -90,7 +100,7 @@ public class ElasticsearchUtils {
               .get()
               .doubleValue();
 
-      if (GeoUtils.isValidLatitude(lat) && GeoUtils.isValidLongitude(lon)) {
+      if (lat >= -90.0 && lat <= 90.0 && lon >= -180.0 && lon <= 180.0) {
         Map<String, Object> geojson = new HashMap<>();
         geojson.put("type", "Point");
         geojson.put("coordinates", List.of(lon, lat));
@@ -111,14 +121,14 @@ public class ElasticsearchUtils {
     return ma;
   }
 
-  public static Map<String, Object> annotationMapping() {
-    Map<String, Object> m = new HashMap<>();
-    m.put(ID, mappingType("keyword"));
-    m.put(TYPE, mappingType("keyword"));
-    m.put(BOUNDS_TYPE, mappingType("keyword"));
-    m.put(GEO, mappingType("geo_shape"));
-    m.put(BEGIN, mappingType("integer"));
-    m.put(END, mappingType("integer"));
+  public static Map<String, Property> annotationMapping() {
+    Map<String, Property> m = new HashMap<>();
+    m.put(ID, TYPE_KEYWORD);
+    m.put(TYPE, TYPE_KEYWORD);
+    m.put(BOUNDS_TYPE, TYPE_KEYWORD);
+    m.put(GEO, TYPE_GEOSHAPE);
+    m.put(BEGIN, TYPE_INTEGER);
+    m.put(END, TYPE_INTEGER);
 
     // TODO: What should VALUE be mapped as?
 
@@ -146,11 +156,11 @@ public class ElasticsearchUtils {
     return mc;
   }
 
-  public static Map<String, Object> contentMapping() {
-    Map<String, Object> m = new HashMap<>();
-    m.put(ID, mappingType("keyword"));
-    m.put(CONTENT_TYPE, mappingType("keyword"));
-    m.put(DESCRIPTION, mappingType("text"));
+  public static Map<String, Property> contentMapping() {
+    Map<String, Property> m = new HashMap<>();
+    m.put(ID, TYPE_KEYWORD);
+    m.put(CONTENT_TYPE, TYPE_KEYWORD);
+    m.put(DESCRIPTION, TYPE_TEXT);
 
     // TODO: What should CONTENT be mapped as?
 
@@ -195,10 +205,10 @@ public class ElasticsearchUtils {
     return mg;
   }
 
-  public static Map<String, Object> groupMapping() {
-    Map<String, Object> m = new HashMap<>();
-    m.put(ID, mappingType("keyword"));
-    m.put(TYPE, mappingType("keyword"));
+  public static Map<String, Property> groupMapping() {
+    Map<String, Property> m = new HashMap<>();
+    m.put(ID, TYPE_KEYWORD);
+    m.put(TYPE, TYPE_KEYWORD);
 
     // TODO: Should add dynamic mapping for roles
 
@@ -220,10 +230,10 @@ public class ElasticsearchUtils {
     return m;
   }
 
-  public static Map<String, Object> itemMapping() {
-    Map<String, Object> m = new HashMap<>();
-    m.put(ID, mappingType("keyword"));
-    m.put(PARENT, mappingType("keyword"));
+  public static Map<String, Property> itemMapping() {
+    Map<String, Property> m = new HashMap<>();
+    m.put(ID, TYPE_KEYWORD);
+    m.put(PARENT, TYPE_KEYWORD);
 
     // Don't know in advance what properties annotations will have,
     // so this will have to be mapped dynamically by Elasticsearch
@@ -241,20 +251,6 @@ public class ElasticsearchUtils {
     return String.class.isAssignableFrom(dataClass)
         || Number.class.isAssignableFrom(dataClass)
         || Boolean.class.isAssignableFrom(dataClass);
-  }
-
-  public static Map<String, Object> wrapWithProperties(Map<String, Object> m) {
-    Map<String, Object> wrapper = new HashMap<>();
-    wrapper.put("properties", m);
-
-    return wrapper;
-  }
-
-  public static Map<String, Object> mappingType(String type) {
-    Map<String, Object> m = new HashMap<>();
-    m.put("type", type);
-
-    return m;
   }
 
   public static Map<String, Object> toStringMap(Map<String, Object> map) {

@@ -1,6 +1,8 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.elasticsearch.processors;
 
+import co.elastic.clients.elasticsearch._types.mapping.Property;
+import co.elastic.clients.elasticsearch.core.bulk.IndexOperation;
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
 import io.annot8.api.components.annotations.ComponentName;
@@ -16,7 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import org.elasticsearch.action.index.IndexRequest;
 
 @ComponentName("Elasticsearch Sink - Groups")
 @ComponentDescription("Persists groups into Elasticsearch")
@@ -42,8 +43,8 @@ public class GroupElasticsearchSink
     }
 
     @Override
-    protected List<IndexRequest> itemToIndexRequests(Item item) {
-      List<IndexRequest> indexRequests = new ArrayList<>();
+    protected List<IndexOperation<?>> itemToIndexRequests(Item item) {
+      List<IndexOperation<?>> indexRequests = new ArrayList<>();
 
       item.getGroups()
           .getAll()
@@ -52,7 +53,11 @@ public class GroupElasticsearchSink
                 Map<String, Object> m = ElasticsearchUtils.groupToMap(g, forceString);
                 m.put(ElasticsearchUtils.ITEM_ID, item.getId());
 
-                return new IndexRequest(index).id(g.getId()).source(m);
+                return new IndexOperation.Builder<>()
+                    .index(index)
+                    .id(g.getId())
+                    .document(m)
+                    .build();
               })
           .forEach(indexRequests::add);
 
@@ -60,11 +65,11 @@ public class GroupElasticsearchSink
     }
 
     @Override
-    protected Optional<Map<String, Object>> getMapping() {
-      Map<String, Object> m = ElasticsearchUtils.groupMapping();
-      m.put(ElasticsearchUtils.ITEM_ID, ElasticsearchUtils.mappingType("keyword"));
+    protected Optional<Map<String, Property>> getMapping() {
+      Map<String, Property> m = ElasticsearchUtils.groupMapping();
+      m.put(ElasticsearchUtils.ITEM_ID, ElasticsearchUtils.TYPE_KEYWORD);
 
-      return Optional.of(ElasticsearchUtils.wrapWithProperties(m));
+      return Optional.of(m);
     }
   }
 }

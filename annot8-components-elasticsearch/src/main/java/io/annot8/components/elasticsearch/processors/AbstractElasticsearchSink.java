@@ -1,9 +1,23 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.elasticsearch.processors;
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.ErrorCause;
+import co.elastic.clients.elasticsearch._types.mapping.Property;
+import co.elastic.clients.elasticsearch._types.mapping.TypeMapping;
+import co.elastic.clients.elasticsearch.core.BulkRequest;
+import co.elastic.clients.elasticsearch.core.BulkResponse;
+import co.elastic.clients.elasticsearch.core.bulk.BulkOperation;
+import co.elastic.clients.elasticsearch.core.bulk.BulkResponseItem;
+import co.elastic.clients.elasticsearch.core.bulk.IndexOperation;
+import co.elastic.clients.elasticsearch.core.bulk.OperationType;
+import co.elastic.clients.json.jackson.JacksonJsonpMapper;
+import co.elastic.clients.transport.ElasticsearchTransport;
+import co.elastic.clients.transport.rest_client.RestClientTransport;
 import io.annot8.api.components.responses.ProcessorResponse;
 import io.annot8.api.data.Item;
 import io.annot8.api.exceptions.BadConfigurationException;
+import io.annot8.api.exceptions.ProcessingException;
 import io.annot8.common.components.AbstractProcessor;
 import io.annot8.components.elasticsearch.ElasticsearchSettings;
 import java.io.IOException;
@@ -12,23 +26,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.apache.http.HttpHost;
 import org.apache.http.client.CredentialsProvider;
-import org.elasticsearch.action.DocWriteResponse;
-import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
-import org.elasticsearch.action.bulk.BulkItemResponse;
-import org.elasticsearch.action.bulk.BulkRequest;
-import org.elasticsearch.action.bulk.BulkResponse;
-import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
-import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.client.indices.CreateIndexRequest;
-import org.elasticsearch.client.indices.GetIndexRequest;
 
 public abstract class AbstractElasticsearchSink extends AbstractProcessor {
-  protected final RestHighLevelClient client;
+  protected final ElasticsearchClient client;
   protected final String index;
   protected final boolean forceString;
 
@@ -55,14 +60,18 @@ public abstract class AbstractElasticsearchSink extends AbstractProcessor {
           httpClientBuilder -> httpClientBuilder.setDefaultCredentialsProvider(credentials));
     }
 
-    client = new RestHighLevelClient(builder);
+    RestClient restClient = builder.build();
+
+    ElasticsearchTransport transport =
+        new RestClientTransport(restClient, new JacksonJsonpMapper());
+    client = new ElasticsearchClient(transport);
 
     this.index = index;
     this.forceString = forceString;
 
     // Validate connection
     try {
-      if (!client.ping(RequestOptions.DEFAULT))
+      if (!client.ping().value())
         throw new BadConfigurationException(
             "Could not connect to Elasticsearch - ping returned false");
 
@@ -72,10 +81,9 @@ public abstract class AbstractElasticsearchSink extends AbstractProcessor {
 
     // Delete index
     try {
-      if (deleteIndex
-          && client.indices().exists(new GetIndexRequest(index), RequestOptions.DEFAULT)) {
+      if (deleteIndex && client.indices().exists(r -> r.index(index)).value()) {
         log().info("Deleting index {}", index);
-        client.indices().delete(new DeleteIndexRequest(index), RequestOptions.DEFAULT);
+        client.indices().delete(r -> r.index(index));
       }
     } catch (IOException e) {
       log().error("An exception occurred whilst deleting index {}", index, e);
@@ -83,15 +91,13 @@ public abstract class AbstractElasticsearchSink extends AbstractProcessor {
 
     // Create index
     try {
-      if (client.indices().exists(new GetIndexRequest(index), RequestOptions.DEFAULT)) {
+      if (client.indices().exists(r -> r.index(index)).value()) {
         log().warn("Index {} already exists - existing mapping will be used", index);
       } else {
-        Optional<Map<String, Object>> mapping = getMapping();
+        Optional<TypeMapping> mapping = getTypeMapping();
         if (mapping.isPresent()) {
           log().info("Creating index {} with mapping", index);
-          client
-              .indices()
-              .create(new CreateIndexRequest(index).mapping(mapping.get()), RequestOptions.DEFAULT);
+          client.indices().create(r -> r.index(index).mappings(mapping.get()));
         }
       }
     } catch (IOException e) {
@@ -100,19 +106,8 @@ public abstract class AbstractElasticsearchSink extends AbstractProcessor {
   }
 
   @Override
-  public void close() {
-    if (client != null) {
-      try {
-        client.close();
-      } catch (IOException e) {
-        log().warn("Unable to close Elasticsearch client", e);
-      }
-    }
-  }
-
-  @Override
   public ProcessorResponse process(Item item) {
-    List<IndexRequest> requests;
+    List<IndexOperation<?>> requests;
     try {
       requests = itemToIndexRequests(item);
     } catch (Exception e) {
@@ -125,8 +120,13 @@ public abstract class AbstractElasticsearchSink extends AbstractProcessor {
       return ProcessorResponse.ok();
     }
 
-    BulkRequest bulkRequest = new BulkRequest();
-    requests.forEach(bulkRequest::add);
+    BulkRequest bulkRequest =
+        new BulkRequest.Builder()
+            .operations(
+                requests.stream()
+                    .map(io -> new BulkOperation.Builder().index(io).build())
+                    .collect(Collectors.toList()))
+            .build();
 
     List<Exception> exceptions = new ArrayList<>();
     try {
@@ -135,45 +135,42 @@ public abstract class AbstractElasticsearchSink extends AbstractProcessor {
               "Performing bulk request to index item {} ({} index requests)",
               item.getId(),
               requests.size());
-      BulkResponse response = client.bulk(bulkRequest, RequestOptions.DEFAULT);
+      BulkResponse response = client.bulk(bulkRequest);
 
-      for (BulkItemResponse bulkItemResponse : response) {
-        if (bulkItemResponse.isFailed()) {
-          BulkItemResponse.Failure failure = bulkItemResponse.getFailure();
-
+      for (BulkResponseItem bulkItemResponse : response.items()) {
+        ErrorCause error = bulkItemResponse.error();
+        if (error != null) {
           log()
               .error(
                   "Failed to create/update document {} in index {}: {}",
-                  bulkItemResponse.getId(),
-                  bulkItemResponse.getIndex(),
-                  failure.getMessage(),
-                  failure.getCause());
-          exceptions.add(failure.getCause());
+                  bulkItemResponse.id(),
+                  bulkItemResponse.index(),
+                  error.reason());
+          exceptions.add(new ProcessingException(error.reason()));
 
           continue;
         }
 
-        DocWriteResponse itemResponse = bulkItemResponse.getResponse();
-
-        if (itemResponse.getResult() == DocWriteResponse.Result.CREATED) {
+        if (bulkItemResponse.operationType() == OperationType.Index
+            || bulkItemResponse.operationType() == OperationType.Create) {
           log()
               .debug(
-                  "New document {} created in index {}",
-                  itemResponse.getId(),
-                  itemResponse.getIndex());
-        } else if (itemResponse.getResult() == DocWriteResponse.Result.UPDATED) {
+                  "New document {} indexed in index {}",
+                  bulkItemResponse.id(),
+                  bulkItemResponse.index());
+        } else if (bulkItemResponse.operationType() == OperationType.Update) {
           log()
               .debug(
                   "Existing document {} updated in index {}",
-                  itemResponse.getId(),
-                  itemResponse.getIndex());
+                  bulkItemResponse.id(),
+                  bulkItemResponse.index());
         } else {
           log()
               .error(
                   "Unexpected result returned whilst indexing document {} in index {}: {}",
-                  itemResponse.getId(),
-                  itemResponse.getIndex(),
-                  itemResponse.getResult().name());
+                  bulkItemResponse.id(),
+                  bulkItemResponse.index(),
+                  bulkItemResponse.operationType().name());
         }
       }
     } catch (ConnectException e) {
@@ -194,9 +191,27 @@ public abstract class AbstractElasticsearchSink extends AbstractProcessor {
     }
   }
 
-  protected Optional<Map<String, Object>> getMapping() {
+  /**
+   * Return a map of {@link Property} to use for the property part of the index mapping, or an empty
+   * optional if no explicit mapping should be set.
+   */
+  protected Optional<Map<String, Property>> getMapping() {
     return Optional.empty();
   }
 
-  protected abstract List<IndexRequest> itemToIndexRequests(Item item);
+  /**
+   * Provides a TypeMapping object based off the properties map provided by getMapping(), or an
+   * empty optional if no explicit mapping should be set.
+   *
+   * <p>Override for finer grained control over the mapping
+   */
+  protected Optional<TypeMapping> getTypeMapping() {
+    Optional<Map<String, Property>> mapping = getMapping();
+
+    if (mapping.isEmpty()) return Optional.empty();
+
+    return Optional.of(TypeMapping.of(t -> t.properties(mapping.get())));
+  }
+
+  protected abstract List<IndexOperation<?>> itemToIndexRequests(Item item);
 }

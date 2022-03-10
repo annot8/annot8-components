@@ -34,8 +34,11 @@ public class DocumentExtractorTest {
 
   @Test
   public void testHtml() {
-    testInputStream("testDocument.html", new HtmlExtractorTest());
-    testFile("testDocument.html", new HtmlExtractorTest());
+    HtmlExtractorTest het = new HtmlExtractorTest();
+    het.checkInternet();
+
+    testInputStream("testDocument.html", het);
+    testFile("testDocument.html", het);
   }
 
   @Test

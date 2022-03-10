@@ -1,6 +1,7 @@
-module annot8.components.image {
+module io.annot8.components.image {
+  requires transitive io.annot8.api;
   requires io.annot8.components.base;
-  requires io.annot8.common.data;
+  requires transitive io.annot8.common.data;
   requires metadata.extractor;
   requires io.annot8.common.components;
   requires io.annot8.conventions;

@@ -374,7 +374,7 @@ public class HtmlExtractor
       for (int i = 0; i < bodyRows.size(); i++) {
         // TODO: Handle column spans?
         List<Object> data =
-            bodyRows.get(i).select("td").stream()
+            bodyRows.get(i).select("td, th").stream()
                 .map(Element::text)
                 .map(ConversionUtils::parseString)
                 .collect(Collectors.toList());
@@ -387,7 +387,11 @@ public class HtmlExtractor
 
     @Override
     public int getColumnCount() {
-      return columnNames.size();
+      if (columnNames.isEmpty()) {
+        return rows.stream().mapToInt(Row::getColumnCount).max().orElse(0);
+      } else {
+        return columnNames.size();
+      }
     }
 
     @Override
