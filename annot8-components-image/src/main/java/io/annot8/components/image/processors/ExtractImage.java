@@ -17,13 +17,12 @@ import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.Image;
 import io.annot8.common.data.content.InputStreamContent;
 import io.annot8.conventions.PropertyKeys;
-
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.imageio.ImageIO;
 
 @ComponentName("Extract Image")
 @ComponentDescription("Extract image content from InputStreams and Files for processing")
