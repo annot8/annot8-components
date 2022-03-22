@@ -3,6 +3,9 @@ name: Release to Maven Central
 on:
   release:
     types: [published]
+  push:
+    branches:
+      - develop
 
 jobs:
   build:
