@@ -6,11 +6,11 @@
   <parent>
     <artifactId>annot8-components</artifactId>
     <groupId>io.annot8</groupId>
-    <version>1.2.2</version>
+    <version>1.2.3-SNAPSHOT</version>
   </parent>
 
   <artifactId>annot8-components-db</artifactId>
-  <version>1.2.2</version>
+  <version>1.2.3-SNAPSHOT</version>
   <name>Annot8 DB Components</name>
   <description>Components to deal with databases (primarily JDBC)</description>
 

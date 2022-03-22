@@ -5,12 +5,12 @@
   <parent>
     <artifactId>annot8-components</artifactId>
     <groupId>io.annot8</groupId>
-    <version>1.2.2</version>
+    <version>1.2.3-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>annot8-components-elasticsearch</artifactId>
-  <version>1.2.2</version>
+  <version>1.2.3-SNAPSHOT</version>
   <name>Annot8 Elasticsearch Components</name>
   <description>Components to deal with reading from and writing to Elasticsearch</description>
 

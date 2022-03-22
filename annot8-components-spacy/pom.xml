@@ -5,7 +5,7 @@
   <parent>
     <artifactId>annot8-components</artifactId>
     <groupId>io.annot8</groupId>
-    <version>1.2.2</version>
+    <version>1.2.3-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -13,7 +13,7 @@
 
   <name>Annot8 SpaCy Components</name>
   <description>Components for communicating with a SpaCy server from within Annot8</description>
-  <version>1.2.2</version>
+  <version>1.2.3-SNAPSHOT</version>
 
   <properties>
     <maven.compiler.source>11</maven.compiler.source>
