@@ -52,6 +52,7 @@ public class GeoNamesUtils {
             // GeoNames metadata
             putIfNotNull(props, PropertyKeys.PROPERTY_KEY_IDENTIFIER, bean.getGeonameId());
             putIfNotNull(props, "lastUpdated", bean.getModificationDate());
+            // fallthrough
           case EXTENDED:
             // More detailed information
             putIfNotNull(props, "admin1Code", bean.getAdmin1Code());
@@ -66,11 +67,13 @@ public class GeoNamesUtils {
             putIfNotNull(props, "featureCode", bean.getFeatureCode());
             putIfNotNull(props, "population", bean.getPopulation());
             putIfNotNull(props, "timezone", bean.getTimezone());
+            // fallthrough
           case BASIC:
             // Essential geo information
             putIfNotNull(props, PropertyKeys.PROPERTY_KEY_COUNTRY, bean.getCountryCode());
             putIfNotNull(props, PropertyKeys.PROPERTY_KEY_LATITUDE, bean.getLatitude());
             putIfNotNull(props, PropertyKeys.PROPERTY_KEY_LONGITUDE, bean.getLongitude());
+            // fallthrough
           case NONE:
           default:
             break;

@@ -95,6 +95,9 @@
     <sign-maven-plugin.version>1.0.1</sign-maven-plugin.version>
     <!-- Logging -->
     <slf4j.version>1.7.35</slf4j.version>
+
+    <!-- Sonar -->
+    <sonar.coverage.exclusions>**/org/openapi/spacy/**</sonar.coverage.exclusions>
   </properties>
 
   <dependencies>

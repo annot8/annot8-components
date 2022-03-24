@@ -1,8 +1,13 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package org.openapi.spacy;
 
-import com.fasterxml.jackson.annotation.*;
-import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.MapperFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.text.DateFormat;
 import java.util.HashMap;
@@ -11,7 +16,6 @@ import java.util.Map;
 import java.util.Set;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.ext.ContextResolver;
-import org.openapi.spacy.model.*;
 import org.openapitools.jackson.nullable.JsonNullableModule;
 
 @javax.annotation.processing.Generated(
@@ -21,18 +25,19 @@ public class JSON implements ContextResolver<ObjectMapper> {
   private ObjectMapper mapper;
 
   public JSON() {
-    mapper = new ObjectMapper();
-    mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-    mapper.configure(MapperFeature.ALLOW_COERCION_OF_SCALARS, false);
-    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true);
-    mapper.configure(DeserializationFeature.FAIL_ON_INVALID_SUBTYPE, true);
-    mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-    mapper.enable(SerializationFeature.WRITE_ENUMS_USING_TO_STRING);
-    mapper.enable(DeserializationFeature.READ_ENUMS_USING_TO_STRING);
-    mapper.setDateFormat(new RFC3339DateFormat());
-    mapper.registerModule(new JavaTimeModule());
-    JsonNullableModule jnm = new JsonNullableModule();
-    mapper.registerModule(jnm);
+    mapper =
+        JsonMapper.builder()
+            .configure(MapperFeature.ALLOW_COERCION_OF_SCALARS, false)
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true)
+            .configure(DeserializationFeature.FAIL_ON_INVALID_SUBTYPE, true)
+            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+            .enable(SerializationFeature.WRITE_ENUMS_USING_TO_STRING)
+            .enable(DeserializationFeature.READ_ENUMS_USING_TO_STRING)
+            .defaultDateFormat(new RFC3339DateFormat())
+            .addModule(new JavaTimeModule())
+            .addModule(new JsonNullableModule())
+            .build()
+            .setSerializationInclusion(JsonInclude.Include.NON_NULL);
   }
 
   /**
@@ -90,11 +95,6 @@ public class JSON implements ContextResolver<ObjectMapper> {
       if (mappings != null) {
         discriminatorMappings.putAll(mappings);
       }
-    }
-
-    // Return the name of the discriminator property for this model class.
-    String getDiscriminatorPropertyName() {
-      return discriminatorName;
     }
 
     // Return the discriminator value or null if the discriminator is not
