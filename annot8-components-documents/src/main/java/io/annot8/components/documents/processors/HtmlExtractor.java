@@ -180,6 +180,7 @@ public class HtmlExtractor
       return metadata;
     }
 
+    @SuppressWarnings("unchecked")
     private void addOrAppend(Map<String, Object> map, String key, String value) {
       if (map.containsKey(key)) {
         Object existingValue = map.get(key);
@@ -200,6 +201,7 @@ public class HtmlExtractor
       }
     }
 
+    @SuppressWarnings("unchecked")
     private void addOrAppend(Map<String, Object> map, String key, Collection<String> value) {
       if (map.containsKey(key)) {
         Object existingValue = map.get(key);

@@ -42,31 +42,33 @@ public class SplitSpanBoundsTest {
     s.setSplit("( and|,) ?");
     s.setTypes(Set.of(AnnotationTypes.ANNOTATION_TYPE_PERSON));
 
-    SplitSpanBounds.Processor p = new SplitSpanBounds.Processor(s);
+    try (SplitSpanBounds.Processor p = new SplitSpanBounds.Processor(s)) {
 
-    ProcessorResponse pr = p.process(i);
-    assertEquals(ProcessorResponse.ok(), pr);
+      ProcessorResponse pr = p.process(i);
+      assertEquals(ProcessorResponse.ok(), pr);
 
-    assertEquals(3L, t.getAnnotations().getByType(AnnotationTypes.ANNOTATION_TYPE_PERSON).count());
-    assertEquals(1, t.getAnnotations().getByType("entity/test").count());
+      assertEquals(
+          3L, t.getAnnotations().getByType(AnnotationTypes.ANNOTATION_TYPE_PERSON).count());
+      assertEquals(1, t.getAnnotations().getByType("entity/test").count());
 
-    List<String> spans =
-        t.getAnnotations()
-            .getByType(AnnotationTypes.ANNOTATION_TYPE_PERSON)
-            .map(
-                a ->
-                    a.getBounds(SpanBounds.class)
-                        .orElse(new SpanBounds(0, 0))
-                        .getData(t, String.class)
-                        .orElse(""))
-            .collect(Collectors.toList());
+      List<String> spans =
+          t.getAnnotations()
+              .getByType(AnnotationTypes.ANNOTATION_TYPE_PERSON)
+              .map(
+                  a ->
+                      a.getBounds(SpanBounds.class)
+                          .orElse(new SpanBounds(0, 0))
+                          .getData(t, String.class)
+                          .orElse(""))
+              .collect(Collectors.toList());
 
-    assertTrue(spans.contains("Alice"));
-    assertTrue(spans.contains("Bob"));
-    assertTrue(spans.contains("Charlie"));
+      assertTrue(spans.contains("Alice"));
+      assertTrue(spans.contains("Bob"));
+      assertTrue(spans.contains("Charlie"));
 
-    t.getAnnotations()
-        .getByType(AnnotationTypes.ANNOTATION_TYPE_PERSON)
-        .forEach(a -> assertEquals(123, (int) a.getProperties().getOrDefault("test", 0)));
+      t.getAnnotations()
+          .getByType(AnnotationTypes.ANNOTATION_TYPE_PERSON)
+          .forEach(a -> assertEquals(123, (int) a.getProperties().getOrDefault("test", 0)));
+    }
   }
 }

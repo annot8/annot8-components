@@ -18,16 +18,16 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 
-public class SQLiteDatabaseTableExtractorTest extends AbstractSQLiteDataTest {
+class SQLiteDatabaseTableExtractorTest extends AbstractSQLiteDataTest {
 
   @Test
-  public void testProcess() {
+  void testProcess() {
     Item item = new TestItem();
     FileContent content = mockFileContent("test.db");
     ((TestItem) item).save(content);
-    SQLiteDatabaseTableExtractor.Processor extractor = new SQLiteDatabaseTableExtractor.Processor();
     ProcessorResponse response = null;
-    try {
+    try (SQLiteDatabaseTableExtractor.Processor extractor =
+        new SQLiteDatabaseTableExtractor.Processor()) {
       response = extractor.process(item);
     } catch (Exception e) {
       fail("Test should not throw an exception here", e);

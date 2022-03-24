@@ -5,20 +5,19 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 
-public class JdbcSettingsTest {
+class JdbcSettingsTest {
 
-  private static final String JDBC_TEST_URL = "jdbc:hsqldb:hsql://localhost:9001/test";
-  private static final String USER = "TEST";
-  private static final String PASS = "TEST";
+  private static final String USER = "USER";
+  private static final String PASS = "PASS";
 
   @Test
-  public void testValidate() {
+  void testValidate() {
     JdbcSettings settings = new JdbcSettings("jdbc:sqlite://exampleDB.db");
     assertTrue(settings.validate());
   }
 
   @Test
-  public void testInvalidSettings() {
+  void testInvalidSettings() {
     JdbcSettings settings = new JdbcSettings(null);
     JdbcSettings emptySettings = new JdbcSettings("");
     assertFalse(settings.validate());
@@ -26,11 +25,9 @@ public class JdbcSettingsTest {
   }
 
   @Test
-  public void testCredentials() {
-    String user = "user";
-    String pass = "pass";
-    JdbcSettings settings = new JdbcSettings("jdbc::url", user, pass);
-    assertEquals(user, settings.getUser());
-    assertEquals(pass, settings.getPassword());
+  void testCredentials() {
+    JdbcSettings settings = new JdbcSettings("jdbc::url", USER, PASS);
+    assertEquals(USER, settings.getUser());
+    assertEquals(PASS, settings.getPassword());
   }
 }

@@ -187,9 +187,12 @@ public class DocxExtractor
     @Override
     public Collection<ExtractionWithProperties<String>> extractText(XWPFDocument doc) {
       // TODO: Should we remove Tables from this?
-
-      XWPFWordExtractor wordExtractor = new XWPFWordExtractor(doc);
-      return List.of(new ExtractionWithProperties<>(wordExtractor.getText()));
+      try (XWPFWordExtractor wordExtractor = new XWPFWordExtractor(doc)) {
+        return List.of(new ExtractionWithProperties<>(wordExtractor.getText()));
+      } catch (IOException e) {
+        log().warn("Failed to extract text from XWPFDocument", e);
+        return List.of();
+      }
     }
 
     @Override

@@ -39,13 +39,11 @@ import java.util.Objects;
  */
 public abstract class AbstractDocumentExtractorProcessor<T, S extends DocumentExtractorSettings>
     extends AbstractProcessor {
-  private final Context context;
   protected final S settings;
 
   protected static final String METADATA_SEPARATOR = "/";
 
-  public AbstractDocumentExtractorProcessor(Context context, S settings) {
-    this.context = context;
+  protected AbstractDocumentExtractorProcessor(Context context, S settings) {
     this.settings = settings;
 
     if (!isMetadataSupported() && settings.isExtractMetadata()) {
@@ -72,6 +70,40 @@ public abstract class AbstractDocumentExtractorProcessor<T, S extends DocumentEx
 
     List<Exception> exceptions = new ArrayList<>();
 
+    processFileContent(item, exceptions);
+    processInputStreamContent(item, exceptions);
+
+    if (exceptions.isEmpty()) {
+      return ProcessorResponse.ok();
+    } else {
+      return ProcessorResponse.processingError(exceptions);
+    }
+  }
+
+  private void processInputStreamContent(Item item, List<Exception> exceptions) {
+    item.getContents(InputStreamContent.class)
+        .filter(this::acceptInputStream)
+        .forEach(
+            c -> {
+              log().info("Extracting content from InputStream Content {}", c.getId());
+
+              T doc;
+              try {
+                doc = extractDocument(c);
+              } catch (Exception e) {
+                exceptions.add(e);
+                return;
+              }
+
+              exceptions.addAll(extract(item, c.getId(), doc));
+
+              tryClose(doc);
+
+              if (settings.isDiscardOriginal()) item.removeContent(c);
+            });
+  }
+
+  private void processFileContent(Item item, List<Exception> exceptions) {
     item.getContents(FileContent.class)
         .filter(this::acceptFile)
         .forEach(
@@ -91,48 +123,19 @@ public abstract class AbstractDocumentExtractorProcessor<T, S extends DocumentEx
 
               exceptions.addAll(extract(item, c.getId(), doc));
 
-              if (doc instanceof Closeable) {
-                try {
-                  ((Closeable) doc).close();
-                } catch (IOException e) {
-                  // Do nothing
-                }
-              }
+              tryClose(doc);
 
               if (settings.isDiscardOriginal()) item.removeContent(c);
             });
+  }
 
-    item.getContents(InputStreamContent.class)
-        .filter(this::acceptInputStream)
-        .forEach(
-            c -> {
-              log().info("Extracting content from InputStream Content {}", c.getId());
-
-              T doc;
-              try {
-                doc = extractDocument(c);
-              } catch (Exception e) {
-                exceptions.add(e);
-                return;
-              }
-
-              exceptions.addAll(extract(item, c.getId(), doc));
-
-              if (doc instanceof Closeable) {
-                try {
-                  ((Closeable) doc).close();
-                } catch (IOException e) {
-                  // Do nothing
-                }
-              }
-
-              if (settings.isDiscardOriginal()) item.removeContent(c);
-            });
-
-    if (exceptions.isEmpty()) {
-      return ProcessorResponse.ok();
-    } else {
-      return ProcessorResponse.processingError(exceptions);
+  private void tryClose(T doc) {
+    if (doc instanceof Closeable) {
+      try {
+        ((Closeable) doc).close();
+      } catch (IOException e) {
+        // Do nothing
+      }
     }
   }
 
@@ -140,81 +143,97 @@ public abstract class AbstractDocumentExtractorProcessor<T, S extends DocumentEx
     List<Exception> exceptions = new ArrayList<>();
 
     if (settings.isExtractMetadata()) {
-      try {
-        Map<String, Object> metadata = extractMetadata(doc);
-        metadata.values().removeIf(Objects::isNull);
-        metadata
-            .values()
-            .removeIf(
-                o -> {
-                  if (o instanceof String) {
-                    String s = (String) o;
-                    return s.isEmpty();
-                  } else {
-                    return false;
-                  }
-                });
-
-        metadata.forEach((k, v) -> item.getProperties().set(k, v));
-      } catch (Exception e) {
-        exceptions.add(e);
-      }
+      extractMetadata(item, doc, exceptions);
     }
 
     if (settings.isExtractText()) {
-      try {
-        Collection<ExtractionWithProperties<String>> extractedText = extractText(doc);
-
-        extractedText.stream()
-            .filter(e -> !e.getExtractedValue().isEmpty())
-            .forEach(
-                e ->
-                    item.createContent(Text.class)
-                        .withDescription("Text extracted from " + contentId)
-                        .withData(e.getExtractedValue())
-                        .withProperties(new InMemoryProperties(e.getProperties()))
-                        .withProperty(PropertyKeys.PROPERTY_KEY_PARENT, contentId)
-                        .save());
-      } catch (Exception e) {
-        exceptions.add(e);
-      }
+      extractText(item, contentId, doc, exceptions);
     }
 
     if (settings.isExtractImages()) {
-      try {
-        Collection<ExtractionWithProperties<BufferedImage>> extractedImages = extractImages(doc);
-
-        for (ExtractionWithProperties<BufferedImage> e : extractedImages) {
-          item.createContent(Image.class)
-              .withDescription("Image extracted from " + contentId)
-              .withData(e.getExtractedValue())
-              .withProperties(new InMemoryProperties(e.getProperties()))
-              .withProperty(PropertyKeys.PROPERTY_KEY_PARENT, contentId)
-              .save();
-        }
-      } catch (Exception e) {
-        exceptions.add(e);
-      }
+      extractImages(item, contentId, doc, exceptions);
     }
 
     if (settings.isExtractTables()) {
-      try {
-        Collection<ExtractionWithProperties<Table>> extractedTables = extractTables(doc);
-
-        for (ExtractionWithProperties<Table> e : extractedTables) {
-          item.createContent(TableContent.class)
-              .withDescription("Table extracted from " + contentId)
-              .withData(e.getExtractedValue())
-              .withProperties(new InMemoryProperties(e.getProperties()))
-              .withProperty(PropertyKeys.PROPERTY_KEY_PARENT, contentId)
-              .save();
-        }
-      } catch (Exception e) {
-        exceptions.add(e);
-      }
+      extractTables(item, contentId, doc, exceptions);
     }
 
     return exceptions;
+  }
+
+  private void extractMetadata(Item item, T doc, List<Exception> exceptions) {
+    try {
+      Map<String, Object> metadata = extractMetadata(doc);
+      metadata.values().removeIf(Objects::isNull);
+      metadata
+          .values()
+          .removeIf(
+              o -> {
+                if (o instanceof String) {
+                  String s = (String) o;
+                  return s.isEmpty();
+                } else {
+                  return false;
+                }
+              });
+
+      metadata.forEach((k, v) -> item.getProperties().set(k, v));
+    } catch (Exception e) {
+      exceptions.add(e);
+    }
+  }
+
+  private void extractText(Item item, String contentId, T doc, List<Exception> exceptions) {
+    try {
+      Collection<ExtractionWithProperties<String>> extractedText = extractText(doc);
+
+      extractedText.stream()
+          .filter(e -> !e.getExtractedValue().isEmpty())
+          .forEach(
+              e ->
+                  item.createContent(Text.class)
+                      .withDescription("Text extracted from " + contentId)
+                      .withData(e.getExtractedValue())
+                      .withProperties(new InMemoryProperties(e.getProperties()))
+                      .withProperty(PropertyKeys.PROPERTY_KEY_PARENT, contentId)
+                      .save());
+    } catch (Exception e) {
+      exceptions.add(e);
+    }
+  }
+
+  private void extractImages(Item item, String contentId, T doc, List<Exception> exceptions) {
+    try {
+      Collection<ExtractionWithProperties<BufferedImage>> extractedImages = extractImages(doc);
+
+      for (ExtractionWithProperties<BufferedImage> e : extractedImages) {
+        item.createContent(Image.class)
+            .withDescription("Image extracted from " + contentId)
+            .withData(e.getExtractedValue())
+            .withProperties(new InMemoryProperties(e.getProperties()))
+            .withProperty(PropertyKeys.PROPERTY_KEY_PARENT, contentId)
+            .save();
+      }
+    } catch (Exception e) {
+      exceptions.add(e);
+    }
+  }
+
+  private void extractTables(Item item, String contentId, T doc, List<Exception> exceptions) {
+    try {
+      Collection<ExtractionWithProperties<Table>> extractedTables = extractTables(doc);
+
+      for (ExtractionWithProperties<Table> e : extractedTables) {
+        item.createContent(TableContent.class)
+            .withDescription("Table extracted from " + contentId)
+            .withData(e.getExtractedValue())
+            .withProperties(new InMemoryProperties(e.getProperties()))
+            .withProperty(PropertyKeys.PROPERTY_KEY_PARENT, contentId)
+            .save();
+      }
+    } catch (Exception e) {
+      exceptions.add(e);
+    }
   }
 
   public void reset() {
@@ -225,15 +244,19 @@ public abstract class AbstractDocumentExtractorProcessor<T, S extends DocumentEx
 
   /** Returns true if this processor supports extracting metadata, and false otherwise */
   public abstract boolean isMetadataSupported();
+
   /** Returns true if this processor supports extracting text, and false otherwise */
   public abstract boolean isTextSupported();
+
   /** Returns true if this processor supports extracting images, and false otherwise */
   public abstract boolean isImagesSupported();
+
   /** Returns true if this processor supports extracting tables, and false otherwise */
   public abstract boolean isTablesSupported();
 
   /** Returns true if this processor should process the given file, and false otherwise */
   public abstract boolean acceptFile(FileContent file);
+
   /**
    * Returns true if this processor should process the given InputStream, and false otherwise
    *
@@ -243,6 +266,7 @@ public abstract class AbstractDocumentExtractorProcessor<T, S extends DocumentEx
 
   /** Convert the given file into the correct format for processing */
   public abstract T extractDocument(FileContent file) throws IOException;
+
   /** Convert the given InputStream into the correct format for processing */
   public abstract T extractDocument(InputStreamContent inputStreamContent) throws IOException;
 
@@ -251,12 +275,15 @@ public abstract class AbstractDocumentExtractorProcessor<T, S extends DocumentEx
    * returned Map will be ignored.
    */
   public abstract Map<String, Object> extractMetadata(T doc) throws ProcessingException;
+
   /** Extract text from the document */
   public abstract Collection<ExtractionWithProperties<String>> extractText(T doc)
       throws ProcessingException;
+
   /** Extract images from the document */
   public abstract Collection<ExtractionWithProperties<BufferedImage>> extractImages(T doc)
       throws ProcessingException;
+
   /** Extract tables from the document */
   public abstract Collection<ExtractionWithProperties<Table>> extractTables(T doc)
       throws ProcessingException;

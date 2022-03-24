@@ -40,6 +40,8 @@ public class DatabaseTable implements Table {
   }
 
   @Override
+  // Closed by stream onClose below
+  @SuppressWarnings("java:S2095")
   public Stream<Row> getRows() {
     final Connection connection;
     final Statement statement;
