@@ -41,6 +41,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 @ComponentName("File System Source")
 @ComponentDescription("Provides items from the local file system")
@@ -108,10 +109,12 @@ public class FileSystemSource
           registerDirectory(p);
 
           // Add files to list
-          Files.list(p)
-              .filter(Files::isRegularFile)
-              .filter(file -> acceptFile(file, settings))
-              .forEach(initialFiles::add);
+          try (Stream<Path> lines = Files.list(p)) {
+            lines
+                .filter(Files::isRegularFile)
+                .filter(file -> acceptFile(file, settings))
+                .forEach(initialFiles::add);
+          }
         }
 
       } catch (IOException ioe) {

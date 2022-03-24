@@ -275,6 +275,10 @@ public class HtmlExtractor
             }
 
             data = response.body();
+          } catch (InterruptedException e) {
+            log().error("Unable to read image from URL {}", src, e);
+            Thread.currentThread().interrupt();
+            continue;
           } catch (Exception e) {
             log().error("Unable to read image from URL {}", src, e);
             continue;

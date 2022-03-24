@@ -15,6 +15,7 @@ import io.annot8.api.settings.Description;
 import io.annot8.common.components.AbstractProcessor;
 import io.annot8.common.components.AbstractProcessorDescriptor;
 import io.annot8.common.components.capabilities.SimpleCapabilities;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -76,8 +77,9 @@ public class ItemPropertyFromProperty
 
     @Override
     public ProcessorResponse process(Item item) {
-      if (item.getProperties().has(sourceKey)) {
-        String s = item.getProperties().get(sourceKey).get().toString();
+      Optional<Object> value = item.getProperties().get(sourceKey);
+      if (value.isPresent()) {
+        String s = value.get().toString();
         Matcher m = pattern.matcher(s);
         if (m.matches()) {
           try {

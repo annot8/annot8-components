@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @ComponentName("Plain Text Extractor")
 @ComponentDescription(
@@ -75,16 +76,18 @@ public class PlainTextExtractor
 
     @Override
     public String extractDocument(FileContent file) throws IOException {
-      return Files.lines(file.getData().toPath(), StandardCharsets.UTF_8)
-          .collect(Collectors.joining("\n"));
+      try (Stream<String> lines = Files.lines(file.getData().toPath(), StandardCharsets.UTF_8)) {
+        return lines.collect(Collectors.joining("\n"));
+      }
     }
 
     @Override
     public String extractDocument(InputStreamContent inputStreamContent) throws IOException {
-      return new BufferedReader(
-              new InputStreamReader(inputStreamContent.getData(), StandardCharsets.UTF_8))
-          .lines()
-          .collect(Collectors.joining("\n"));
+      try (BufferedReader reader =
+          new BufferedReader(
+              new InputStreamReader(inputStreamContent.getData(), StandardCharsets.UTF_8))) {
+        return reader.lines().collect(Collectors.joining("\n"));
+      }
     }
 
     @Override
