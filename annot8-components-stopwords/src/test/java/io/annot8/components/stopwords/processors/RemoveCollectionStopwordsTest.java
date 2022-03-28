@@ -14,6 +14,7 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 public class RemoveCollectionStopwordsTest {
+
   @Test
   public void test() {
     RemoveCollectionStopwords.Settings s = new RemoveCollectionStopwords.Settings();

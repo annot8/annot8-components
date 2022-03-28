@@ -21,19 +21,20 @@ public class SpaceyTokensIT {
 
     SpacyServerSettings s = new SpacyServerSettings();
     s.setBaseUri("http://localhost:8000");
-    SpacyTokens.Processor p = new SpacyTokens.Processor(s);
+    try (SpacyTokens.Processor p = new SpacyTokens.Processor(s)) {
 
-    ProcessorResponse r = p.process(item);
-    assertEquals(ProcessorResponse.ok(), r);
+      ProcessorResponse r = p.process(item);
+      assertEquals(ProcessorResponse.ok(), r);
 
-    List<Annotation> a = t.getAnnotations().getAll().collect(Collectors.toList());
-    assertEquals(9, a.size());
+      List<Annotation> a = t.getAnnotations().getAll().collect(Collectors.toList());
+      assertEquals(9, a.size());
 
-    List<String> as =
-        a.stream()
-            .sorted(SortUtils.SORT_BY_SPANBOUNDS)
-            .map(an -> an.getBounds().getData(t).get())
-            .collect(Collectors.toList());
-    assertEquals(List.of("Who", "am", "I", "?", "Who", "are", "you", "?", "!"), as);
+      List<String> as =
+          a.stream()
+              .sorted(SortUtils.SORT_BY_SPANBOUNDS)
+              .map(an -> an.getBounds().getData(t).get())
+              .collect(Collectors.toList());
+      assertEquals(List.of("Who", "am", "I", "?", "Who", "are", "you", "?", "!"), as);
+    }
   }
 }

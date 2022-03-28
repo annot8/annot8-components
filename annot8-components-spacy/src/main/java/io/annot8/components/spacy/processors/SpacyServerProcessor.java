@@ -38,10 +38,14 @@ public abstract class SpacyServerProcessor extends AbstractTextProcessor {
     // labelMapping.put("WORK_OF_ART", "");
   }
 
-  public SpacyServerProcessor(SpacyServerSettings settings) {
+  protected SpacyServerProcessor(SpacyServerSettings settings) {
     HttpClient.Builder builder =
-        HttpClient.newBuilder()
-            .version(HttpClient.Version.HTTP_1_1); // Version 2 not supported by server
+        HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1); // Version
+    // 2
+    // not
+    // supported
+    // by
+    // server
 
     ApiClient apiClient = new ApiClient();
     apiClient.updateBaseUri(settings.getBaseUri());
@@ -50,7 +54,7 @@ public abstract class SpacyServerProcessor extends AbstractTextProcessor {
     client = new NlpApi(apiClient);
   }
 
-  public static org.openapi.spacy.model.Text fromTextContent(Text content) {
+  protected static org.openapi.spacy.model.Text fromTextContent(Text content) {
     org.openapi.spacy.model.Text t = new org.openapi.spacy.model.Text();
     t.setText(content.getData());
 

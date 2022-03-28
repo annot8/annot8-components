@@ -7,25 +7,28 @@ import io.annot8.api.exceptions.BadConfigurationException;
 import org.junit.jupiter.api.Test;
 
 public class StopwordsIsoTest {
+
   @Test
   public void testDefault() {
-    Stopwords sw = new StopwordsIso();
+    try (Stopwords sw = new StopwordsIso()) {
 
-    assertEquals("en", sw.getLanguage());
-    assertTrue(sw.isStopword("and"));
+      assertEquals("en", sw.getLanguage());
+      assertTrue(sw.isStopword("and"));
+    }
   }
 
   @Test
   public void testEnglish() {
-    Stopwords sw = new StopwordsIso("en");
+    try (Stopwords sw = new StopwordsIso("en")) {
 
-    assertEquals("en", sw.getLanguage());
-    assertTrue(sw.isStopword("and"));
-    assertTrue(sw.isStopword("YOUR"));
-    assertTrue(sw.isStopword("Why"));
-    assertFalse(sw.isStopword("java"));
-    assertFalse(sw.isStopword("JAVA"));
-    assertFalse(sw.isStopword("Java"));
+      assertEquals("en", sw.getLanguage());
+      assertTrue(sw.isStopword("and"));
+      assertTrue(sw.isStopword("YOUR"));
+      assertTrue(sw.isStopword("Why"));
+      assertFalse(sw.isStopword("java"));
+      assertFalse(sw.isStopword("JAVA"));
+      assertFalse(sw.isStopword("Java"));
+    }
   }
 
   @Test

@@ -9,9 +9,10 @@ import org.junit.jupiter.api.Test;
 public class NoOpStopwordsTest {
   @Test
   public void test() {
-    Stopwords sw = new NoOpStopwords();
+    try (Stopwords sw = new NoOpStopwords()) {
 
-    assertEquals("*", sw.getLanguage());
-    assertFalse(sw.isStopword("and"));
+      assertEquals("*", sw.getLanguage());
+      assertFalse(sw.isStopword("and"));
+    }
   }
 }

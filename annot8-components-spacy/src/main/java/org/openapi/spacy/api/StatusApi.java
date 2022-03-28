@@ -14,6 +14,7 @@ import org.openapi.spacy.ApiClient;
 import org.openapi.spacy.ApiException;
 import org.openapi.spacy.ApiResponse;
 
+@SuppressWarnings("unused")
 @javax.annotation.processing.Generated(
     value = "org.openapitools.codegen.languages.JavaClientCodegen",
     date = "2021-04-21T10:03:16.456502+01:00[Europe/London]")

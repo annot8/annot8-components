@@ -26,45 +26,49 @@ public class SpaceyIT {
 
     Spacy.Settings s = new Spacy.Settings();
     s.setBaseUri("http://localhost:8000");
-    Spacy.Processor p = new Spacy.Processor(s);
+    try (Spacy.Processor p = new Spacy.Processor(s)) {
 
-    ProcessorResponse r = p.process(item);
-    assertEquals(ProcessorResponse.ok(), r);
+      ProcessorResponse r = p.process(item);
+      assertEquals(ProcessorResponse.ok(), r);
 
-    System.out.println("== Sentences ==");
+      System.out.println("== Sentences ==");
 
-    t.getAnnotations()
-        .getByType(AnnotationTypes.ANNOTATION_TYPE_SENTENCE)
-        .forEach(
-            a -> {
-              System.out.println(a.getBounds().getData(t).orElseThrow());
-            });
+      t.getAnnotations()
+          .getByType(AnnotationTypes.ANNOTATION_TYPE_SENTENCE)
+          .forEach(
+              a -> {
+                System.out.println(a.getBounds().getData(t).orElseThrow());
+              });
 
-    System.out.println();
-    System.out.println("== Tokens ==");
+      System.out.println();
+      System.out.println("== Tokens ==");
 
-    t.getAnnotations()
-        .getByType(AnnotationTypes.ANNOTATION_TYPE_WORDTOKEN)
-        .sorted(SortUtils.SORT_BY_SPANBOUNDS)
-        .forEach(
-            a -> {
-              System.out.println(
-                  a.getBounds().getData(t).orElseThrow()
-                      + " ("
-                      + a.getProperties().get(PropertyKeys.PROPERTY_KEY_PARTOFSPEECH).orElseThrow()
-                      + ")");
-            });
+      t.getAnnotations()
+          .getByType(AnnotationTypes.ANNOTATION_TYPE_WORDTOKEN)
+          .sorted(SortUtils.SORT_BY_SPANBOUNDS)
+          .forEach(
+              a -> {
+                System.out.println(
+                    a.getBounds().getData(t).orElseThrow()
+                        + " ("
+                        + a.getProperties()
+                            .get(PropertyKeys.PROPERTY_KEY_PARTOFSPEECH)
+                            .orElseThrow()
+                        + ")");
+              });
 
-    System.out.println();
-    System.out.println("== Entities ==");
+      System.out.println();
+      System.out.println("== Entities ==");
 
-    t.getAnnotations()
-        .getAll()
-        .filter(a -> a.getType().startsWith(AnnotationTypes.ENTITY_PREFIX))
-        .sorted(SortUtils.SORT_BY_SPANBOUNDS)
-        .forEach(
-            a -> {
-              System.out.println(a.getBounds().getData(t).orElseThrow() + " (" + a.getType() + ")");
-            });
+      t.getAnnotations()
+          .getAll()
+          .filter(a -> a.getType().startsWith(AnnotationTypes.ENTITY_PREFIX))
+          .sorted(SortUtils.SORT_BY_SPANBOUNDS)
+          .forEach(
+              a -> {
+                System.out.println(
+                    a.getBounds().getData(t).orElseThrow() + " (" + a.getType() + ")");
+              });
+    }
   }
 }

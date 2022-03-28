@@ -21,6 +21,7 @@ import org.openapitools.jackson.nullable.JsonNullableModule;
 @javax.annotation.processing.Generated(
     value = "org.openapitools.codegen.languages.JavaClientCodegen",
     date = "2021-04-21T10:03:16.456502+01:00[Europe/London]")
+@SuppressWarnings("rawtypes")
 public class JSON implements ContextResolver<ObjectMapper> {
   private ObjectMapper mapper;
 
