@@ -21,37 +21,38 @@ public class NaiveParagraphTest {
 
   @Test
   public void test() throws Annot8Exception {
-    Processor processor = new NaiveParagraph.Processor(2);
+    try (Processor processor = new NaiveParagraph.Processor(2)) {
 
-    Item item = new TestItem();
-    Text content =
-        item.createContent(TestStringContent.class)
-            .withData(
-                "Hello world!\n\nWhat is the square root of 64?\r\nWhy, it's 8 of course!  \nAh, right you are!\n\nHooray!")
-            .save();
+      Item item = new TestItem();
+      Text content =
+          item.createContent(TestStringContent.class)
+              .withData(
+                  "Hello world!\n\nWhat is the square root of 64?\r\nWhy, it's 8 of course!  \nAh, right you are!\n\nHooray!")
+              .save();
 
-    processor.process(item);
+      processor.process(item);
 
-    AnnotationStore store = content.getAnnotations();
+      AnnotationStore store = content.getAnnotations();
 
-    List<Annotation> paragraphs =
-        store.getByType(AnnotationTypes.ANNOTATION_TYPE_PARAGRAPH).collect(Collectors.toList());
-    Assertions.assertEquals(3, paragraphs.size());
+      List<Annotation> paragraphs =
+          store.getByType(AnnotationTypes.ANNOTATION_TYPE_PARAGRAPH).collect(Collectors.toList());
+      Assertions.assertEquals(3, paragraphs.size());
 
-    paragraphs.sort(Comparator.comparingInt(a -> a.getBounds(SpanBounds.class).get().getBegin()));
+      paragraphs.sort(Comparator.comparingInt(a -> a.getBounds(SpanBounds.class).get().getBegin()));
 
-    Annotation p1 = paragraphs.get(0);
-    Assertions.assertEquals("Hello world!", p1.getBounds().getData(content).get());
-    Assertions.assertEquals(0, p1.getProperties().getAll().size());
+      Annotation p1 = paragraphs.get(0);
+      Assertions.assertEquals("Hello world!", p1.getBounds().getData(content).get());
+      Assertions.assertEquals(0, p1.getProperties().getAll().size());
 
-    Annotation p2 = paragraphs.get(1);
-    Assertions.assertEquals(
-        "What is the square root of 64?\r\nWhy, it's 8 of course!  \nAh, right you are!",
-        p2.getBounds().getData(content).get());
-    Assertions.assertEquals(0, p2.getProperties().getAll().size());
+      Annotation p2 = paragraphs.get(1);
+      Assertions.assertEquals(
+          "What is the square root of 64?\r\nWhy, it's 8 of course!  \nAh, right you are!",
+          p2.getBounds().getData(content).get());
+      Assertions.assertEquals(0, p2.getProperties().getAll().size());
 
-    Annotation p3 = paragraphs.get(2);
-    Assertions.assertEquals("Hooray!", p3.getBounds().getData(content).get());
-    Assertions.assertEquals(0, p3.getProperties().getAll().size());
+      Annotation p3 = paragraphs.get(2);
+      Assertions.assertEquals("Hooray!", p3.getBounds().getData(content).get());
+      Assertions.assertEquals(0, p3.getProperties().getAll().size());
+    }
   }
 }

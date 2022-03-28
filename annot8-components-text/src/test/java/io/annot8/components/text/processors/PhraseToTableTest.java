@@ -80,17 +80,18 @@ public class PhraseToTableTest {
 
     Item item = createTestItem();
 
-    PhraseToTable.Processor p = new PhraseToTable.Processor(s);
-    p.process(item);
+    try (PhraseToTable.Processor p = new PhraseToTable.Processor(s)) {
+      p.process(item);
 
-    assertEquals(1L, item.getContents(TableContent.class).count());
-    TableContent tc = item.getContents(TableContent.class).findFirst().orElseThrow();
+      assertEquals(1L, item.getContents(TableContent.class).count());
+      TableContent tc = item.getContents(TableContent.class).findFirst().orElseThrow();
 
-    assertNotNull(tc.getDescription());
-    assertEquals(2, tc.getData().getRowCount());
+      assertNotNull(tc.getDescription());
+      assertEquals(2, tc.getData().getRowCount());
 
-    assertEquals("document", tc.getData().getColumnNames().orElseThrow().get(0));
-    assertEquals("foobar.txt", tc.getData().getRow(0).orElseThrow().getValueAt(0).orElseThrow());
+      assertEquals("document", tc.getData().getColumnNames().orElseThrow().get(0));
+      assertEquals("foobar.txt", tc.getData().getRow(0).orElseThrow().getValueAt(0).orElseThrow());
+    }
   }
 
   private Item createTestItem() {

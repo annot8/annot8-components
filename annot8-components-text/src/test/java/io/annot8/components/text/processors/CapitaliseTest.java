@@ -15,37 +15,40 @@ public class CapitaliseTest {
 
   @Test
   public void testUpper() {
-    Processor capitalise = new Capitalise.Processor(TextCase.UPPERCASE, false);
-    Item item = new TestItem();
+    try (Processor capitalise = new Capitalise.Processor(TextCase.UPPERCASE, false)) {
+      Item item = new TestItem();
 
-    item.createContent(TestStringContent.class).withData("Test").save();
+      item.createContent(TestStringContent.class).withData("Test").save();
 
-    capitalise.process(item);
+      capitalise.process(item);
 
-    assertThat(item.getContents(Text.class).map(Text::getData)).anyMatch(s -> s.equals("TEST"));
+      assertThat(item.getContents(Text.class).map(Text::getData)).anyMatch(s -> s.equals("TEST"));
+    }
   }
 
   @Test
   public void testLower() {
-    Processor capitalise = new Capitalise.Processor(TextCase.LOWERCASE, false);
-    Item item = new TestItem();
+    try (Processor capitalise = new Capitalise.Processor(TextCase.LOWERCASE, false)) {
+      Item item = new TestItem();
 
-    item.createContent(TestStringContent.class).withData("Test").save();
+      item.createContent(TestStringContent.class).withData("Test").save();
 
-    capitalise.process(item);
+      capitalise.process(item);
 
-    assertThat(item.getContents(Text.class).map(Text::getData)).anyMatch(s -> s.equals("test"));
+      assertThat(item.getContents(Text.class).map(Text::getData)).anyMatch(s -> s.equals("test"));
+    }
   }
 
   @Test
   public void testRemove() {
-    Processor capitalise = new Capitalise.Processor(TextCase.UPPERCASE, true);
-    Item item = new TestItem();
+    try (Processor capitalise = new Capitalise.Processor(TextCase.UPPERCASE, true)) {
+      Item item = new TestItem();
 
-    item.createContent(TestStringContent.class).withData("Test").save();
+      item.createContent(TestStringContent.class).withData("Test").save();
 
-    capitalise.process(item);
+      capitalise.process(item);
 
-    assertThat(item.getContents(Text.class).map(Text::getData)).allMatch(s -> s.equals("TEST"));
+      assertThat(item.getContents(Text.class).map(Text::getData)).allMatch(s -> s.equals("TEST"));
+    }
   }
 }
