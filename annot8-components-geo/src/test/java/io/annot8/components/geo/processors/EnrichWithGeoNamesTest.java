@@ -55,27 +55,29 @@ public class EnrichWithGeoNamesTest {
     s.setGeonamesFile(
         Paths.get(GeoNamesGazetteerTest.class.getResource("AI.txt").toURI()).toFile());
 
-    EnrichWithGeoNames.Processor p = new EnrichWithGeoNames.Processor(s);
+    try (EnrichWithGeoNames.Processor p = new EnrichWithGeoNames.Processor(s)) {
 
-    ProcessorResponse pr = p.process(i);
-    assertEquals(ProcessorResponse.ok(), pr);
+      ProcessorResponse pr = p.process(i);
+      assertEquals(ProcessorResponse.ok(), pr);
 
-    List<Annotation> annotations =
-        t.getAnnotations()
-            .getAll()
-            .sorted(SortUtils.SORT_BY_SPANBOUNDS)
-            .collect(Collectors.toList());
-    assertEquals(3, annotations.size());
+      List<Annotation> annotations =
+          t.getAnnotations()
+              .getAll()
+              .sorted(SortUtils.SORT_BY_SPANBOUNDS)
+              .collect(Collectors.toList());
+      assertEquals(3, annotations.size());
 
-    Annotation a1 = annotations.get(0);
-    assertTrue(a1.getProperties().getAll().size() > 0);
-    assertTrue(a1.getProperties().has(PropertyKeys.PROPERTY_KEY_GEOJSON));
+      Annotation a1 = annotations.get(0);
+      assertTrue(a1.getProperties().getAll().size() > 0);
+      assertTrue(a1.getProperties().has(PropertyKeys.PROPERTY_KEY_GEOJSON));
 
-    Annotation a2 = annotations.get(1);
-    assertTrue(a2.getProperties().getAll().size() > 1); // This annotation already had a VALUE
-    assertTrue(a2.getProperties().has(PropertyKeys.PROPERTY_KEY_GEOJSON));
+      Annotation a2 = annotations.get(1);
+      assertTrue(a2.getProperties().getAll().size() > 1); // This annotation already had a
+      // VALUE
+      assertTrue(a2.getProperties().has(PropertyKeys.PROPERTY_KEY_GEOJSON));
 
-    Annotation a3 = annotations.get(2);
-    assertTrue(a3.getProperties().getAll().isEmpty());
+      Annotation a3 = annotations.get(2);
+      assertTrue(a3.getProperties().getAll().isEmpty());
+    }
   }
 }
