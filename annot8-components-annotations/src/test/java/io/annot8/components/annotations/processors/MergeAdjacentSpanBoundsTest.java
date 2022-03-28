@@ -17,10 +17,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 
-class MergeAdjacentSpanBoundsTest {
+public class MergeAdjacentSpanBoundsTest {
 
   @Test
-  void testWithTypeFilter() {
+  public void testWithTypeFilter() {
     Item item = new TestItem();
 
     TestStringContent c =
@@ -102,7 +102,7 @@ class MergeAdjacentSpanBoundsTest {
   }
 
   @Test
-  void testIncludesLastElement() {
+  public void testIncludesLastElement() {
     Item item = new TestItem();
 
     TestStringContent c =

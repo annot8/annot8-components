@@ -17,10 +17,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 
-class MergeContainedSpanBoundsTest {
+public class MergeContainedSpanBoundsTest {
 
   @Test
-  void test() {
+  public void test() {
     Item item = new TestItem();
 
     TestStringContent c =
@@ -85,7 +85,7 @@ class MergeContainedSpanBoundsTest {
   }
 
   @Test
-  void testOverlap() {
+  public void testOverlap() {
     Item item = new TestItem();
 
     TestStringContent c =

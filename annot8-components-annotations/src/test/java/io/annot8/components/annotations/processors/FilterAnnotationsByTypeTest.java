@@ -13,6 +13,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 public class FilterAnnotationsByTypeTest {
+
   @Test
   public void test() {
     Item item = new TestItem();

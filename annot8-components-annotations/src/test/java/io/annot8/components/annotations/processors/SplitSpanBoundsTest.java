@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 
 public class SplitSpanBoundsTest {
+
   @Test
   public void test() {
     Item i = new TestItem();

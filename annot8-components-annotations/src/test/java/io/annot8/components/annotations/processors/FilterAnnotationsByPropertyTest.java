@@ -12,6 +12,7 @@ import io.annot8.testing.testimpl.content.TestStringContent;
 import org.junit.jupiter.api.Test;
 
 public class FilterAnnotationsByPropertyTest {
+
   @Test
   public void test() {
     Item item = new TestItem();
