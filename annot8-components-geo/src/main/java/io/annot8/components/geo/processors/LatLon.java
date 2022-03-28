@@ -229,9 +229,15 @@ public class LatLon extends AbstractProcessorDescriptor<LatLon.Processor, LatLon
           }
 
           try {
-            double[] lonLat = determineLonLatDMS(matcher);
+            double[] lonLatValues = determineLonLatDMS(matcher);
             addCoordinate(
-                content, matcher.start(), matcher.end(), lonLat[0], lonLat[1], "dms", found);
+                content,
+                matcher.start(),
+                matcher.end(),
+                lonLatValues[0],
+                lonLatValues[1],
+                "dms",
+                found);
           } catch (NumberFormatException e) {
             log().warn(COULD_NOT_PARSE, e);
           }
