@@ -28,35 +28,36 @@ public class MachineTranslationTest {
     when(mockConnector.queryEngine())
         .thenReturn(new EngineDetails("Mock Connector", "1.0.0", true, false, true));
 
-    MachineTranslation.Processor processor =
-        new MachineTranslation.Processor("fr", "en", true, mockConnector);
+    try (MachineTranslation.Processor processor =
+        new MachineTranslation.Processor("fr", "en", true, mockConnector)) {
 
-    Item item = new TestItem();
+      Item item = new TestItem();
 
-    item.createContent(TestStringContent.class)
-        .withData("Bonjour le monde!")
-        .withProperty("example", "example")
-        .save();
+      item.createContent(TestStringContent.class)
+          .withData("Bonjour le monde!")
+          .withProperty("example", "example")
+          .save();
 
-    processor.process(item);
+      processor.process(item);
 
-    verify(mockConnector, times(1)).queryEngine();
-    verify(mockConnector, times(1)).translate("fr", "en", "Bonjour le monde!");
+      verify(mockConnector, times(1)).queryEngine();
+      verify(mockConnector, times(1)).translate("fr", "en", "Bonjour le monde!");
 
-    List<Content> contents = item.getContents().collect(Collectors.toList());
-    assertEquals(2, contents.size());
+      List<Content<?>> contents = item.getContents().collect(Collectors.toList());
+      assertEquals(2, contents.size());
 
-    contents.forEach(c -> assertTrue(c.getProperties().has("example")));
+      contents.forEach(c -> assertTrue(c.getProperties().has("example")));
 
-    List<Content> translatedContents =
-        contents.stream()
-            .filter(c -> c.getProperties().has(PropertyKeys.PROPERTY_KEY_LANGUAGE))
-            .collect(Collectors.toList());
-    assertEquals(1, translatedContents.size());
-    assertEquals("Hello world!", translatedContents.get(0).getData());
-    assertEquals(
-        "en",
-        translatedContents.get(0).getProperties().get(PropertyKeys.PROPERTY_KEY_LANGUAGE).get());
+      List<Content<?>> translatedContents =
+          contents.stream()
+              .filter(c -> c.getProperties().has(PropertyKeys.PROPERTY_KEY_LANGUAGE))
+              .collect(Collectors.toList());
+      assertEquals(1, translatedContents.size());
+      assertEquals("Hello world!", translatedContents.get(0).getData());
+      assertEquals(
+          "en",
+          translatedContents.get(0).getProperties().get(PropertyKeys.PROPERTY_KEY_LANGUAGE).get());
+    }
   }
 
   @Test
@@ -67,30 +68,31 @@ public class MachineTranslationTest {
     when(mockConnector.queryEngine())
         .thenReturn(new EngineDetails("Mock Connector", "1.0.0", true, false, true));
 
-    MachineTranslation.Processor processor =
-        new MachineTranslation.Processor("fr", "en", false, mockConnector);
+    try (MachineTranslation.Processor processor =
+        new MachineTranslation.Processor("fr", "en", false, mockConnector)) {
 
-    Item item = new TestItem();
+      Item item = new TestItem();
 
-    item.createContent(TestStringContent.class)
-        .withData("Bonjour le monde!")
-        .withProperty("example", "example")
-        .save();
+      item.createContent(TestStringContent.class)
+          .withData("Bonjour le monde!")
+          .withProperty("example", "example")
+          .save();
 
-    processor.process(item);
+      processor.process(item);
 
-    verify(mockConnector, times(1)).queryEngine();
-    verify(mockConnector, times(1)).translate("fr", "en", "Bonjour le monde!");
+      verify(mockConnector, times(1)).queryEngine();
+      verify(mockConnector, times(1)).translate("fr", "en", "Bonjour le monde!");
 
-    List<Content> translatedContents =
-        item.getContents()
-            .filter(c -> c.getProperties().has(PropertyKeys.PROPERTY_KEY_LANGUAGE))
-            .collect(Collectors.toList());
-    assertEquals(1, translatedContents.size());
-    assertEquals(1, translatedContents.get(0).getProperties().getAll().size());
-    assertEquals(
-        "en",
-        translatedContents.get(0).getProperties().get(PropertyKeys.PROPERTY_KEY_LANGUAGE).get());
+      List<Content<?>> translatedContents =
+          item.getContents()
+              .filter(c -> c.getProperties().has(PropertyKeys.PROPERTY_KEY_LANGUAGE))
+              .collect(Collectors.toList());
+      assertEquals(1, translatedContents.size());
+      assertEquals(1, translatedContents.get(0).getProperties().getAll().size());
+      assertEquals(
+          "en",
+          translatedContents.get(0).getProperties().get(PropertyKeys.PROPERTY_KEY_LANGUAGE).get());
+    }
   }
 
   // TODO: Test engine configuration
