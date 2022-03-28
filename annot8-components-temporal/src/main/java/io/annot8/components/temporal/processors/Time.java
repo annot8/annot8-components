@@ -52,6 +52,8 @@ public class Time extends AbstractProcessorDescriptor<Time.Processor, Time.Setti
     return new Processor(settings.getRequireAlpha());
   }
 
+  // Deep type hierarchy
+  @SuppressWarnings("java:S110")
   public static class Processor extends AbstractRegexProcessor {
 
     private Boolean requireAlpha;
@@ -76,9 +78,10 @@ public class Time extends AbstractProcessorDescriptor<Time.Processor, Time.Setti
     }
 
     @Override
+    @SuppressWarnings("java:S5852")
     protected boolean acceptMatch(Matcher matcher) {
 
-      if (requireAlpha) {
+      if (Boolean.TRUE.equals(requireAlpha)) {
         String time = matcher.group();
         return time.matches(".*[a-zA-Z:].*");
       }
@@ -89,6 +92,7 @@ public class Time extends AbstractProcessorDescriptor<Time.Processor, Time.Setti
 
   public static class Settings implements io.annot8.api.settings.Settings {
     private boolean requireAlpha = true;
+
     /**
      * Do we require that there are alphabetical characters in the time? This helps avoid picking
      * out things like 2015 as a time when it should be a year, as it forces the time to be written

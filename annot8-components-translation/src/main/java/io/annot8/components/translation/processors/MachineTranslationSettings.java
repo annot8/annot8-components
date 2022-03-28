@@ -54,6 +54,7 @@ public class MachineTranslationSettings implements Settings {
     this.translatorClass = translatorClass;
   }
 
+  @SuppressWarnings("unchecked")
   public void setTranslatorClass(String translatorClass) throws BadConfigurationException {
     Class<?> clazz;
     try {

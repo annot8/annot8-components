@@ -2,6 +2,7 @@
 package io.annot8.components.mongo.sinks;
 
 /** Class for tests designed to be non serializable by Jackson */
+@SuppressWarnings("unused")
 public class NonSerializableTestData {
 
   private String nonAccessibleField;

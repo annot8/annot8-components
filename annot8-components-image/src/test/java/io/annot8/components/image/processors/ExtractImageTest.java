@@ -59,12 +59,13 @@ public class ExtractImageTest {
     ExtractImage.Settings settings = new ExtractImage.Settings();
     settings.setFileExtensions(List.of("png"));
 
-    ExtractImage.Processor processor = new ExtractImage.Processor(settings);
-    ProcessorResponse pr = processor.process(item);
+    try (ExtractImage.Processor processor = new ExtractImage.Processor(settings)) {
+      ProcessorResponse pr = processor.process(item);
 
-    assertEquals(ProcessorResponse.ok(), pr);
+      assertEquals(ProcessorResponse.ok(), pr);
 
-    assertEquals(0L, item.getContents(Image.class).count());
+      assertEquals(0L, item.getContents(Image.class).count());
+    }
   }
 
   @Test

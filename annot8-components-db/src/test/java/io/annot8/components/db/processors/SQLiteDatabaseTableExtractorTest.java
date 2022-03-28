@@ -25,9 +25,9 @@ public class SQLiteDatabaseTableExtractorTest extends AbstractSQLiteDataTest {
     Item item = new TestItem();
     FileContent content = mockFileContent("test.db");
     ((TestItem) item).save(content);
-    SQLiteDatabaseTableExtractor.Processor extractor = new SQLiteDatabaseTableExtractor.Processor();
     ProcessorResponse response = null;
-    try {
+    try (SQLiteDatabaseTableExtractor.Processor extractor =
+        new SQLiteDatabaseTableExtractor.Processor()) {
       response = extractor.process(item);
     } catch (Exception e) {
       fail("Test should not throw an exception here", e);

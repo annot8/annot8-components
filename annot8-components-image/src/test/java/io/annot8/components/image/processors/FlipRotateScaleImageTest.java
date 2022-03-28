@@ -36,13 +36,14 @@ public class FlipRotateScaleImageTest {
         .withProperty("en", "Hello World")
         .save();
 
-    FlipRotateScaleImage.Processor p = new FlipRotateScaleImage.Processor(s);
-    p.process(item);
+    try (FlipRotateScaleImage.Processor p = new FlipRotateScaleImage.Processor(s)) {
+      p.process(item);
 
-    assertEquals(1, item.getContents(Image.class).count());
+      assertEquals(1, item.getContents(Image.class).count());
 
-    Properties props = item.getContents(Image.class).findFirst().orElseThrow().getProperties();
-    assertTrue(props.has("en"));
+      Properties props = item.getContents(Image.class).findFirst().orElseThrow().getProperties();
+      assertTrue(props.has("en"));
+    }
   }
 
   @Test
@@ -59,13 +60,14 @@ public class FlipRotateScaleImageTest {
         .withProperty("en", "Hello World")
         .save();
 
-    FlipRotateScaleImage.Processor p = new FlipRotateScaleImage.Processor(s);
-    p.process(item);
+    try (FlipRotateScaleImage.Processor p = new FlipRotateScaleImage.Processor(s)) {
+      p.process(item);
 
-    assertEquals(1, item.getContents(Image.class).count());
+      assertEquals(1, item.getContents(Image.class).count());
 
-    Properties props = item.getContents(Image.class).findFirst().orElseThrow().getProperties();
-    assertFalse(props.has("en"));
+      Properties props = item.getContents(Image.class).findFirst().orElseThrow().getProperties();
+      assertFalse(props.has("en"));
+    }
   }
 
   @Test
@@ -80,10 +82,11 @@ public class FlipRotateScaleImageTest {
                 FlipRotateScaleImageTest.class.getClassLoader().getResourceAsStream("quads.png")))
         .save();
 
-    FlipRotateScaleImage.Processor p = new FlipRotateScaleImage.Processor(s);
-    p.process(item);
+    try (FlipRotateScaleImage.Processor p = new FlipRotateScaleImage.Processor(s)) {
+      p.process(item);
 
-    assertEquals(2, item.getContents(Image.class).count());
+      assertEquals(2, item.getContents(Image.class).count());
+    }
   }
 
   @Test
@@ -99,14 +102,15 @@ public class FlipRotateScaleImageTest {
                 FlipRotateScaleImageTest.class.getClassLoader().getResourceAsStream("quads.png")))
         .save();
 
-    FlipRotateScaleImage.Processor p = new FlipRotateScaleImage.Processor(s);
+    try (FlipRotateScaleImage.Processor p = new FlipRotateScaleImage.Processor(s)) {
 
-    p.process(item);
+      p.process(item);
 
-    assertEquals(1, item.getContents(Image.class).count());
+      assertEquals(1, item.getContents(Image.class).count());
 
-    BufferedImage img = item.getContents(Image.class).findFirst().orElseThrow().getData();
-    testQuads(img, Color.GREEN, Color.WHITE, Color.RED, Color.BLUE);
+      BufferedImage img = item.getContents(Image.class).findFirst().orElseThrow().getData();
+      testQuads(img, Color.GREEN, Color.WHITE, Color.RED, Color.BLUE);
+    }
   }
 
   @Test
@@ -122,14 +126,15 @@ public class FlipRotateScaleImageTest {
                 FlipRotateScaleImageTest.class.getClassLoader().getResourceAsStream("quads.png")))
         .save();
 
-    FlipRotateScaleImage.Processor p = new FlipRotateScaleImage.Processor(s);
+    try (FlipRotateScaleImage.Processor p = new FlipRotateScaleImage.Processor(s)) {
 
-    p.process(item);
+      p.process(item);
 
-    assertEquals(1, item.getContents(Image.class).count());
+      assertEquals(1, item.getContents(Image.class).count());
 
-    BufferedImage img = item.getContents(Image.class).findFirst().orElseThrow().getData();
-    testQuads(img, Color.RED, Color.BLUE, Color.GREEN, Color.WHITE);
+      BufferedImage img = item.getContents(Image.class).findFirst().orElseThrow().getData();
+      testQuads(img, Color.RED, Color.BLUE, Color.GREEN, Color.WHITE);
+    }
   }
 
   @Test
@@ -146,14 +151,15 @@ public class FlipRotateScaleImageTest {
                 FlipRotateScaleImageTest.class.getClassLoader().getResourceAsStream("quads.png")))
         .save();
 
-    FlipRotateScaleImage.Processor p = new FlipRotateScaleImage.Processor(s);
+    try (FlipRotateScaleImage.Processor p = new FlipRotateScaleImage.Processor(s)) {
 
-    p.process(item);
+      p.process(item);
 
-    assertEquals(1, item.getContents(Image.class).count());
+      assertEquals(1, item.getContents(Image.class).count());
 
-    BufferedImage img = item.getContents(Image.class).findFirst().orElseThrow().getData();
-    testQuads(img, Color.BLUE, Color.RED, Color.WHITE, Color.GREEN);
+      BufferedImage img = item.getContents(Image.class).findFirst().orElseThrow().getData();
+      testQuads(img, Color.BLUE, Color.RED, Color.WHITE, Color.GREEN);
+    }
   }
 
   @Test
@@ -169,14 +175,15 @@ public class FlipRotateScaleImageTest {
                 FlipRotateScaleImageTest.class.getClassLoader().getResourceAsStream("quads.png")))
         .save();
 
-    FlipRotateScaleImage.Processor p = new FlipRotateScaleImage.Processor(s);
+    try (FlipRotateScaleImage.Processor p = new FlipRotateScaleImage.Processor(s)) {
 
-    p.process(item);
+      p.process(item);
 
-    assertEquals(1, item.getContents(Image.class).count());
+      assertEquals(1, item.getContents(Image.class).count());
 
-    BufferedImage img = item.getContents(Image.class).findFirst().orElseThrow().getData();
-    testQuads(img, Color.RED, Color.WHITE, Color.GREEN, Color.BLUE);
+      BufferedImage img = item.getContents(Image.class).findFirst().orElseThrow().getData();
+      testQuads(img, Color.RED, Color.WHITE, Color.GREEN, Color.BLUE);
+    }
   }
 
   @Test
@@ -194,14 +201,15 @@ public class FlipRotateScaleImageTest {
                 FlipRotateScaleImageTest.class.getClassLoader().getResourceAsStream("quads.png")))
         .save();
 
-    FlipRotateScaleImage.Processor p = new FlipRotateScaleImage.Processor(s);
+    try (FlipRotateScaleImage.Processor p = new FlipRotateScaleImage.Processor(s)) {
 
-    p.process(item);
+      p.process(item);
 
-    assertEquals(1, item.getContents(Image.class).count());
+      assertEquals(1, item.getContents(Image.class).count());
 
-    BufferedImage img = item.getContents(Image.class).findFirst().orElseThrow().getData();
-    testQuads(img, Color.BLUE, Color.RED, Color.WHITE, Color.GREEN);
+      BufferedImage img = item.getContents(Image.class).findFirst().orElseThrow().getData();
+      testQuads(img, Color.BLUE, Color.RED, Color.WHITE, Color.GREEN);
+    }
   }
 
   @Test
@@ -217,15 +225,16 @@ public class FlipRotateScaleImageTest {
                 FlipRotateScaleImageTest.class.getClassLoader().getResourceAsStream("quads.png")))
         .save();
 
-    FlipRotateScaleImage.Processor p = new FlipRotateScaleImage.Processor(s);
+    try (FlipRotateScaleImage.Processor p = new FlipRotateScaleImage.Processor(s)) {
 
-    p.process(item);
+      p.process(item);
 
-    assertEquals(1, item.getContents(Image.class).count());
+      assertEquals(1, item.getContents(Image.class).count());
 
-    BufferedImage img = item.getContents(Image.class).findFirst().orElseThrow().getData();
-    assertEquals(200, img.getWidth());
-    assertEquals(200, img.getHeight());
+      BufferedImage img = item.getContents(Image.class).findFirst().orElseThrow().getData();
+      assertEquals(200, img.getWidth());
+      assertEquals(200, img.getHeight());
+    }
   }
 
   @Test
@@ -242,15 +251,16 @@ public class FlipRotateScaleImageTest {
                 FlipRotateScaleImageTest.class.getClassLoader().getResourceAsStream("quads.png")))
         .save();
 
-    FlipRotateScaleImage.Processor p = new FlipRotateScaleImage.Processor(s);
+    try (FlipRotateScaleImage.Processor p = new FlipRotateScaleImage.Processor(s)) {
 
-    p.process(item);
+      p.process(item);
 
-    assertEquals(1, item.getContents(Image.class).count());
+      assertEquals(1, item.getContents(Image.class).count());
 
-    BufferedImage img = item.getContents(Image.class).findFirst().orElseThrow().getData();
-    assertEquals(100, img.getWidth());
-    assertEquals(100, img.getHeight());
+      BufferedImage img = item.getContents(Image.class).findFirst().orElseThrow().getData();
+      assertEquals(100, img.getWidth());
+      assertEquals(100, img.getHeight());
+    }
   }
 
   @Test
@@ -266,15 +276,16 @@ public class FlipRotateScaleImageTest {
                 FlipRotateScaleImageTest.class.getClassLoader().getResourceAsStream("quads.png")))
         .save();
 
-    FlipRotateScaleImage.Processor p = new FlipRotateScaleImage.Processor(s);
+    try (FlipRotateScaleImage.Processor p = new FlipRotateScaleImage.Processor(s)) {
 
-    p.process(item);
+      p.process(item);
 
-    assertEquals(1, item.getContents(Image.class).count());
+      assertEquals(1, item.getContents(Image.class).count());
 
-    BufferedImage img = item.getContents(Image.class).findFirst().orElseThrow().getData();
-    assertEquals(50, img.getWidth());
-    assertEquals(50, img.getHeight());
+      BufferedImage img = item.getContents(Image.class).findFirst().orElseThrow().getData();
+      assertEquals(50, img.getWidth());
+      assertEquals(50, img.getHeight());
+    }
   }
 
   @Test
@@ -290,18 +301,19 @@ public class FlipRotateScaleImageTest {
                 FlipRotateScaleImageTest.class.getClassLoader().getResourceAsStream("quads.png")))
         .save();
 
-    FlipRotateScaleImage.Processor p = new FlipRotateScaleImage.Processor(s);
+    try (FlipRotateScaleImage.Processor p = new FlipRotateScaleImage.Processor(s)) {
 
-    p.process(item);
+      p.process(item);
 
-    assertEquals(1, item.getContents(Image.class).count());
+      assertEquals(1, item.getContents(Image.class).count());
 
-    BufferedImage img = item.getContents(Image.class).findFirst().orElseThrow().getData();
-    assertEquals(136, img.getWidth());
-    assertEquals(136, img.getHeight());
+      BufferedImage img = item.getContents(Image.class).findFirst().orElseThrow().getData();
+      assertEquals(136, img.getWidth());
+      assertEquals(136, img.getHeight());
 
-    assertEquals(Color.BLACK, new Color(img.getRGB(0, 0)));
-    assertEquals(Color.WHITE, new Color(img.getRGB(50, 0)));
+      assertEquals(Color.BLACK, new Color(img.getRGB(0, 0)));
+      assertEquals(Color.WHITE, new Color(img.getRGB(50, 0)));
+    }
   }
 
   @Test
@@ -317,19 +329,20 @@ public class FlipRotateScaleImageTest {
                 FlipRotateScaleImageTest.class.getClassLoader().getResourceAsStream("quads.png")))
         .save();
 
-    FlipRotateScaleImage.Processor p = new FlipRotateScaleImage.Processor(s);
+    try (FlipRotateScaleImage.Processor p = new FlipRotateScaleImage.Processor(s)) {
 
-    p.process(item);
+      p.process(item);
 
-    assertEquals(1, item.getContents(Image.class).count());
+      assertEquals(1, item.getContents(Image.class).count());
 
-    BufferedImage img = item.getContents(Image.class).findFirst().orElseThrow().getData();
-    assertEquals(136, img.getWidth());
-    assertEquals(136, img.getHeight());
+      BufferedImage img = item.getContents(Image.class).findFirst().orElseThrow().getData();
+      assertEquals(136, img.getWidth());
+      assertEquals(136, img.getHeight());
 
-    assertEquals(Color.BLACK, new Color(img.getRGB(0, 0)));
-    assertEquals(Color.WHITE, new Color(img.getRGB(86, 0)));
-    assertEquals(Color.RED, new Color(img.getRGB(0, 50)));
+      assertEquals(Color.BLACK, new Color(img.getRGB(0, 0)));
+      assertEquals(Color.WHITE, new Color(img.getRGB(86, 0)));
+      assertEquals(Color.RED, new Color(img.getRGB(0, 50)));
+    }
   }
 
   @Test
@@ -345,19 +358,20 @@ public class FlipRotateScaleImageTest {
                 FlipRotateScaleImageTest.class.getClassLoader().getResourceAsStream("quads.png")))
         .save();
 
-    FlipRotateScaleImage.Processor p = new FlipRotateScaleImage.Processor(s);
+    try (FlipRotateScaleImage.Processor p = new FlipRotateScaleImage.Processor(s)) {
 
-    p.process(item);
+      p.process(item);
 
-    assertEquals(1, item.getContents(Image.class).count());
+      assertEquals(1, item.getContents(Image.class).count());
 
-    BufferedImage img = item.getContents(Image.class).findFirst().orElseThrow().getData();
-    assertEquals(141, img.getWidth());
-    assertEquals(141, img.getHeight());
+      BufferedImage img = item.getContents(Image.class).findFirst().orElseThrow().getData();
+      assertEquals(141, img.getWidth());
+      assertEquals(141, img.getHeight());
 
-    assertEquals(Color.BLACK, new Color(img.getRGB(0, 0)));
-    assertEquals(Color.GREEN, new Color(img.getRGB(70, 0)));
-    assertEquals(Color.WHITE, new Color(img.getRGB(0, 70)));
+      assertEquals(Color.BLACK, new Color(img.getRGB(0, 0)));
+      assertEquals(Color.GREEN, new Color(img.getRGB(70, 0)));
+      assertEquals(Color.WHITE, new Color(img.getRGB(0, 70)));
+    }
   }
 
   @Test
@@ -375,23 +389,24 @@ public class FlipRotateScaleImageTest {
                 FlipRotateScaleImageTest.class.getClassLoader().getResourceAsStream("quads.png")))
         .save();
 
-    FlipRotateScaleImage.Processor p = new FlipRotateScaleImage.Processor(s);
+    try (FlipRotateScaleImage.Processor p = new FlipRotateScaleImage.Processor(s)) {
 
-    p.process(item);
+      p.process(item);
 
-    assertEquals(1, item.getContents(Image.class).count());
+      assertEquals(1, item.getContents(Image.class).count());
 
-    BufferedImage img = item.getContents(Image.class).findFirst().orElseThrow().getData();
-    assertEquals(192, img.getWidth());
-    assertEquals(192, img.getHeight());
+      BufferedImage img = item.getContents(Image.class).findFirst().orElseThrow().getData();
+      assertEquals(192, img.getWidth());
+      assertEquals(192, img.getHeight());
 
-    int intersect = (int) (1.5 * Math.sin(Math.toRadians(20)) * 100);
+      int intersect = (int) (1.5 * Math.sin(Math.toRadians(20)) * 100);
 
-    for (int x = 0; x < img.getWidth(); x++) {
-      if (x == intersect || x == intersect + 1) {
-        assertEquals(Color.GREEN, new Color(img.getRGB(x, 0)));
-      } else {
-        assertEquals(Color.BLACK, new Color(img.getRGB(x, 0)));
+      for (int x = 0; x < img.getWidth(); x++) {
+        if (x == intersect || x == intersect + 1) {
+          assertEquals(Color.GREEN, new Color(img.getRGB(x, 0)));
+        } else {
+          assertEquals(Color.BLACK, new Color(img.getRGB(x, 0)));
+        }
       }
     }
   }

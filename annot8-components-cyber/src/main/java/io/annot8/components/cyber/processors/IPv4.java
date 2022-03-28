@@ -36,6 +36,8 @@ public class IPv4 extends AbstractProcessorDescriptor<IPv4.Processor, NoSettings
         .build();
   }
 
+  // Deep type hierarchy
+  @SuppressWarnings("java:S110")
   public static class Processor extends AbstractRegexProcessor {
 
     public Processor() {

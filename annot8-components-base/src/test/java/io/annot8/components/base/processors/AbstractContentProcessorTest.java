@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
-import io.annot8.api.data.Content;
 import io.annot8.api.data.Item;
 import io.annot8.api.exceptions.ProcessingException;
 import io.annot8.common.data.content.Text;
@@ -15,9 +14,8 @@ import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.mockito.stubbing.Answer;
 
-public class AbstractContentProcessorTest {
+class AbstractContentProcessorTest {
 
   private static final String SHOULD_PROCESS = "SHOULD_PROCESS";
   private static final String NOT_PROCESS = "NOT_PROCESS";
@@ -26,31 +24,33 @@ public class AbstractContentProcessorTest {
   public void testProcessItem() {
     Item item = getMockedItem();
 
-    TestContentProcessor processor = new TestContentProcessor();
-
-    processor.process(item);
-    assertEquals(2, processor.getObservedContent().size());
-    assertEquals(SHOULD_PROCESS, processor.getObservedContent().get(0));
-    assertEquals(NOT_PROCESS, processor.getObservedContent().get(1));
+    try (TestContentProcessor processor = new TestContentProcessor()) {
+      processor.process(item);
+      assertEquals(2, processor.getObservedContent().size());
+      assertEquals(SHOULD_PROCESS, processor.getObservedContent().get(0));
+      assertEquals(NOT_PROCESS, processor.getObservedContent().get(1));
+    }
   }
 
   @Test
   public void testAcceptsContent() {
-    AcceptingContentProcessor processor = new AcceptingContentProcessor();
-    Item item = getMockedItem();
-    processor.process(item);
-    List<String> observedContent = processor.getObservedContent();
-    assertEquals(1, observedContent.size());
-    assertEquals(SHOULD_PROCESS, observedContent.get(0));
+    try (AcceptingContentProcessor processor = new AcceptingContentProcessor()) {
+      Item item = getMockedItem();
+      processor.process(item);
+      List<String> observedContent = processor.getObservedContent();
+      assertEquals(1, observedContent.size());
+      assertEquals(SHOULD_PROCESS, observedContent.get(0));
+    }
   }
 
   @Test
   public void testProcessingError() {
     Item item = getMockedItem();
-    Content content = Mockito.mock(Content.class);
+    Text content = Mockito.mock(Text.class);
     doReturn(Stream.of(content)).when(item).getContents();
-    AbstractContentProcessor processor = new ErrorContentProcessor();
-    assertTrue(processor.process(item).hasExceptions());
+    try (AbstractContentProcessor<Text> processor = new ErrorContentProcessor()) {
+      assertTrue(processor.process(item).hasExceptions());
+    }
   }
 
   private Item getMockedItem() {
@@ -62,10 +62,6 @@ public class AbstractContentProcessorTest {
     when(item.getContents(Text.class)).thenReturn(Stream.of(toProcess, notProcess));
 
     return item;
-  }
-
-  private <T> Answer<Stream<T>> getAnswer(T... content) {
-    return invocation -> Stream.of(content);
   }
 
   private class TestContentProcessor extends AbstractContentProcessor<Text> {

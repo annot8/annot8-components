@@ -52,9 +52,12 @@ public class DTG extends AbstractProcessorDescriptor<DTG.Processor, NoSettings> 
         .build();
   }
 
+  // Deep type hierarchy
+  @SuppressWarnings("java:S110")
   public static class Processor extends AbstractRegexProcessor {
     private static final Map<String, ZoneOffset> zoneMap = createTimeCodeMap();
 
+    @SuppressWarnings("java:S5843")
     public Processor() {
       super(
           Pattern.compile(

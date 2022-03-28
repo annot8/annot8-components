@@ -46,38 +46,40 @@ public class ExifMetadataProcessorTest {
         .when(item)
         .getContents(Mockito.eq(FileContent.class));
 
-    Processor processor = new ExifMetadataProcessor.Processor();
+    try (Processor processor = new ExifMetadataProcessor.Processor()) {
 
-    ProcessorResponse response = processor.process(item);
+      ProcessorResponse response = processor.process(item);
 
-    assertNotNull(response);
-    assertEquals(Status.OK, response.getStatus());
-    assertEquals(4, store.getByType(ExifMetadataProcessor.EXIF_TYPE).count());
-    assertEquals(1, store.getByType(ExifMetadataProcessor.EXIF_GPS_TYPE).count());
+      assertNotNull(response);
+      assertEquals(Status.OK, response.getStatus());
+      assertEquals(4, store.getByType(ExifMetadataProcessor.EXIF_TYPE).count());
+      assertEquals(1, store.getByType(ExifMetadataProcessor.EXIF_GPS_TYPE).count());
 
-    Map<String, Object> allProperties = new HashMap<>();
-    store
-        .getByType(ExifMetadataProcessor.EXIF_TYPE)
-        .forEach(a -> allProperties.putAll(a.getProperties().getAll()));
+      Map<String, Object> allProperties = new HashMap<>();
+      store
+          .getByType(ExifMetadataProcessor.EXIF_TYPE)
+          .forEach(a -> allProperties.putAll(a.getProperties().getAll()));
 
-    containsKeyValue(allProperties, "Make", "Google");
-    containsKeyValue(allProperties, "Model", "Pixel XL");
-    containsKeyValue(allProperties, "Exif Image Width", 3036);
-    containsKeyValue(allProperties, "Exif Image Height", 4048);
-    containsKeyValue(allProperties, "Date/Time Original", 1537799743000L);
+      containsKeyValue(allProperties, "Make", "Google");
+      containsKeyValue(allProperties, "Model", "Pixel XL");
+      containsKeyValue(allProperties, "Exif Image Width", 3036);
+      containsKeyValue(allProperties, "Exif Image Height", 4048);
+      containsKeyValue(allProperties, "Date/Time Original", 1537799743000L);
 
-    Annotation geolocation = store.getByType(ExifMetadataProcessor.EXIF_GPS_TYPE).findFirst().get();
-    assertEquals(3, geolocation.getProperties().keys().count());
+      Annotation geolocation =
+          store.getByType(ExifMetadataProcessor.EXIF_GPS_TYPE).findFirst().get();
+      assertEquals(3, geolocation.getProperties().keys().count());
 
-    assertEquals(
-        51.897819444444444,
-        geolocation.getProperties().get(PropertyKeys.PROPERTY_KEY_LATITUDE, Double.class).get());
-    assertEquals(
-        -2.0717722222222226,
-        geolocation.getProperties().get(PropertyKeys.PROPERTY_KEY_LONGITUDE, Double.class).get());
-    assertEquals(
-        1537796134000L,
-        geolocation.getProperties().get(PropertyKeys.PROPERTY_KEY_DATE, Long.class).get());
+      assertEquals(
+          51.897819444444444,
+          geolocation.getProperties().get(PropertyKeys.PROPERTY_KEY_LATITUDE, Double.class).get());
+      assertEquals(
+          -2.0717722222222226,
+          geolocation.getProperties().get(PropertyKeys.PROPERTY_KEY_LONGITUDE, Double.class).get());
+      assertEquals(
+          1537796134000L,
+          geolocation.getProperties().get(PropertyKeys.PROPERTY_KEY_DATE, Long.class).get());
+    }
   }
 
   private void containsKeyValue(Map<String, Object> map, String key, Object value) {

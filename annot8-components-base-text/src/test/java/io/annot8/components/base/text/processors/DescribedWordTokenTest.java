@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 
 public class DescribedWordTokenTest {
+
   @Test
   public void test() {
     TestItem item = new TestItem();

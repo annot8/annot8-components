@@ -85,27 +85,27 @@ public class OdtExtractor
     }
 
     @Override
-    public boolean isMetadataSupported() {
+    protected boolean isMetadataSupported() {
       return true;
     }
 
     @Override
-    public boolean isTextSupported() {
+    protected boolean isTextSupported() {
       return true;
     }
 
     @Override
-    public boolean isImagesSupported() {
+    protected boolean isImagesSupported() {
       return true;
     }
 
     @Override
-    public boolean isTablesSupported() {
+    protected boolean isTablesSupported() {
       return true;
     }
 
     @Override
-    public boolean acceptFile(FileContent file) {
+    protected boolean acceptFile(FileContent file) {
       OdfTextDocument doc;
       try {
         doc = OdfTextDocument.loadDocument(file.getData());
@@ -119,7 +119,7 @@ public class OdtExtractor
     }
 
     @Override
-    public boolean acceptInputStream(InputStreamContent inputStream) {
+    protected boolean acceptInputStream(InputStreamContent inputStream) {
       OdfTextDocument doc;
       try {
         doc = OdfTextDocument.loadDocument(inputStream.getData());
@@ -137,7 +137,7 @@ public class OdtExtractor
     }
 
     @Override
-    public OdfTextDocument extractDocument(FileContent file) throws IOException {
+    protected OdfTextDocument extractDocument(FileContent file) throws IOException {
       if (cache.containsKey(file.getId())) {
         return cache.get(file.getId());
       } else {
@@ -150,7 +150,7 @@ public class OdtExtractor
     }
 
     @Override
-    public OdfTextDocument extractDocument(InputStreamContent inputStreamContent)
+    protected OdfTextDocument extractDocument(InputStreamContent inputStreamContent)
         throws IOException {
       if (cache.containsKey(inputStreamContent.getId())) {
         return cache.get(inputStreamContent.getId());
@@ -164,7 +164,7 @@ public class OdtExtractor
     }
 
     @Override
-    public Map<String, Object> extractMetadata(OdfTextDocument doc) {
+    protected Map<String, Object> extractMetadata(OdfTextDocument doc) {
       Map<String, Object> metadata = new HashMap<>();
 
       OdfOfficeMeta oom = doc.getOfficeMetadata();
@@ -219,7 +219,7 @@ public class OdtExtractor
     }
 
     @Override
-    public Collection<ExtractionWithProperties<String>> extractText(OdfTextDocument doc) {
+    protected Collection<ExtractionWithProperties<String>> extractText(OdfTextDocument doc) {
 
       StringBuilder sb = new StringBuilder();
 
@@ -256,35 +256,43 @@ public class OdtExtractor
       for (int i = 0; i < nodes.getLength(); i++) {
         Node node = nodes.item(i);
 
-        // Handle spaces
-        if ("text:s".equals(node.getNodeName())) builder.append(" ");
-
-        // Handle lists
-        if ("text:list-item".equals(node.getNodeName())) {
-          int levelCount = 0;
-          Node currNode = node;
-          while ((currNode = currNode.getParentNode()) != null) {
-            if ("text:list".equals(currNode.getNodeName())) levelCount++;
-          }
-
-          builder.append("\t".repeat(levelCount));
-          builder.append("* ");
-        }
-
-        // Handle text
-        if (node.getNodeType() == Node.TEXT_NODE) {
-          builder.append(node.getTextContent());
-        } else if (node.hasChildNodes()) {
-          recurseNodes(node.getChildNodes(), builder);
-
-          String nodeName = node.getNodeName();
-          if ("text:p".equals(nodeName) || "text:h".equals(nodeName)) builder.append("\n");
-        }
+        handleSpaces(builder, node);
+        handleLists(builder, node);
+        handleText(builder, node);
       }
     }
 
+    private void handleText(StringBuilder builder, Node node) {
+      if (node.getNodeType() == Node.TEXT_NODE) {
+        builder.append(node.getTextContent());
+      } else if (node.hasChildNodes()) {
+        recurseNodes(node.getChildNodes(), builder);
+
+        String nodeName = node.getNodeName();
+        if ("text:p".equals(nodeName) || "text:h".equals(nodeName)) builder.append("\n");
+      }
+    }
+
+    private void handleLists(StringBuilder builder, Node node) {
+      if ("text:list-item".equals(node.getNodeName())) {
+        int levelCount = 0;
+        Node currNode = node;
+        while ((currNode = currNode.getParentNode()) != null) {
+          if ("text:list".equals(currNode.getNodeName())) levelCount++;
+        }
+
+        builder.append("\t".repeat(levelCount));
+        builder.append("* ");
+      }
+    }
+
+    private void handleSpaces(StringBuilder builder, Node node) {
+      if ("text:s".equals(node.getNodeName())) builder.append(" ");
+    }
+
     @Override
-    public Collection<ExtractionWithProperties<BufferedImage>> extractImages(OdfTextDocument doc) {
+    protected Collection<ExtractionWithProperties<BufferedImage>> extractImages(
+        OdfTextDocument doc) {
       List<ExtractionWithProperties<BufferedImage>> extractedImages = new ArrayList<>();
 
       int imageNumber = 0;
@@ -346,7 +354,7 @@ public class OdtExtractor
     }
 
     @Override
-    public Collection<ExtractionWithProperties<Table>> extractTables(OdfTextDocument doc)
+    protected Collection<ExtractionWithProperties<Table>> extractTables(OdfTextDocument doc)
         throws ProcessingException {
       return doc.getTableList().stream()
           .map(Processor::transformTable)
@@ -372,26 +380,27 @@ public class OdtExtractor
     private final List<Row> rows;
     private final List<String> columnNames;
 
-    public OdtTable(OdfTable t) {
+    protected OdtTable(OdfTable t) {
+      int rowCount = t.getRowCount();
+
+      if (rowCount == 0) {
+        rows = List.of();
+        columnNames = List.of();
+        return;
+      }
+
       int headerRows = Math.max(1, t.getHeaderRowCount());
-      List<Row> rows = new ArrayList<>(t.getRowCount() - headerRows);
-      List<String> columnNames = Collections.emptyList();
+      List<Row> tmpRows = new ArrayList<>(rowCount - headerRows);
 
-      for (int i = 0; i < t.getRowCount(); i++) {
-        if (i == 0) {
-          OdfTableRow headerRow = t.getRowByIndex(i);
+      OdfTableRow headerRow = t.getRowByIndex(0);
+      List<String> tmpColumnNames = new ArrayList<>(headerRow.getCellCount());
 
-          List<String> header = new ArrayList<>(headerRow.getCellCount());
-          for (int col = 0; col < headerRow.getCellCount(); col++) {
-            OdfTableCell headerCell = headerRow.getCellByIndex(col);
-            header.add(headerCell.getDisplayText());
-          }
+      for (int col = 0; col < headerRow.getCellCount(); col++) {
+        OdfTableCell headerCell = headerRow.getCellByIndex(col);
+        tmpColumnNames.add(headerCell.getDisplayText());
+      }
 
-          columnNames = header;
-
-          continue;
-        }
-
+      for (int i = 1; i < rowCount; i++) {
         if (i < t.getHeaderRowCount()) {
           continue;
         }
@@ -402,46 +411,41 @@ public class OdtExtractor
         for (int col = 0; col < row.getCellCount(); col++) {
           OdfTableCell cell = row.getCellByIndex(col);
 
-          switch (cell.getValueType()) {
-            case "boolean":
-              values.add(cell.getBooleanValue());
-              break;
-            case "currency":
-              String currencyPrefix = "";
-              if (cell.getCurrencyCode() != null && !cell.getCurrencyCode().isBlank()) {
-                currencyPrefix = cell.getCurrencyCode() + " ";
-              } else if (cell.getCurrencySymbol() != null && !cell.getCurrencySymbol().isBlank()) {
-                currencyPrefix = cell.getCurrencySymbol();
-              }
-              values.add(currencyPrefix + cell.getCurrencyValue());
-              break;
-            case "date":
-              values.add(
-                  cell.getDateValue().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
-              break;
-            case "float":
-              values.add(cell.getDoubleValue());
-              break;
-            case "percentage":
-              values.add(cell.getPercentageValue());
-              break;
-            case "string":
-              values.add(cell.getStringValue());
-              break;
-            case "time":
-              values.add(
-                  cell.getDateValue().toInstant().atZone(ZoneId.systemDefault()).toLocalTime());
-              break;
-            default:
-              values.add(cell.getDisplayText());
-          }
+          values.add(getCallValue(cell));
         }
 
-        rows.add(new DefaultRow(i - headerRows, columnNames, values));
+        tmpRows.add(new DefaultRow(i - headerRows, tmpColumnNames, values));
       }
 
-      this.rows = Collections.unmodifiableList(rows);
-      this.columnNames = columnNames;
+      this.rows = Collections.unmodifiableList(tmpRows);
+      this.columnNames = Collections.unmodifiableList(tmpColumnNames);
+    }
+
+    private Object getCallValue(OdfTableCell cell) {
+      switch (cell.getValueType()) {
+        case "boolean":
+          return cell.getBooleanValue();
+        case "currency":
+          String currencyPrefix = "";
+          if (cell.getCurrencyCode() != null && !cell.getCurrencyCode().isBlank()) {
+            currencyPrefix = cell.getCurrencyCode() + " ";
+          } else if (cell.getCurrencySymbol() != null && !cell.getCurrencySymbol().isBlank()) {
+            currencyPrefix = cell.getCurrencySymbol();
+          }
+          return currencyPrefix + cell.getCurrencyValue();
+        case "date":
+          return cell.getDateValue().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        case "float":
+          return cell.getDoubleValue();
+        case "percentage":
+          return cell.getPercentageValue();
+        case "string":
+          return cell.getStringValue();
+        case "time":
+          return cell.getDateValue().toInstant().atZone(ZoneId.systemDefault()).toLocalTime();
+        default:
+          return cell.getDisplayText();
+      }
     }
 
     @Override

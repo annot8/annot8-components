@@ -14,6 +14,7 @@ import io.annot8.conventions.PropertyKeys;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -75,7 +76,9 @@ public class ElasticsearchUtils {
       try {
         Map<String, Object> json =
             mapper.readValue(
-                a.getProperties().get(PropertyKeys.PROPERTY_KEY_GEOJSON, String.class).get(),
+                a.getProperties()
+                    .get(PropertyKeys.PROPERTY_KEY_GEOJSON, String.class)
+                    .orElseThrow(),
                 new TypeReference<>() {});
 
         ma.put(GEO, json);
@@ -92,12 +95,12 @@ public class ElasticsearchUtils {
       double lat =
           a.getProperties()
               .get(PropertyKeys.PROPERTY_KEY_LATITUDE, Number.class)
-              .get()
+              .orElseThrow()
               .doubleValue();
       double lon =
           a.getProperties()
               .get(PropertyKeys.PROPERTY_KEY_LONGITUDE, Number.class)
-              .get()
+              .orElseThrow()
               .doubleValue();
 
       if (lat >= -90.0 && lat <= 90.0 && lon >= -180.0 && lon <= 180.0) {
@@ -183,9 +186,9 @@ public class ElasticsearchUtils {
     Map<String, List<Map<String, String>>> roles = new HashMap<>();
 
     Map<String, Stream<AnnotationReference>> mar = g.getReferences();
-    for (String role : mar.keySet()) {
+    for (Entry<String, Stream<AnnotationReference>> role : mar.entrySet()) {
       List<Map<String, String>> lr =
-          mar.get(role)
+          role.getValue()
               .map(
                   r -> {
                     Map<String, String> mr = new HashMap<>();
@@ -197,7 +200,7 @@ public class ElasticsearchUtils {
                   })
               .collect(Collectors.toList());
 
-      roles.put(role, lr);
+      roles.put(role.getKey(), lr);
     }
 
     mg.put(ROLES, roles);
@@ -253,6 +256,7 @@ public class ElasticsearchUtils {
         || Boolean.class.isAssignableFrom(dataClass);
   }
 
+  @SuppressWarnings("unchecked")
   public static Map<String, Object> toStringMap(Map<String, Object> map) {
     Map<String, Object> m = new HashMap<>();
 

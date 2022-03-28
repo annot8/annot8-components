@@ -43,11 +43,12 @@ public class FilterImageBySizeTest {
     FilterImageBySize.Settings s = new FilterImageBySize.Settings();
     s.setMinHeight(150);
 
-    FilterImageBySize.Processor p = new FilterImageBySize.Processor(s);
-    assertEquals(ProcessorResponse.ok(), p.process(i));
+    try (FilterImageBySize.Processor p = new FilterImageBySize.Processor(s)) {
+      assertEquals(ProcessorResponse.ok(), p.process(i));
 
-    assertEquals(1L, i.getContents(Image.class).count());
-    assertEquals(img.getId(), i.getContents(Image.class).findFirst().get().getId());
+      assertEquals(1L, i.getContents(Image.class).count());
+      assertEquals(img.getId(), i.getContents(Image.class).findFirst().get().getId());
+    }
   }
 
   @Test
@@ -63,11 +64,12 @@ public class FilterImageBySizeTest {
     FilterImageBySize.Settings s = new FilterImageBySize.Settings();
     s.setMinWidth(150);
 
-    FilterImageBySize.Processor p = new FilterImageBySize.Processor(s);
-    assertEquals(ProcessorResponse.ok(), p.process(i));
+    try (FilterImageBySize.Processor p = new FilterImageBySize.Processor(s)) {
+      assertEquals(ProcessorResponse.ok(), p.process(i));
 
-    assertEquals(1L, i.getContents(Image.class).count());
-    assertEquals(img.getId(), i.getContents(Image.class).findFirst().get().getId());
+      assertEquals(1L, i.getContents(Image.class).count());
+      assertEquals(img.getId(), i.getContents(Image.class).findFirst().get().getId());
+    }
   }
 
   @Test
@@ -83,11 +85,12 @@ public class FilterImageBySizeTest {
     FilterImageBySize.Settings s = new FilterImageBySize.Settings();
     s.setMaxHeight(150);
 
-    FilterImageBySize.Processor p = new FilterImageBySize.Processor(s);
-    assertEquals(ProcessorResponse.ok(), p.process(i));
+    try (FilterImageBySize.Processor p = new FilterImageBySize.Processor(s)) {
+      assertEquals(ProcessorResponse.ok(), p.process(i));
 
-    assertEquals(1L, i.getContents(Image.class).count());
-    assertEquals(img.getId(), i.getContents(Image.class).findFirst().get().getId());
+      assertEquals(1L, i.getContents(Image.class).count());
+      assertEquals(img.getId(), i.getContents(Image.class).findFirst().get().getId());
+    }
   }
 
   @Test
@@ -103,11 +106,12 @@ public class FilterImageBySizeTest {
     FilterImageBySize.Settings s = new FilterImageBySize.Settings();
     s.setMaxWidth(150);
 
-    FilterImageBySize.Processor p = new FilterImageBySize.Processor(s);
-    assertEquals(ProcessorResponse.ok(), p.process(i));
+    try (FilterImageBySize.Processor p = new FilterImageBySize.Processor(s)) {
+      assertEquals(ProcessorResponse.ok(), p.process(i));
 
-    assertEquals(1L, i.getContents(Image.class).count());
-    assertEquals(img.getId(), i.getContents(Image.class).findFirst().get().getId());
+      assertEquals(1L, i.getContents(Image.class).count());
+      assertEquals(img.getId(), i.getContents(Image.class).findFirst().get().getId());
+    }
   }
 
   @Test

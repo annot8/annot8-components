@@ -29,11 +29,12 @@ public class ItemPropertyAsBooleanTest {
     ItemPropertyAsBoolean.Settings s = new ItemPropertyAsBoolean.Settings();
     s.setKey("val");
 
-    ItemPropertyAsBoolean.Processor p = new ItemPropertyAsBoolean.Processor(s);
-    assertEquals(ProcessorResponse.ok(), p.process(item));
+    try (ItemPropertyAsBoolean.Processor p = new ItemPropertyAsBoolean.Processor(s)) {
+      assertEquals(ProcessorResponse.ok(), p.process(item));
 
-    assertTrue(item.getProperties().has("val"));
-    assertEquals(Boolean.class, item.getProperties().get("val").orElseThrow().getClass());
-    assertEquals(expected, item.getProperties().get("val").orElseThrow());
+      assertTrue(item.getProperties().has("val"));
+      assertEquals(Boolean.class, item.getProperties().get("val").orElseThrow().getClass());
+      assertEquals(expected, item.getProperties().get("val").orElseThrow());
+    }
   }
 }

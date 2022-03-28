@@ -41,6 +41,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 @ComponentName("File System Source")
 @ComponentDescription("Provides items from the local file system")
@@ -108,10 +109,12 @@ public class FileSystemSource
           registerDirectory(p);
 
           // Add files to list
-          Files.list(p)
-              .filter(Files::isRegularFile)
-              .filter(file -> acceptFile(file, settings))
-              .forEach(initialFiles::add);
+          try (Stream<Path> lines = Files.list(p)) {
+            lines
+                .filter(Files::isRegularFile)
+                .filter(file -> acceptFile(file, settings))
+                .forEach(initialFiles::add);
+          }
         }
 
       } catch (IOException ioe) {
@@ -158,8 +161,11 @@ public class FileSystemSource
         read +=
             initialFiles.stream()
                 .filter(queue::add)
-                .peek(file -> createItem(itemFactory, file, settings.getDelay()))
-                .mapToLong(p -> 1L)
+                .mapToLong(
+                    file -> {
+                      createItem(itemFactory, file, settings.getDelay());
+                      return 1L;
+                    })
                 .sum();
 
         initialFiles.clear();
@@ -177,37 +183,51 @@ public class FileSystemSource
         Path dir = (Path) key.watchable();
         List<WatchEvent<?>> events = key.pollEvents();
 
-        // Watch new directories
-        events.stream()
-            .filter(e -> e.kind() == ENTRY_CREATE)
-            .map(event -> dir.resolve(((WatchEvent<Path>) event).context()))
-            .filter(Files::isDirectory)
-            .forEach(
-                p -> {
-                  try {
-                    registerDirectory(p);
-                  } catch (IOException e) {
-                    log().error("Unable to watch new folder {}", p);
-                  }
-                });
+        watchNewDirectories(dir, events);
 
         // Process each event and create an Item from it
-        read +=
-            events.stream()
-                .map(event -> dir.resolve(((WatchEvent<Path>) event).context()))
-                .filter(Files::isRegularFile)
-                .filter(file -> acceptFile(file, settings))
-                .filter(queue::add) // Check that we're not already about to process this, as we may
-                // receive multiple events for the same file
-                .peek(file -> createItem(itemFactory, file, settings.getDelay()))
-                .mapToLong(p -> 1L)
-                .sum();
+        read = processEvents(itemFactory, read, dir, events);
 
         key.reset();
       }
 
       // If we (successfully) read any files, then return OK. Otherwise EMPTY
       return read > 0 ? SourceResponse.ok() : SourceResponse.empty();
+    }
+
+    @SuppressWarnings("unchecked")
+    private long processEvents(
+        ItemFactory itemFactory, long read, Path dir, List<WatchEvent<?>> events) {
+      read +=
+          events.stream()
+              .map(event -> dir.resolve(((WatchEvent<Path>) event).context()))
+              .filter(Files::isRegularFile)
+              .filter(file -> acceptFile(file, settings))
+              .filter(queue::add) // Check that we're not already about to process this, as we may
+              // receive multiple events for the same file
+              .mapToLong(
+                  file -> {
+                    createItem(itemFactory, file, settings.getDelay());
+                    return 1L;
+                  })
+              .sum();
+      return read;
+    }
+
+    @SuppressWarnings("unchecked")
+    private void watchNewDirectories(Path dir, List<WatchEvent<?>> events) {
+      events.stream()
+          .filter(e -> e.kind() == ENTRY_CREATE)
+          .map(event -> dir.resolve(((WatchEvent<Path>) event).context()))
+          .filter(Files::isDirectory)
+          .forEach(
+              p -> {
+                try {
+                  registerDirectory(p);
+                } catch (IOException e) {
+                  log().error("Unable to watch new folder {}", p);
+                }
+              });
     }
 
     private void createItem(ItemFactory itemFactory, Path path, long delay) {

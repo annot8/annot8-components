@@ -84,14 +84,15 @@ public class AnnotationToPropertyTest {
     AnnotationToProperty.Settings s = new AnnotationToProperty.Settings();
     s.setAnnotationType("number");
 
-    AnnotationToProperty.Processor p = new AnnotationToProperty.Processor(s);
+    try (AnnotationToProperty.Processor p = new AnnotationToProperty.Processor(s)) {
 
-    Item i = createTestItem();
+      Item i = createTestItem();
 
-    ProcessorResponse r = p.process(i);
-    assertEquals(ProcessorResponse.ok(), r);
+      ProcessorResponse r = p.process(i);
+      assertEquals(ProcessorResponse.ok(), r);
 
-    assertTrue(i.getProperties().getAll().isEmpty());
+      assertTrue(i.getProperties().getAll().isEmpty());
+    }
   }
 
   @Test
@@ -100,25 +101,26 @@ public class AnnotationToPropertyTest {
     s.setAnnotationType("file");
     s.setPropertyName("test");
 
-    AnnotationToProperty.Processor p = new AnnotationToProperty.Processor(s);
+    try (AnnotationToProperty.Processor p = new AnnotationToProperty.Processor(s)) {
 
-    Item i = createTestItem();
+      Item i = createTestItem();
 
-    FileContent fc =
-        i.createContent(TestFileContent.class)
-            .withData(new File("testMixed.tmp"))
-            .withDescription("File")
-            .save();
+      FileContent fc =
+          i.createContent(TestFileContent.class)
+              .withData(new File("testMixed.tmp"))
+              .withDescription("File")
+              .save();
 
-    fc.getAnnotations().create().withBounds(ContentBounds.getInstance()).withType("file").save();
+      fc.getAnnotations().create().withBounds(ContentBounds.getInstance()).withType("file").save();
 
-    ProcessorResponse r = p.process(i);
-    assertEquals(ProcessorResponse.ok(), r);
+      ProcessorResponse r = p.process(i);
+      assertEquals(ProcessorResponse.ok(), r);
 
-    Map<String, Object> m = i.getProperties().getAll();
-    assertEquals(1, m.size());
-    assertTrue(m.containsKey("test"));
-    assertNotNull(m.get("test"));
+      Map<String, Object> m = i.getProperties().getAll();
+      assertEquals(1, m.size());
+      assertTrue(m.containsKey("test"));
+      assertNotNull(m.get("test"));
+    }
   }
 
   @Test
@@ -175,19 +177,20 @@ public class AnnotationToPropertyTest {
     s.setPropertyName(strategy.name());
     s.setAnnotationProperty(annotationProperty);
 
-    AnnotationToProperty.Processor p = new AnnotationToProperty.Processor(s);
+    try (AnnotationToProperty.Processor p = new AnnotationToProperty.Processor(s)) {
 
-    ProcessorResponse r = p.process(item);
-    assertEquals(ProcessorResponse.ok(), r);
+      ProcessorResponse r = p.process(item);
+      assertEquals(ProcessorResponse.ok(), r);
 
-    Map<String, Object> m = item.getProperties().getAll();
-    assertEquals(1, m.size());
-    assertTrue(m.containsKey(strategy.name()));
+      Map<String, Object> m = item.getProperties().getAll();
+      assertEquals(1, m.size());
+      assertTrue(m.containsKey(strategy.name()));
 
-    if (expected == null) {
-      assertNotNull(m.get(strategy.name()));
-    } else {
-      assertEquals(expected, m.get(strategy.name()));
+      if (expected == null) {
+        assertNotNull(m.get(strategy.name()));
+      } else {
+        assertEquals(expected, m.get(strategy.name()));
+      }
     }
   }
 

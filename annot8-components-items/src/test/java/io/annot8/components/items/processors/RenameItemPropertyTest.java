@@ -30,13 +30,15 @@ public class RenameItemPropertyTest {
     TestItem item = new TestItem();
     item.getProperties().set("myFirstKey", 17);
 
-    RenameItemProperty.Processor p = new RenameItemProperty.Processor("myFirstKey", "mySecondKey");
-    p.process(item);
+    try (RenameItemProperty.Processor p =
+        new RenameItemProperty.Processor("myFirstKey", "mySecondKey")) {
+      p.process(item);
 
-    assertFalse(item.getProperties().has("myFirstKey"));
-    assertTrue(item.getProperties().has("mySecondKey"));
+      assertFalse(item.getProperties().has("myFirstKey"));
+      assertTrue(item.getProperties().has("mySecondKey"));
 
-    assertEquals(17, item.getProperties().get("mySecondKey").get());
+      assertEquals(17, item.getProperties().get("mySecondKey").get());
+    }
   }
 
   @Test
@@ -44,10 +46,11 @@ public class RenameItemPropertyTest {
     TestItem item = new TestItem();
     item.getProperties().set("myFirstKey", 17);
 
-    RenameItemProperty.Processor p = new RenameItemProperty.Processor("myFirstKey", null);
-    p.process(item);
+    try (RenameItemProperty.Processor p = new RenameItemProperty.Processor("myFirstKey", null)) {
+      p.process(item);
 
-    assertFalse(item.getProperties().has("myFirstKey"));
+      assertFalse(item.getProperties().has("myFirstKey"));
+    }
   }
 
   @Test
@@ -55,9 +58,11 @@ public class RenameItemPropertyTest {
     TestItem item = new TestItem();
     item.getProperties().set("firstKey", 17);
 
-    RenameItemProperty.Processor p = new RenameItemProperty.Processor("myFirstKey", "mySecondKey");
-    p.process(item);
+    try (RenameItemProperty.Processor p =
+        new RenameItemProperty.Processor("myFirstKey", "mySecondKey")) {
+      p.process(item);
 
-    assertTrue(item.getProperties().has("firstKey"));
+      assertTrue(item.getProperties().has("firstKey"));
+    }
   }
 }

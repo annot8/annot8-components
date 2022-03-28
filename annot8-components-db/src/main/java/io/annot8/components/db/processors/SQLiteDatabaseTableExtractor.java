@@ -101,8 +101,9 @@ public class SQLiteDatabaseTableExtractor
       }
 
       JdbcSettings settings = getConnectionSettings(content);
-      try (Connection connection = DriverManager.getConnection(settings.getJdbcUrl())) {
-        ResultSet set = connection.createStatement().executeQuery(SCHEMA_QUERY);
+      try (Connection connection = DriverManager.getConnection(settings.getJdbcUrl());
+          Statement statement = connection.createStatement()) {
+        ResultSet set = statement.executeQuery(SCHEMA_QUERY);
         int schemaVersion = 0;
         while (set.next()) {
           schemaVersion = set.getInt("schema_version");
@@ -130,7 +131,7 @@ public class SQLiteDatabaseTableExtractor
         DatabaseMetaData metaData = connection.getMetaData();
         ResultSet set = metaData.getTables(null, null, null, null);
         while (set.next()) {
-          String tableName = set.getString("TABLE_NAME");
+          String tableName = set.getString(PROPERTY_NAME);
           String tableType = set.getString("TABLE_TYPE");
           List<ColumnMetadata> columns = getColumnMetadata(metaData, tableName);
           int rowSize = getRowCount(connection, tableName);
@@ -149,7 +150,6 @@ public class SQLiteDatabaseTableExtractor
       ResultSet set = metadata.getColumns(null, null, tableName, null);
       while (set.next()) {
         String columnName = set.getString("COLUMN_NAME");
-        String type = set.getString("TYPE_NAME");
         long size = set.getLong("COLUMN_SIZE");
         columnMetadata.add(new ColumnMetadata(columnName, size));
       }

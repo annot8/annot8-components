@@ -7,13 +7,15 @@ import java.util.Arrays;
 import org.junit.jupiter.api.Test;
 
 public class CollectionStopwordsTest {
+
   @Test
   public void testDefault() {
-    Stopwords sw = new CollectionStopwords("en", Arrays.asList("and", "the"));
+    try (Stopwords sw = new CollectionStopwords("en", Arrays.asList("and", "the"))) {
 
-    assertEquals("en", sw.getLanguage());
-    assertTrue(sw.isStopword("and"));
-    assertTrue(sw.isStopword(" THE "));
-    assertFalse(sw.isStopword("foo"));
+      assertEquals("en", sw.getLanguage());
+      assertTrue(sw.isStopword("and"));
+      assertTrue(sw.isStopword(" THE "));
+      assertFalse(sw.isStopword("foo"));
+    }
   }
 }

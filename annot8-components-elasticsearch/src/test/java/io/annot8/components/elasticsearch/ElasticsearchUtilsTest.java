@@ -16,7 +16,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 
-public class ElasticsearchUtilsTest {
+@SuppressWarnings("unchecked")
+class ElasticsearchUtilsTest {
+
   @Test
   public void testPersistData() {
     assertTrue(ElasticsearchUtils.shouldPersistData(String.class));

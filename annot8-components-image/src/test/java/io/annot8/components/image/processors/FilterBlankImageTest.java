@@ -34,13 +34,14 @@ public class FilterBlankImageTest {
         .withDescription("Blank Transparent")
         .save();
 
-    FilterBlankImages.Processor p = new FilterBlankImages.Processor();
-    p.process(i);
+    try (FilterBlankImages.Processor p = new FilterBlankImages.Processor()) {
+      p.process(i);
 
-    List<Image> images = i.getContents(Image.class).collect(Collectors.toList());
-    assertEquals(1, images.size());
+      List<Image> images = i.getContents(Image.class).collect(Collectors.toList());
+      assertEquals(1, images.size());
 
-    Image image = images.get(0);
-    assertEquals("Test Image", image.getDescription());
+      Image image = images.get(0);
+      assertEquals("Test Image", image.getDescription());
+    }
   }
 }

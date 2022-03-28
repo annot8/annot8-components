@@ -2,17 +2,17 @@
 package io.annot8.components.mongo.sinks;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import com.mongodb.client.MongoCollection;
-import io.annot8.api.annotations.Annotation;
 import io.annot8.api.components.Processor;
 import io.annot8.api.components.responses.ProcessorResponse;
 import io.annot8.api.components.responses.ProcessorResponse.Status;
 import io.annot8.api.data.Content;
 import io.annot8.api.data.Item;
 import io.annot8.common.data.content.Text;
-import io.annot8.components.mongo.resources.MongoConnection;
+import io.annot8.components.mongo.utils.MongoConnection;
 import io.annot8.testing.testimpl.TestAnnotationStore;
 import io.annot8.testing.testimpl.TestItem;
 import io.annot8.testing.testimpl.TestProperties;
@@ -24,47 +24,52 @@ import org.mockito.Mockito;
 
 public class NestedItemSinkTest extends AbstractSinkTest {
 
-  private MongoConnection connection;
-  private MongoCollection collection;
+  private MongoConnection<Document> connection;
+  private MongoCollection<Document> collection;
 
   @BeforeEach
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public void beforeEach() {
     connection = mock(MongoConnection.class);
     collection = mock(MongoCollection.class);
-    when(connection.getCollection()).thenReturn(collection);
+    when(connection.getCollection()).thenReturn((MongoCollection) collection);
   }
 
   @Test
+  @SuppressWarnings("unchecked")
   public void testStore() {
-    Processor store = new NestedItemSink.Processor(connection);
+    try (Processor store = new NestedItemSink.Processor(connection)) {
 
-    Mockito.reset(collection);
+      Mockito.reset(collection);
 
-    Item item = new TestItem();
-    Content content = addContent(item, "test", "testing");
-    Annotation annotation = addAnnotation(content, "test", 0, 1);
+      Item item = new TestItem();
+      Content<String> content = addContent(item, "test", "testing");
+      addAnnotation(content, "test", 0, 1);
 
-    ProcessorResponse response = store.process(item);
-    assertEquals(Status.OK, response.getStatus());
-    Mockito.verify(collection, Mockito.times(1)).insertOne(Mockito.any(Document.class));
+      ProcessorResponse response = store.process(item);
+      assertEquals(Status.OK, response.getStatus());
+      verify(collection, times(1)).insertOne(any(Document.class));
+    }
   }
 
   @Test
+  @SuppressWarnings("unchecked")
   public void testStoreNonSerializableItem() {
-    Processor store = new NestedItemSink.Processor(connection);
+    try (Processor store = new NestedItemSink.Processor(connection)) {
 
-    TestItem item = new TestItem();
-    Content content = mock(Content.class);
-    when(content.getId()).thenReturn("test");
-    when(content.getDescription()).thenReturn("desc");
-    when(content.getAnnotations()).thenReturn(new TestAnnotationStore(content));
-    when(content.getData()).thenReturn(new NonSerializableTestData("test"));
-    when(content.getProperties()).thenReturn(new TestProperties());
-    doReturn(Text.class).when(content).getContentClass();
-    item.setContent(Collections.singletonMap("content", content));
+      TestItem item = new TestItem();
+      Content<NonSerializableTestData> content = mock(Content.class);
+      when(content.getId()).thenReturn("test");
+      when(content.getDescription()).thenReturn("desc");
+      when(content.getAnnotations()).thenReturn(new TestAnnotationStore(content));
+      when(content.getData()).thenReturn(new NonSerializableTestData("test"));
+      when(content.getProperties()).thenReturn(new TestProperties());
+      doReturn(Text.class).when(content).getContentClass();
+      item.setContent(Collections.singletonMap("content", content));
 
-    ProcessorResponse processResponse = store.process(item);
-    assertEquals(Status.ITEM_ERROR, processResponse.getStatus());
-    Mockito.verify(collection, times(0)).insertOne(Mockito.any());
+      ProcessorResponse processResponse = store.process(item);
+      assertEquals(Status.ITEM_ERROR, processResponse.getStatus());
+      verify(collection, times(0)).insertOne(any());
+    }
   }
 }

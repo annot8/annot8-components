@@ -14,6 +14,7 @@ import io.annot8.common.components.AbstractProcessor;
 import io.annot8.common.components.AbstractProcessorDescriptor;
 import io.annot8.common.components.capabilities.SimpleCapabilities;
 import java.util.List;
+import java.util.Optional;
 
 @ComponentName("Item Property as Boolean")
 @ComponentDescription("Converts an existing Item Property into a Boolean")
@@ -42,8 +43,9 @@ public class ItemPropertyAsBoolean
 
     @Override
     public ProcessorResponse process(Item item) {
-      if (item.getProperties().has(settings.getKey())) {
-        Object o = item.getProperties().get(settings.getKey()).get();
+      Optional<Object> value = item.getProperties().get(settings.getKey());
+      if (value.isPresent()) {
+        Object o = value.get();
 
         if (!Boolean.class.isAssignableFrom(o.getClass())) {
           item.getProperties()

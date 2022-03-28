@@ -28,25 +28,24 @@ public class CSVExtractorTest extends AbstractCSVDataTest {
     doReturn(FileContent.class).when(content).getContentClass();
     item.save(content);
 
-    CSVExtractor.Processor extractor = new CSVExtractor.Processor(false, false, List.of("csv"));
-    ProcessorResponse response = null;
-    try {
-      response = extractor.process(item);
+    try (CSVExtractor.Processor extractor =
+        new CSVExtractor.Processor(false, false, List.of("csv"))) {
+      ProcessorResponse response = extractor.process(item);
+
+      assertEquals(Status.OK, response.getStatus());
+
+      List<TableContent> tables = item.getContents(TableContent.class).collect(Collectors.toList());
+      assertEquals(1, tables.size());
+
+      TableContent tableContent = tables.get(0);
+      assertEquals(
+          "test.csv",
+          tableContent
+              .getProperties()
+              .get(CSVExtractor.Processor.PROPERTY_FILE, String.class)
+              .orElse(null));
     } catch (Exception e) {
       fail("No error expected during test", e);
     }
-
-    assertEquals(Status.OK, response.getStatus());
-
-    List<TableContent> tables = item.getContents(TableContent.class).collect(Collectors.toList());
-    assertEquals(1, tables.size());
-
-    TableContent tableContent = tables.get(0);
-    assertEquals(
-        "test.csv",
-        tableContent
-            .getProperties()
-            .get(CSVExtractor.Processor.PROPERTY_FILE, String.class)
-            .orElse(null));
   }
 }

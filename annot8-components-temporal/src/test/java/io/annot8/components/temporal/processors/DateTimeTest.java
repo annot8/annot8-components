@@ -66,7 +66,7 @@ public class DateTimeTest {
     try (Processor p = new DateTime.Processor()) {
       Item item = new TestItem();
 
-      //    Item item = new SimpleItem(itemFactory, contentBuilderFactoryRegistry);
+      // Item item = new SimpleItem(itemFactory, contentBuilderFactoryRegistry);
       Text content = item.createContent(TestStringContent.class).withData(text).save();
 
       p.process(item);

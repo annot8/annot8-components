@@ -149,39 +149,40 @@ public class KeyValuePairsTest {
     KeyValuePairs.Settings s = new KeyValuePairs.Settings();
     s.setMaxKeyLength(5);
 
-    KeyValuePairs.Processor p = new KeyValuePairs.Processor(s);
+    try (KeyValuePairs.Processor p = new KeyValuePairs.Processor(s)) {
 
-    assertEquals(ProcessorResponse.ok(), p.process(item));
+      assertEquals(ProcessorResponse.ok(), p.process(item));
 
-    assertEquals(
-        2, text.getAnnotations().getByType(AnnotationTypes.ANNOTATION_TYPE_METADATA).count());
+      assertEquals(
+          2, text.getAnnotations().getByType(AnnotationTypes.ANNOTATION_TYPE_METADATA).count());
 
-    assertFalse(
-        text.getAnnotations()
-            .getAll()
-            .anyMatch(
-                a ->
-                    a.getProperties()
-                        .get(PropertyKeys.PROPERTY_KEY_KEY)
-                        .orElseThrow()
-                        .equals("longKeyOver5Letters")));
-    assertTrue(
-        text.getAnnotations()
-            .getAll()
-            .anyMatch(
-                a ->
-                    a.getProperties()
-                        .get(PropertyKeys.PROPERTY_KEY_KEY)
-                        .orElseThrow()
-                        .equals("short")));
-    assertTrue(
-        text.getAnnotations()
-            .getAll()
-            .anyMatch(
-                a ->
-                    a.getProperties()
-                        .get(PropertyKeys.PROPERTY_KEY_KEY)
-                        .orElseThrow()
-                        .equals("key")));
+      assertFalse(
+          text.getAnnotations()
+              .getAll()
+              .anyMatch(
+                  a ->
+                      a.getProperties()
+                          .get(PropertyKeys.PROPERTY_KEY_KEY)
+                          .orElseThrow()
+                          .equals("longKeyOver5Letters")));
+      assertTrue(
+          text.getAnnotations()
+              .getAll()
+              .anyMatch(
+                  a ->
+                      a.getProperties()
+                          .get(PropertyKeys.PROPERTY_KEY_KEY)
+                          .orElseThrow()
+                          .equals("short")));
+      assertTrue(
+          text.getAnnotations()
+              .getAll()
+              .anyMatch(
+                  a ->
+                      a.getProperties()
+                          .get(PropertyKeys.PROPERTY_KEY_KEY)
+                          .orElseThrow()
+                          .equals("key")));
+    }
   }
 }

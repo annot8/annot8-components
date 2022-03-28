@@ -40,6 +40,7 @@ public class FilterItemContent
     private final List<Class<Content<?>>> contentClasses = new ArrayList<>();
     private final boolean discardMatching;
 
+    @SuppressWarnings("unchecked")
     public Processor(List<String> contentClasses, boolean discardMatching) {
       contentClasses.forEach(
           s -> {

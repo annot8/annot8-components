@@ -24,22 +24,23 @@ public class SpaceyNERIT {
 
     SpacyServerSettings s = new SpacyServerSettings();
     s.setBaseUri("http://localhost:8000");
-    SpacyNER.Processor p = new SpacyNER.Processor(s);
+    try (SpacyNER.Processor p = new SpacyNER.Processor(s)) {
 
-    ProcessorResponse r = p.process(item);
-    assertEquals(ProcessorResponse.ok(), r);
+      ProcessorResponse r = p.process(item);
+      assertEquals(ProcessorResponse.ok(), r);
 
-    List<Annotation> a = t.getAnnotations().getAll().collect(Collectors.toList());
-    assertEquals(4, a.size());
+      List<Annotation> a = t.getAnnotations().getAll().collect(Collectors.toList());
+      assertEquals(4, a.size());
 
-    List<String> as =
-        a.stream()
-            .map(an -> an.getType() + ": " + an.getBounds().getData(t).get())
-            .collect(Collectors.toList());
+      List<String> as =
+          a.stream()
+              .map(an -> an.getType() + ": " + an.getBounds().getData(t).get())
+              .collect(Collectors.toList());
 
-    assertTrue(as.contains("entity/person: Bill Gates"));
-    assertTrue(as.contains("entity/person: Paul Allen"));
-    assertTrue(as.contains("entity/organisation: Microsoft"));
-    assertTrue(as.contains("entity/temporal: 1975"));
+      assertTrue(as.contains("entity/person: Bill Gates"));
+      assertTrue(as.contains("entity/person: Paul Allen"));
+      assertTrue(as.contains("entity/organisation: Microsoft"));
+      assertTrue(as.contains("entity/temporal: 1975"));
+    }
   }
 }

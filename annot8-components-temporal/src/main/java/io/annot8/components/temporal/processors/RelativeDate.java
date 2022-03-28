@@ -101,6 +101,7 @@ public class RelativeDate
         settings.dateFormatter(), settings.getDateProperties(), settings.isUseTodayAsRelative());
   }
 
+  @SuppressWarnings("java:S5843")
   public static class Processor extends AbstractTextProcessor {
 
     private DateTimeFormatter dtf;
@@ -109,6 +110,7 @@ public class RelativeDate
 
     private static final String DAYS =
         "(Mon|Monday|Tue|Tues|Tuesday|Wed|Wednesday|Thu|Thurs|Thursday|Fri|Friday|Sat|Saturday|Sun|Sunday)";
+
     private static final String MONTHS =
         "(January|Jan|February|Feb|March|Mar|April|Apr|May|June|Jun|July|Jul|August|Aug|September|Sept|Sep|October|Oct|November|Nov|December|Dec)";
 
@@ -497,6 +499,7 @@ public class RelativeDate
           .save();
     }
 
+    @SuppressWarnings("rawtypes")
     private void createResolvedIntervalAnnotation(
         Text content,
         int charBegin,

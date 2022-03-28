@@ -44,11 +44,13 @@ public class Time extends AbstractProcessorDescriptor<Time.Processor, NoSettings
         .build();
   }
 
+  // Deep type hierarchy
+  @SuppressWarnings({"java:S110", "java:S5852"})
   public static class Processor extends AbstractQuantityProcessor {
 
     public static final int YEAR_TO_SECOND = 31536000;
-    public static final int MONTH_TO_SECOND =
-        2628000; // differs from Baleen 2 - this is YEAR_TO_SECOND / 12
+    public static final int MONTH_TO_SECOND = 2628000; // differs from Baleen 2 - this is
+    // YEAR_TO_SECOND / 12
     public static final int WEEK_TO_SECOND = 604800;
     public static final int DAY_TO_SECOND = 86400;
 

@@ -53,22 +53,23 @@ public class KafkaSourceTest {
     startOffsets.put(tpFr, 0L);
     mockConsumer.updateBeginningOffsets(startOffsets);
 
-    KafkaSource.Source source = new KafkaSource.Source(mockConsumer, List.of("en", "fr"));
+    try (KafkaSource.Source source = new KafkaSource.Source(mockConsumer, List.of("en", "fr"))) {
 
-    mockConsumer.rebalance(Arrays.asList(tpEn, tpFr));
-    mockConsumer.addRecord(new ConsumerRecord<>("en", 0, 0, "greeting", "Hello"));
-    mockConsumer.addRecord(new ConsumerRecord<>("fr", 1, 0, "greeting", "Bonjour"));
+      mockConsumer.rebalance(Arrays.asList(tpEn, tpFr));
+      mockConsumer.addRecord(new ConsumerRecord<>("en", 0, 0, "greeting", "Hello"));
+      mockConsumer.addRecord(new ConsumerRecord<>("fr", 1, 0, "greeting", "Bonjour"));
 
-    TestItemFactory tif = new TestItemFactory();
+      TestItemFactory tif = new TestItemFactory();
 
-    assertEquals(SourceResponse.ok(), source.read(tif));
-    assertEquals(2, tif.getCreatedItems().size());
+      assertEquals(SourceResponse.ok(), source.read(tif));
+      assertEquals(2, tif.getCreatedItems().size());
 
-    assertEquals(SourceResponse.empty(), source.read(tif));
+      assertEquals(SourceResponse.empty(), source.read(tif));
 
-    mockConsumer.addRecord(new ConsumerRecord<>("en", 0, 1, "greeting", "Hi"));
-    assertEquals(SourceResponse.ok(), source.read(tif));
-    assertEquals(3, tif.getCreatedItems().size());
+      mockConsumer.addRecord(new ConsumerRecord<>("en", 0, 1, "greeting", "Hi"));
+      assertEquals(SourceResponse.ok(), source.read(tif));
+      assertEquals(3, tif.getCreatedItems().size());
+    }
   }
 
   @Test

@@ -20,13 +20,14 @@ public class RemoveEmptyPropertiesTest {
     item.getProperties().set("stringProperty", "Hello World!");
     item.getProperties().set("intProperty", 123);
 
-    RemoveEmptyProperties.Processor p = new RemoveEmptyProperties.Processor();
-    p.process(item);
+    try (RemoveEmptyProperties.Processor p = new RemoveEmptyProperties.Processor()) {
+      p.process(item);
 
-    List<String> keys = item.getProperties().keys().collect(Collectors.toList());
-    assertEquals(2, keys.size());
-    assertTrue(keys.contains("stringProperty"));
-    assertTrue(keys.contains("intProperty"));
+      List<String> keys = item.getProperties().keys().collect(Collectors.toList());
+      assertEquals(2, keys.size());
+      assertTrue(keys.contains("stringProperty"));
+      assertTrue(keys.contains("intProperty"));
+    }
   }
 
   @Test

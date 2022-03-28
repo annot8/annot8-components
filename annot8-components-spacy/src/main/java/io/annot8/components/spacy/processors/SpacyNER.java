@@ -41,6 +41,8 @@ public class SpacyNER extends AbstractProcessorDescriptor<SpacyNER.Processor, Sp
     return builder.build();
   }
 
+  // Deep type hierarchy
+  @SuppressWarnings("java:S110")
   public static class Processor extends SpacyServerProcessor {
     public Processor(SpacyServerSettings settings) {
       super(settings);

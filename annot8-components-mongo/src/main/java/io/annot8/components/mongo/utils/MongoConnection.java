@@ -1,10 +1,10 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
-package io.annot8.components.mongo.resources;
+package io.annot8.components.mongo.utils;
 
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
-public interface MongoConnection {
+public interface MongoConnection<D> {
 
   MongoDatabase getDatabase();
 
@@ -12,7 +12,7 @@ public interface MongoConnection {
     return getCollection().withDocumentClass(clazz);
   }
 
-  MongoCollection getCollection();
+  MongoCollection<D> getCollection();
 
   void disconnect();
 }

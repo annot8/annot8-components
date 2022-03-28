@@ -24,12 +24,13 @@ public class AnnotationsToPropertiesTest {
     s.setStrategy(AnnotationsToProperties.Strategy.MOST_COMMON);
     s.setPropertyNameTransformation(AnnotationsToProperties.StringTransformation.NONE);
 
-    AnnotationsToProperties.Processor p = new AnnotationsToProperties.Processor(s);
-    p.process(item);
+    try (AnnotationsToProperties.Processor p = new AnnotationsToProperties.Processor(s)) {
+      p.process(item);
 
-    assertEquals(1, item.getProperties().getAll().size());
-    assertTrue(item.getProperties().has("First Name"));
-    assertEquals("Alice", item.getProperties().get("First Name").get());
+      assertEquals(1, item.getProperties().getAll().size());
+      assertTrue(item.getProperties().has("First Name"));
+      assertEquals("Alice", item.getProperties().get("First Name").get());
+    }
   }
 
   @Test
@@ -43,12 +44,13 @@ public class AnnotationsToPropertiesTest {
     s.setStrategy(AnnotationsToProperties.Strategy.LEAST_COMMON);
     s.setPropertyNameTransformation(AnnotationsToProperties.StringTransformation.CAMEL_CASE);
 
-    AnnotationsToProperties.Processor p = new AnnotationsToProperties.Processor(s);
-    p.process(item);
+    try (AnnotationsToProperties.Processor p = new AnnotationsToProperties.Processor(s)) {
+      p.process(item);
 
-    assertEquals(1, item.getProperties().getAll().size());
-    assertTrue(item.getProperties().has("firstName"));
-    assertEquals("Al", item.getProperties().get("firstName").get());
+      assertEquals(1, item.getProperties().getAll().size());
+      assertTrue(item.getProperties().has("firstName"));
+      assertEquals("Al", item.getProperties().get("firstName").get());
+    }
   }
 
   private Item createTestItem() {

@@ -16,6 +16,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 public class MoveSourceFileTest {
+
   @Test
   public void testMove() throws IOException {
     Path input = Files.createTempDirectory("tmp-msf-input");
@@ -33,21 +34,22 @@ public class MoveSourceFileTest {
     s.setCopyOriginalFile(false);
     s.setRootOutputFolder(output);
 
-    MoveSourceFile.Processor p = new MoveSourceFile.Processor(s);
-    ProcessorResponse pr = p.process(i);
-    assertEquals(ProcessorResponse.ok(), pr);
+    try (MoveSourceFile.Processor p = new MoveSourceFile.Processor(s)) {
+      ProcessorResponse pr = p.process(i);
+      assertEquals(ProcessorResponse.ok(), pr);
 
-    File fOut = new File(output.toFile(), "example.txt");
-    assertTrue(fOut.exists());
-    assertFalse(f.exists());
+      File fOut = new File(output.toFile(), "example.txt");
+      assertTrue(fOut.exists());
+      assertFalse(f.exists());
 
-    assertEquals(
-        fOut.toPath().toString(),
-        i.getProperties().get(PropertyKeys.PROPERTY_KEY_SOURCE).get().toString());
+      assertEquals(
+          fOut.toPath().toString(),
+          i.getProperties().get(PropertyKeys.PROPERTY_KEY_SOURCE).get().toString());
 
-    input.toFile().delete();
-    fOut.delete();
-    output.toFile().delete();
+      input.toFile().delete();
+      fOut.delete();
+      output.toFile().delete();
+    }
   }
 
   @Test
@@ -67,22 +69,23 @@ public class MoveSourceFileTest {
     s.setCopyOriginalFile(true);
     s.setRootOutputFolder(output);
 
-    MoveSourceFile.Processor p = new MoveSourceFile.Processor(s);
-    ProcessorResponse pr = p.process(i);
-    assertEquals(ProcessorResponse.ok(), pr);
+    try (MoveSourceFile.Processor p = new MoveSourceFile.Processor(s)) {
+      ProcessorResponse pr = p.process(i);
+      assertEquals(ProcessorResponse.ok(), pr);
 
-    File fOut = new File(output.toFile(), "example.txt");
-    assertTrue(fOut.exists());
-    assertTrue(f.exists());
+      File fOut = new File(output.toFile(), "example.txt");
+      assertTrue(fOut.exists());
+      assertTrue(f.exists());
 
-    assertEquals(
-        f.toPath().toString(),
-        i.getProperties().get(PropertyKeys.PROPERTY_KEY_SOURCE).get().toString());
+      assertEquals(
+          f.toPath().toString(),
+          i.getProperties().get(PropertyKeys.PROPERTY_KEY_SOURCE).get().toString());
 
-    f.delete();
-    input.toFile().delete();
-    fOut.delete();
-    output.toFile().delete();
+      f.delete();
+      input.toFile().delete();
+      fOut.delete();
+      output.toFile().delete();
+    }
   }
 
   @Test
@@ -103,22 +106,23 @@ public class MoveSourceFileTest {
     s.setRootOutputFolder(output);
     s.setBasePaths(List.of(input.getParent()));
 
-    MoveSourceFile.Processor p = new MoveSourceFile.Processor(s);
-    ProcessorResponse pr = p.process(i);
-    assertEquals(ProcessorResponse.ok(), pr);
+    try (MoveSourceFile.Processor p = new MoveSourceFile.Processor(s)) {
+      ProcessorResponse pr = p.process(i);
+      assertEquals(ProcessorResponse.ok(), pr);
 
-    File fOut = new File(output.resolve(input.getFileName()).toFile(), "example.txt");
-    assertTrue(fOut.exists());
-    assertFalse(f.exists());
+      File fOut = new File(output.resolve(input.getFileName()).toFile(), "example.txt");
+      assertTrue(fOut.exists());
+      assertFalse(f.exists());
 
-    assertEquals(
-        fOut.toPath().toString(),
-        i.getProperties().get(PropertyKeys.PROPERTY_KEY_SOURCE).get().toString());
+      assertEquals(
+          fOut.toPath().toString(),
+          i.getProperties().get(PropertyKeys.PROPERTY_KEY_SOURCE).get().toString());
 
-    input.toFile().delete();
-    fOut.delete();
-    output.resolve(input.getFileName()).toFile().delete();
-    output.toFile().delete();
+      input.toFile().delete();
+      fOut.delete();
+      output.resolve(input.getFileName()).toFile().delete();
+      output.toFile().delete();
+    }
   }
 
   @Test
@@ -142,20 +146,21 @@ public class MoveSourceFileTest {
     File fOut = new File(output.toFile(), "example.txt");
     fOut.createNewFile();
 
-    MoveSourceFile.Processor p = new MoveSourceFile.Processor(s);
-    ProcessorResponse pr = p.process(i);
-    assertEquals(ProcessorResponse.ok(), pr);
+    try (MoveSourceFile.Processor p = new MoveSourceFile.Processor(s)) {
+      ProcessorResponse pr = p.process(i);
+      assertEquals(ProcessorResponse.ok(), pr);
 
-    assertTrue(fOut.exists());
-    assertFalse(f.exists());
+      assertTrue(fOut.exists());
+      assertFalse(f.exists());
 
-    assertEquals(
-        fOut.toPath().toString(),
-        i.getProperties().get(PropertyKeys.PROPERTY_KEY_SOURCE).get().toString());
+      assertEquals(
+          fOut.toPath().toString(),
+          i.getProperties().get(PropertyKeys.PROPERTY_KEY_SOURCE).get().toString());
 
-    input.toFile().delete();
-    fOut.delete();
-    output.toFile().delete();
+      input.toFile().delete();
+      fOut.delete();
+      output.toFile().delete();
+    }
   }
 
   @Test
@@ -179,13 +184,14 @@ public class MoveSourceFileTest {
     File fOut = new File(output.toFile(), "example.txt");
     fOut.createNewFile();
 
-    MoveSourceFile.Processor p = new MoveSourceFile.Processor(s);
-    ProcessorResponse pr = p.process(i);
-    assertEquals(ProcessorResponse.Status.ITEM_ERROR, pr.getStatus());
+    try (MoveSourceFile.Processor p = new MoveSourceFile.Processor(s)) {
+      ProcessorResponse pr = p.process(i);
+      assertEquals(ProcessorResponse.Status.ITEM_ERROR, pr.getStatus());
 
-    f.delete();
-    input.toFile().delete();
-    output.toFile().delete();
+      f.delete();
+      input.toFile().delete();
+      output.toFile().delete();
+    }
   }
 
   @Test
@@ -193,10 +199,11 @@ public class MoveSourceFileTest {
     Item i = new TestItem();
 
     MoveSourceFile.Settings s = new MoveSourceFile.Settings();
-    MoveSourceFile.Processor p = new MoveSourceFile.Processor(s);
+    try (MoveSourceFile.Processor p = new MoveSourceFile.Processor(s)) {
 
-    ProcessorResponse pr = p.process(i);
-    assertEquals(ProcessorResponse.ok(), pr);
+      ProcessorResponse pr = p.process(i);
+      assertEquals(ProcessorResponse.ok(), pr);
+    }
   }
 
   @Test
@@ -205,10 +212,11 @@ public class MoveSourceFileTest {
     i.getProperties().set(PropertyKeys.PROPERTY_KEY_SOURCE, 123);
 
     MoveSourceFile.Settings s = new MoveSourceFile.Settings();
-    MoveSourceFile.Processor p = new MoveSourceFile.Processor(s);
+    try (MoveSourceFile.Processor p = new MoveSourceFile.Processor(s)) {
 
-    ProcessorResponse pr = p.process(i);
-    assertEquals(ProcessorResponse.ok(), pr);
+      ProcessorResponse pr = p.process(i);
+      assertEquals(ProcessorResponse.ok(), pr);
+    }
   }
 
   @Test

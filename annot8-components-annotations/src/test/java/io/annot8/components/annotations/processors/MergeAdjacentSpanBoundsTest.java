@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 
 public class MergeAdjacentSpanBoundsTest {
+
   @Test
   public void testWithTypeFilter() {
     Item item = new TestItem();
@@ -65,36 +66,39 @@ public class MergeAdjacentSpanBoundsTest {
     settings.setAllowableSeparators(Set.of(" ", "\t", "-"));
     settings.setMaxRepeatableSeparators(-1);
 
-    Processor p = new MergeAdjacentSpanBounds.Processor(settings);
+    try (Processor p = new MergeAdjacentSpanBounds.Processor(settings)) {
 
-    ProcessorResponse pr = p.process(item);
-    assertEquals(ProcessorResponse.ok(), pr);
+      ProcessorResponse pr = p.process(item);
+      assertEquals(ProcessorResponse.ok(), pr);
 
-    Content<?> cProcessed = item.getContents().findFirst().get();
+      Content<?> cProcessed = item.getContents().findFirst().get();
 
-    List<Annotation> persons =
-        cProcessed.getAnnotations().getByType("person").collect(Collectors.toList());
-    List<Annotation> time =
-        cProcessed.getAnnotations().getByType("time").collect(Collectors.toList());
+      List<Annotation> persons =
+          cProcessed.getAnnotations().getByType("person").collect(Collectors.toList());
+      List<Annotation> time =
+          cProcessed.getAnnotations().getByType("time").collect(Collectors.toList());
 
-    assertEquals(3, persons.size());
-    assertEquals(2, time.size());
+      assertEquals(3, persons.size());
+      assertEquals(2, time.size());
 
-    List<String> personNames =
-        persons.stream().map(a -> a.getBounds().getData(c).get()).collect(Collectors.toList());
-    assertTrue(personNames.contains("John Doe"));
-    assertTrue(personNames.contains("Ms.\tAlice Bethany  Cox"));
-    assertTrue(personNames.contains("Jane"));
+      List<String> personNames =
+          persons.stream().map(a -> a.getBounds().getData(c).get()).collect(Collectors.toList());
+      assertTrue(personNames.contains("John Doe"));
+      assertTrue(personNames.contains("Ms.\tAlice Bethany  Cox"));
+      assertTrue(personNames.contains("Jane"));
 
-    List<Annotation> surnameProp =
-        persons.stream().filter(a -> a.getProperties().has("surname")).collect(Collectors.toList());
-    assertEquals(1, surnameProp.size());
-    assertEquals(true, surnameProp.get(0).getProperties().get("surname").get());
+      List<Annotation> surnameProp =
+          persons.stream()
+              .filter(a -> a.getProperties().has("surname"))
+              .collect(Collectors.toList());
+      assertEquals(1, surnameProp.size());
+      assertEquals(true, surnameProp.get(0).getProperties().get("surname").get());
 
-    List<String> timeValues =
-        time.stream().map(a -> a.getBounds().getData(c).get()).collect(Collectors.toList());
-    assertTrue(timeValues.contains("last"));
-    assertTrue(timeValues.contains("week"));
+      List<String> timeValues =
+          time.stream().map(a -> a.getBounds().getData(c).get()).collect(Collectors.toList());
+      assertTrue(timeValues.contains("last"));
+      assertTrue(timeValues.contains("week"));
+    }
   }
 
   @Test
@@ -143,34 +147,37 @@ public class MergeAdjacentSpanBoundsTest {
     settings.setAllowableSeparators(Set.of(" ", "\t", "-"));
     settings.setMaxRepeatableSeparators(-1);
 
-    Processor p = new MergeAdjacentSpanBounds.Processor(settings);
+    try (Processor p = new MergeAdjacentSpanBounds.Processor(settings)) {
 
-    ProcessorResponse pr = p.process(item);
-    assertEquals(ProcessorResponse.ok(), pr);
+      ProcessorResponse pr = p.process(item);
+      assertEquals(ProcessorResponse.ok(), pr);
 
-    Content<?> cProcessed = item.getContents().findFirst().get();
+      Content<?> cProcessed = item.getContents().findFirst().get();
 
-    List<Annotation> persons =
-        cProcessed.getAnnotations().getByType("person").collect(Collectors.toList());
-    List<Annotation> time =
-        cProcessed.getAnnotations().getByType("time").collect(Collectors.toList());
+      List<Annotation> persons =
+          cProcessed.getAnnotations().getByType("person").collect(Collectors.toList());
+      List<Annotation> time =
+          cProcessed.getAnnotations().getByType("time").collect(Collectors.toList());
 
-    assertEquals(3, persons.size());
-    assertEquals(1, time.size());
+      assertEquals(3, persons.size());
+      assertEquals(1, time.size());
 
-    List<String> personNames =
-        persons.stream().map(a -> a.getBounds().getData(c).get()).collect(Collectors.toList());
-    assertTrue(personNames.contains("John Doe"));
-    assertTrue(personNames.contains("Ms.\tAlice Bethany  Cox"));
-    assertTrue(personNames.contains("Jane"));
+      List<String> personNames =
+          persons.stream().map(a -> a.getBounds().getData(c).get()).collect(Collectors.toList());
+      assertTrue(personNames.contains("John Doe"));
+      assertTrue(personNames.contains("Ms.\tAlice Bethany  Cox"));
+      assertTrue(personNames.contains("Jane"));
 
-    List<Annotation> surnameProp =
-        persons.stream().filter(a -> a.getProperties().has("surname")).collect(Collectors.toList());
-    assertEquals(1, surnameProp.size());
-    assertEquals(true, surnameProp.get(0).getProperties().get("surname").get());
+      List<Annotation> surnameProp =
+          persons.stream()
+              .filter(a -> a.getProperties().has("surname"))
+              .collect(Collectors.toList());
+      assertEquals(1, surnameProp.size());
+      assertEquals(true, surnameProp.get(0).getProperties().get("surname").get());
 
-    List<String> timeValues =
-        time.stream().map(a -> a.getBounds().getData(c).get()).collect(Collectors.toList());
-    assertTrue(timeValues.contains("last week"));
+      List<String> timeValues =
+          time.stream().map(a -> a.getBounds().getData(c).get()).collect(Collectors.toList());
+      assertTrue(timeValues.contains("last week"));
+    }
   }
 }

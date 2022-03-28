@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 
 public class DocumentExtractorTest {
+
   @Test
   public void testDoc() {
     testInputStream("testDocument.doc", new DocExtractorTest());
@@ -80,19 +81,20 @@ public class DocumentExtractorTest {
 
   private void testInputStream(
       String fileName, AbstractDocumentExtractorTest t, DocumentExtractor.Settings s) {
-    DocumentExtractor.Processor p = new DocumentExtractor.Processor(new SimpleContext(), s);
+    try (DocumentExtractor.Processor p = new DocumentExtractor.Processor(new SimpleContext(), s)) {
 
-    Item item = new TestItem();
-    item.createContent(InputStreamContent.class)
-        .withData(() -> DocumentExtractorTest.class.getResourceAsStream(fileName))
-        .save();
+      Item item = new TestItem();
+      item.createContent(InputStreamContent.class)
+          .withData(() -> DocumentExtractorTest.class.getResourceAsStream(fileName))
+          .save();
 
-    assertEquals(ProcessorResponse.ok(), p.process(item));
+      assertEquals(ProcessorResponse.ok(), p.process(item));
 
-    t.validateText(item.getContents(Text.class).collect(Collectors.toList()));
-    t.validateImages(item.getContents(Image.class).collect(Collectors.toList()));
-    t.validateTables(item.getContents(TableContent.class).collect(Collectors.toList()));
-    t.validateMetadata(item.getProperties());
+      t.validateText(item.getContents(Text.class).collect(Collectors.toList()));
+      t.validateImages(item.getContents(Image.class).collect(Collectors.toList()));
+      t.validateTables(item.getContents(TableContent.class).collect(Collectors.toList()));
+      t.validateMetadata(item.getProperties());
+    }
   }
 
   private void testFile(String fileName, AbstractDocumentExtractorTest t) {
@@ -101,24 +103,25 @@ public class DocumentExtractorTest {
 
   private void testFile(
       String fileName, AbstractDocumentExtractorTest t, DocumentExtractor.Settings s) {
-    DocumentExtractor.Processor p = new DocumentExtractor.Processor(new SimpleContext(), s);
+    try (DocumentExtractor.Processor p = new DocumentExtractor.Processor(new SimpleContext(), s)) {
 
-    URL resource = DocumentExtractorTest.class.getResource(fileName);
-    File file;
-    try {
-      file = Paths.get(resource.toURI()).toFile();
-    } catch (URISyntaxException e) {
-      throw new RuntimeException(e);
+      URL resource = DocumentExtractorTest.class.getResource(fileName);
+      File file;
+      try {
+        file = Paths.get(resource.toURI()).toFile();
+      } catch (URISyntaxException e) {
+        throw new RuntimeException(e);
+      }
+
+      Item item = new TestItem();
+      item.createContent(FileContent.class).withData(file).save();
+
+      assertEquals(ProcessorResponse.ok(), p.process(item));
+
+      t.validateText(item.getContents(Text.class).collect(Collectors.toList()));
+      t.validateImages(item.getContents(Image.class).collect(Collectors.toList()));
+      t.validateTables(item.getContents(TableContent.class).collect(Collectors.toList()));
+      t.validateMetadata(item.getProperties());
     }
-
-    Item item = new TestItem();
-    item.createContent(FileContent.class).withData(file).save();
-
-    assertEquals(ProcessorResponse.ok(), p.process(item));
-
-    t.validateText(item.getContents(Text.class).collect(Collectors.toList()));
-    t.validateImages(item.getContents(Image.class).collect(Collectors.toList()));
-    t.validateTables(item.getContents(TableContent.class).collect(Collectors.toList()));
-    t.validateMetadata(item.getProperties());
   }
 }

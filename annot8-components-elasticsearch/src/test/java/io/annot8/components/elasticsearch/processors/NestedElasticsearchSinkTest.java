@@ -15,7 +15,8 @@ import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
-public class NestedElasticsearchSinkTest {
+@SuppressWarnings("unchecked")
+class NestedElasticsearchSinkTest {
 
   @Test
   public void testTransformData() {

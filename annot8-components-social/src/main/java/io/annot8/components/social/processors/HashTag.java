@@ -33,6 +33,8 @@ public class HashTag extends AbstractProcessorDescriptor<HashTag.Processor, NoSe
         .build();
   }
 
+  // Deep type hierarchy
+  @SuppressWarnings("java:S110")
   public static class Processor extends AbstractRegexProcessor {
     public Processor() {
       super(

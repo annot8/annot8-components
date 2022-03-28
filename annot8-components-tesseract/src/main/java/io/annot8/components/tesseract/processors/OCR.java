@@ -51,7 +51,7 @@ public class OCR extends AbstractProcessorDescriptor<OCR.Processor, OCR.Settings
     instance.setLanguage(settings.getLanguage());
     instance.setOcrEngineMode(settings.getOcrEngine());
     instance.setPageSegMode(settings.getPageSegmentation());
-    settings.getVariables().forEach(instance::setTessVariable);
+    settings.getVariables().forEach(instance::setVariable);
 
     return new Processor(settings.getExtensions(), instance);
   }

@@ -1,13 +1,14 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
-package io.annot8.components.mongo.resources;
+package io.annot8.components.mongo.utils;
 
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import io.annot8.components.mongo.resources.MongoConnectionSettings;
 import org.bson.Document;
 
-public class Mongo implements MongoConnection {
+public class Mongo implements MongoConnection<Document> {
 
   private MongoClient client;
   private MongoDatabase database;
@@ -24,7 +25,7 @@ public class Mongo implements MongoConnection {
     return database;
   }
 
-  public MongoCollection getCollection() {
+  public MongoCollection<Document> getCollection() {
     return collection;
   }
 

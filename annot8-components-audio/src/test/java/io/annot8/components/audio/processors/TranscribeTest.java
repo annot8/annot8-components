@@ -14,6 +14,7 @@ import javax.sound.sampled.AudioSystem;
 import org.junit.jupiter.api.Test;
 
 public class TranscribeTest {
+
   @Test
   public void test() throws Exception {
     Transcribe.Settings s = new Transcribe.Settings();

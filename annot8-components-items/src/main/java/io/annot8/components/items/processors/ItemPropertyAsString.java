@@ -13,6 +13,7 @@ import io.annot8.api.settings.Description;
 import io.annot8.common.components.AbstractProcessor;
 import io.annot8.common.components.AbstractProcessorDescriptor;
 import io.annot8.common.components.capabilities.SimpleCapabilities;
+import java.util.Optional;
 
 @ComponentName("Item Property as String")
 @ComponentDescription("Converts an existing Item Property into a String")
@@ -41,8 +42,9 @@ public class ItemPropertyAsString
 
     @Override
     public ProcessorResponse process(Item item) {
-      if (item.getProperties().has(settings.getKey())) {
-        Object o = item.getProperties().get(settings.getKey()).get();
+      Optional<Object> value = item.getProperties().get(settings.getKey());
+      if (value.isPresent()) {
+        Object o = value.get();
 
         item.getProperties().set(settings.getKey(), o.toString());
       }

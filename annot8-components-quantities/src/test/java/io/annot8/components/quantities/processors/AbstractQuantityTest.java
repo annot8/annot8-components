@@ -17,19 +17,19 @@ import org.junit.jupiter.api.Assertions;
 
 public abstract class AbstractQuantityTest {
 
-  private final Class<? extends AbstractProcessorDescriptor> clazz;
+  private final Class<? extends AbstractProcessorDescriptor<?, ?>> clazz;
   private final String type;
   private final String unit;
 
   public AbstractQuantityTest(
-      Class<? extends AbstractProcessorDescriptor> clazz, String type, String unit) {
+      Class<? extends AbstractProcessorDescriptor<?, ?>> clazz, String type, String unit) {
     this.clazz = clazz;
     this.type = type;
     this.unit = unit;
   }
 
   protected void test(String text, String expectedMatch, Double expectedValue) throws Exception {
-    AbstractProcessorDescriptor pd = clazz.getConstructor().newInstance();
+    AbstractProcessorDescriptor<?, ?> pd = clazz.getConstructor().newInstance();
 
     try (Processor p = (Processor) pd.create(new SimpleContext())) {
       Item item = new TestItem();
@@ -59,7 +59,7 @@ public abstract class AbstractQuantityTest {
   }
 
   protected void testCount(String text, Integer count) throws Exception {
-    AbstractProcessorDescriptor pd = clazz.getConstructor().newInstance();
+    AbstractProcessorDescriptor<?, ?> pd = clazz.getConstructor().newInstance();
 
     try (Processor p = (Processor) pd.create(new SimpleContext())) {
       Item item = new TestItem();

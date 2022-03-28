@@ -10,6 +10,7 @@ import javax.ws.rs.core.GenericType;
 @javax.annotation.processing.Generated(
     value = "org.openapitools.codegen.languages.JavaClientCodegen",
     date = "2021-04-21T10:03:16.456502+01:00[Europe/London]")
+@SuppressWarnings("rawtypes")
 public abstract class AbstractOpenApiSchema {
 
   // store the actual instance of the schema/object

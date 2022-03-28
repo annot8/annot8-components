@@ -13,7 +13,6 @@ import io.annot8.api.settings.Description;
 import io.annot8.common.components.AbstractProcessor;
 import io.annot8.common.components.AbstractProcessorDescriptor;
 import io.annot8.common.components.capabilities.SimpleCapabilities;
-import java.util.Optional;
 
 @ComponentName("Filter Items by Property")
 @ComponentDescription("Discard items that match a specified property")
@@ -44,29 +43,26 @@ public class FilterItemsByProperty
       this.discardMatching = discardMatching;
     }
 
+    private boolean valueMatches(Object o) {
+      return o.equals(value);
+    }
+
+    private boolean nullMatches() {
+      return value == null;
+    }
+
     @Override
     public ProcessorResponse process(Item item) {
-      Optional<Object> match = item.getProperties().get(key);
+      boolean matches =
+          item.getProperties().get(key).map(this::valueMatches).orElseGet(this::nullMatches);
 
-      if (value == null) {
-        // Discard instances where there is no match (i.e. value is null)
-        if (discardMatching && match.isEmpty()) {
-          item.discard();
-        } else if (!discardMatching && match.isPresent()) {
-          // Discard instances where there is a match (i.e. value isn't null)
+      if (discardMatching) {
+        if (matches) {
           item.discard();
         }
       } else {
-        if (discardMatching) {
-          if (match.isPresent() && match.get().equals(value)) {
-            // The property is present and it matches, so discard
-            item.discard();
-          }
-        } else {
-          if (match.isEmpty() || !match.get().equals(value)) {
-            // The property isn't present, or it is but doesn't match, so discard
-            item.discard();
-          }
+        if (!matches) {
+          item.discard();
         }
       }
 

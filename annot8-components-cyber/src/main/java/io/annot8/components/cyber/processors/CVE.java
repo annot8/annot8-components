@@ -36,6 +36,8 @@ public class CVE extends AbstractProcessorDescriptor<CVE.Processor, NoSettings> 
         .build();
   }
 
+  // Deep type hierarchy
+  @SuppressWarnings("java:S110")
   public static class Processor extends AbstractRegexProcessor {
 
     public Processor() {

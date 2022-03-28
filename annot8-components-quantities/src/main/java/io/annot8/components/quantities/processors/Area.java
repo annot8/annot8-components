@@ -32,6 +32,8 @@ public class Area extends AbstractProcessorDescriptor<Area.Processor, NoSettings
         .build();
   }
 
+  // Deep type hierarchy
+  @SuppressWarnings({"java:S110", "java:S5852"})
   public static class Processor extends AbstractQuantityProcessor {
 
     private static final double MM2_TO_M2 = 0.000001;

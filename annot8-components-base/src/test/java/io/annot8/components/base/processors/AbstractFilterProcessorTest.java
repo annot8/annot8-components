@@ -10,22 +10,24 @@ import io.annot8.api.exceptions.Annot8RuntimeException;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-public class AbstractFilterProcessorTest {
+class AbstractFilterProcessorTest {
 
   @Test
   public void testFilterItems() {
-    FilterAll filter = new FilterAll();
-    Item item = Mockito.mock(Item.class);
-    ProcessorResponse processResponse = filter.process(item);
-    assertEquals(Status.OK, processResponse.getStatus());
-    Mockito.verify(item, Mockito.times(1)).discard();
+    try (FilterAll filter = new FilterAll()) {
+      Item item = Mockito.mock(Item.class);
+      ProcessorResponse processResponse = filter.process(item);
+      assertEquals(Status.OK, processResponse.getStatus());
+      Mockito.verify(item, Mockito.times(1)).discard();
+    }
   }
 
   @Test
   public void testFilterError() {
-    FilterError error = new FilterError();
-    ProcessorResponse response = error.process(Mockito.mock(Item.class));
-    assertEquals(ProcessorResponse.Status.ITEM_ERROR, response.getStatus());
+    try (FilterError error = new FilterError()) {
+      ProcessorResponse response = error.process(Mockito.mock(Item.class));
+      assertEquals(ProcessorResponse.Status.ITEM_ERROR, response.getStatus());
+    }
   }
 
   private class FilterAll extends AbstractFilterProcessor {

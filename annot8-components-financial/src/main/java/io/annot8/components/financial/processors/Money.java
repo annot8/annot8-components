@@ -34,6 +34,8 @@ public class Money extends AbstractProcessorDescriptor<Money.Processor, NoSettin
         .build();
   }
 
+  // Deep type hierarchy
+  @SuppressWarnings("java:S110")
   public static class Processor extends AbstractRegexProcessor {
     private static final String NUMBER_REGEX =
         "(?<number>[0-9]{1,3}"

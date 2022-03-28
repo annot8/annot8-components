@@ -68,27 +68,27 @@ public class DocxExtractor
     }
 
     @Override
-    public boolean isMetadataSupported() {
+    protected boolean isMetadataSupported() {
       return true;
     }
 
     @Override
-    public boolean isTextSupported() {
+    protected boolean isTextSupported() {
       return true;
     }
 
     @Override
-    public boolean isImagesSupported() {
+    protected boolean isImagesSupported() {
       return true;
     }
 
     @Override
-    public boolean isTablesSupported() {
+    protected boolean isTablesSupported() {
       return true;
     }
 
     @Override
-    public boolean acceptFile(FileContent file) {
+    protected boolean acceptFile(FileContent file) {
       XWPFDocument doc;
       try {
         doc = new XWPFDocument(new FileInputStream(file.getData()));
@@ -102,7 +102,7 @@ public class DocxExtractor
     }
 
     @Override
-    public boolean acceptInputStream(InputStreamContent inputStream) {
+    protected boolean acceptInputStream(InputStreamContent inputStream) {
       XWPFDocument doc;
       try {
         doc = new XWPFDocument(inputStream.getData());
@@ -120,7 +120,7 @@ public class DocxExtractor
     }
 
     @Override
-    public XWPFDocument extractDocument(FileContent file) throws IOException {
+    protected XWPFDocument extractDocument(FileContent file) throws IOException {
       if (cache.containsKey(file.getId())) {
         return cache.get(file.getId());
       } else {
@@ -129,7 +129,8 @@ public class DocxExtractor
     }
 
     @Override
-    public XWPFDocument extractDocument(InputStreamContent inputStreamContent) throws IOException {
+    protected XWPFDocument extractDocument(InputStreamContent inputStreamContent)
+        throws IOException {
       if (cache.containsKey(inputStreamContent.getId())) {
         return cache.get(inputStreamContent.getId());
       } else {
@@ -138,7 +139,7 @@ public class DocxExtractor
     }
 
     @Override
-    public Map<String, Object> extractMetadata(XWPFDocument doc) {
+    protected Map<String, Object> extractMetadata(XWPFDocument doc) {
       Map<String, Object> metadata = new HashMap<>();
 
       POIXMLProperties.CoreProperties props = doc.getProperties().getCoreProperties();
@@ -185,15 +186,19 @@ public class DocxExtractor
     }
 
     @Override
-    public Collection<ExtractionWithProperties<String>> extractText(XWPFDocument doc) {
+    protected Collection<ExtractionWithProperties<String>> extractText(XWPFDocument doc) {
       // TODO: Should we remove Tables from this?
-
-      XWPFWordExtractor wordExtractor = new XWPFWordExtractor(doc);
-      return List.of(new ExtractionWithProperties<>(wordExtractor.getText()));
+      try (XWPFWordExtractor wordExtractor = new XWPFWordExtractor(doc)) {
+        wordExtractor.setCloseFilesystem(false);
+        return List.of(new ExtractionWithProperties<>(wordExtractor.getText()));
+      } catch (IOException e) {
+        log().warn("Failed to extract text from XWPFDocument", e);
+        return List.of();
+      }
     }
 
     @Override
-    public Collection<ExtractionWithProperties<BufferedImage>> extractImages(XWPFDocument doc) {
+    protected Collection<ExtractionWithProperties<BufferedImage>> extractImages(XWPFDocument doc) {
       List<ExtractionWithProperties<BufferedImage>> extractedImages = new ArrayList<>();
 
       int imageNumber = 0;
@@ -233,7 +238,7 @@ public class DocxExtractor
     }
 
     @Override
-    public Collection<ExtractionWithProperties<Table>> extractTables(XWPFDocument doc)
+    protected Collection<ExtractionWithProperties<Table>> extractTables(XWPFDocument doc)
         throws ProcessingException {
       return doc.getTables().stream().map(Processor::transformTable).collect(Collectors.toList());
     }
@@ -247,10 +252,10 @@ public class DocxExtractor
     private final List<Row> rows;
     private final List<String> columnNames;
 
-    public DocxTable(XWPFTable t) {
-      List<Row> rows = new ArrayList<>(t.getNumberOfRows() - 1);
+    protected DocxTable(XWPFTable t) {
+      List<Row> tmpRows = new ArrayList<>(t.getNumberOfRows() - 1);
+      List<String> tmpColumnNames = Collections.emptyList();
 
-      List<String> columnNames = Collections.emptyList();
       for (int i = 0; i < t.getNumberOfRows(); i++) {
         XWPFTableRow r = t.getRow(i);
 
@@ -262,15 +267,15 @@ public class DocxExtractor
 
         if (i == 0) {
           // Assume header row if first row
-          columnNames = data.stream().map(Object::toString).collect(Collectors.toList());
+          tmpColumnNames = data.stream().map(Object::toString).collect(Collectors.toList());
         } else {
-          Row row = new DefaultRow(i - 1, columnNames, data);
-          rows.add(row);
+          Row row = new DefaultRow(i - 1, tmpColumnNames, data);
+          tmpRows.add(row);
         }
       }
 
-      this.rows = Collections.unmodifiableList(rows);
-      this.columnNames = columnNames;
+      this.rows = Collections.unmodifiableList(tmpRows);
+      this.columnNames = Collections.unmodifiableList(tmpColumnNames);
     }
 
     @Override

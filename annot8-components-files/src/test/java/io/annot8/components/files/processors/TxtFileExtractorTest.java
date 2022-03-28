@@ -7,7 +7,6 @@ import io.annot8.api.components.Processor;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.Text;
 import io.annot8.testing.testimpl.TestItem;
-import io.annot8.testing.testimpl.TestItemFactory;
 import java.io.File;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -24,7 +23,6 @@ public class TxtFileExtractorTest {
         new TxtFileExtractor.Processor(true, List.of("txt"), Charset.defaultCharset().name())) {
 
       TestItem item = new TestItem();
-      TestItemFactory itemFactory = (TestItemFactory) item.getItemFactory();
 
       URL resource = TxtFileExtractorTest.class.getResource("testfilemetadata.txt");
       File f = Paths.get(resource.toURI()).toFile();
@@ -49,7 +47,6 @@ public class TxtFileExtractorTest {
         new TxtFileExtractor.Processor(true, List.of("text"), Charset.defaultCharset().name())) {
 
       TestItem item = new TestItem();
-      TestItemFactory itemFactory = (TestItemFactory) item.getItemFactory();
 
       URL resource = TxtFileExtractorTest.class.getResource("testfilemetadata.txt");
       File f = Paths.get(resource.toURI()).toFile();
@@ -70,7 +67,6 @@ public class TxtFileExtractorTest {
         new TxtFileExtractor.Processor(false, List.of(), Charset.defaultCharset().name())) {
 
       TestItem item = new TestItem();
-      TestItemFactory itemFactory = (TestItemFactory) item.getItemFactory();
 
       URL resource = TxtFileExtractorTest.class.getResource("testfilemetadata.txt");
       File f = Paths.get(resource.toURI()).toFile();

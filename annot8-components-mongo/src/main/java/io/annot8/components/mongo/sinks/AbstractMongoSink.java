@@ -9,8 +9,8 @@ import io.annot8.api.data.Item;
 import io.annot8.api.exceptions.Annot8Exception;
 import io.annot8.api.properties.Properties;
 import io.annot8.components.mongo.AbstractMongoComponent;
-import io.annot8.components.mongo.resources.MongoConnection;
 import io.annot8.components.mongo.resources.MongoConnectionSettings;
+import io.annot8.components.mongo.utils.MongoConnection;
 import java.util.HashMap;
 import java.util.Map;
 import org.bson.Document;
@@ -19,20 +19,20 @@ public abstract class AbstractMongoSink extends AbstractMongoComponent implement
 
   private ObjectMapper mapper = new ObjectMapper();
 
-  AbstractMongoSink(MongoConnectionSettings settings) {
+  protected AbstractMongoSink(MongoConnectionSettings settings) {
     super(settings);
 
     configureMongo(getConnection());
   }
 
-  public AbstractMongoSink(MongoConnection connection) {
+  protected AbstractMongoSink(MongoConnection<Document> connection) {
     super(connection);
     configureMongo(getConnection());
   }
 
   protected abstract void storeItem(Item item) throws Annot8Exception;
 
-  protected abstract void configureMongo(MongoConnection connection);
+  protected abstract void configureMongo(MongoConnection<Document> connection);
 
   @Override
   public ProcessorResponse process(Item item) {

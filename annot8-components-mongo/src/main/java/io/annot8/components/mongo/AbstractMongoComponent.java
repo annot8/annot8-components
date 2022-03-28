@@ -2,9 +2,10 @@
 package io.annot8.components.mongo;
 
 import io.annot8.common.components.AbstractComponent;
-import io.annot8.components.mongo.resources.Mongo;
-import io.annot8.components.mongo.resources.MongoConnection;
 import io.annot8.components.mongo.resources.MongoConnectionSettings;
+import io.annot8.components.mongo.utils.Mongo;
+import io.annot8.components.mongo.utils.MongoConnection;
+import org.bson.Document;
 
 /**
  * Base class for Mongo components which simplifies configuration
@@ -13,18 +14,18 @@ import io.annot8.components.mongo.resources.MongoConnectionSettings;
  */
 public abstract class AbstractMongoComponent extends AbstractComponent {
 
-  private MongoConnection connection = null;
+  private MongoConnection<Document> connection = null;
   private MongoConnectionSettings settings;
 
   protected AbstractMongoComponent(MongoConnectionSettings settings) {
     this.settings = settings;
   }
 
-  public AbstractMongoComponent(MongoConnection connection) {
+  protected AbstractMongoComponent(MongoConnection<Document> connection) {
     this.connection = connection;
   }
 
-  protected MongoConnection getConnection() {
+  protected MongoConnection<Document> getConnection() {
     if (connection == null) {
       connection = new Mongo(settings);
     }

@@ -9,32 +9,35 @@ import io.annot8.api.exceptions.Annot8RuntimeException;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-public class AbstractSplitterTest {
+class AbstractSplitterTest {
 
   @Test
   public void testProcessAcceptingItem() {
     Item item = Mockito.mock(Item.class);
-    AbstractSplitter splitter = new Splitter();
-    ProcessorResponse response = splitter.process(item);
-    Mockito.verify(item, Mockito.times(1)).discard();
-    assertEquals(ProcessorResponse.Status.OK, response.getStatus());
+    try (AbstractSplitter splitter = new Splitter()) {
+      ProcessorResponse response = splitter.process(item);
+      Mockito.verify(item, Mockito.times(1)).discard();
+      assertEquals(ProcessorResponse.Status.OK, response.getStatus());
+    }
   }
 
   @Test
   public void testProcessNonAcceptingItem() {
     Item item = Mockito.mock(Item.class);
-    AbstractSplitter splitter = new NonAcceptingSplitter();
-    ProcessorResponse response = splitter.process(item);
-    assertEquals(ProcessorResponse.Status.OK, response.getStatus());
-    Mockito.verify(item, Mockito.times(0)).discard();
+    try (AbstractSplitter splitter = new NonAcceptingSplitter()) {
+      ProcessorResponse response = splitter.process(item);
+      assertEquals(ProcessorResponse.Status.OK, response.getStatus());
+      Mockito.verify(item, Mockito.times(0)).discard();
+    }
   }
 
   @Test
   public void testProcessError() {
     Item item = Mockito.mock(Item.class);
-    AbstractSplitter splitter = new ErrorSplitter();
-    ProcessorResponse response = splitter.process(item);
-    assertEquals(ProcessorResponse.Status.ITEM_ERROR, response.getStatus());
+    try (AbstractSplitter splitter = new ErrorSplitter()) {
+      ProcessorResponse response = splitter.process(item);
+      assertEquals(ProcessorResponse.Status.ITEM_ERROR, response.getStatus());
+    }
   }
 
   private class Splitter extends AbstractSplitter {

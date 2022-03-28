@@ -3,6 +3,8 @@ package io.annot8.components.base.text.processors;
 
 import java.util.regex.Pattern;
 
+// Deep type hierarchy
+@SuppressWarnings("java:S110")
 public class RegexProcessor extends AbstractRegexProcessor {
 
   public RegexProcessor(Pattern pattern, int group, String type) {

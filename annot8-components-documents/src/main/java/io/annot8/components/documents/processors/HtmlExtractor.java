@@ -63,6 +63,9 @@ public class HtmlExtractor
   public static class Processor
       extends AbstractDocumentExtractorProcessor<Document, HtmlExtractor.Settings> {
 
+    private static final String CHARSET = "charset";
+    private static final String TITLE = "title";
+
     private final HttpClient client;
 
     public Processor(Context context, HtmlExtractor.Settings settings) {
@@ -78,27 +81,27 @@ public class HtmlExtractor
     }
 
     @Override
-    public boolean isMetadataSupported() {
+    protected boolean isMetadataSupported() {
       return true;
     }
 
     @Override
-    public boolean isTextSupported() {
+    protected boolean isTextSupported() {
       return true;
     }
 
     @Override
-    public boolean isImagesSupported() {
+    protected boolean isImagesSupported() {
       return true;
     }
 
     @Override
-    public boolean isTablesSupported() {
+    protected boolean isTablesSupported() {
       return true;
     }
 
     @Override
-    public boolean acceptFile(FileContent file) {
+    protected boolean acceptFile(FileContent file) {
       try {
         return FileMagic.valueOf(file.getData()) == FileMagic.HTML;
       } catch (IOException e) {
@@ -107,7 +110,7 @@ public class HtmlExtractor
     }
 
     @Override
-    public boolean acceptInputStream(InputStreamContent inputStream) {
+    protected boolean acceptInputStream(InputStreamContent inputStream) {
       try (InputStream is = new BufferedInputStream(inputStream.getData())) {
         return FileMagic.valueOf(is) == FileMagic.HTML;
       } catch (IOException e) {
@@ -116,17 +119,17 @@ public class HtmlExtractor
     }
 
     @Override
-    public Document extractDocument(FileContent file) throws IOException {
+    protected Document extractDocument(FileContent file) throws IOException {
       return Jsoup.parse(file.getData(), StandardCharsets.UTF_8.name());
     }
 
     @Override
-    public Document extractDocument(InputStreamContent inputStreamContent) throws IOException {
+    protected Document extractDocument(InputStreamContent inputStreamContent) throws IOException {
       return Jsoup.parse(inputStreamContent.getData(), StandardCharsets.UTF_8.name(), "");
     }
 
     @Override
-    public Map<String, Object> extractMetadata(Document doc) {
+    protected Map<String, Object> extractMetadata(Document doc) {
       Map<String, Object> metadata = new HashMap<>();
 
       metadata.put(PropertyKeys.PROPERTY_KEY_TITLE, doc.title());
@@ -171,8 +174,8 @@ public class HtmlExtractor
                       addOrAppend(metadata, name, content);
                   }
                 } else {
-                  if (e.hasAttr("charset")) {
-                    metadata.put("charset", e.attr("charset"));
+                  if (e.hasAttr(CHARSET)) {
+                    metadata.put(CHARSET, e.attr(CHARSET));
                   }
                 }
               });
@@ -180,6 +183,7 @@ public class HtmlExtractor
       return metadata;
     }
 
+    @SuppressWarnings("unchecked")
     private void addOrAppend(Map<String, Object> map, String key, String value) {
       if (map.containsKey(key)) {
         Object existingValue = map.get(key);
@@ -200,6 +204,7 @@ public class HtmlExtractor
       }
     }
 
+    @SuppressWarnings("unchecked")
     private void addOrAppend(Map<String, Object> map, String key, Collection<String> value) {
       if (map.containsKey(key)) {
         Object existingValue = map.get(key);
@@ -221,7 +226,7 @@ public class HtmlExtractor
     }
 
     @Override
-    public Collection<ExtractionWithProperties<String>> extractText(Document doc) {
+    protected Collection<ExtractionWithProperties<String>> extractText(Document doc) {
       List<ExtractionWithProperties<String>> extractedText = new ArrayList<>();
 
       if (settings.getCssQueryText() != null && !settings.getCssQueryText().isBlank()) {
@@ -245,7 +250,7 @@ public class HtmlExtractor
     }
 
     @Override
-    public Collection<ExtractionWithProperties<BufferedImage>> extractImages(Document doc) {
+    protected Collection<ExtractionWithProperties<BufferedImage>> extractImages(Document doc) {
       List<ExtractionWithProperties<BufferedImage>> images = new ArrayList<>();
 
       int imageNumber = 0;
@@ -275,6 +280,10 @@ public class HtmlExtractor
             }
 
             data = response.body();
+          } catch (InterruptedException e) {
+            log().error("Unable to read image from URL {}", src, e);
+            Thread.currentThread().interrupt();
+            continue;
           } catch (Exception e) {
             log().error("Unable to read image from URL {}", src, e);
             continue;
@@ -303,7 +312,7 @@ public class HtmlExtractor
           log().warn("Unable to extract metadata from image {}", src, e);
         }
 
-        properties.put(PropertyKeys.PROPERTY_KEY_TITLE, i.attr("title"));
+        properties.put(PropertyKeys.PROPERTY_KEY_TITLE, i.attr(TITLE));
         properties.put(PropertyKeys.PROPERTY_KEY_INDEX, imageNumber);
 
         if ("figure".equalsIgnoreCase(i.parent().tagName())) {
@@ -316,7 +325,7 @@ public class HtmlExtractor
         i.attributes()
             .forEach(
                 a -> {
-                  if ("title".equalsIgnoreCase(a.getKey())) return;
+                  if (TITLE.equalsIgnoreCase(a.getKey())) return;
 
                   properties.put("html" + METADATA_SEPARATOR + a.getKey(), a.getValue());
                 });
@@ -328,7 +337,7 @@ public class HtmlExtractor
     }
 
     @Override
-    public Collection<ExtractionWithProperties<Table>> extractTables(Document doc)
+    protected Collection<ExtractionWithProperties<Table>> extractTables(Document doc)
         throws ProcessingException {
       return doc.getElementsByTag("table").stream()
           .map(Processor::transformTable)
@@ -344,7 +353,7 @@ public class HtmlExtractor
       String lang = table.attr("lang");
       if (lang != null && !lang.isBlank()) props.put(PropertyKeys.PROPERTY_KEY_LANGUAGE, lang);
 
-      String title = table.attr("title");
+      String title = table.attr(TITLE);
       if (title != null && !title.isBlank()) props.put(PropertyKeys.PROPERTY_KEY_TITLE, title);
 
       String id = table.attr("id");
@@ -358,18 +367,18 @@ public class HtmlExtractor
     private final List<Row> rows;
     private final List<String> columnNames;
 
-    public HtmlTable(Element table) {
-      List<String> columnNames = Collections.emptyList();
+    protected HtmlTable(Element table) {
+      List<String> tmpComumnNames = Collections.emptyList();
 
       Element headerRow = table.selectFirst("thead > tr");
       if (headerRow != null) {
-        columnNames =
+        tmpComumnNames =
             headerRow.getElementsByTag("th").stream()
                 .map(Element::text)
                 .collect(Collectors.toList());
       }
 
-      List<Row> rows = new ArrayList<>();
+      List<Row> tmpRows = new ArrayList<>();
       Elements bodyRows = table.select("tbody > tr");
       for (int i = 0; i < bodyRows.size(); i++) {
         // TODO: Handle column spans?
@@ -378,11 +387,11 @@ public class HtmlExtractor
                 .map(Element::text)
                 .map(ConversionUtils::parseString)
                 .collect(Collectors.toList());
-        rows.add(new DefaultRow(i, columnNames, data));
+        tmpRows.add(new DefaultRow(i, tmpComumnNames, data));
       }
 
-      this.columnNames = columnNames;
-      this.rows = rows;
+      this.columnNames = Collections.unmodifiableList(tmpComumnNames);
+      this.rows = Collections.unmodifiableList(tmpRows);
     }
 
     @Override

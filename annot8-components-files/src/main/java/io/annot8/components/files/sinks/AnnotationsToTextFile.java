@@ -62,8 +62,8 @@ public class AnnotationsToTextFile
           log().warn("Unable to delete file {}", settings.getOutputFile(), e);
         }
       } else if (settings.isDeduplicate()) {
-        try {
-          Files.lines(settings.getOutputFile()).map(String::strip).distinct().forEach(prev::add);
+        try (Stream<String> lines = Files.lines(settings.getOutputFile())) {
+          lines.map(String::strip).distinct().forEach(prev::add);
         } catch (FileNotFoundException fnfe) {
           // Do nothing - no existing file
         } catch (IOException e) {

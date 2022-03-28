@@ -75,11 +75,12 @@ public class MongoConnectionSettings implements Settings {
     return this;
   }
 
+  @SafeVarargs
   public static MongoConnectionSettings merge(Optional<MongoConnectionSettings>... settings) {
 
     MongoConnectionSettings s = new MongoConnectionSettings();
 
-    Stream.of(settings).forEach(s::merge);
+    Stream.of(settings).filter(MongoConnectionSettings.class::isInstance).forEach(s::merge);
 
     return s;
   }

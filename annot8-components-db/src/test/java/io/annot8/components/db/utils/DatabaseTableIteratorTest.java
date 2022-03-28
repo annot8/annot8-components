@@ -73,7 +73,6 @@ public class DatabaseTableIteratorTest {
 
   private File getTestFile() {
     URL resource = DatabaseTableIteratorTest.class.getClassLoader().getResource("test.db");
-    File file = null;
     try {
       return new File(resource.toURI());
     } catch (URISyntaxException e) {

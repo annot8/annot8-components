@@ -18,6 +18,7 @@ import io.annot8.conventions.PropertyKeys;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -107,7 +108,7 @@ public class TextDetection
       return ProcessorResponse.itemError(exceptions);
     }
 
-    private void processImage(Item item, Image img) throws Exception {
+    private void processImage(Item item, Image img) throws IOException {
       // Based on code from: https://gist.github.com/berak/788da80d1dd5bade3f878210f45d6742
       long start = System.currentTimeMillis();
 
@@ -220,8 +221,8 @@ public class TextDetection
 
             BufferedImage trimmed =
                 rotated.getSubimage(
-                    (int) ((centreX - (ratio.x * rot.size.width) / 2.0)),
-                    (int) ((centreY - (ratio.y * rot.size.height) / 2.0)),
+                    (int) (centreX - (ratio.x * rot.size.width) / 2.0),
+                    (int) (centreY - (ratio.y * rot.size.height) / 2.0),
                     (int) (ratio.x * rot.size.width),
                     (int) (ratio.y * rot.size.height));
 
@@ -304,7 +305,8 @@ public class TextDetection
 
     private static BufferedImage rotateImageByDegrees(BufferedImage img, double angle) {
       double rads = Math.toRadians(angle);
-      double sin = Math.abs(Math.sin(rads)), cos = Math.abs(Math.cos(rads));
+      double sin = Math.abs(Math.sin(rads));
+      double cos = Math.abs(Math.cos(rads));
       int w = img.getWidth();
       int h = img.getHeight();
       int newWidth = (int) Math.floor(w * cos + h * sin);

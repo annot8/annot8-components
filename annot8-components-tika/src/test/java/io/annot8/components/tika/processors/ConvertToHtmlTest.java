@@ -17,24 +17,25 @@ public class ConvertToHtmlTest {
 
   @Test
   public void test() {
-    Processor extractor = new ConvertToHtml.Processor(true);
+    try (Processor extractor = new ConvertToHtml.Processor(true)) {
 
-    Item item = new TestItem();
-    item.createContent(InputStreamContent.class)
-        .withData(ConvertToHtmlTest.class.getResourceAsStream("test.pdf"))
-        .save();
+      Item item = new TestItem();
+      item.createContent(InputStreamContent.class)
+          .withData(ConvertToHtmlTest.class.getResourceAsStream("test.pdf"))
+          .save();
 
-    assertEquals(1, item.getContents(InputStreamContent.class).count());
+      assertEquals(1, item.getContents(InputStreamContent.class).count());
 
-    extractor.process(item);
+      extractor.process(item);
 
-    assertEquals(1, item.getContents(InputStreamContent.class).count());
-    InputStreamContent isc = item.getContents(InputStreamContent.class).findFirst().get();
-    String html =
-        new BufferedReader(new InputStreamReader(isc.getData()))
-            .lines()
-            .collect(Collectors.joining("\n"));
+      assertEquals(1, item.getContents(InputStreamContent.class).count());
+      InputStreamContent isc = item.getContents(InputStreamContent.class).findFirst().get();
+      String html =
+          new BufferedReader(new InputStreamReader(isc.getData()))
+              .lines()
+              .collect(Collectors.joining("\n"));
 
-    assertTrue(html.contains("<p>Hello world!</p>"));
+      assertTrue(html.contains("<p>Hello world!</p>"));
+    }
   }
 }

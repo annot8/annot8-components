@@ -62,27 +62,27 @@ public class PptxExtractor
     }
 
     @Override
-    public boolean isMetadataSupported() {
+    protected boolean isMetadataSupported() {
       return true;
     }
 
     @Override
-    public boolean isTextSupported() {
+    protected boolean isTextSupported() {
       return true;
     }
 
     @Override
-    public boolean isImagesSupported() {
+    protected boolean isImagesSupported() {
       return true;
     }
 
     @Override
-    public boolean isTablesSupported() {
+    protected boolean isTablesSupported() {
       return false;
     }
 
     @Override
-    public boolean acceptFile(FileContent file) {
+    protected boolean acceptFile(FileContent file) {
       XMLSlideShow doc;
       try {
         doc = new XMLSlideShow(new FileInputStream(file.getData()));
@@ -96,7 +96,7 @@ public class PptxExtractor
     }
 
     @Override
-    public boolean acceptInputStream(InputStreamContent inputStream) {
+    protected boolean acceptInputStream(InputStreamContent inputStream) {
       XMLSlideShow doc;
       try {
         doc = new XMLSlideShow(inputStream.getData());
@@ -114,7 +114,7 @@ public class PptxExtractor
     }
 
     @Override
-    public XMLSlideShow extractDocument(FileContent file) throws IOException {
+    protected XMLSlideShow extractDocument(FileContent file) throws IOException {
       if (cache.containsKey(file.getId())) {
         return cache.get(file.getId());
       } else {
@@ -123,7 +123,8 @@ public class PptxExtractor
     }
 
     @Override
-    public XMLSlideShow extractDocument(InputStreamContent inputStreamContent) throws IOException {
+    protected XMLSlideShow extractDocument(InputStreamContent inputStreamContent)
+        throws IOException {
       if (cache.containsKey(inputStreamContent.getId())) {
         return cache.get(inputStreamContent.getId());
       } else {
@@ -132,7 +133,7 @@ public class PptxExtractor
     }
 
     @Override
-    public Map<String, Object> extractMetadata(XMLSlideShow doc) {
+    protected Map<String, Object> extractMetadata(XMLSlideShow doc) {
       Map<String, Object> metadata = new HashMap<>();
 
       POIXMLProperties.CoreProperties props = doc.getProperties().getCoreProperties();
@@ -179,72 +180,79 @@ public class PptxExtractor
     }
 
     @Override
-    public Collection<ExtractionWithProperties<String>> extractText(XMLSlideShow doc) {
+    protected Collection<ExtractionWithProperties<String>> extractText(XMLSlideShow doc) {
       List<ExtractionWithProperties<String>> extractedText = new ArrayList<>();
 
-      SlideShowExtractor<XSLFShape, XSLFTextParagraph> slideExtractor =
-          new SlideShowExtractor<>(doc);
-      slideExtractor.setCommentsByDefault(false);
-      slideExtractor.setMasterByDefault(true);
-      slideExtractor.setNotesByDefault(false);
-      slideExtractor.setSlidesByDefault(true);
+      try (SlideShowExtractor<XSLFShape, XSLFTextParagraph> slideExtractor =
+              new SlideShowExtractor<>(doc);
+          SlideShowExtractor<XSLFShape, XSLFTextParagraph> notesExtractor =
+              new SlideShowExtractor<>(doc);
+          SlideShowExtractor<XSLFShape, XSLFTextParagraph> commentsExtractor =
+              new SlideShowExtractor<>(doc)) {
 
-      SlideShowExtractor<XSLFShape, XSLFTextParagraph> notesExtractor =
-          new SlideShowExtractor<>(doc);
-      notesExtractor.setCommentsByDefault(false);
-      notesExtractor.setMasterByDefault(false);
-      notesExtractor.setNotesByDefault(true);
-      notesExtractor.setSlidesByDefault(false);
+        slideExtractor.setCloseFilesystem(false);
+        slideExtractor.setCommentsByDefault(false);
+        slideExtractor.setMasterByDefault(true);
+        slideExtractor.setNotesByDefault(false);
+        slideExtractor.setSlidesByDefault(true);
 
-      SlideShowExtractor<XSLFShape, XSLFTextParagraph> commentsExtractor =
-          new SlideShowExtractor<>(doc);
-      commentsExtractor.setCommentsByDefault(true);
-      commentsExtractor.setMasterByDefault(false);
-      commentsExtractor.setNotesByDefault(false);
-      commentsExtractor.setSlidesByDefault(false);
+        notesExtractor.setCloseFilesystem(false);
+        notesExtractor.setCommentsByDefault(false);
+        notesExtractor.setMasterByDefault(false);
+        notesExtractor.setNotesByDefault(true);
+        notesExtractor.setSlidesByDefault(false);
 
-      for (XSLFSlide slide : doc.getSlides()) {
-        // Extract Slides
-        String slideText = slideExtractor.getText(slide);
+        commentsExtractor.setCloseFilesystem(false);
+        commentsExtractor.setCommentsByDefault(true);
+        commentsExtractor.setMasterByDefault(false);
+        commentsExtractor.setNotesByDefault(false);
+        commentsExtractor.setSlidesByDefault(false);
 
-        if (!slideText.isBlank()) {
-          Map<String, Object> slideProperties = new HashMap<>();
-          slideProperties.put(PropertyKeys.PROPERTY_KEY_NAME, slide.getSlideName());
-          slideProperties.put(PropertyKeys.PROPERTY_KEY_PAGE, slide.getSlideNumber());
-          slideProperties.put(PropertyKeys.PROPERTY_KEY_TITLE, slide.getTitle());
-          slideProperties.put(PropertyKeys.PROPERTY_KEY_SUBTYPE, "slide");
+        for (XSLFSlide slide : doc.getSlides()) {
+          // Extract Slides
+          String slideText = slideExtractor.getText(slide);
 
-          extractedText.add(new ExtractionWithProperties<>(slideText, slideProperties));
+          if (!slideText.isBlank()) {
+            Map<String, Object> slideProperties = new HashMap<>();
+            slideProperties.put(PropertyKeys.PROPERTY_KEY_NAME, slide.getSlideName());
+            slideProperties.put(PropertyKeys.PROPERTY_KEY_PAGE, slide.getSlideNumber());
+            slideProperties.put(PropertyKeys.PROPERTY_KEY_TITLE, slide.getTitle());
+            slideProperties.put(PropertyKeys.PROPERTY_KEY_SUBTYPE, "slide");
+
+            extractedText.add(new ExtractionWithProperties<>(slideText, slideProperties));
+          }
+
+          // Extract Notes
+          String notesText = notesExtractor.getText(slide);
+
+          if (!notesText.isBlank()) {
+            Map<String, Object> notesProperties = new HashMap<>();
+            notesProperties.put(PropertyKeys.PROPERTY_KEY_PAGE, slide.getSlideNumber());
+            notesProperties.put(PropertyKeys.PROPERTY_KEY_SUBTYPE, "note");
+
+            extractedText.add(new ExtractionWithProperties<>(notesText, notesProperties));
+          }
+
+          // Extract Comments
+          String commentsText = commentsExtractor.getText(slide);
+
+          if (!commentsText.isBlank()) {
+            Map<String, Object> commentsProperties = new HashMap<>();
+            commentsProperties.put(PropertyKeys.PROPERTY_KEY_PAGE, slide.getSlideNumber());
+            commentsProperties.put(PropertyKeys.PROPERTY_KEY_SUBTYPE, "comment");
+
+            extractedText.add(new ExtractionWithProperties<>(commentsText, commentsProperties));
+          }
         }
-
-        // Extract Notes
-        String notesText = notesExtractor.getText(slide);
-
-        if (!notesText.isBlank()) {
-          Map<String, Object> notesProperties = new HashMap<>();
-          notesProperties.put(PropertyKeys.PROPERTY_KEY_PAGE, slide.getSlideNumber());
-          notesProperties.put(PropertyKeys.PROPERTY_KEY_SUBTYPE, "note");
-
-          extractedText.add(new ExtractionWithProperties<>(notesText, notesProperties));
-        }
-
-        // Extract Comments
-        String commentsText = commentsExtractor.getText(slide);
-
-        if (!commentsText.isBlank()) {
-          Map<String, Object> commentsProperties = new HashMap<>();
-          commentsProperties.put(PropertyKeys.PROPERTY_KEY_PAGE, slide.getSlideNumber());
-          commentsProperties.put(PropertyKeys.PROPERTY_KEY_SUBTYPE, "comment");
-
-          extractedText.add(new ExtractionWithProperties<>(commentsText, commentsProperties));
-        }
+      } catch (IOException e) {
+        throw new ProcessingException("Error extracting text from presentation", e);
       }
 
       return extractedText;
     }
 
     @Override
-    public Collection<ExtractionWithProperties<BufferedImage>> extractImages(XMLSlideShow doc) {
+    protected Collection<ExtractionWithProperties<BufferedImage>> extractImages(XMLSlideShow doc) {
       List<ExtractionWithProperties<BufferedImage>> extractedImages = new ArrayList<>();
 
       for (XSLFPictureData picture : doc.getPictureData()) {
@@ -282,7 +290,7 @@ public class PptxExtractor
     }
 
     @Override
-    public Collection<ExtractionWithProperties<Table>> extractTables(XMLSlideShow doc)
+    protected Collection<ExtractionWithProperties<Table>> extractTables(XMLSlideShow doc)
         throws ProcessingException {
       // TODO: Extract tables from PPTX
       return Collections.emptyList();

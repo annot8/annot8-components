@@ -24,8 +24,9 @@ public class FilterAnnotationsByNumericalPropertyTest {
 
     assertNotNull(d.capabilities());
 
-    Processor p = d.createComponent(null, settings);
-    assertNotNull(p);
+    try (Processor p = d.createComponent(null, settings)) {
+      assertNotNull(p);
+    }
   }
 
   @Test
@@ -36,21 +37,22 @@ public class FilterAnnotationsByNumericalPropertyTest {
             "value", 1.0, FilterAnnotationsByNumericalProperty.Operator.GREATER_THAN, true);
     assertTrue(settings.validate());
 
-    Processor p = new FilterAnnotationsByNumericalProperty.Processor(settings);
+    try (Processor p = new FilterAnnotationsByNumericalProperty.Processor(settings)) {
 
-    Item item = createTestItem();
-    ProcessorResponse pr = p.process(item);
-    assertEquals(ProcessorResponse.ok(), pr);
+      Item item = createTestItem();
+      ProcessorResponse pr = p.process(item);
+      assertEquals(ProcessorResponse.ok(), pr);
 
-    item.getContents()
-        .forEach(
-            c -> {
-              assertEquals(1L, c.getAnnotations().getByType("double").count());
-              assertEquals(0L, c.getAnnotations().getByType("integer").count());
-              assertEquals(0L, c.getAnnotations().getByType("string").count());
-              assertEquals(1L, c.getAnnotations().getByType("boolean").count());
-              assertEquals(1L, c.getAnnotations().getByType("missing").count());
-            });
+      item.getContents()
+          .forEach(
+              c -> {
+                assertEquals(1L, c.getAnnotations().getByType("double").count());
+                assertEquals(0L, c.getAnnotations().getByType("integer").count());
+                assertEquals(0L, c.getAnnotations().getByType("string").count());
+                assertEquals(1L, c.getAnnotations().getByType("boolean").count());
+                assertEquals(1L, c.getAnnotations().getByType("missing").count());
+              });
+    }
   }
 
   @Test
@@ -64,21 +66,22 @@ public class FilterAnnotationsByNumericalPropertyTest {
             true);
     assertTrue(settings.validate());
 
-    Processor p = new FilterAnnotationsByNumericalProperty.Processor(settings);
+    try (Processor p = new FilterAnnotationsByNumericalProperty.Processor(settings)) {
 
-    Item item = createTestItem();
-    ProcessorResponse pr = p.process(item);
-    assertEquals(ProcessorResponse.ok(), pr);
+      Item item = createTestItem();
+      ProcessorResponse pr = p.process(item);
+      assertEquals(ProcessorResponse.ok(), pr);
 
-    item.getContents()
-        .forEach(
-            c -> {
-              assertEquals(0L, c.getAnnotations().getByType("double").count());
-              assertEquals(0L, c.getAnnotations().getByType("integer").count());
-              assertEquals(0L, c.getAnnotations().getByType("string").count());
-              assertEquals(1L, c.getAnnotations().getByType("boolean").count());
-              assertEquals(1L, c.getAnnotations().getByType("missing").count());
-            });
+      item.getContents()
+          .forEach(
+              c -> {
+                assertEquals(0L, c.getAnnotations().getByType("double").count());
+                assertEquals(0L, c.getAnnotations().getByType("integer").count());
+                assertEquals(0L, c.getAnnotations().getByType("string").count());
+                assertEquals(1L, c.getAnnotations().getByType("boolean").count());
+                assertEquals(1L, c.getAnnotations().getByType("missing").count());
+              });
+    }
   }
 
   @Test
@@ -89,21 +92,22 @@ public class FilterAnnotationsByNumericalPropertyTest {
             "value", 2.0, FilterAnnotationsByNumericalProperty.Operator.LESS_THAN, true);
     assertTrue(settings.validate());
 
-    Processor p = new FilterAnnotationsByNumericalProperty.Processor(settings);
+    try (Processor p = new FilterAnnotationsByNumericalProperty.Processor(settings)) {
 
-    Item item = createTestItem();
-    ProcessorResponse pr = p.process(item);
-    assertEquals(ProcessorResponse.ok(), pr);
+      Item item = createTestItem();
+      ProcessorResponse pr = p.process(item);
+      assertEquals(ProcessorResponse.ok(), pr);
 
-    item.getContents()
-        .forEach(
-            c -> {
-              assertEquals(0L, c.getAnnotations().getByType("double").count());
-              assertEquals(1L, c.getAnnotations().getByType("integer").count());
-              assertEquals(1L, c.getAnnotations().getByType("string").count());
-              assertEquals(1L, c.getAnnotations().getByType("boolean").count());
-              assertEquals(1L, c.getAnnotations().getByType("missing").count());
-            });
+      item.getContents()
+          .forEach(
+              c -> {
+                assertEquals(0L, c.getAnnotations().getByType("double").count());
+                assertEquals(1L, c.getAnnotations().getByType("integer").count());
+                assertEquals(1L, c.getAnnotations().getByType("string").count());
+                assertEquals(1L, c.getAnnotations().getByType("boolean").count());
+                assertEquals(1L, c.getAnnotations().getByType("missing").count());
+              });
+    }
   }
 
   @Test
@@ -114,21 +118,22 @@ public class FilterAnnotationsByNumericalPropertyTest {
             "value", 2.0, FilterAnnotationsByNumericalProperty.Operator.LESS_THAN_OR_EQUAL, true);
     assertTrue(settings.validate());
 
-    Processor p = new FilterAnnotationsByNumericalProperty.Processor(settings);
+    try (Processor p = new FilterAnnotationsByNumericalProperty.Processor(settings)) {
 
-    Item item = createTestItem();
-    ProcessorResponse pr = p.process(item);
-    assertEquals(ProcessorResponse.ok(), pr);
+      Item item = createTestItem();
+      ProcessorResponse pr = p.process(item);
+      assertEquals(ProcessorResponse.ok(), pr);
 
-    item.getContents()
-        .forEach(
-            c -> {
-              assertEquals(0L, c.getAnnotations().getByType("double").count());
-              assertEquals(0L, c.getAnnotations().getByType("integer").count());
-              assertEquals(1L, c.getAnnotations().getByType("string").count());
-              assertEquals(1L, c.getAnnotations().getByType("boolean").count());
-              assertEquals(1L, c.getAnnotations().getByType("missing").count());
-            });
+      item.getContents()
+          .forEach(
+              c -> {
+                assertEquals(0L, c.getAnnotations().getByType("double").count());
+                assertEquals(0L, c.getAnnotations().getByType("integer").count());
+                assertEquals(1L, c.getAnnotations().getByType("string").count());
+                assertEquals(1L, c.getAnnotations().getByType("boolean").count());
+                assertEquals(1L, c.getAnnotations().getByType("missing").count());
+              });
+    }
   }
 
   @Test
@@ -139,21 +144,22 @@ public class FilterAnnotationsByNumericalPropertyTest {
             "value", 2.0, FilterAnnotationsByNumericalProperty.Operator.EQUALS, true);
     assertTrue(settings.validate());
 
-    Processor p = new FilterAnnotationsByNumericalProperty.Processor(settings);
+    try (Processor p = new FilterAnnotationsByNumericalProperty.Processor(settings)) {
 
-    Item item = createTestItem();
-    ProcessorResponse pr = p.process(item);
-    assertEquals(ProcessorResponse.ok(), pr);
+      Item item = createTestItem();
+      ProcessorResponse pr = p.process(item);
+      assertEquals(ProcessorResponse.ok(), pr);
 
-    item.getContents()
-        .forEach(
-            c -> {
-              assertEquals(1L, c.getAnnotations().getByType("double").count());
-              assertEquals(0L, c.getAnnotations().getByType("integer").count());
-              assertEquals(1L, c.getAnnotations().getByType("string").count());
-              assertEquals(1L, c.getAnnotations().getByType("boolean").count());
-              assertEquals(1L, c.getAnnotations().getByType("missing").count());
-            });
+      item.getContents()
+          .forEach(
+              c -> {
+                assertEquals(1L, c.getAnnotations().getByType("double").count());
+                assertEquals(0L, c.getAnnotations().getByType("integer").count());
+                assertEquals(1L, c.getAnnotations().getByType("string").count());
+                assertEquals(1L, c.getAnnotations().getByType("boolean").count());
+                assertEquals(1L, c.getAnnotations().getByType("missing").count());
+              });
+    }
   }
 
   @Test
@@ -164,21 +170,22 @@ public class FilterAnnotationsByNumericalPropertyTest {
             "value", 2.0, FilterAnnotationsByNumericalProperty.Operator.EQUALS, false);
     assertTrue(settings.validate());
 
-    Processor p = new FilterAnnotationsByNumericalProperty.Processor(settings);
+    try (Processor p = new FilterAnnotationsByNumericalProperty.Processor(settings)) {
 
-    Item item = createTestItem();
-    ProcessorResponse pr = p.process(item);
-    assertEquals(ProcessorResponse.ok(), pr);
+      Item item = createTestItem();
+      ProcessorResponse pr = p.process(item);
+      assertEquals(ProcessorResponse.ok(), pr);
 
-    item.getContents()
-        .forEach(
-            c -> {
-              assertEquals(1L, c.getAnnotations().getByType("double").count());
-              assertEquals(0L, c.getAnnotations().getByType("integer").count());
-              assertEquals(1L, c.getAnnotations().getByType("string").count());
-              assertEquals(0L, c.getAnnotations().getByType("boolean").count());
-              assertEquals(0L, c.getAnnotations().getByType("missing").count());
-            });
+      item.getContents()
+          .forEach(
+              c -> {
+                assertEquals(1L, c.getAnnotations().getByType("double").count());
+                assertEquals(0L, c.getAnnotations().getByType("integer").count());
+                assertEquals(1L, c.getAnnotations().getByType("string").count());
+                assertEquals(0L, c.getAnnotations().getByType("boolean").count());
+                assertEquals(0L, c.getAnnotations().getByType("missing").count());
+              });
+    }
   }
 
   private Item createTestItem() {

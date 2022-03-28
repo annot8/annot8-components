@@ -85,24 +85,26 @@ public class MoneyTest {
   }
 
   private void assertFoundMoney(String inputString, double value, String currencyCode) {
-    Processor moneyProcessor = new Money.Processor();
-    TestItem testItem = new TestItem();
-    TestStringContent content =
-        testItem.createContent(TestStringContent.class).withData(inputString).save();
-    moneyProcessor.process(testItem);
-    ImmutableProperties properties =
-        content.getAnnotations().getAll().findAny().orElseThrow().getProperties();
-    assertEquals(value, properties.getOrDefault("value", 0.0));
-    assertEquals(currencyCode, properties.getOrDefault("currencyCode", ""));
+    try (Processor moneyProcessor = new Money.Processor()) {
+      TestItem testItem = new TestItem();
+      TestStringContent content =
+          testItem.createContent(TestStringContent.class).withData(inputString).save();
+      moneyProcessor.process(testItem);
+      ImmutableProperties properties =
+          content.getAnnotations().getAll().findAny().orElseThrow().getProperties();
+      assertEquals(value, properties.getOrDefault("value", 0.0));
+      assertEquals(currencyCode, properties.getOrDefault("currencyCode", ""));
+    }
   }
 
   private void assertNotFoundMoney(String inputString) {
-    Processor moneyProcessor = new Money.Processor();
-    TestItem testItem = new TestItem();
-    TestStringContent content =
-        testItem.createContent(TestStringContent.class).withData(inputString).save();
-    moneyProcessor.process(testItem);
+    try (Processor moneyProcessor = new Money.Processor()) {
+      TestItem testItem = new TestItem();
+      TestStringContent content =
+          testItem.createContent(TestStringContent.class).withData(inputString).save();
+      moneyProcessor.process(testItem);
 
-    assertEquals(0L, content.getAnnotations().getAll().count());
+      assertEquals(0L, content.getAnnotations().getAll().count());
+    }
   }
 }

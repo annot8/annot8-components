@@ -13,6 +13,7 @@ import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 
 public class TextToFileTest {
+
   @Test
   public void test() throws IOException {
     Item item = new TestItem();
@@ -22,17 +23,18 @@ public class TextToFileTest {
     TextToFile.Settings s = new TextToFile.Settings();
     s.setOutputFolder(tempFolder);
 
-    TextToFile.Processor p = new TextToFile.Processor(s);
-    assertEquals(ProcessorResponse.ok(), p.process(item));
+    try (TextToFile.Processor p = new TextToFile.Processor(s)) {
+      assertEquals(ProcessorResponse.ok(), p.process(item));
 
-    Path itemFolder = tempFolder.resolve(item.getId());
-    Path contentFile = itemFolder.resolve(text.getId() + ".txt");
+      Path itemFolder = tempFolder.resolve(item.getId());
+      Path contentFile = itemFolder.resolve(text.getId() + ".txt");
 
-    String content = Files.readString(contentFile);
-    assertEquals("Hello, World!", content);
+      String content = Files.readString(contentFile);
+      assertEquals("Hello, World!", content);
 
-    contentFile.toFile().delete();
-    itemFolder.toFile().delete();
-    tempFolder.toFile().delete();
+      contentFile.toFile().delete();
+      itemFolder.toFile().delete();
+      tempFolder.toFile().delete();
+    }
   }
 }

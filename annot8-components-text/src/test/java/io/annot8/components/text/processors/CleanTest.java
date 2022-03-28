@@ -30,19 +30,20 @@ public class CleanTest {
     Clean.Settings s = getFalseSettings();
     s.setRemoveSingleNewLines(true);
 
-    Processor p = new Clean.Processor(s);
-    Item item = new TestItem();
+    try (Processor p = new Clean.Processor(s)) {
+      Item item = new TestItem();
 
-    item.createContent(TestStringContent.class)
-        .withData("Hello \r\nWorld!\n\n\n\nThis is an extreme-\nly long word.\n")
-        .save();
+      item.createContent(TestStringContent.class)
+          .withData("Hello \r\nWorld!\n\n\n\nThis is an extreme-\nly long word.\n")
+          .save();
 
-    p.process(item);
-    assertEquals(1L, item.getContents().count());
+      p.process(item);
+      assertEquals(1L, item.getContents().count());
 
-    assertEquals(
-        "Hello World!\n\nThis is an extreme-ly long word.\n",
-        item.getContents(Text.class).findFirst().get().getData());
+      assertEquals(
+          "Hello World!\n\nThis is an extreme-ly long word.\n",
+          item.getContents(Text.class).findFirst().get().getData());
+    }
   }
 
   @Test
@@ -50,15 +51,16 @@ public class CleanTest {
     Clean.Settings s = getFalseSettings();
     s.setTrim(true);
 
-    Processor p = new Clean.Processor(s);
-    Item item = new TestItem();
+    try (Processor p = new Clean.Processor(s)) {
+      Item item = new TestItem();
 
-    item.createContent(TestStringContent.class).withData(" Hello \nworld!\t\n").save();
+      item.createContent(TestStringContent.class).withData(" Hello \nworld!\t\n").save();
 
-    p.process(item);
-    assertEquals(1L, item.getContents().count());
+      p.process(item);
+      assertEquals(1L, item.getContents().count());
 
-    assertEquals("Hello \nworld!", item.getContents(Text.class).findFirst().get().getData());
+      assertEquals("Hello \nworld!", item.getContents(Text.class).findFirst().get().getData());
+    }
   }
 
   @Test
@@ -66,19 +68,20 @@ public class CleanTest {
     Clean.Settings s = getFalseSettings();
     s.setTrimLines(true);
 
-    Processor p = new Clean.Processor(s);
-    Item item = new TestItem();
+    try (Processor p = new Clean.Processor(s)) {
+      Item item = new TestItem();
 
-    item.createContent(TestStringContent.class)
-        .withData("Hello   \neveryone;\t \nHello \nworld!\t\n")
-        .save();
+      item.createContent(TestStringContent.class)
+          .withData("Hello   \neveryone;\t \nHello \nworld!\t\n")
+          .save();
 
-    p.process(item);
-    assertEquals(1L, item.getContents().count());
+      p.process(item);
+      assertEquals(1L, item.getContents().count());
 
-    assertEquals(
-        "Hello\neveryone;\nHello\nworld!\n",
-        item.getContents(Text.class).findFirst().get().getData());
+      assertEquals(
+          "Hello\neveryone;\nHello\nworld!\n",
+          item.getContents(Text.class).findFirst().get().getData());
+    }
   }
 
   @Test
@@ -86,15 +89,16 @@ public class CleanTest {
     Clean.Settings s = getFalseSettings();
     s.setReplaceSmartCharacters(true);
 
-    Processor p = new Clean.Processor(s);
-    Item item = new TestItem();
+    try (Processor p = new Clean.Processor(s)) {
+      Item item = new TestItem();
 
-    item.createContent(TestStringContent.class).withData("\u201cHello\u201d she said").save();
+      item.createContent(TestStringContent.class).withData("\u201cHello\u201d she said").save();
 
-    p.process(item);
-    assertEquals(1L, item.getContents().count());
+      p.process(item);
+      assertEquals(1L, item.getContents().count());
 
-    assertEquals("\"Hello\" she said", item.getContents(Text.class).findFirst().get().getData());
+      assertEquals("\"Hello\" she said", item.getContents(Text.class).findFirst().get().getData());
+    }
   }
 
   @Test
@@ -102,17 +106,19 @@ public class CleanTest {
     Clean.Settings s = getFalseSettings();
     s.setRemoveRepeatedWhitespace(true);
 
-    Processor p = new Clean.Processor(s);
-    Item item = new TestItem();
+    try (Processor p = new Clean.Processor(s)) {
+      Item item = new TestItem();
 
-    item.createContent(TestStringContent.class)
-        .withData("A  B \tC\t D\t\tE\t \tF \t G  \t \t  H")
-        .save();
+      item.createContent(TestStringContent.class)
+          .withData("A  B \tC\t D\t\tE\t \tF \t G  \t \t  H")
+          .save();
 
-    p.process(item);
-    assertEquals(1L, item.getContents().count());
+      p.process(item);
+      assertEquals(1L, item.getContents().count());
 
-    assertEquals("A B\tC\tD\tE\tF\tG\tH", item.getContents(Text.class).findFirst().get().getData());
+      assertEquals(
+          "A B\tC\tD\tE\tF\tG\tH", item.getContents(Text.class).findFirst().get().getData());
+    }
   }
 
   @Test
@@ -120,19 +126,20 @@ public class CleanTest {
     Clean.Settings s = getFalseSettings();
     s.setCopyProperties(true);
 
-    Clean.Processor p = new Clean.Processor(s);
+    try (Processor p = new Clean.Processor(s)) {
 
-    Item item = new TestItem();
-    item.createContent(TestStringContent.class)
-        .withData("Hello World!")
-        .withProperty("lang", "en")
-        .save();
+      Item item = new TestItem();
+      item.createContent(TestStringContent.class)
+          .withData("Hello World!")
+          .withProperty("lang", "en")
+          .save();
 
-    p.process(item);
-    assertEquals(1L, item.getContents().count());
+      p.process(item);
+      assertEquals(1L, item.getContents().count());
 
-    assertEquals(
-        "en", item.getContents(Text.class).findFirst().get().getProperties().get("lang").get());
+      assertEquals(
+          "en", item.getContents(Text.class).findFirst().get().getProperties().get("lang").get());
+    }
   }
 
   @Test
@@ -141,18 +148,19 @@ public class CleanTest {
     s.setRemoveSingleNewLines(false);
     s.setRemoveRepeatedNewLines(true);
 
-    Processor p = new Clean.Processor(s);
-    Item item = new TestItem();
+    try (Processor p = new Clean.Processor(s)) {
+      Item item = new TestItem();
 
-    item.createContent(TestStringContent.class)
-        .withData("Hello\neveryone;\n\n\n\nHello world!\n")
-        .save();
+      item.createContent(TestStringContent.class)
+          .withData("Hello\neveryone;\n\n\n\nHello world!\n")
+          .save();
 
-    p.process(item);
-    assertEquals(1L, item.getContents().count());
+      p.process(item);
+      assertEquals(1L, item.getContents().count());
 
-    assertEquals(
-        "Hello\neveryone;\n\nHello world!\n",
-        item.getContents(Text.class).findFirst().get().getData());
+      assertEquals(
+          "Hello\neveryone;\n\nHello world!\n",
+          item.getContents(Text.class).findFirst().get().getData());
+    }
   }
 }

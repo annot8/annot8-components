@@ -38,6 +38,8 @@ public class SpacySentences
         .build();
   }
 
+  // Deep type hierarchy
+  @SuppressWarnings("java:S110")
   public static class Processor extends SpacyServerProcessor {
 
     public Processor(SpacyServerSettings settings) {

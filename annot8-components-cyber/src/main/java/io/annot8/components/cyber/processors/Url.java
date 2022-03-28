@@ -38,6 +38,8 @@ public class Url extends AbstractProcessorDescriptor<Url.Processor, Url.Settings
     return new Processor(settings.isLenient());
   }
 
+  // Deep type hierarchy
+  @SuppressWarnings("java:S110")
   public static class Processor extends AbstractRegexProcessor {
     private static final Pattern URL_PATTERN =
         Pattern.compile(

@@ -31,7 +31,8 @@ public class EmlFileExtractorTest {
       TestItem item = new TestItem();
       TestItemFactory itemFactory = (TestItemFactory) item.getItemFactory();
 
-      URL resource = EmlFileExtractorTest.class.getResource("test_sample_message.eml"); // Based on
+      URL resource = EmlFileExtractorTest.class.getResource("test_sample_message.eml"); // Based
+      // on
       // https://www.phpclasses.org/browse/file/14672.html
       File f = Paths.get(resource.toURI()).toFile();
 

@@ -14,33 +14,36 @@ import java.nio.file.Paths;
 import org.junit.jupiter.api.Test;
 
 public class RenderPdfTest {
+
   @Test
   public void testFile() throws Exception {
-    RenderPdf.Processor p = new RenderPdf.Processor(300);
-    Item i = new TestItem();
+    try (RenderPdf.Processor p = new RenderPdf.Processor(300)) {
+      Item i = new TestItem();
 
-    URL uPdf = PdfExtractorTest.class.getResource("testDocument.pdf");
-    File fPdf = Paths.get(uPdf.toURI()).toFile();
+      URL uPdf = PdfExtractorTest.class.getResource("testDocument.pdf");
+      File fPdf = Paths.get(uPdf.toURI()).toFile();
 
-    i.createContent(FileContent.class).withData(fPdf).save();
+      i.createContent(FileContent.class).withData(fPdf).save();
 
-    p.process(i);
+      p.process(i);
 
-    assertEquals(2, i.getContents(Image.class).count());
+      assertEquals(2, i.getContents(Image.class).count());
+    }
   }
 
   @Test
   public void testInputStream() {
-    RenderPdf.Processor p = new RenderPdf.Processor(300);
-    Item i = new TestItem();
+    try (RenderPdf.Processor p = new RenderPdf.Processor(300)) {
+      Item i = new TestItem();
 
-    i.createContent(InputStreamContent.class)
-        .withData(() -> PdfExtractorTest.class.getResourceAsStream("testDocument.pdf"))
-        .save();
+      i.createContent(InputStreamContent.class)
+          .withData(() -> PdfExtractorTest.class.getResourceAsStream("testDocument.pdf"))
+          .save();
 
-    p.process(i);
+      p.process(i);
 
-    assertEquals(2, i.getContents(Image.class).count());
+      assertEquals(2, i.getContents(Image.class).count());
+    }
   }
 
   @Test

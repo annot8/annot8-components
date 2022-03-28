@@ -27,7 +27,7 @@ public class IPv4Test {
     try (Processor p = ip.createComponent(new SimpleContext(), NoSettings.getInstance())) {
       Item item = new TestItem();
 
-      //    Item item = new SimpleItem(itemFactory, contentBuilderFactoryRegistry);
+      // Item item = new SimpleItem(itemFactory, contentBuilderFactoryRegistry);
       Text content =
           item.createContent(TestStringContent.class)
               .withData("The attack came from 127.0.0.1")

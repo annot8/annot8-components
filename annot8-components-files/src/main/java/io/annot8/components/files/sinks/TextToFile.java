@@ -49,14 +49,12 @@ public class TextToFile
       try {
         Files.createDirectories(p.getParent());
       } catch (IOException e) {
-        log().error("Could not create directory {}", p.getParent());
         throw new ProcessingException("Could not create directory", e);
       }
 
       try {
         Files.writeString(p, content.getData());
       } catch (IOException e) {
-        log().error("Unable to write text file for {}", content.getId(), e);
         throw new ProcessingException("Unable to write text file", e);
       }
     }

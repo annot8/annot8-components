@@ -24,6 +24,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.Temporal;
 import java.time.temporal.TemporalAccessor;
+import java.util.Optional;
 
 @ComponentName("Item Property as Date Time")
 @ComponentDescription("Converts an existing Item Property into a date time")
@@ -58,8 +59,9 @@ public class ItemPropertyAsDateTime
 
     @Override
     public ProcessorResponse process(Item item) {
-      if (item.getProperties().has(settings.getKey())) {
-        Object o = item.getProperties().get(settings.getKey()).get();
+      Optional<Object> value = item.getProperties().get(settings.getKey());
+      if (value.isPresent()) {
+        Object o = value.get();
 
         Temporal temporal = null;
         if (o instanceof TemporalAccessor) {

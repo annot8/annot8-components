@@ -20,26 +20,27 @@ public class HashTagTest {
 
   @Test
   public void testHashtag() throws Annot8Exception {
-    Processor p = new HashTag.Processor();
+    try (Processor p = new HashTag.Processor()) {
 
-    Item item = new TestItem();
+      Item item = new TestItem();
 
-    Text content =
-        item.createContent(TestStringContent.class)
-            .withData("Prime Minister making a speech #latestnews")
-            .save();
+      Text content =
+          item.createContent(TestStringContent.class)
+              .withData("Prime Minister making a speech #latestnews")
+              .save();
 
-    p.process(item);
+      p.process(item);
 
-    AnnotationStore store = content.getAnnotations();
+      AnnotationStore store = content.getAnnotations();
 
-    List<Annotation> annotations = store.getAll().collect(Collectors.toList());
-    assertEquals(1, annotations.size());
+      List<Annotation> annotations = store.getAll().collect(Collectors.toList());
+      assertEquals(1, annotations.size());
 
-    Annotation a = annotations.get(0);
-    assertEquals(AnnotationTypes.ANNOTATION_TYPE_HASHTAG, a.getType());
-    assertEquals(content.getId(), a.getContentId());
-    assertEquals("#latestnews", a.getBounds().getData(content).get());
-    assertEquals(0, a.getProperties().getAll().size());
+      Annotation a = annotations.get(0);
+      assertEquals(AnnotationTypes.ANNOTATION_TYPE_HASHTAG, a.getType());
+      assertEquals(content.getId(), a.getContentId());
+      assertEquals("#latestnews", a.getBounds().getData(content).get());
+      assertEquals(0, a.getProperties().getAll().size());
+    }
   }
 }

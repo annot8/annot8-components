@@ -25,17 +25,18 @@ public class SpaceySentencesIT {
 
     SpacyServerSettings s = new SpacyServerSettings();
     s.setBaseUri("http://localhost:8000");
-    SpacySentences.Processor p = new SpacySentences.Processor(s);
+    try (SpacySentences.Processor p = new SpacySentences.Processor(s)) {
 
-    ProcessorResponse r = p.process(item);
-    assertEquals(ProcessorResponse.ok(), r);
+      ProcessorResponse r = p.process(item);
+      assertEquals(ProcessorResponse.ok(), r);
 
-    List<Annotation> a = t.getAnnotations().getAll().collect(Collectors.toList());
-    assertEquals(2, a.size());
+      List<Annotation> a = t.getAnnotations().getAll().collect(Collectors.toList());
+      assertEquals(2, a.size());
 
-    List<String> as =
-        a.stream().map(an -> an.getBounds().getData(t).get()).collect(Collectors.toList());
-    assertTrue(as.contains("Dr. J Watson lives with Mr. Sherlock Holmes in London."));
-    assertTrue(as.contains("Their address is 221B, Baker Street."));
+      List<String> as =
+          a.stream().map(an -> an.getBounds().getData(t).get()).collect(Collectors.toList());
+      assertTrue(as.contains("Dr. J Watson lives with Mr. Sherlock Holmes in London."));
+      assertTrue(as.contains("Their address is 221B, Baker Street."));
+    }
   }
 }

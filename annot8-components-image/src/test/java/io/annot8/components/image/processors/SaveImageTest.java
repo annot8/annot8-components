@@ -66,39 +66,40 @@ public class SaveImageTest {
     settings.setFileType(fileType);
     settings.setOutputFolder(tempFolder);
 
-    SaveImage.Processor processor = new SaveImage.Processor(settings);
+    try (SaveImage.Processor processor = new SaveImage.Processor(settings)) {
 
-    BufferedImage img;
-    try (InputStream is =
-        SaveImageTest.class.getClassLoader().getResourceAsStream("testimage.jpg")) {
-      img = ImageIO.read(is);
+      BufferedImage img;
+      try (InputStream is =
+          SaveImageTest.class.getClassLoader().getResourceAsStream("testimage.jpg")) {
+        img = ImageIO.read(is);
+      }
+
+      TestItem item = new TestItem();
+      Image content1 = item.createContent(Image.class).withData(img).save();
+      Image content2 = item.createContent(Image.class).withData(img).save();
+
+      processor.process(item);
+
+      String extension;
+      if (fileType == SaveImage.FileType.PNG) {
+        extension = ".png";
+      } else {
+        extension = ".jpg";
+      }
+
+      Path expected1 = tempFolder.resolve(item.getId()).resolve(content1.getId() + extension);
+      Path expected2 = tempFolder.resolve(item.getId()).resolve(content2.getId() + extension);
+
+      assertTrue(expected1.toFile().exists());
+      assertTrue(Files.size(expected1) > 0L);
+
+      assertTrue(expected2.toFile().exists());
+      assertTrue(Files.size(expected2) > 0L);
+
+      expected1.toFile().delete();
+      expected2.toFile().delete();
+      tempFolder.resolve(item.getId()).toFile().delete();
+      tempFolder.toFile().delete();
     }
-
-    TestItem item = new TestItem();
-    Image content1 = item.createContent(Image.class).withData(img).save();
-    Image content2 = item.createContent(Image.class).withData(img).save();
-
-    processor.process(item);
-
-    String extension;
-    if (fileType == SaveImage.FileType.PNG) {
-      extension = ".png";
-    } else {
-      extension = ".jpg";
-    }
-
-    Path expected1 = tempFolder.resolve(item.getId()).resolve(content1.getId() + extension);
-    Path expected2 = tempFolder.resolve(item.getId()).resolve(content2.getId() + extension);
-
-    assertTrue(expected1.toFile().exists());
-    assertTrue(Files.size(expected1) > 0L);
-
-    assertTrue(expected2.toFile().exists());
-    assertTrue(Files.size(expected2) > 0L);
-
-    expected1.toFile().delete();
-    expected2.toFile().delete();
-    tempFolder.resolve(item.getId()).toFile().delete();
-    tempFolder.toFile().delete();
   }
 }
