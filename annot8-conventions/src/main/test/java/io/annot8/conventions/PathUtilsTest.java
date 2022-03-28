@@ -10,52 +10,52 @@ import org.junit.jupiter.api.Test;
 class PathUtilsTest {
 
   private String TEST_PATH = "hello/world";
-  private String[] TEST_PARTS = new String[] { "hello" , "world" };
+  private String[] TEST_PARTS = new String[] {"hello", "world"};
 
   @Test
-  void joinIterator() {
+  public void joinIterator() {
     String path = PathUtils.join(Arrays.asList(TEST_PARTS).iterator());
     assertThat(path).isEqualTo(TEST_PATH);
   }
 
   @Test
-  void joinStream() {
+  public void joinStream() {
     String path = PathUtils.join(Arrays.asList(TEST_PARTS).stream());
     assertThat(path).isEqualTo(TEST_PATH);
   }
 
   @Test
-  void joinArray() {
+  public void joinArray() {
     String path = PathUtils.join(TEST_PARTS);
     assertThat(path).isEqualTo(TEST_PATH);
   }
 
   @Test
-  void joinIterable() {
+  public void joinIterable() {
     String path = PathUtils.join(Arrays.asList(TEST_PARTS));
     assertThat(path).isEqualTo(TEST_PATH);
   }
 
   @Test
-  void split() {
+  public void split() {
     String[] path = PathUtils.split(TEST_PATH);
     assertThat(path).isEqualTo(TEST_PARTS);
   }
 
   @Test
-  void splitToIterable() {
+  public void splitToIterable() {
     Iterable<String> path = PathUtils.splitToIterable(TEST_PATH);
     assertThat(path).containsExactly(TEST_PARTS);
   }
 
   @Test
-  void splitToStream() {
+  public void splitToStream() {
     Stream<String> path = PathUtils.splitToStream(TEST_PATH);
     assertThat(path).containsExactly(TEST_PARTS);
   }
 
   @Test
-  void splitToList() {
+  public void splitToList() {
     List<String> path = PathUtils.splitToList(TEST_PATH);
     assertThat(path).containsExactly(TEST_PARTS);
   }

@@ -21,55 +21,58 @@ import org.junit.jupiter.api.Test;
 public class WordNetTest {
   @Test
   public void test() {
-    Processor p = new WordNet.Processor();
-    Item item = new TestItem();
+    try (Processor p = new WordNet.Processor()) {
+      Item item = new TestItem();
 
-    Text content = item.createContent(TestStringContent.class).withData("Is this working?").save();
+      Text content =
+          item.createContent(TestStringContent.class).withData("Is this working?").save();
 
-    content
-        .getAnnotations()
-        .create()
-        .withType(AnnotationTypes.ANNOTATION_TYPE_WORDTOKEN)
-        .withBounds(new SpanBounds(0, 2))
-        .withProperty(PropertyKeys.PROPERTY_KEY_PARTOFSPEECH, "VBZ")
-        .save();
-    content
-        .getAnnotations()
-        .create()
-        .withType(AnnotationTypes.ANNOTATION_TYPE_WORDTOKEN)
-        .withBounds(new SpanBounds(3, 7))
-        .withProperty(PropertyKeys.PROPERTY_KEY_PARTOFSPEECH, "DT")
-        .save();
-    content
-        .getAnnotations()
-        .create()
-        .withType(AnnotationTypes.ANNOTATION_TYPE_WORDTOKEN)
-        .withBounds(new SpanBounds(8, 15))
-        .withProperty(PropertyKeys.PROPERTY_KEY_PARTOFSPEECH, "NN")
-        .save();
-    content
-        .getAnnotations()
-        .create()
-        .withType(AnnotationTypes.ANNOTATION_TYPE_WORDTOKEN)
-        .withBounds(new SpanBounds(15, 16))
-        .withProperty(PropertyKeys.PROPERTY_KEY_PARTOFSPEECH, ".")
-        .save();
+      content
+          .getAnnotations()
+          .create()
+          .withType(AnnotationTypes.ANNOTATION_TYPE_WORDTOKEN)
+          .withBounds(new SpanBounds(0, 2))
+          .withProperty(PropertyKeys.PROPERTY_KEY_PARTOFSPEECH, "VBZ")
+          .save();
+      content
+          .getAnnotations()
+          .create()
+          .withType(AnnotationTypes.ANNOTATION_TYPE_WORDTOKEN)
+          .withBounds(new SpanBounds(3, 7))
+          .withProperty(PropertyKeys.PROPERTY_KEY_PARTOFSPEECH, "DT")
+          .save();
+      content
+          .getAnnotations()
+          .create()
+          .withType(AnnotationTypes.ANNOTATION_TYPE_WORDTOKEN)
+          .withBounds(new SpanBounds(8, 15))
+          .withProperty(PropertyKeys.PROPERTY_KEY_PARTOFSPEECH, "NN")
+          .save();
+      content
+          .getAnnotations()
+          .create()
+          .withType(AnnotationTypes.ANNOTATION_TYPE_WORDTOKEN)
+          .withBounds(new SpanBounds(15, 16))
+          .withProperty(PropertyKeys.PROPERTY_KEY_PARTOFSPEECH, ".")
+          .save();
 
-    p.process(item);
+      p.process(item);
 
-    List<Annotation> annotations =
-        content
-            .getAnnotations()
-            .getByBoundsAndType(SpanBounds.class, AnnotationTypes.ANNOTATION_TYPE_WORDTOKEN)
-            .sorted(SortUtils.SORT_BY_SPANBOUNDS)
-            .collect(Collectors.toList());
+      List<Annotation> annotations =
+          content
+              .getAnnotations()
+              .getByBoundsAndType(SpanBounds.class, AnnotationTypes.ANNOTATION_TYPE_WORDTOKEN)
+              .sorted(SortUtils.SORT_BY_SPANBOUNDS)
+              .collect(Collectors.toList());
 
-    Annotation is = annotations.get(0);
-    assertTrue(is.getProperties().has(PropertyKeys.PROPERTY_KEY_LEMMA));
-    assertEquals("be", is.getProperties().get(PropertyKeys.PROPERTY_KEY_LEMMA, String.class).get());
+      Annotation is = annotations.get(0);
+      assertTrue(is.getProperties().has(PropertyKeys.PROPERTY_KEY_LEMMA));
+      assertEquals(
+          "be", is.getProperties().get(PropertyKeys.PROPERTY_KEY_LEMMA, String.class).get());
 
-    Annotation qm = annotations.get(3);
-    assertFalse(qm.getProperties().has(PropertyKeys.PROPERTY_KEY_LEMMA));
+      Annotation qm = annotations.get(3);
+      assertFalse(qm.getProperties().has(PropertyKeys.PROPERTY_KEY_LEMMA));
+    }
   }
 
   @Test
