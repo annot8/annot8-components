@@ -63,27 +63,27 @@ public class PptExtractor
     }
 
     @Override
-    public boolean isMetadataSupported() {
+    protected boolean isMetadataSupported() {
       return true;
     }
 
     @Override
-    public boolean isTextSupported() {
+    protected boolean isTextSupported() {
       return true;
     }
 
     @Override
-    public boolean isImagesSupported() {
+    protected boolean isImagesSupported() {
       return true;
     }
 
     @Override
-    public boolean isTablesSupported() {
+    protected boolean isTablesSupported() {
       return false;
     }
 
     @Override
-    public boolean acceptFile(FileContent file) {
+    protected boolean acceptFile(FileContent file) {
       HSLFSlideShow doc;
       try {
         doc = new HSLFSlideShow(new FileInputStream(file.getData()));
@@ -97,7 +97,7 @@ public class PptExtractor
     }
 
     @Override
-    public boolean acceptInputStream(InputStreamContent inputStream) {
+    protected boolean acceptInputStream(InputStreamContent inputStream) {
       HSLFSlideShow doc;
       try {
         doc = new HSLFSlideShow(inputStream.getData());
@@ -115,7 +115,7 @@ public class PptExtractor
     }
 
     @Override
-    public HSLFSlideShow extractDocument(FileContent file) throws IOException {
+    protected HSLFSlideShow extractDocument(FileContent file) throws IOException {
       if (cache.containsKey(file.getId())) {
         return cache.get(file.getId());
       } else {
@@ -124,7 +124,8 @@ public class PptExtractor
     }
 
     @Override
-    public HSLFSlideShow extractDocument(InputStreamContent inputStreamContent) throws IOException {
+    protected HSLFSlideShow extractDocument(InputStreamContent inputStreamContent)
+        throws IOException {
       if (cache.containsKey(inputStreamContent.getId())) {
         return cache.get(inputStreamContent.getId());
       } else {
@@ -133,140 +134,152 @@ public class PptExtractor
     }
 
     @Override
-    public Map<String, Object> extractMetadata(HSLFSlideShow doc) {
+    protected Map<String, Object> extractMetadata(HSLFSlideShow doc) {
       Map<String, Object> props = new HashMap<>();
 
-      HPSFPropertiesExtractor propsEx = new HPSFPropertiesExtractor(doc);
-      SummaryInformation si = propsEx.getSummaryInformation();
+      try (HPSFPropertiesExtractor propsEx = new HPSFPropertiesExtractor(doc)) {
+        propsEx.setCloseFilesystem(false);
 
-      props.put(DocumentProperties.APPLICATION, si.getApplicationName());
-      props.put(DocumentProperties.AUTHOR, si.getAuthor());
-      props.put(DocumentProperties.CHARACTER_COUNT, si.getCharCount());
-      props.put(DocumentProperties.KEYWORDS, si.getKeywords());
-      props.put(DocumentProperties.COMMENTS, si.getComments());
-      props.put(DocumentProperties.CREATION_DATE, toTemporal(si.getCreateDateTime()));
-      props.put(DocumentProperties.EDITING_DURATION, si.getEditTime());
-      props.put(DocumentProperties.LAST_MODIFIED_BY, si.getLastAuthor());
-      props.put(DocumentProperties.LAST_PRINTED_DATE, toTemporal(si.getLastPrinted()));
-      props.put(DocumentProperties.LAST_MODIFIED_DATE, toTemporal(si.getLastSaveDateTime()));
-      props.put(DocumentProperties.PAGE_COUNT, si.getPageCount());
-      props.put(DocumentProperties.REVISION, si.getRevNumber());
-      switch (si.getSecurity()) {
-          // 0 = No security, so let's ignore
-        case 1:
-          props.put(DocumentProperties.SECURITY, "passwordProtected");
-          break;
-        case 2:
-          props.put(DocumentProperties.SECURITY, "readOnlyRecommended");
-          break;
-        case 4:
-          props.put(DocumentProperties.SECURITY, "readOnlyEnforced");
-          break;
-        case 8:
-          props.put(DocumentProperties.SECURITY, "lockedForAnnotations");
-          break;
+        SummaryInformation si = propsEx.getSummaryInformation();
+
+        props.put(DocumentProperties.APPLICATION, si.getApplicationName());
+        props.put(DocumentProperties.AUTHOR, si.getAuthor());
+        props.put(DocumentProperties.CHARACTER_COUNT, si.getCharCount());
+        props.put(DocumentProperties.KEYWORDS, si.getKeywords());
+        props.put(DocumentProperties.COMMENTS, si.getComments());
+        props.put(DocumentProperties.CREATION_DATE, toTemporal(si.getCreateDateTime()));
+        props.put(DocumentProperties.EDITING_DURATION, si.getEditTime());
+        props.put(DocumentProperties.LAST_MODIFIED_BY, si.getLastAuthor());
+        props.put(DocumentProperties.LAST_PRINTED_DATE, toTemporal(si.getLastPrinted()));
+        props.put(DocumentProperties.LAST_MODIFIED_DATE, toTemporal(si.getLastSaveDateTime()));
+        props.put(DocumentProperties.PAGE_COUNT, si.getPageCount());
+        props.put(DocumentProperties.REVISION, si.getRevNumber());
+        switch (si.getSecurity()) {
+            // 0 = No security, so let's ignore
+          case 1:
+            props.put(DocumentProperties.SECURITY, "passwordProtected");
+            break;
+          case 2:
+            props.put(DocumentProperties.SECURITY, "readOnlyRecommended");
+            break;
+          case 4:
+            props.put(DocumentProperties.SECURITY, "readOnlyEnforced");
+            break;
+          case 8:
+            props.put(DocumentProperties.SECURITY, "lockedForAnnotations");
+            break;
+        }
+        props.put(DocumentProperties.SUBJECT, si.getSubject());
+        props.put(PropertyKeys.PROPERTY_KEY_TITLE, si.getTitle());
+        props.put(DocumentProperties.TEMPLATE, si.getTemplate());
+        props.put(DocumentProperties.WORD_COUNT, si.getWordCount());
+
+        DocumentSummaryInformation di = propsEx.getDocSummaryInformation();
+        props.put(DocumentProperties.APPLICATION_VERSION, di.getApplicationVersion());
+        props.put(DocumentProperties.CATEGORY, di.getCategory());
+        props.put(DocumentProperties.COMPANY, di.getCompany());
+        props.put(DocumentProperties.CONTENT_STATUS, di.getContentStatus());
+        props.put(DocumentProperties.CONTENT_TYPE, di.getContentType());
+        props.put(DocumentProperties.BYTE_COUNT, di.getByteCount());
+        props.put(DocumentProperties.CHARACTER_COUNT_WS, di.getCharCountWithSpaces());
+        props.put(DocumentProperties.DOCUMENT_VERSION, di.getDocumentVersion());
+        props.put(DocumentProperties.HIDDEN_COUNT, di.getHiddenCount());
+        props.put(PropertyKeys.PROPERTY_KEY_LANGUAGE, di.getLanguage());
+        props.put(DocumentProperties.LINE_COUNT, di.getLineCount());
+        props.put(DocumentProperties.MANAGER, di.getManager());
+        props.put(DocumentProperties.MULTIMEDIA_CLIP_COUNT, di.getMMClipCount());
+        props.put(DocumentProperties.NOTE_COUNT, di.getNoteCount());
+        props.put(DocumentProperties.PARAGRAPH_COUNT, di.getParCount());
+        props.put(DocumentProperties.PRESENTATION_FORMAT, di.getPresentationFormat());
+        props.put(DocumentProperties.SLIDE_COUNT, di.getSlideCount());
+
+        di.getCustomProperties()
+            .forEach((k, v) -> props.put(DocumentProperties.CUSTOM_PREFIX + k, v));
+
+        // Remove any values that are 0, which POI uses to indicate null for integers
+        props.values().removeIf(o -> Integer.valueOf(0).equals(o));
+      } catch (IOException e) {
+        throw new ProcessingException("Error extracting metadata", e);
       }
-      props.put(DocumentProperties.SUBJECT, si.getSubject());
-      props.put(PropertyKeys.PROPERTY_KEY_TITLE, si.getTitle());
-      props.put(DocumentProperties.TEMPLATE, si.getTemplate());
-      props.put(DocumentProperties.WORD_COUNT, si.getWordCount());
-
-      DocumentSummaryInformation di = propsEx.getDocSummaryInformation();
-      props.put(DocumentProperties.APPLICATION_VERSION, di.getApplicationVersion());
-      props.put(DocumentProperties.CATEGORY, di.getCategory());
-      props.put(DocumentProperties.COMPANY, di.getCompany());
-      props.put(DocumentProperties.CONTENT_STATUS, di.getContentStatus());
-      props.put(DocumentProperties.CONTENT_TYPE, di.getContentType());
-      props.put(DocumentProperties.BYTE_COUNT, di.getByteCount());
-      props.put(DocumentProperties.CHARACTER_COUNT_WS, di.getCharCountWithSpaces());
-      props.put(DocumentProperties.DOCUMENT_VERSION, di.getDocumentVersion());
-      props.put(DocumentProperties.HIDDEN_COUNT, di.getHiddenCount());
-      props.put(PropertyKeys.PROPERTY_KEY_LANGUAGE, di.getLanguage());
-      props.put(DocumentProperties.LINE_COUNT, di.getLineCount());
-      props.put(DocumentProperties.MANAGER, di.getManager());
-      props.put(DocumentProperties.MULTIMEDIA_CLIP_COUNT, di.getMMClipCount());
-      props.put(DocumentProperties.NOTE_COUNT, di.getNoteCount());
-      props.put(DocumentProperties.PARAGRAPH_COUNT, di.getParCount());
-      props.put(DocumentProperties.PRESENTATION_FORMAT, di.getPresentationFormat());
-      props.put(DocumentProperties.SLIDE_COUNT, di.getSlideCount());
-
-      di.getCustomProperties()
-          .forEach((k, v) -> props.put(DocumentProperties.CUSTOM_PREFIX + k, v));
-
-      // Remove any values that are 0, which POI uses to indicate null for integers
-      props.values().removeIf(o -> Integer.valueOf(0).equals(o));
 
       return props;
     }
 
     @Override
-    public Collection<ExtractionWithProperties<String>> extractText(HSLFSlideShow doc) {
+    protected Collection<ExtractionWithProperties<String>> extractText(HSLFSlideShow doc) {
       List<ExtractionWithProperties<String>> extractedText = new ArrayList<>();
 
-      SlideShowExtractor<HSLFShape, HSLFTextParagraph> slideExtractor =
-          new SlideShowExtractor<>(doc);
-      slideExtractor.setCommentsByDefault(false);
-      slideExtractor.setMasterByDefault(true);
-      slideExtractor.setNotesByDefault(false);
-      slideExtractor.setSlidesByDefault(true);
+      try (SlideShowExtractor<HSLFShape, HSLFTextParagraph> notesExtractor =
+              new SlideShowExtractor<>(doc);
+          SlideShowExtractor<HSLFShape, HSLFTextParagraph> commentsExtractor =
+              new SlideShowExtractor<>(doc);
+          SlideShowExtractor<HSLFShape, HSLFTextParagraph> slideExtractor =
+              new SlideShowExtractor<>(doc)) {
 
-      SlideShowExtractor<HSLFShape, HSLFTextParagraph> notesExtractor =
-          new SlideShowExtractor<>(doc);
-      notesExtractor.setCommentsByDefault(false);
-      notesExtractor.setMasterByDefault(false);
-      notesExtractor.setNotesByDefault(true);
-      notesExtractor.setSlidesByDefault(false);
+        slideExtractor.setCloseFilesystem(false);
+        slideExtractor.setCommentsByDefault(false);
+        slideExtractor.setMasterByDefault(true);
+        slideExtractor.setNotesByDefault(false);
+        slideExtractor.setSlidesByDefault(true);
 
-      SlideShowExtractor<HSLFShape, HSLFTextParagraph> commentsExtractor =
-          new SlideShowExtractor<>(doc);
-      commentsExtractor.setCommentsByDefault(true);
-      commentsExtractor.setMasterByDefault(false);
-      commentsExtractor.setNotesByDefault(false);
-      commentsExtractor.setSlidesByDefault(false);
+        notesExtractor.setCloseFilesystem(false);
+        notesExtractor.setCommentsByDefault(false);
+        notesExtractor.setMasterByDefault(false);
+        notesExtractor.setNotesByDefault(true);
+        notesExtractor.setSlidesByDefault(false);
 
-      for (HSLFSlide slide : doc.getSlides()) {
-        // Extract Slides
-        String slideText = slideExtractor.getText(slide);
+        commentsExtractor.setCloseFilesystem(false);
+        commentsExtractor.setCommentsByDefault(true);
+        commentsExtractor.setMasterByDefault(false);
+        commentsExtractor.setNotesByDefault(false);
+        commentsExtractor.setSlidesByDefault(false);
 
-        if (!slideText.isBlank()) {
-          Map<String, Object> slideProperties = new HashMap<>();
-          slideProperties.put(PropertyKeys.PROPERTY_KEY_NAME, slide.getSlideName());
-          slideProperties.put(PropertyKeys.PROPERTY_KEY_PAGE, slide.getSlideNumber());
-          slideProperties.put(PropertyKeys.PROPERTY_KEY_SUBTYPE, "slide");
+        for (HSLFSlide slide : doc.getSlides()) {
+          // Extract Slides
+          String slideText = slideExtractor.getText(slide);
 
-          extractedText.add(new ExtractionWithProperties<>(slideText, slideProperties));
+          if (!slideText.isBlank()) {
+            Map<String, Object> slideProperties = new HashMap<>();
+            slideProperties.put(PropertyKeys.PROPERTY_KEY_NAME, slide.getSlideName());
+            slideProperties.put(PropertyKeys.PROPERTY_KEY_PAGE, slide.getSlideNumber());
+            slideProperties.put(PropertyKeys.PROPERTY_KEY_SUBTYPE, "slide");
+
+            extractedText.add(new ExtractionWithProperties<>(slideText, slideProperties));
+          }
+
+          // Extract Notes
+          String notesText = notesExtractor.getText(slide);
+
+          if (!notesText.isBlank()) {
+            Map<String, Object> notesProperties = new HashMap<>();
+            notesProperties.put(PropertyKeys.PROPERTY_KEY_NAME, slide.getSlideName());
+            notesProperties.put(PropertyKeys.PROPERTY_KEY_PAGE, slide.getSlideNumber());
+            notesProperties.put(PropertyKeys.PROPERTY_KEY_SUBTYPE, "note");
+
+            extractedText.add(new ExtractionWithProperties<>(notesText, notesProperties));
+          }
+
+          // Extract Comments
+          String commentsText = commentsExtractor.getText(slide);
+
+          if (!commentsText.isBlank()) {
+            Map<String, Object> commentsProperties = new HashMap<>();
+            commentsProperties.put(PropertyKeys.PROPERTY_KEY_NAME, slide.getSlideName());
+            commentsProperties.put(PropertyKeys.PROPERTY_KEY_PAGE, slide.getSlideNumber());
+            commentsProperties.put(PropertyKeys.PROPERTY_KEY_SUBTYPE, "comment");
+
+            extractedText.add(new ExtractionWithProperties<>(commentsText, commentsProperties));
+          }
         }
-
-        // Extract Notes
-        String notesText = notesExtractor.getText(slide);
-
-        if (!notesText.isBlank()) {
-          Map<String, Object> notesProperties = new HashMap<>();
-          notesProperties.put(PropertyKeys.PROPERTY_KEY_NAME, slide.getSlideName());
-          notesProperties.put(PropertyKeys.PROPERTY_KEY_PAGE, slide.getSlideNumber());
-          notesProperties.put(PropertyKeys.PROPERTY_KEY_SUBTYPE, "note");
-
-          extractedText.add(new ExtractionWithProperties<>(notesText, notesProperties));
-        }
-
-        // Extract Comments
-        String commentsText = commentsExtractor.getText(slide);
-
-        if (!commentsText.isBlank()) {
-          Map<String, Object> commentsProperties = new HashMap<>();
-          commentsProperties.put(PropertyKeys.PROPERTY_KEY_NAME, slide.getSlideName());
-          commentsProperties.put(PropertyKeys.PROPERTY_KEY_PAGE, slide.getSlideNumber());
-          commentsProperties.put(PropertyKeys.PROPERTY_KEY_SUBTYPE, "comment");
-
-          extractedText.add(new ExtractionWithProperties<>(commentsText, commentsProperties));
-        }
+      } catch (IOException e) {
+        throw new ProcessingException("Error extracting text for " + doc.getClass().getName(), e);
       }
 
       return extractedText;
     }
 
     @Override
-    public Collection<ExtractionWithProperties<BufferedImage>> extractImages(HSLFSlideShow doc) {
+    protected Collection<ExtractionWithProperties<BufferedImage>> extractImages(HSLFSlideShow doc) {
       List<ExtractionWithProperties<BufferedImage>> extractedImages = new ArrayList<>();
 
       for (HSLFPictureData picture : doc.getPictureData()) {
@@ -303,7 +316,7 @@ public class PptExtractor
     }
 
     @Override
-    public Collection<ExtractionWithProperties<Table>> extractTables(HSLFSlideShow doc)
+    protected Collection<ExtractionWithProperties<Table>> extractTables(HSLFSlideShow doc)
         throws ProcessingException {
       // TODO: Extract tables from PPT
       return Collections.emptyList();

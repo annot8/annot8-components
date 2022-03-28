@@ -45,44 +45,44 @@ public class PlainTextExtractor
     }
 
     @Override
-    public boolean isMetadataSupported() {
+    protected boolean isMetadataSupported() {
       return false;
     }
 
     @Override
-    public boolean isTextSupported() {
+    protected boolean isTextSupported() {
       return true;
     }
 
     @Override
-    public boolean isImagesSupported() {
+    protected boolean isImagesSupported() {
       return false;
     }
 
     @Override
-    public boolean isTablesSupported() {
+    protected boolean isTablesSupported() {
       return false;
     }
 
     @Override
-    public boolean acceptFile(FileContent file) {
+    protected boolean acceptFile(FileContent file) {
       return true;
     }
 
     @Override
-    public boolean acceptInputStream(InputStreamContent inputStream) {
+    protected boolean acceptInputStream(InputStreamContent inputStream) {
       return true;
     }
 
     @Override
-    public String extractDocument(FileContent file) throws IOException {
+    protected String extractDocument(FileContent file) throws IOException {
       try (Stream<String> lines = Files.lines(file.getData().toPath(), StandardCharsets.UTF_8)) {
         return lines.collect(Collectors.joining("\n"));
       }
     }
 
     @Override
-    public String extractDocument(InputStreamContent inputStreamContent) throws IOException {
+    protected String extractDocument(InputStreamContent inputStreamContent) throws IOException {
       try (BufferedReader reader =
           new BufferedReader(
               new InputStreamReader(inputStreamContent.getData(), StandardCharsets.UTF_8))) {
@@ -91,22 +91,22 @@ public class PlainTextExtractor
     }
 
     @Override
-    public Map<String, Object> extractMetadata(String doc) {
+    protected Map<String, Object> extractMetadata(String doc) {
       return Collections.emptyMap();
     }
 
     @Override
-    public Collection<ExtractionWithProperties<String>> extractText(String doc) {
+    protected Collection<ExtractionWithProperties<String>> extractText(String doc) {
       return Collections.singletonList(new ExtractionWithProperties<>(doc));
     }
 
     @Override
-    public Collection<ExtractionWithProperties<BufferedImage>> extractImages(String doc) {
+    protected Collection<ExtractionWithProperties<BufferedImage>> extractImages(String doc) {
       return Collections.emptyList();
     }
 
     @Override
-    public Collection<ExtractionWithProperties<Table>> extractTables(String doc)
+    protected Collection<ExtractionWithProperties<Table>> extractTables(String doc)
         throws ProcessingException {
       return Collections.emptyList();
     }

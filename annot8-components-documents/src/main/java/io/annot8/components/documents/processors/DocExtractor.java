@@ -68,27 +68,27 @@ public class DocExtractor
     }
 
     @Override
-    public boolean isMetadataSupported() {
+    protected boolean isMetadataSupported() {
       return true;
     }
 
     @Override
-    public boolean isTextSupported() {
+    protected boolean isTextSupported() {
       return true;
     }
 
     @Override
-    public boolean isImagesSupported() {
+    protected boolean isImagesSupported() {
       return true;
     }
 
     @Override
-    public boolean isTablesSupported() {
+    protected boolean isTablesSupported() {
       return true;
     }
 
     @Override
-    public boolean acceptFile(FileContent file) {
+    protected boolean acceptFile(FileContent file) {
       HWPFDocument doc;
       try {
         doc = new HWPFDocument(new FileInputStream(file.getData()));
@@ -102,7 +102,7 @@ public class DocExtractor
     }
 
     @Override
-    public boolean acceptInputStream(InputStreamContent inputStream) {
+    protected boolean acceptInputStream(InputStreamContent inputStream) {
       HWPFDocument doc;
       try {
         doc = new HWPFDocument(inputStream.getData());
@@ -120,7 +120,7 @@ public class DocExtractor
     }
 
     @Override
-    public HWPFDocument extractDocument(FileContent file) throws IOException {
+    protected HWPFDocument extractDocument(FileContent file) throws IOException {
       if (cache.containsKey(file.getId())) {
         return cache.get(file.getId());
       } else {
@@ -129,7 +129,8 @@ public class DocExtractor
     }
 
     @Override
-    public HWPFDocument extractDocument(InputStreamContent inputStreamContent) throws IOException {
+    protected HWPFDocument extractDocument(InputStreamContent inputStreamContent)
+        throws IOException {
       if (cache.containsKey(inputStreamContent.getId())) {
         return cache.get(inputStreamContent.getId());
       } else {
@@ -138,7 +139,7 @@ public class DocExtractor
     }
 
     @Override
-    public Map<String, Object> extractMetadata(HWPFDocument doc) {
+    protected Map<String, Object> extractMetadata(HWPFDocument doc) {
       Map<String, Object> props = new HashMap<>();
 
       try (HPSFPropertiesExtractor propsEx = new HPSFPropertiesExtractor(doc)) {
@@ -200,19 +201,24 @@ public class DocExtractor
 
         // Remove any values that are 0, which POI uses to indicate null for integers
         props.values().removeIf(o -> Integer.valueOf(0).equals(o));
+      } catch (IOException e) {
+        throw new ProcessingException("Error extracting metadata from HWPFDocument", e);
       }
+
       return props;
     }
 
     @Override
-    public Collection<ExtractionWithProperties<String>> extractText(HWPFDocument doc) {
+    protected Collection<ExtractionWithProperties<String>> extractText(HWPFDocument doc) {
       try (WordExtractor wordExtractor = new WordExtractor(doc)) {
         return List.of(new ExtractionWithProperties<>(wordExtractor.getText()));
+      } catch (IOException e) {
+        throw new ProcessingException("Error extracting text from HWPFDocument", e);
       }
     }
 
     @Override
-    public Collection<ExtractionWithProperties<BufferedImage>> extractImages(HWPFDocument doc) {
+    protected Collection<ExtractionWithProperties<BufferedImage>> extractImages(HWPFDocument doc) {
       List<ExtractionWithProperties<BufferedImage>> extractedImages = new ArrayList<>();
 
       int imageNumber = 0;
@@ -254,7 +260,7 @@ public class DocExtractor
     }
 
     @Override
-    public Collection<ExtractionWithProperties<Table>> extractTables(HWPFDocument doc)
+    protected Collection<ExtractionWithProperties<Table>> extractTables(HWPFDocument doc)
         throws ProcessingException {
 
       List<ExtractionWithProperties<Table>> ret = new ArrayList<>();
@@ -273,7 +279,7 @@ public class DocExtractor
     private final List<Row> rows;
     private final List<String> columnNames;
 
-    public DocTable(org.apache.poi.hwpf.usermodel.Table t) {
+    protected DocTable(org.apache.poi.hwpf.usermodel.Table t) {
 
       List<Row> tempRows = new ArrayList<>(t.numRows());
 

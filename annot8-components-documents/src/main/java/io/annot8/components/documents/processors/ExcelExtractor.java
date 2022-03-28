@@ -81,7 +81,7 @@ public class ExcelExtractor
       return ProcessorResponse.ok();
     }
 
-    public Pair<Workbook, String> mapToWorkbook(FileContent fileContent) {
+    protected Pair<Workbook, String> mapToWorkbook(FileContent fileContent) {
       try {
         return new Pair<>(WorkbookFactory.create(fileContent.getData()), fileContent.getId());
       } catch (IOException e) {
@@ -90,7 +90,7 @@ public class ExcelExtractor
       }
     }
 
-    public Pair<Workbook, String> mapToWorkbook(InputStreamContent inputStream) {
+    protected Pair<Workbook, String> mapToWorkbook(InputStreamContent inputStream) {
       try {
         return new Pair<>(WorkbookFactory.create(inputStream.getData()), inputStream.getId());
       } catch (IOException e) {

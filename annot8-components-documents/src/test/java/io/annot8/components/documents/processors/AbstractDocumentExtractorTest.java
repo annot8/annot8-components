@@ -101,8 +101,6 @@ public abstract class AbstractDocumentExtractorTest {
     AbstractDocumentExtractorDescriptor<?, DocumentExtractorSettings> desc =
         getInstantiatedDescriptor(settings);
 
-    Capabilities capabilities = desc.capabilities();
-
     assertEquals(
         1,
         desc.capabilities()
@@ -318,6 +316,7 @@ public abstract class AbstractDocumentExtractorTest {
     return getDescriptor().getConstructor().newInstance();
   }
 
+  @SuppressWarnings("unchecked")
   protected <S extends DocumentExtractorSettings>
       AbstractDocumentExtractorDescriptor<?, S> getInstantiatedDescriptor(S settings)
           throws Exception {
@@ -328,6 +327,7 @@ public abstract class AbstractDocumentExtractorTest {
     return desc;
   }
 
+  @SuppressWarnings("unchecked")
   protected <S extends DocumentExtractorSettings>
       AbstractDocumentExtractorProcessor<?, S> getInstantiatedProcessor(S settings) {
     try {

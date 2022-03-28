@@ -243,49 +243,49 @@ public abstract class AbstractDocumentExtractorProcessor<T, S extends DocumentEx
   // Abstract functions below here
 
   /** Returns true if this processor supports extracting metadata, and false otherwise */
-  public abstract boolean isMetadataSupported();
+  protected abstract boolean isMetadataSupported();
 
   /** Returns true if this processor supports extracting text, and false otherwise */
-  public abstract boolean isTextSupported();
+  protected abstract boolean isTextSupported();
 
   /** Returns true if this processor supports extracting images, and false otherwise */
-  public abstract boolean isImagesSupported();
+  protected abstract boolean isImagesSupported();
 
   /** Returns true if this processor supports extracting tables, and false otherwise */
-  public abstract boolean isTablesSupported();
+  protected abstract boolean isTablesSupported();
 
   /** Returns true if this processor should process the given file, and false otherwise */
-  public abstract boolean acceptFile(FileContent file);
+  protected abstract boolean acceptFile(FileContent file);
 
   /**
    * Returns true if this processor should process the given InputStream, and false otherwise
    *
    * <p>Note that this method should not modify the InputStream
    */
-  public abstract boolean acceptInputStream(InputStreamContent inputStream);
+  protected abstract boolean acceptInputStream(InputStreamContent inputStream);
 
   /** Convert the given file into the correct format for processing */
-  public abstract T extractDocument(FileContent file) throws IOException;
+  protected abstract T extractDocument(FileContent file) throws IOException;
 
   /** Convert the given InputStream into the correct format for processing */
-  public abstract T extractDocument(InputStreamContent inputStreamContent) throws IOException;
+  protected abstract T extractDocument(InputStreamContent inputStreamContent) throws IOException;
 
   /**
    * Extract metadata from the document, returning it as a Map. Empty and null values in the
    * returned Map will be ignored.
    */
-  public abstract Map<String, Object> extractMetadata(T doc) throws ProcessingException;
+  protected abstract Map<String, Object> extractMetadata(T doc) throws ProcessingException;
 
   /** Extract text from the document */
-  public abstract Collection<ExtractionWithProperties<String>> extractText(T doc)
+  protected abstract Collection<ExtractionWithProperties<String>> extractText(T doc)
       throws ProcessingException;
 
   /** Extract images from the document */
-  public abstract Collection<ExtractionWithProperties<BufferedImage>> extractImages(T doc)
+  protected abstract Collection<ExtractionWithProperties<BufferedImage>> extractImages(T doc)
       throws ProcessingException;
 
   /** Extract tables from the document */
-  public abstract Collection<ExtractionWithProperties<Table>> extractTables(T doc)
+  protected abstract Collection<ExtractionWithProperties<Table>> extractTables(T doc)
       throws ProcessingException;
 
   // Utility functions below here

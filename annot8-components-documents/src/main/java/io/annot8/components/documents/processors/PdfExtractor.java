@@ -108,27 +108,27 @@ public class PdfExtractor
     }
 
     @Override
-    public boolean isMetadataSupported() {
+    protected boolean isMetadataSupported() {
       return true;
     }
 
     @Override
-    public boolean isTextSupported() {
+    protected boolean isTextSupported() {
       return true;
     }
 
     @Override
-    public boolean isImagesSupported() {
+    protected boolean isImagesSupported() {
       return true;
     }
 
     @Override
-    public boolean isTablesSupported() {
+    protected boolean isTablesSupported() {
       return true;
     }
 
     @Override
-    public boolean acceptFile(FileContent file) {
+    protected boolean acceptFile(FileContent file) {
       try {
         return FileMagic.valueOf(file.getData()) == FileMagic.PDF;
       } catch (IOException ioe) {
@@ -137,7 +137,7 @@ public class PdfExtractor
     }
 
     @Override
-    public boolean acceptInputStream(InputStreamContent inputStream) {
+    protected boolean acceptInputStream(InputStreamContent inputStream) {
       try (InputStream is = new BufferedInputStream(inputStream.getData())) {
         return FileMagic.valueOf(is) == FileMagic.PDF;
       } catch (IOException ioe) {
@@ -146,17 +146,17 @@ public class PdfExtractor
     }
 
     @Override
-    public PDDocument extractDocument(FileContent file) throws IOException {
+    protected PDDocument extractDocument(FileContent file) throws IOException {
       return PDDocument.load(file.getData());
     }
 
     @Override
-    public PDDocument extractDocument(InputStreamContent inputStreamContent) throws IOException {
+    protected PDDocument extractDocument(InputStreamContent inputStreamContent) throws IOException {
       return PDDocument.load(inputStreamContent.getData());
     }
 
     @Override
-    public Map<String, Object> extractMetadata(PDDocument doc) {
+    protected Map<String, Object> extractMetadata(PDDocument doc) {
       Map<String, Object> metadata = new HashMap<>();
 
       PDDocumentInformation info = doc.getDocumentInformation();
@@ -180,7 +180,7 @@ public class PdfExtractor
     }
 
     @Override
-    public Collection<ExtractionWithProperties<String>> extractText(PDDocument doc)
+    protected Collection<ExtractionWithProperties<String>> extractText(PDDocument doc)
         throws ProcessingException {
       try {
         return List.of(new ExtractionWithProperties<>(stripper.getText(doc)));
@@ -190,7 +190,7 @@ public class PdfExtractor
     }
 
     @Override
-    public Collection<ExtractionWithProperties<BufferedImage>> extractImages(PDDocument doc) {
+    protected Collection<ExtractionWithProperties<BufferedImage>> extractImages(PDDocument doc) {
       Collection<ExtractionWithProperties<BufferedImage>> images = new ArrayList<>();
 
       int imageNumber = 0;
@@ -274,54 +274,56 @@ public class PdfExtractor
     }
 
     @Override
-    public Collection<ExtractionWithProperties<Table>> extractTables(PDDocument doc)
+    protected Collection<ExtractionWithProperties<Table>> extractTables(PDDocument doc)
         throws ProcessingException {
       List<ExtractionWithProperties<Table>> t = new ArrayList<>();
 
-      ObjectExtractor extractor = new ObjectExtractor(doc);
+      try (ObjectExtractor extractor = new ObjectExtractor(doc)) {
 
-      PageIterator pages = extractor.extract();
-      while (pages.hasNext()) {
-        Page page = pages.next();
+        PageIterator pages = extractor.extract();
+        while (pages.hasNext()) {
+          Page page = pages.next();
 
-        // extract text from the table after detecting
-        List<Rectangle> tablesOnPage = detectionAlgorithm.detect(page);
+          // extract text from the table after detecting
+          List<Rectangle> tablesOnPage = detectionAlgorithm.detect(page);
 
-        log().debug("{} tables found on page {}", tablesOnPage.size(), page.getPageNumber());
-        for (Rectangle r : tablesOnPage) {
-          Page p = page.getArea(r);
+          log().debug("{} tables found on page {}", tablesOnPage.size(), page.getPageNumber());
+          for (Rectangle r : tablesOnPage) {
+            Page p = page.getArea(r);
 
-          List<? extends technology.tabula.Table> tables;
-          switch (settings.getTableExtractionAlgorithm()) {
-            case STREAM:
-              tables = basicExtractionAlgorithm.extract(p);
-              break;
-            case LATTICE:
-              tables = spreadsheetExtractionAlgorithm.extract(p);
-              break;
-            case DETERMINE:
-            default:
-              tables =
-                  spreadsheetExtractionAlgorithm.isTabular(p)
-                      ? spreadsheetExtractionAlgorithm.extract(p)
-                      : basicExtractionAlgorithm.extract(p);
-          }
+            List<? extends technology.tabula.Table> tables;
+            switch (settings.getTableExtractionAlgorithm()) {
+              case STREAM:
+                tables = basicExtractionAlgorithm.extract(p);
+                break;
+              case LATTICE:
+                tables = spreadsheetExtractionAlgorithm.extract(p);
+                break;
+              case DETERMINE:
+              default:
+                tables =
+                    spreadsheetExtractionAlgorithm.isTabular(p)
+                        ? spreadsheetExtractionAlgorithm.extract(p)
+                        : basicExtractionAlgorithm.extract(p);
+            }
 
-          for (technology.tabula.Table table : tables) {
-            Map<String, Object> properties = new HashMap<>();
-            properties.put(PropertyKeys.PROPERTY_KEY_X, table.getX());
-            properties.put(PropertyKeys.PROPERTY_KEY_Y, table.getY());
-            properties.put(PropertyKeys.PROPERTY_KEY_WIDTH, table.getWidth());
-            properties.put(PropertyKeys.PROPERTY_KEY_HEIGHT, table.getHeight());
-            properties.put("extractionMethod", table.getExtractionMethod());
+            for (technology.tabula.Table table : tables) {
+              Map<String, Object> properties = new HashMap<>();
+              properties.put(PropertyKeys.PROPERTY_KEY_X, table.getX());
+              properties.put(PropertyKeys.PROPERTY_KEY_Y, table.getY());
+              properties.put(PropertyKeys.PROPERTY_KEY_WIDTH, table.getWidth());
+              properties.put(PropertyKeys.PROPERTY_KEY_HEIGHT, table.getHeight());
+              properties.put("extractionMethod", table.getExtractionMethod());
 
-            ExtractionWithProperties<Table> e =
-                new ExtractionWithProperties<>(new PdfTable(table), properties);
-            t.add(e);
+              ExtractionWithProperties<Table> e =
+                  new ExtractionWithProperties<>(new PdfTable(table), properties);
+              t.add(e);
+            }
           }
         }
+      } catch (IOException e) {
+        throw new ProcessingException("Unable to extract tables from PDF", e);
       }
-
       return t;
     }
   }
@@ -444,8 +446,8 @@ public class PdfExtractor
     private final List<Row> rows;
     private final List<String> columnNames;
 
-    public PdfTable(technology.tabula.Table t) {
-      List<Row> rows = new ArrayList<>(t.getRowCount() - 1);
+    protected PdfTable(technology.tabula.Table t) {
+      List<Row> tmpRows = new ArrayList<>(t.getRowCount() - 1);
 
       List<List<Object>> objRows =
           t.getRows().stream()
@@ -465,10 +467,10 @@ public class PdfExtractor
 
       for (int i = 0; i < objRows.size(); i++) {
         Row row = new DefaultRow(i, columnNames, objRows.get(i));
-        rows.add(row);
+        tmpRows.add(row);
       }
 
-      this.rows = Collections.unmodifiableList(rows);
+      this.rows = Collections.unmodifiableList(tmpRows);
     }
 
     @Override

@@ -84,26 +84,6 @@ public class DocumentExtractor
     }
 
     @Override
-    public boolean isMetadataSupported() {
-      return true;
-    }
-
-    @Override
-    public boolean isTextSupported() {
-      return true;
-    }
-
-    @Override
-    public boolean isImagesSupported() {
-      return true;
-    }
-
-    @Override
-    public boolean isTablesSupported() {
-      return true;
-    }
-
-    @Override
     public void reset() {
       contentToType.clear();
 
@@ -118,7 +98,27 @@ public class DocumentExtractor
     }
 
     @Override
-    public boolean acceptFile(FileContent file) {
+    protected boolean isMetadataSupported() {
+      return true;
+    }
+
+    @Override
+    protected boolean isTextSupported() {
+      return true;
+    }
+
+    @Override
+    protected boolean isImagesSupported() {
+      return true;
+    }
+
+    @Override
+    protected boolean isTablesSupported() {
+      return true;
+    }
+
+    @Override
+    protected boolean acceptFile(FileContent file) {
       DocumentType documentType = DocumentType.PLAIN_TEXT; // Accepts any document, so use it as our
       // default
 
@@ -145,7 +145,7 @@ public class DocumentExtractor
     }
 
     @Override
-    public boolean acceptInputStream(InputStreamContent inputStream) {
+    protected boolean acceptInputStream(InputStreamContent inputStream) {
       DocumentType documentType = DocumentType.PLAIN_TEXT; // Accepts any document, so use it as our
       // default
 
@@ -172,7 +172,7 @@ public class DocumentExtractor
     }
 
     @Override
-    public DocumentObjectWithType extractDocument(FileContent file) throws IOException {
+    protected DocumentObjectWithType extractDocument(FileContent file) throws IOException {
       DocumentType type = contentToType.get(file.getId());
       if (type == null) throw new ProcessingException("FileContent type has not been recorded");
 
@@ -199,7 +199,7 @@ public class DocumentExtractor
     }
 
     @Override
-    public DocumentObjectWithType extractDocument(InputStreamContent inputStreamContent)
+    protected DocumentObjectWithType extractDocument(InputStreamContent inputStreamContent)
         throws IOException {
       DocumentType type = contentToType.get(inputStreamContent.getId());
       if (type == null)
@@ -232,7 +232,7 @@ public class DocumentExtractor
     }
 
     @Override
-    public Map<String, Object> extractMetadata(DocumentObjectWithType doc) {
+    protected Map<String, Object> extractMetadata(DocumentObjectWithType doc) {
       switch (doc.getType()) {
         case DOC:
           return docProcessor.extractMetadata((HWPFDocument) doc.getDocument());
@@ -256,7 +256,7 @@ public class DocumentExtractor
     }
 
     @Override
-    public Collection<ExtractionWithProperties<String>> extractText(DocumentObjectWithType doc) {
+    protected Collection<ExtractionWithProperties<String>> extractText(DocumentObjectWithType doc) {
       switch (doc.getType()) {
         case DOC:
           return docProcessor.extractText((HWPFDocument) doc.getDocument());
@@ -280,7 +280,7 @@ public class DocumentExtractor
     }
 
     @Override
-    public Collection<ExtractionWithProperties<BufferedImage>> extractImages(
+    protected Collection<ExtractionWithProperties<BufferedImage>> extractImages(
         DocumentObjectWithType doc) {
       switch (doc.getType()) {
         case DOC:
@@ -305,7 +305,7 @@ public class DocumentExtractor
     }
 
     @Override
-    public Collection<ExtractionWithProperties<Table>> extractTables(DocumentObjectWithType doc)
+    protected Collection<ExtractionWithProperties<Table>> extractTables(DocumentObjectWithType doc)
         throws ProcessingException {
 
       switch (doc.getType()) {
