@@ -10,6 +10,7 @@ import io.annot8.testing.testimpl.TestItem;
 import org.junit.jupiter.api.Test;
 
 public class FilterItemsByPropertyTest {
+
   @Test
   public void testDiscardMatching() {
     Item itemMatch = new TestItem();
@@ -19,16 +20,18 @@ public class FilterItemsByPropertyTest {
     itemMatch.getProperties().set("foo", "bar");
     itemNoMatch.getProperties().set("foo", "baz");
 
-    FilterItemsByProperty.Processor p = new FilterItemsByProperty.Processor("foo", "bar", true);
+    try (FilterItemsByProperty.Processor p =
+        new FilterItemsByProperty.Processor("foo", "bar", true)) {
 
-    assertEquals(ProcessorResponse.ok(), p.process(itemMatch));
-    assertTrue(itemMatch.isDiscarded());
+      assertEquals(ProcessorResponse.ok(), p.process(itemMatch));
+      assertTrue(itemMatch.isDiscarded());
 
-    assertEquals(ProcessorResponse.ok(), p.process(itemNoMatch));
-    assertFalse(itemNoMatch.isDiscarded());
+      assertEquals(ProcessorResponse.ok(), p.process(itemNoMatch));
+      assertFalse(itemNoMatch.isDiscarded());
 
-    assertEquals(ProcessorResponse.ok(), p.process(itemNotPresent));
-    assertFalse(itemNotPresent.isDiscarded());
+      assertEquals(ProcessorResponse.ok(), p.process(itemNotPresent));
+      assertFalse(itemNotPresent.isDiscarded());
+    }
   }
 
   @Test
@@ -38,13 +41,15 @@ public class FilterItemsByPropertyTest {
 
     itemPresent.getProperties().set("foo", "bar");
 
-    FilterItemsByProperty.Processor p = new FilterItemsByProperty.Processor("foo", null, true);
+    try (FilterItemsByProperty.Processor p =
+        new FilterItemsByProperty.Processor("foo", null, true)) {
 
-    assertEquals(ProcessorResponse.ok(), p.process(itemPresent));
-    assertFalse(itemPresent.isDiscarded());
+      assertEquals(ProcessorResponse.ok(), p.process(itemPresent));
+      assertFalse(itemPresent.isDiscarded());
 
-    assertEquals(ProcessorResponse.ok(), p.process(itemNotPresent));
-    assertTrue(itemNotPresent.isDiscarded());
+      assertEquals(ProcessorResponse.ok(), p.process(itemNotPresent));
+      assertTrue(itemNotPresent.isDiscarded());
+    }
   }
 
   @Test
@@ -56,16 +61,18 @@ public class FilterItemsByPropertyTest {
     itemMatch.getProperties().set("foo", "bar");
     itemNoMatch.getProperties().set("foo", "baz");
 
-    FilterItemsByProperty.Processor p = new FilterItemsByProperty.Processor("foo", "bar", false);
+    try (FilterItemsByProperty.Processor p =
+        new FilterItemsByProperty.Processor("foo", "bar", false)) {
 
-    assertEquals(ProcessorResponse.ok(), p.process(itemMatch));
-    assertFalse(itemMatch.isDiscarded());
+      assertEquals(ProcessorResponse.ok(), p.process(itemMatch));
+      assertFalse(itemMatch.isDiscarded());
 
-    assertEquals(ProcessorResponse.ok(), p.process(itemNoMatch));
-    assertTrue(itemNoMatch.isDiscarded());
+      assertEquals(ProcessorResponse.ok(), p.process(itemNoMatch));
+      assertTrue(itemNoMatch.isDiscarded());
 
-    assertEquals(ProcessorResponse.ok(), p.process(itemNotPresent));
-    assertTrue(itemNotPresent.isDiscarded());
+      assertEquals(ProcessorResponse.ok(), p.process(itemNotPresent));
+      assertTrue(itemNotPresent.isDiscarded());
+    }
   }
 
   @Test
@@ -75,13 +82,15 @@ public class FilterItemsByPropertyTest {
 
     itemPresent.getProperties().set("foo", "bar");
 
-    FilterItemsByProperty.Processor p = new FilterItemsByProperty.Processor("foo", null, false);
+    try (FilterItemsByProperty.Processor p =
+        new FilterItemsByProperty.Processor("foo", null, false)) {
 
-    assertEquals(ProcessorResponse.ok(), p.process(itemPresent));
-    assertTrue(itemPresent.isDiscarded());
+      assertEquals(ProcessorResponse.ok(), p.process(itemPresent));
+      assertTrue(itemPresent.isDiscarded());
 
-    assertEquals(ProcessorResponse.ok(), p.process(itemNotPresent));
-    assertFalse(itemNotPresent.isDiscarded());
+      assertEquals(ProcessorResponse.ok(), p.process(itemNotPresent));
+      assertFalse(itemNotPresent.isDiscarded());
+    }
   }
 
   @Test

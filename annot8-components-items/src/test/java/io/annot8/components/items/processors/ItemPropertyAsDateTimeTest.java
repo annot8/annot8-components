@@ -43,11 +43,12 @@ public class ItemPropertyAsDateTimeTest {
     s.setDateTimeType(ItemPropertyAsDateTime.DateTimeType.DATE);
     s.setDateTimeFormat("yyyy-MM-dd HH:mm:ss");
 
-    ItemPropertyAsDateTime.Processor p = new ItemPropertyAsDateTime.Processor(s);
-    p.process(item);
+    try (ItemPropertyAsDateTime.Processor p = new ItemPropertyAsDateTime.Processor(s)) {
+      p.process(item);
 
-    assertEquals(
-        LocalDate.of(2021, Month.APRIL, 23), item.getProperties().get("date").orElseThrow());
+      assertEquals(
+          LocalDate.of(2021, Month.APRIL, 23), item.getProperties().get("date").orElseThrow());
+    }
   }
 
   @Test
@@ -60,10 +61,11 @@ public class ItemPropertyAsDateTimeTest {
     s.setDateTimeType(ItemPropertyAsDateTime.DateTimeType.TIME);
     s.setDateTimeFormat("yyyy-MM-dd HH:mm:ss");
 
-    ItemPropertyAsDateTime.Processor p = new ItemPropertyAsDateTime.Processor(s);
-    p.process(item);
+    try (ItemPropertyAsDateTime.Processor p = new ItemPropertyAsDateTime.Processor(s)) {
+      p.process(item);
 
-    assertEquals(LocalTime.of(10, 44, 12), item.getProperties().get("date").orElseThrow());
+      assertEquals(LocalTime.of(10, 44, 12), item.getProperties().get("date").orElseThrow());
+    }
   }
 
   @Test
@@ -76,12 +78,13 @@ public class ItemPropertyAsDateTimeTest {
     s.setDateTimeType(ItemPropertyAsDateTime.DateTimeType.DATETIME);
     s.setDateTimeFormat("yyyy-MM-dd HH:mm:ss");
 
-    ItemPropertyAsDateTime.Processor p = new ItemPropertyAsDateTime.Processor(s);
-    p.process(item);
+    try (ItemPropertyAsDateTime.Processor p = new ItemPropertyAsDateTime.Processor(s)) {
+      p.process(item);
 
-    assertEquals(
-        LocalDateTime.of(2021, Month.APRIL, 23, 10, 44, 12),
-        item.getProperties().get("date").orElseThrow());
+      assertEquals(
+          LocalDateTime.of(2021, Month.APRIL, 23, 10, 44, 12),
+          item.getProperties().get("date").orElseThrow());
+    }
   }
 
   @Test
@@ -94,12 +97,13 @@ public class ItemPropertyAsDateTimeTest {
     s.setDateTimeType(ItemPropertyAsDateTime.DateTimeType.ZONED_DATETIME);
     s.setDateTimeFormat("yyyy-MM-dd HH:mm:ssX");
 
-    ItemPropertyAsDateTime.Processor p = new ItemPropertyAsDateTime.Processor(s);
-    p.process(item);
+    try (ItemPropertyAsDateTime.Processor p = new ItemPropertyAsDateTime.Processor(s)) {
+      p.process(item);
 
-    assertEquals(
-        ZonedDateTime.of(2021, 4, 23, 10, 44, 12, 0, ZoneId.of("Z")),
-        item.getProperties().get("date").orElseThrow());
+      assertEquals(
+          ZonedDateTime.of(2021, 4, 23, 10, 44, 12, 0, ZoneId.of("Z")),
+          item.getProperties().get("date").orElseThrow());
+    }
   }
 
   @Test
@@ -112,12 +116,13 @@ public class ItemPropertyAsDateTimeTest {
     s.setDateTimeType(ItemPropertyAsDateTime.DateTimeType.OFFSET_DATETIME);
     s.setDateTimeFormat("yyyy-MM-dd HH:mm:ssX");
 
-    ItemPropertyAsDateTime.Processor p = new ItemPropertyAsDateTime.Processor(s);
-    p.process(item);
+    try (ItemPropertyAsDateTime.Processor p = new ItemPropertyAsDateTime.Processor(s)) {
+      p.process(item);
 
-    assertEquals(
-        OffsetDateTime.of(2021, 4, 23, 10, 44, 12, 0, ZoneOffset.UTC),
-        item.getProperties().get("date").orElseThrow());
+      assertEquals(
+          OffsetDateTime.of(2021, 4, 23, 10, 44, 12, 0, ZoneOffset.UTC),
+          item.getProperties().get("date").orElseThrow());
+    }
   }
 
   @Test
@@ -129,10 +134,11 @@ public class ItemPropertyAsDateTimeTest {
     s.setKey("date");
     s.setDateTimeType(ItemPropertyAsDateTime.DateTimeType.TIME);
 
-    ItemPropertyAsDateTime.Processor p = new ItemPropertyAsDateTime.Processor(s);
-    p.process(item);
+    try (ItemPropertyAsDateTime.Processor p = new ItemPropertyAsDateTime.Processor(s)) {
+      p.process(item);
 
-    assertEquals(LocalTime.of(10, 44, 12), item.getProperties().get("date").orElseThrow());
+      assertEquals(LocalTime.of(10, 44, 12), item.getProperties().get("date").orElseThrow());
+    }
   }
 
   @Test
@@ -144,11 +150,12 @@ public class ItemPropertyAsDateTimeTest {
     s.setKey("date");
     s.setDateTimeType(ItemPropertyAsDateTime.DateTimeType.DATE);
 
-    ItemPropertyAsDateTime.Processor p = new ItemPropertyAsDateTime.Processor(s);
-    p.process(item);
+    try (ItemPropertyAsDateTime.Processor p = new ItemPropertyAsDateTime.Processor(s)) {
+      p.process(item);
 
-    assertEquals(
-        LocalDate.of(2021, Month.APRIL, 23), item.getProperties().get("date").orElseThrow());
+      assertEquals(
+          LocalDate.of(2021, Month.APRIL, 23), item.getProperties().get("date").orElseThrow());
+    }
   }
 
   @Test
@@ -161,10 +168,11 @@ public class ItemPropertyAsDateTimeTest {
     s.setDateTimeType(ItemPropertyAsDateTime.DateTimeType.DATE);
     s.setErrorOnUnparseable(false);
 
-    ItemPropertyAsDateTime.Processor p = new ItemPropertyAsDateTime.Processor(s);
-    assertEquals(ProcessorResponse.ok(), p.process(item));
+    try (ItemPropertyAsDateTime.Processor p = new ItemPropertyAsDateTime.Processor(s)) {
+      assertEquals(ProcessorResponse.ok(), p.process(item));
 
-    assertFalse(item.getProperties().has("date"));
+      assertFalse(item.getProperties().has("date"));
+    }
   }
 
   @Test
@@ -177,8 +185,9 @@ public class ItemPropertyAsDateTimeTest {
     s.setDateTimeType(ItemPropertyAsDateTime.DateTimeType.DATE);
     s.setErrorOnUnparseable(true);
 
-    ItemPropertyAsDateTime.Processor p = new ItemPropertyAsDateTime.Processor(s);
-    assertEquals(ProcessorResponse.Status.ITEM_ERROR, p.process(item).getStatus());
+    try (ItemPropertyAsDateTime.Processor p = new ItemPropertyAsDateTime.Processor(s)) {
+      assertEquals(ProcessorResponse.Status.ITEM_ERROR, p.process(item).getStatus());
+    }
   }
 
   @Test
@@ -191,10 +200,11 @@ public class ItemPropertyAsDateTimeTest {
     s.setDateTimeType(ItemPropertyAsDateTime.DateTimeType.DATE);
     s.setErrorOnUnparseable(false);
 
-    ItemPropertyAsDateTime.Processor p = new ItemPropertyAsDateTime.Processor(s);
-    assertEquals(ProcessorResponse.ok(), p.process(item));
+    try (ItemPropertyAsDateTime.Processor p = new ItemPropertyAsDateTime.Processor(s)) {
+      assertEquals(ProcessorResponse.ok(), p.process(item));
 
-    assertFalse(item.getProperties().has("date"));
+      assertFalse(item.getProperties().has("date"));
+    }
   }
 
   @Test
@@ -207,7 +217,8 @@ public class ItemPropertyAsDateTimeTest {
     s.setDateTimeType(ItemPropertyAsDateTime.DateTimeType.DATE);
     s.setErrorOnUnparseable(true);
 
-    ItemPropertyAsDateTime.Processor p = new ItemPropertyAsDateTime.Processor(s);
-    assertEquals(ProcessorResponse.Status.ITEM_ERROR, p.process(item).getStatus());
+    try (ItemPropertyAsDateTime.Processor p = new ItemPropertyAsDateTime.Processor(s)) {
+      assertEquals(ProcessorResponse.Status.ITEM_ERROR, p.process(item).getStatus());
+    }
   }
 }

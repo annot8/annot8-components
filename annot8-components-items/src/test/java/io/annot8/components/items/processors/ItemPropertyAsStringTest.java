@@ -12,6 +12,7 @@ import java.time.Month;
 import org.junit.jupiter.api.Test;
 
 public class ItemPropertyAsStringTest {
+
   @Test
   public void test() {
     test("Hello", "Hello");
@@ -27,11 +28,12 @@ public class ItemPropertyAsStringTest {
     ItemPropertyAsString.Settings s = new ItemPropertyAsString.Settings();
     s.setKey("val");
 
-    ItemPropertyAsString.Processor p = new ItemPropertyAsString.Processor(s);
-    assertEquals(ProcessorResponse.ok(), p.process(item));
+    try (ItemPropertyAsString.Processor p = new ItemPropertyAsString.Processor(s)) {
+      assertEquals(ProcessorResponse.ok(), p.process(item));
 
-    assertTrue(item.getProperties().has("val"));
-    assertEquals(String.class, item.getProperties().get("val").orElseThrow().getClass());
-    assertEquals(expected, item.getProperties().get("val").orElseThrow());
+      assertTrue(item.getProperties().has("val"));
+      assertEquals(String.class, item.getProperties().get("val").orElseThrow().getClass());
+      assertEquals(expected, item.getProperties().get("val").orElseThrow());
+    }
   }
 }

@@ -3,7 +3,6 @@ package io.annot8.components.items.processors;
 
 import io.annot8.api.components.Processor;
 import io.annot8.api.data.Item;
-import io.annot8.common.data.content.Text;
 import io.annot8.testing.testimpl.TestItem;
 import io.annot8.testing.testimpl.content.TestStringContent;
 import org.junit.jupiter.api.Assertions;
@@ -13,11 +12,10 @@ public class ItemPropertyFromParameterTest {
 
   private Item getProcessedItem(Processor p) {
     Item item = new TestItem();
-    Text content =
-        item.createContent(TestStringContent.class)
-            .withData("This is a generic document text, to test a non-content annotator.")
-            .withProperty("foo", "bar")
-            .save();
+    item.createContent(TestStringContent.class)
+        .withData("This is a generic document text, to test a non-content annotator.")
+        .withProperty("foo", "bar")
+        .save();
 
     p.process(item);
     return item;
