@@ -21,7 +21,7 @@ class AbstractContentProcessorTest {
   private static final String NOT_PROCESS = "NOT_PROCESS";
 
   @Test
-  void testProcessItem() {
+  public void testProcessItem() {
     Item item = getMockedItem();
 
     try (TestContentProcessor processor = new TestContentProcessor()) {
@@ -33,7 +33,7 @@ class AbstractContentProcessorTest {
   }
 
   @Test
-  void testAcceptsContent() {
+  public void testAcceptsContent() {
     try (AcceptingContentProcessor processor = new AcceptingContentProcessor()) {
       Item item = getMockedItem();
       processor.process(item);
@@ -44,7 +44,7 @@ class AbstractContentProcessorTest {
   }
 
   @Test
-  void testProcessingError() {
+  public void testProcessingError() {
     Item item = getMockedItem();
     Text content = Mockito.mock(Text.class);
     doReturn(Stream.of(content)).when(item).getContents();

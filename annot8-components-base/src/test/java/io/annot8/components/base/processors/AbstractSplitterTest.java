@@ -12,7 +12,7 @@ import org.mockito.Mockito;
 class AbstractSplitterTest {
 
   @Test
-  void testProcessAcceptingItem() {
+  public void testProcessAcceptingItem() {
     Item item = Mockito.mock(Item.class);
     try (AbstractSplitter splitter = new Splitter()) {
       ProcessorResponse response = splitter.process(item);
@@ -22,7 +22,7 @@ class AbstractSplitterTest {
   }
 
   @Test
-  void testProcessNonAcceptingItem() {
+  public void testProcessNonAcceptingItem() {
     Item item = Mockito.mock(Item.class);
     try (AbstractSplitter splitter = new NonAcceptingSplitter()) {
       ProcessorResponse response = splitter.process(item);
@@ -32,7 +32,7 @@ class AbstractSplitterTest {
   }
 
   @Test
-  void testProcessError() {
+  public void testProcessError() {
     Item item = Mockito.mock(Item.class);
     try (AbstractSplitter splitter = new ErrorSplitter()) {
       ProcessorResponse response = splitter.process(item);

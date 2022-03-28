@@ -13,7 +13,7 @@ import org.mockito.Mockito;
 class AbstractFilterProcessorTest {
 
   @Test
-  void testFilterItems() {
+  public void testFilterItems() {
     try (FilterAll filter = new FilterAll()) {
       Item item = Mockito.mock(Item.class);
       ProcessorResponse processResponse = filter.process(item);
@@ -23,7 +23,7 @@ class AbstractFilterProcessorTest {
   }
 
   @Test
-  void testFilterError() {
+  public void testFilterError() {
     try (FilterError error = new FilterError()) {
       ProcessorResponse response = error.process(Mockito.mock(Item.class));
       assertEquals(ProcessorResponse.Status.ITEM_ERROR, response.getStatus());

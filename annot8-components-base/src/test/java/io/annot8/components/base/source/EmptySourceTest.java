@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 class EmptySourceTest {
 
   @Test
-  void read() {
+  public void read() {
     EmptySource source = new EmptySource();
 
     Source s = source.createComponent(null, NoSettings.getInstance());
