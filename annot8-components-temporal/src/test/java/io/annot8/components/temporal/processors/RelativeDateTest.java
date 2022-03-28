@@ -40,7 +40,6 @@ public class RelativeDateTest {
   @Test
   public void testRelativeDate() throws Exception {
 
-    String format = "yyyy-MM-dd";
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     try (RelativeDate.Processor p =

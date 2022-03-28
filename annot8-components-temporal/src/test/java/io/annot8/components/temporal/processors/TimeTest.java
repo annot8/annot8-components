@@ -58,7 +58,7 @@ public class TimeTest {
       Processor p, String text, Integer expectedCount, String... expectedValues) {
     Item item = new TestItem();
 
-    //    Item item = new SimpleItem(itemFactory, contentBuilderFactoryRegistry);
+    // Item item = new SimpleItem(itemFactory, contentBuilderFactoryRegistry);
     Text content = item.createContent(TestStringContent.class).withData(text).save();
 
     p.process(item);
@@ -164,6 +164,7 @@ public class TimeTest {
       timeRegexCountAndValueCheck(p, "It is currently 1700hrs CET.", 1, "1700hrs CET");
     }
   }
+
   // Catch a reference containing a colon
   @Test
   public void testYearAndTimeColon() throws Exception {
