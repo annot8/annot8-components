@@ -22,8 +22,7 @@ public class RegexProcessorTest {
 
   @Test
   public void testRegexFromConstructor() {
-    Processor p = new RegexProcessor(Pattern.compile("[0-9]+"), 0, "number");
-    try {
+    try (Processor p = new RegexProcessor(Pattern.compile("[0-9]+"), 0, "number")) {
       assertProcessorCorrectness(p);
     } catch (Annot8Exception e) {
       fail("Error not expected in this test", e);
@@ -33,9 +32,7 @@ public class RegexProcessorTest {
   @Test
   public void testRegexFromSettings() {
     RegexSettings rs = new RegexSettings(Pattern.compile("[0-9]+"), 0, "number");
-    Processor p = new RegexProcessor(rs);
-
-    try {
+    try (Processor p = new RegexProcessor(rs)) {
       assertProcessorCorrectness(p);
     } catch (Annot8Exception e) {
       fail("Error not expected in this test", e);
