@@ -10,6 +10,12 @@ import io.annot8.api.settings.NoSettings;
 import io.annot8.conventions.PropertyKeys;
 import io.annot8.testing.testimpl.TestItem;
 import io.annot8.testing.testimpl.content.TestStringContent;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 
 public class PostcodeTest {
@@ -52,5 +58,41 @@ public class PostcodeTest {
     assertFalse(result.has("postcode"));
     assertFalse(result.has(PropertyKeys.PROPERTY_KEY_LONGITUDE));
     assertFalse(result.has(PropertyKeys.PROPERTY_KEY_LATITUDE));
+  }
+
+  @Test
+  public void testNonPatterns() {
+    TestItem testItem = new TestItem();
+    TestStringContent content =
+        testItem
+            .createContent(TestStringContent.class)
+            .withData("Q000AB\n WR15 0CI\nX12 0EB")
+            .save();
+
+    Postcode postcode = new Postcode();
+    Processor postcodeProcessor = postcode.createComponent(null, NoSettings.getInstance());
+    postcodeProcessor.process(testItem);
+
+    assertEquals(0L, content.getAnnotations().getAll().count());
+  }
+
+  @Test
+  public void testAll() throws IOException {
+    try (InputStream resource = PostcodeTest.class.getResourceAsStream("ukpostcodes.csv"); ) {
+      String doc =
+          new BufferedReader(new InputStreamReader(resource, StandardCharsets.UTF_8))
+              .lines()
+              .collect(Collectors.joining("\\n"));
+
+      TestItem testItem = new TestItem();
+      TestStringContent content =
+          testItem.createContent(TestStringContent.class).withData(doc).save();
+
+      Postcode postcode = new Postcode();
+      Processor postcodeProcessor = postcode.createComponent(null, NoSettings.getInstance());
+      postcodeProcessor.process(testItem);
+
+      assertEquals(1717777L, content.getAnnotations().getAll().count());
+    }
   }
 }

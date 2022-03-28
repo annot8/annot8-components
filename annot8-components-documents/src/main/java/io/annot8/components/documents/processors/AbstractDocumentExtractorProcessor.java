@@ -43,7 +43,8 @@ public abstract class AbstractDocumentExtractorProcessor<T, S extends DocumentEx
 
   protected static final String METADATA_SEPARATOR = "/";
 
-  protected AbstractDocumentExtractorProcessor(Context context, S settings) {
+  protected AbstractDocumentExtractorProcessor(
+      @SuppressWarnings("unused") Context context, S settings) {
     this.settings = settings;
 
     if (!isMetadataSupported() && settings.isExtractMetadata()) {

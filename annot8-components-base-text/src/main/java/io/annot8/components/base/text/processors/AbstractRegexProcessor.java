@@ -17,13 +17,13 @@ public abstract class AbstractRegexProcessor extends AbstractTextProcessor {
   protected final int group;
   protected final String type;
 
-  public AbstractRegexProcessor(Pattern pattern, String type) {
+  protected AbstractRegexProcessor(Pattern pattern, String type) {
     this.pattern = pattern;
     this.group = 0;
     this.type = type;
   }
 
-  public AbstractRegexProcessor(Pattern pattern, int group, String type) {
+  protected AbstractRegexProcessor(Pattern pattern, int group, String type) {
     this.pattern = pattern;
     this.group = group;
     this.type = type;

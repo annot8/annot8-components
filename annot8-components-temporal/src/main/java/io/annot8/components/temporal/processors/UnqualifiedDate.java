@@ -41,30 +41,37 @@ public class UnqualifiedDate
     return new Processor(settings.getAllowLowercase());
   }
 
+  // Deep type hierarchy
+  @SuppressWarnings({"java:S110", "java:S5843"})
   public static class Processor extends AbstractRegexProcessor {
 
     private Boolean allowLowercase;
 
     private static final String DAYS =
         "(Mon(day)?+|Tue(s(day)?+)?+|Wed(nesday)?+|Thu(r(s(day)?+)?+)?+|Fri(day)?+|Sat(urday)?+|Sun(day)?+)";
+
+    private static final String DATE = "([1-9]|[12][0-9]|3[01])";
     private static final String SUFFIXES = "(st|nd|rd|th)";
     private static final String MONTHS =
         "(Jan(uary)?+|Feb(ruary)?+|Mar(ch)?+|Apr(il)?+|May|Jun(e)?+|Jul(y)?+|Aug(ust)?+|Sep(t(ember)?+)?+|Oct(ober)?+|Nov(ember)?+|Dec(ember)?+)";
 
-    private static final String PATTERN =
+    private static final String FULL_PATTERN =
         "\\b(("
             + DAYS
-            + " )?((([1-9]|[12][0-9]|3[01])"
+            + " )?(("
+            + DATE
             + SUFFIXES
             + "?+ (?:of )?"
             + MONTHS
             + "|"
             + MONTHS
-            + " ([1-9]|[12][0-9]|3[01])"
+            + " "
+            + DATE
             + SUFFIXES
             + "?+|"
             + MONTHS
-            + "|([1-9]|[12][0-9]|3[01])"
+            + "|"
+            + DATE
             + SUFFIXES
             + ")+)|"
             + DAYS
@@ -73,7 +80,7 @@ public class UnqualifiedDate
     public Processor(boolean allowLowerCase) {
 
       super(
-          Pattern.compile(PATTERN, Pattern.CASE_INSENSITIVE),
+          Pattern.compile(FULL_PATTERN, Pattern.CASE_INSENSITIVE),
           0,
           AnnotationTypes.ANNOTATION_TYPE_TEMPORAL);
       this.allowLowercase = allowLowerCase;

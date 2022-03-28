@@ -4,7 +4,7 @@ package io.annot8.components.mongo.utils;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
-public interface MongoConnection {
+public interface MongoConnection<D> {
 
   MongoDatabase getDatabase();
 
@@ -12,7 +12,7 @@ public interface MongoConnection {
     return getCollection().withDocumentClass(clazz);
   }
 
-  <D> MongoCollection<D> getCollection();
+  MongoCollection<D> getCollection();
 
   void disconnect();
 }

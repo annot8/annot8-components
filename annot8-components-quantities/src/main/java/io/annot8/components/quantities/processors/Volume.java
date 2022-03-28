@@ -32,6 +32,8 @@ public class Volume extends AbstractProcessorDescriptor<Volume.Processor, NoSett
         .build();
   }
 
+  // Deep type hierarchy
+  @SuppressWarnings({"java:S110", "java:S5852"})
   public static class Processor extends AbstractQuantityProcessor {
 
     private static final double PINT_TO_M3 = 0.000568;

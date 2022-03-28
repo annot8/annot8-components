@@ -18,6 +18,7 @@ import io.annot8.conventions.PropertyKeys;
 import java.util.List;
 import org.openapi.spacy.ApiException;
 import org.openapi.spacy.model.PartsOfSpeech;
+import org.openapi.spacy.model.PartsOfSpeechData;
 import org.openapi.spacy.model.PartsOfSpeechTags;
 
 @ComponentName("SpaCy POS")
@@ -51,6 +52,8 @@ public class Spacy extends AbstractProcessorDescriptor<Spacy.Processor, Spacy.Se
     return builder.build();
   }
 
+  // Deep type hierarchy
+  @SuppressWarnings("java:S110")
   public static class Processor extends SpacyServerProcessor {
     private final Spacy.Settings settings;
 
@@ -69,88 +72,85 @@ public class Spacy extends AbstractProcessorDescriptor<Spacy.Processor, Spacy.Se
         throw new ProcessingException("An error occurred whilst using the SpaCy POS API", e);
       }
 
-      pos.getData()
-          .forEach(
-              sentence -> {
-                List<PartsOfSpeechTags> tags = sentence.getTags();
+      pos.getData().stream()
+          .map(PartsOfSpeechData::getTags)
+          .filter(tags -> !tags.isEmpty())
+          .forEach(tags -> processTags(content, tags));
+    }
 
-                if (tags.isEmpty()) return;
+    private void processTags(Text content, List<PartsOfSpeechTags> tags) {
+      int lastTagIndex = tags.size() - 1;
+      int sentenceEnd =
+          tags.get(lastTagIndex).getCharOffset() + tags.get(lastTagIndex).getText().length();
 
-                int lastTagIndex = tags.size() - 1;
-                int sentenceEnd =
-                    tags.get(lastTagIndex).getCharOffset()
-                        + tags.get(lastTagIndex).getText().length();
+      if (settings.isAddSentences()) {
+        int sentenceBegin = tags.get(0).getCharOffset();
 
-                if (settings.isAddSentences()) {
-                  int sentenceBegin = tags.get(0).getCharOffset();
+        // Create sentence
+        content
+            .getAnnotations()
+            .create()
+            .withBounds(new SpanBounds(sentenceBegin, sentenceEnd))
+            .withType(AnnotationTypes.ANNOTATION_TYPE_SENTENCE)
+            .save();
+      }
 
-                  // Create sentence
-                  content
-                      .getAnnotations()
-                      .create()
-                      .withBounds(new SpanBounds(sentenceBegin, sentenceEnd))
-                      .withType(AnnotationTypes.ANNOTATION_TYPE_SENTENCE)
-                      .save();
-                }
+      // If we're not adding tokens or entities, then speed things up by skipping to the
+      // next sentence
+      if (!(settings.isAddTokens() || settings.isAddEntities())) return;
 
-                // If we're not adding tokens or entities, then speed things up by skipping to the
-                // next sentence
-                if (!(settings.isAddTokens() || settings.isAddEntities())) return;
+      int entityBegin = -1;
+      int entityEnd = -1;
+      String entityType = null;
 
-                int entityBegin = -1;
-                int entityEnd = -1;
-                String entityType = null;
+      for (int i = 0; i <= lastTagIndex; i++) {
+        PartsOfSpeechTags tag = tags.get(i);
 
-                for (int i = 0; i <= lastTagIndex; i++) {
-                  PartsOfSpeechTags tag = tags.get(i);
+        if (settings.isAddTokens()) {
+          // Create token
+          content
+              .getAnnotations()
+              .create()
+              .withBounds(
+                  new SpanBounds(tag.getCharOffset(), tag.getCharOffset() + tag.getText().length()))
+              .withType(AnnotationTypes.ANNOTATION_TYPE_WORDTOKEN)
+              .withProperty(PropertyKeys.PROPERTY_KEY_PARTOFSPEECH, tag.getTag())
+              .withProperty(PropertyKeys.PROPERTY_KEY_LEMMA, tag.getLemma())
+              .withProperty(PropertyKeys.PROPERTY_KEY_LANGUAGE, tag.getLang())
+              .save();
+        }
 
-                  if (settings.isAddTokens()) {
-                    // Create token
-                    content
-                        .getAnnotations()
-                        .create()
-                        .withBounds(
-                            new SpanBounds(
-                                tag.getCharOffset(), tag.getCharOffset() + tag.getText().length()))
-                        .withType(AnnotationTypes.ANNOTATION_TYPE_WORDTOKEN)
-                        .withProperty(PropertyKeys.PROPERTY_KEY_PARTOFSPEECH, tag.getTag())
-                        .withProperty(PropertyKeys.PROPERTY_KEY_LEMMA, tag.getLemma())
-                        .withProperty(PropertyKeys.PROPERTY_KEY_LANGUAGE, tag.getLang())
-                        .save();
-                  }
+        if (settings.isAddEntities()) {
+          // Create entities
+          if (tag.getEntIob().equals(PartsOfSpeechTags.EntIobEnum.B)) {
+            entityBegin = tag.getCharOffset();
+            entityEnd = tag.getCharOffset() + tag.getText().length();
+            entityType = tag.getEntType();
+          } else if (tag.getEntIob().equals(PartsOfSpeechTags.EntIobEnum.I)) {
+            entityEnd = tag.getCharOffset() + tag.getText().length();
+          } else if (entityBegin != -1) {
+            content
+                .getAnnotations()
+                .create()
+                .withBounds(new SpanBounds(entityBegin, entityEnd))
+                .withType(toNerLabel(entityType))
+                .save();
 
-                  if (settings.isAddEntities()) {
-                    // Create entities
-                    if (tag.getEntIob().equals(PartsOfSpeechTags.EntIobEnum.B)) {
-                      entityBegin = tag.getCharOffset();
-                      entityEnd = tag.getCharOffset() + tag.getText().length();
-                      entityType = tag.getEntType();
-                    } else if (tag.getEntIob().equals(PartsOfSpeechTags.EntIobEnum.I)) {
-                      entityEnd = tag.getCharOffset() + tag.getText().length();
-                    } else if (entityBegin != -1) {
-                      content
-                          .getAnnotations()
-                          .create()
-                          .withBounds(new SpanBounds(entityBegin, entityEnd))
-                          .withType(toNerLabel(entityType))
-                          .save();
+            entityBegin = -1;
+            entityEnd = -1;
+          }
+        }
+      }
 
-                      entityBegin = -1;
-                      entityEnd = -1;
-                    }
-                  }
-                }
-
-                // Handle case where entity is at very end of sentence
-                if (settings.isAddEntities() && entityBegin != -1) {
-                  content
-                      .getAnnotations()
-                      .create()
-                      .withBounds(new SpanBounds(entityBegin, sentenceEnd))
-                      .withType(toNerLabel(entityType))
-                      .save();
-                }
-              });
+      // Handle case where entity is at very end of sentence
+      if (settings.isAddEntities() && entityBegin != -1) {
+        content
+            .getAnnotations()
+            .create()
+            .withBounds(new SpanBounds(entityBegin, sentenceEnd))
+            .withType(toNerLabel(entityType))
+            .save();
+      }
     }
   }
 

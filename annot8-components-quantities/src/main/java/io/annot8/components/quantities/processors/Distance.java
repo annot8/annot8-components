@@ -32,6 +32,8 @@ public class Distance extends AbstractProcessorDescriptor<Distance.Processor, No
         .build();
   }
 
+  // Deep type hierarchy
+  @SuppressWarnings({"java:S110", "java:S5852"})
   public static class Processor extends AbstractQuantityProcessor {
 
     private static final double MI_TO_M = 1609.344;

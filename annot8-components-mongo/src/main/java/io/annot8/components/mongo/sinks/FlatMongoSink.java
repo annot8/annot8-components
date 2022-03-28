@@ -80,7 +80,7 @@ public class FlatMongoSink
     private MongoCollection<Document> contentsCollection;
     private MongoCollection<Document> annotationsCollection;
 
-    public Processor(MongoConnection connection) {
+    public Processor(MongoConnection<Document> connection) {
       super(connection);
     }
 
@@ -167,7 +167,7 @@ public class FlatMongoSink
     }
 
     @Override
-    protected void configureMongo(MongoConnection connection) {
+    protected void configureMongo(MongoConnection<Document> connection) {
       MongoDatabase database = connection.getDatabase();
       itemCollection = database.getCollection(ITEM);
       contentsCollection = database.getCollection(CONTENT);

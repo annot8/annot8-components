@@ -33,6 +33,8 @@ public class Username extends AbstractProcessorDescriptor<Username.Processor, No
         .build();
   }
 
+  // Deep type hierarchy
+  @SuppressWarnings("java:S110")
   public static class Processor extends AbstractRegexProcessor {
     public Processor() {
       super(

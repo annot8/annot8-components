@@ -31,7 +31,11 @@ public class FlightNumber extends AbstractProcessorDescriptor<FlightNumber.Proce
         .build();
   }
 
+  // Deep type hierarchy
+  @SuppressWarnings("java:S110")
   public static class Processor extends AbstractRegexProcessor {
+
+    @SuppressWarnings("java:S5843")
     public Processor() {
       super(
           Pattern.compile(

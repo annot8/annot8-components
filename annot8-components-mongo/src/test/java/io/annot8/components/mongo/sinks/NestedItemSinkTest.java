@@ -24,7 +24,7 @@ import org.mockito.Mockito;
 
 public class NestedItemSinkTest extends AbstractSinkTest {
 
-  private MongoConnection connection;
+  private MongoConnection<Document> connection;
   private MongoCollection<Document> collection;
 
   @BeforeEach

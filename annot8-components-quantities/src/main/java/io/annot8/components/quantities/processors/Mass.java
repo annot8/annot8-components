@@ -32,6 +32,8 @@ public class Mass extends AbstractProcessorDescriptor<Mass.Processor, NoSettings
         .build();
   }
 
+  // Deep type hierarchy
+  @SuppressWarnings("java:S110")
   public static class Processor extends AbstractQuantityProcessor {
 
     private static final double LONG_TON_TO_KG = 1016.0469088;

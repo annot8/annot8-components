@@ -19,20 +19,20 @@ public abstract class AbstractMongoSink extends AbstractMongoComponent implement
 
   private ObjectMapper mapper = new ObjectMapper();
 
-  AbstractMongoSink(MongoConnectionSettings settings) {
+  protected AbstractMongoSink(MongoConnectionSettings settings) {
     super(settings);
 
     configureMongo(getConnection());
   }
 
-  public AbstractMongoSink(MongoConnection connection) {
+  protected AbstractMongoSink(MongoConnection<Document> connection) {
     super(connection);
     configureMongo(getConnection());
   }
 
   protected abstract void storeItem(Item item) throws Annot8Exception;
 
-  protected abstract void configureMongo(MongoConnection connection);
+  protected abstract void configureMongo(MongoConnection<Document> connection);
 
   @Override
   public ProcessorResponse process(Item item) {

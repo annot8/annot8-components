@@ -71,6 +71,7 @@ public class Date extends AbstractProcessorDescriptor<Date.Processor, Date.Setti
     return new Processor(settings.getAmericanDates());
   }
 
+  @SuppressWarnings("java:S5843")
   public static class Processor extends AbstractTextProcessor {
 
     private final boolean americanDates;
@@ -81,9 +82,12 @@ public class Date extends AbstractProcessorDescriptor<Date.Processor, Date.Setti
     private static final String MONTHS =
         "(Jan(\\.|uary)?|Feb(\\.|ruary)?|Mar(\\.|ch)?|Apr(\\.|il)?|May|Jun([.e])?|Jul([.y])?|Aug(\\.|ust)?|Sep(\\.|t(\\.|ember)?)?|Oct(\\.|ober)?|Nov(\\.|ember)?|Dec(\\.|ember)?)";
     private static final String DATES = "(0?[1-9]|[12][0-9]|3[01])\\s*";
-    private static final String DATE_SUFFIXES = "(st|nd|rd|th)";
+    private static final String DATES_ALT = "([0-2]?[0-9]|3[01])\\s*";
+    private static final String DATE_SUFFIXES = "(st|nd|rd|th)?";
+    private static final String YEAR = "\\s+(\\d{4}|'?\\d{2})\\b";
+    private static final String SPACER = "\\s+";
 
-    private static final String INVALID_DATE_FOUND = "Invalid date found";
+    private static final String INVALID_DATE_FOUND = "Invalid date found {}";
 
     public Processor(boolean americanDates) {
       this.americanDates = americanDates;
@@ -168,8 +172,7 @@ public class Date extends AbstractProcessorDescriptor<Date.Processor, Date.Setti
       // e.g. Mar-Apr 1997, between March and April 97, March to Apr '97
       Pattern sameYear =
           Pattern.compile(
-              "\\b" + MONTHS + "\\s*(-|to|and)\\s*" + MONTHS + "\\s+(\\d{4}|'?\\d{2})\\b",
-              Pattern.CASE_INSENSITIVE);
+              "\\b" + MONTHS + "\\s*(-|to|and)\\s*" + MONTHS + YEAR, Pattern.CASE_INSENSITIVE);
       Matcher m = sameYear.matcher(text);
 
       while (m.find()) {
@@ -198,11 +201,7 @@ public class Date extends AbstractProcessorDescriptor<Date.Processor, Date.Setti
       // e.g. March 97 to June 98, between Mar '97 and Jun 1998
       Pattern diffYear =
           Pattern.compile(
-              "\\b"
-                  + MONTHS
-                  + "\\s+(\\d{4}|'?\\d{2})\\s*(-|to|and)\\s*"
-                  + MONTHS
-                  + "\\s+(\\d{4}|'?\\d{2})\\b",
+              "\\b" + MONTHS + "\\s+(\\d{4}|'?\\d{2})\\s*(-|to|and)\\s*" + MONTHS + YEAR,
               Pattern.CASE_INSENSITIVE);
       m = diffYear.matcher(text);
 
@@ -261,15 +260,15 @@ public class Date extends AbstractProcessorDescriptor<Date.Processor, Date.Setti
           Pattern.compile(
               "\\b"
                   + DAYS
-                  + "([0-2]?[0-9]|3[01])\\s*"
+                  + DATES_ALT
                   + DATE_SUFFIXES
-                  + "?\\s*(-|to|and|\\\\|/)\\s*"
+                  + "\\s*(-|to|and|\\\\|/)\\s*"
                   + DAYS
-                  + "([0-2]?[0-9]|3[01])\\s*"
+                  + DATES_ALT
                   + DATE_SUFFIXES
-                  + "?\\s+"
+                  + SPACER
                   + MONTHS
-                  + "\\s+(\\d{4}|'?\\d{2})\\b",
+                  + YEAR,
               Pattern.CASE_INSENSITIVE);
       String text = content.getData();
       Matcher m = sameMonth.matcher(text);
@@ -295,7 +294,7 @@ public class Date extends AbstractProcessorDescriptor<Date.Processor, Date.Setti
           ld1 = ym.atDay(Integer.parseInt(m.group(1)));
           ld2 = ym.atDay(Integer.parseInt(m.group(4)));
         } catch (DateTimeException dte) {
-          log().warn(INVALID_DATE_FOUND + dte);
+          log().warn(INVALID_DATE_FOUND, dte);
           continue;
         }
 
@@ -323,15 +322,15 @@ public class Date extends AbstractProcessorDescriptor<Date.Processor, Date.Setti
                   + DAYS
                   + DATES
                   + DATE_SUFFIXES
-                  + "?\\s+"
+                  + SPACER
                   + MONTHS
                   + "\\s*(-|to|and)\\s*"
                   + DAYS
                   + DATES
                   + DATE_SUFFIXES
-                  + "?\\s+"
+                  + SPACER
                   + MONTHS
-                  + "\\s+(\\d{4}|'?\\d{2})\\b",
+                  + YEAR,
               Pattern.CASE_INSENSITIVE);
       m = sameYear.matcher(text);
 
@@ -369,7 +368,7 @@ public class Date extends AbstractProcessorDescriptor<Date.Processor, Date.Setti
               ym2.atDay(Integer.parseInt(m.group(17))),
               extracted);
         } catch (DateTimeException dte) {
-          log().warn(INVALID_DATE_FOUND + dte);
+          log().warn(INVALID_DATE_FOUND, dte);
         }
       }
 
@@ -378,17 +377,17 @@ public class Date extends AbstractProcessorDescriptor<Date.Processor, Date.Setti
           Pattern.compile(
               "\\b"
                   + DAYS
-                  + "([0-2]?[0-9]|3[01])\\s*"
+                  + DATES_ALT
                   + DATE_SUFFIXES
-                  + "?\\s+"
+                  + SPACER
                   + MONTHS
                   + "\\s+(\\d{4}|'?\\d{2})\\s*(-|to|and)\\s*"
                   + DAYS
-                  + "([0-2]?[0-9]|3[01])\\s*"
+                  + DATES_ALT
                   + DATE_SUFFIXES
-                  + "?\\s+"
+                  + SPACER
                   + MONTHS
-                  + "\\s+(\\d{4}|'?\\d{2})\\b",
+                  + YEAR,
               Pattern.CASE_INSENSITIVE);
       m = fullDates.matcher(text);
 
@@ -428,7 +427,7 @@ public class Date extends AbstractProcessorDescriptor<Date.Processor, Date.Setti
               ym2.atDay(Integer.parseInt(m.group(18))),
               extracted);
         } catch (DateTimeException dte) {
-          log().warn(INVALID_DATE_FOUND + dte);
+          log().warn(INVALID_DATE_FOUND, dte);
         }
       }
     }
@@ -461,13 +460,7 @@ public class Date extends AbstractProcessorDescriptor<Date.Processor, Date.Setti
       // e.g. 4 November 1998, 8th May '01
       Pattern fullDateDayMonth =
           Pattern.compile(
-              "\\b"
-                  + DAYS
-                  + DATES
-                  + DATE_SUFFIXES
-                  + "?\\s+"
-                  + MONTHS
-                  + ",?\\s+(\\d{4}|'?\\d{2}\\b)",
+              "\\b" + DAYS + DATES + DATE_SUFFIXES + SPACER + MONTHS + ",?\\s+(\\d{4}|'?\\d{2}\\b)",
               Pattern.CASE_INSENSITIVE);
       String text = content.getData();
       Matcher m = fullDateDayMonth.matcher(text);
@@ -483,7 +476,7 @@ public class Date extends AbstractProcessorDescriptor<Date.Processor, Date.Setti
                   + MONTHS
                   + "\\s+([0-2]?[0-9]|3[01])\\s*"
                   + DATE_SUFFIXES
-                  + "?,?\\s+(\\d{4}|'?\\d{2}\\b)",
+                  + ",?\\s+(\\d{4}|'?\\d{2}\\b)",
               Pattern.CASE_INSENSITIVE);
       m = fullDateMonthDay.matcher(text);
 
@@ -555,7 +548,7 @@ public class Date extends AbstractProcessorDescriptor<Date.Processor, Date.Setti
         try {
           ld = ym.atDay(day);
         } catch (DateTimeException dte) {
-          log().warn(INVALID_DATE_FOUND + dte);
+          log().warn(INVALID_DATE_FOUND, dte);
           continue;
         }
 
@@ -723,7 +716,7 @@ public class Date extends AbstractProcessorDescriptor<Date.Processor, Date.Setti
       try {
         ld = ym.atDay(Integer.parseInt(m.group(dayGroup)));
       } catch (DateTimeException dte) {
-        log().warn(INVALID_DATE_FOUND + dte);
+        log().warn(INVALID_DATE_FOUND, dte);
         return;
       }
 

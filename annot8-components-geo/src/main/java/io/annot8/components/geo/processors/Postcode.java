@@ -44,9 +44,12 @@ public class Postcode extends AbstractProcessorDescriptor<Postcode.Processor, No
         .build();
   }
 
+  // Deep type hierarchy
+  @SuppressWarnings({"java:S110", "java:S5843"})
   public static class Processor extends AbstractRegexProcessor {
+
     private static final String POSTCODE_REGEX =
-        "\\b(GIR 0AA)|((([A-Z-[QVX]][0-9][0-9]?)|(([A-Z-[QVX]][A-Z-[IJZ]][0-9][0-9]?)|(([A-Z-[QVX]][0-9][A-HJKSTUW])|([A-Z-[IJZ]][0-9][ABEHMNPRVWXY])))) [0-9][A-Z-[CIKMOV]]{2})\\b";
+        "\\b(GIR 0AA)|((([A-Z&&[^QVX]][0-9][0-9]?)|(([A-Z&&[^QVX]][A-Z&&[^IJZ]][0-9][0-9]?)|(([A-Z&&[^QVX]][0-9][A-HJKSTUW])|([A-Z&&[^IJZ]][0-9][ABEHMNPRVWXY]))))\\s?[0-9][A-Z&&[^CIKMOV]]{2})\\b";
     private Map<String, double[]> postcodeResource = new HashMap<>();
 
     public Processor() {
@@ -83,7 +86,7 @@ public class Postcode extends AbstractProcessorDescriptor<Postcode.Processor, No
           postcodeResource.put(line[0].toUpperCase(), lonlat);
         }
 
-        log().debug(postcodeResource.size() + " postcodes loaded from CSV");
+        log().debug("{} postcodes loaded from CSV", postcodeResource.size());
       } catch (IOException | CsvValidationException e) {
         log().warn("Unable to load postcode data - geospatial data will not be available", e);
       }

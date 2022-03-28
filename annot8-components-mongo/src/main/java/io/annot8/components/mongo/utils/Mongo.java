@@ -8,7 +8,7 @@ import com.mongodb.client.MongoDatabase;
 import io.annot8.components.mongo.resources.MongoConnectionSettings;
 import org.bson.Document;
 
-public class Mongo implements MongoConnection {
+public class Mongo implements MongoConnection<Document> {
 
   private MongoClient client;
   private MongoDatabase database;
@@ -25,7 +25,7 @@ public class Mongo implements MongoConnection {
     return database;
   }
 
-  public MongoCollection<?> getCollection() {
+  public MongoCollection<Document> getCollection() {
     return collection;
   }
 
