@@ -13,10 +13,10 @@ import java.io.BufferedInputStream;
 import javax.sound.sampled.AudioSystem;
 import org.junit.jupiter.api.Test;
 
-class TranscribeTest {
+public class TranscribeTest {
 
   @Test
-  void test() throws Exception {
+  public void test() throws Exception {
     Transcribe.Settings s = new Transcribe.Settings();
     s.setAnnotateAudio(true);
     s.setModel(
@@ -44,7 +44,7 @@ class TranscribeTest {
   }
 
   @Test
-  void testNoAudioAnnotation() throws Exception {
+  public void testNoAudioAnnotation() throws Exception {
     Transcribe.Settings s = new Transcribe.Settings();
     s.setAnnotateAudio(false);
     s.setModel(
@@ -73,7 +73,7 @@ class TranscribeTest {
   }
 
   @Test
-  void testDescriptor() {
+  public void testDescriptor() {
     Transcribe.Settings s = new Transcribe.Settings();
     s.setAnnotateAudio(false);
     s.setModel(
@@ -89,7 +89,7 @@ class TranscribeTest {
   }
 
   @Test
-  void testSettings() {
+  public void testSettings() {
     Transcribe.Settings s = new Transcribe.Settings();
     assertFalse(s.validate());
 
