@@ -18,10 +18,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 
-class SQLiteDatabaseTableExtractorTest extends AbstractSQLiteDataTest {
+public class SQLiteDatabaseTableExtractorTest extends AbstractSQLiteDataTest {
 
   @Test
-  void testProcess() {
+  public void testProcess() {
     Item item = new TestItem();
     FileContent content = mockFileContent("test.db");
     ((TestItem) item).save(content);
