@@ -182,159 +182,163 @@ public class NestedElasticsearchSink
 
       return m;
     }
-  }
 
-  private static Map<String, Property> createMapping(boolean nested) {
-    Map<String, Property> mapping = new HashMap<>();
+    private static Map<String, Property> createMapping(boolean nested) {
+      Map<String, Property> mapping = new HashMap<>();
 
-    mapping.put(ElasticsearchUtils.ID, ElasticsearchUtils.TYPE_KEYWORD);
+      mapping.put(ElasticsearchUtils.ID, ElasticsearchUtils.TYPE_KEYWORD);
 
-    Property contents;
-    Property groups;
-    if (nested) {
-      contents =
-          Property.of(
-              p ->
-                  p.nested(
-                      n ->
-                          n.properties(ElasticsearchUtils.CONTENT, ElasticsearchUtils.TYPE_TEXT)
-                              .properties(
-                                  ElasticsearchUtils.CONTENT_TYPE, ElasticsearchUtils.TYPE_KEYWORD)
-                              .properties(
-                                  ElasticsearchUtils.DESCRIPTION, ElasticsearchUtils.TYPE_TEXT)
-                              .properties(ElasticsearchUtils.ID, ElasticsearchUtils.TYPE_KEYWORD)
-                              .properties(
-                                  "annotations",
-                                  a ->
-                                      a.nested(
-                                          na ->
-                                              na.properties(
-                                                      ElasticsearchUtils.BEGIN,
-                                                      ElasticsearchUtils.TYPE_LONG)
-                                                  .properties(
-                                                      ElasticsearchUtils.END,
-                                                      ElasticsearchUtils.TYPE_LONG)
-                                                  .properties(
-                                                      ElasticsearchUtils.BOUNDS_TYPE,
-                                                      ElasticsearchUtils.TYPE_KEYWORD)
-                                                  .properties(
-                                                      ElasticsearchUtils.ID,
-                                                      ElasticsearchUtils.TYPE_KEYWORD)
-                                                  .properties(
-                                                      ElasticsearchUtils.TYPE,
-                                                      ElasticsearchUtils.TYPE_KEYWORD)
-                                                  .properties(
-                                                      ElasticsearchUtils.GEO,
-                                                      ElasticsearchUtils.TYPE_GEOSHAPE)
-                                                  .properties(
-                                                      ElasticsearchUtils.VALUE,
-                                                      ElasticsearchUtils
-                                                          .TYPE_TEXT_WITH_KEYWORD)))));
+      Property contents;
+      Property groups;
+      if (nested) {
+        contents =
+            Property.of(
+                p ->
+                    p.nested(
+                        n ->
+                            n.properties(ElasticsearchUtils.CONTENT, ElasticsearchUtils.TYPE_TEXT)
+                                .properties(
+                                    ElasticsearchUtils.CONTENT_TYPE,
+                                    ElasticsearchUtils.TYPE_KEYWORD)
+                                .properties(
+                                    ElasticsearchUtils.DESCRIPTION, ElasticsearchUtils.TYPE_TEXT)
+                                .properties(ElasticsearchUtils.ID, ElasticsearchUtils.TYPE_KEYWORD)
+                                .properties(
+                                    ANNOTATIONS,
+                                    a ->
+                                        a.nested(
+                                            na ->
+                                                na.properties(
+                                                        ElasticsearchUtils.BEGIN,
+                                                        ElasticsearchUtils.TYPE_LONG)
+                                                    .properties(
+                                                        ElasticsearchUtils.END,
+                                                        ElasticsearchUtils.TYPE_LONG)
+                                                    .properties(
+                                                        ElasticsearchUtils.BOUNDS_TYPE,
+                                                        ElasticsearchUtils.TYPE_KEYWORD)
+                                                    .properties(
+                                                        ElasticsearchUtils.ID,
+                                                        ElasticsearchUtils.TYPE_KEYWORD)
+                                                    .properties(
+                                                        ElasticsearchUtils.TYPE,
+                                                        ElasticsearchUtils.TYPE_KEYWORD)
+                                                    .properties(
+                                                        ElasticsearchUtils.GEO,
+                                                        ElasticsearchUtils.TYPE_GEOSHAPE)
+                                                    .properties(
+                                                        ElasticsearchUtils.VALUE,
+                                                        ElasticsearchUtils
+                                                            .TYPE_TEXT_WITH_KEYWORD)))));
 
-      groups =
-          Property.of(
-              p ->
-                  p.nested(
-                      n ->
-                          n.properties(ElasticsearchUtils.ID, ElasticsearchUtils.TYPE_KEYWORD)
-                              .properties(
-                                  ElasticsearchUtils.TYPE, ElasticsearchUtils.TYPE_KEYWORD)));
-    } else {
-      contents =
-          Property.of(
-              p ->
-                  p.object(
-                      o ->
-                          o.properties(ElasticsearchUtils.CONTENT, ElasticsearchUtils.TYPE_TEXT)
-                              .properties(
-                                  ElasticsearchUtils.CONTENT_TYPE, ElasticsearchUtils.TYPE_KEYWORD)
-                              .properties(
-                                  ElasticsearchUtils.DESCRIPTION, ElasticsearchUtils.TYPE_TEXT)
-                              .properties(ElasticsearchUtils.ID, ElasticsearchUtils.TYPE_KEYWORD)
-                              .properties(
-                                  "annotations",
-                                  a ->
-                                      a.object(
-                                          oa ->
-                                              oa.properties(
-                                                      ElasticsearchUtils.BEGIN,
-                                                      ElasticsearchUtils.TYPE_LONG)
-                                                  .properties(
-                                                      ElasticsearchUtils.END,
-                                                      ElasticsearchUtils.TYPE_LONG)
-                                                  .properties(
-                                                      ElasticsearchUtils.BOUNDS_TYPE,
-                                                      ElasticsearchUtils.TYPE_KEYWORD)
-                                                  .properties(
-                                                      ElasticsearchUtils.ID,
-                                                      ElasticsearchUtils.TYPE_KEYWORD)
-                                                  .properties(
-                                                      ElasticsearchUtils.TYPE,
-                                                      ElasticsearchUtils.TYPE_KEYWORD)
-                                                  .properties(
-                                                      ElasticsearchUtils.GEO,
-                                                      ElasticsearchUtils.TYPE_GEOSHAPE)
-                                                  .properties(
-                                                      ElasticsearchUtils.VALUE,
-                                                      ElasticsearchUtils
-                                                          .TYPE_TEXT_WITH_KEYWORD)))));
+        groups =
+            Property.of(
+                p ->
+                    p.nested(
+                        n ->
+                            n.properties(ElasticsearchUtils.ID, ElasticsearchUtils.TYPE_KEYWORD)
+                                .properties(
+                                    ElasticsearchUtils.TYPE, ElasticsearchUtils.TYPE_KEYWORD)));
+      } else {
+        contents =
+            Property.of(
+                p ->
+                    p.object(
+                        o ->
+                            o.properties(ElasticsearchUtils.CONTENT, ElasticsearchUtils.TYPE_TEXT)
+                                .properties(
+                                    ElasticsearchUtils.CONTENT_TYPE,
+                                    ElasticsearchUtils.TYPE_KEYWORD)
+                                .properties(
+                                    ElasticsearchUtils.DESCRIPTION, ElasticsearchUtils.TYPE_TEXT)
+                                .properties(ElasticsearchUtils.ID, ElasticsearchUtils.TYPE_KEYWORD)
+                                .properties(
+                                    ANNOTATIONS,
+                                    a ->
+                                        a.object(
+                                            oa ->
+                                                oa.properties(
+                                                        ElasticsearchUtils.BEGIN,
+                                                        ElasticsearchUtils.TYPE_LONG)
+                                                    .properties(
+                                                        ElasticsearchUtils.END,
+                                                        ElasticsearchUtils.TYPE_LONG)
+                                                    .properties(
+                                                        ElasticsearchUtils.BOUNDS_TYPE,
+                                                        ElasticsearchUtils.TYPE_KEYWORD)
+                                                    .properties(
+                                                        ElasticsearchUtils.ID,
+                                                        ElasticsearchUtils.TYPE_KEYWORD)
+                                                    .properties(
+                                                        ElasticsearchUtils.TYPE,
+                                                        ElasticsearchUtils.TYPE_KEYWORD)
+                                                    .properties(
+                                                        ElasticsearchUtils.GEO,
+                                                        ElasticsearchUtils.TYPE_GEOSHAPE)
+                                                    .properties(
+                                                        ElasticsearchUtils.VALUE,
+                                                        ElasticsearchUtils
+                                                            .TYPE_TEXT_WITH_KEYWORD)))));
 
-      groups =
-          Property.of(
-              p ->
-                  p.object(
-                      o ->
-                          o.properties(ElasticsearchUtils.ID, ElasticsearchUtils.TYPE_KEYWORD)
-                              .properties(
-                                  ElasticsearchUtils.TYPE, ElasticsearchUtils.TYPE_KEYWORD)));
+        groups =
+            Property.of(
+                p ->
+                    p.object(
+                        o ->
+                            o.properties(ElasticsearchUtils.ID, ElasticsearchUtils.TYPE_KEYWORD)
+                                .properties(
+                                    ElasticsearchUtils.TYPE, ElasticsearchUtils.TYPE_KEYWORD)));
+      }
+
+      mapping.put(CONTENTS, contents);
+      mapping.put(GROUPS, groups);
+
+      return mapping;
     }
 
-    mapping.put("contents", contents);
-    mapping.put("groups", groups);
-
-    return mapping;
-  }
-
-  private static List<Map<String, DynamicTemplate>> createDynamicTemplate(
-      boolean nested, boolean forceString) {
-    List<Map<String, DynamicTemplate>> l = new ArrayList<>();
-    Map<String, DynamicTemplate> groupRolesContent = new HashMap<>();
-    groupRolesContent.put(
-        "group_roles_content",
-        DynamicTemplate.of(
-            d -> d.pathMatch("groups.roles.*.contentId").mapping(ElasticsearchUtils.TYPE_KEYWORD)));
-    l.add(groupRolesContent);
-
-    Map<String, DynamicTemplate> groupRolesAnnotation = new HashMap<>();
-    groupRolesAnnotation.put(
-        "group_roles_annotation",
-        DynamicTemplate.of(
-            d ->
-                d.pathMatch("groups.roles.*.annotationId")
-                    .mapping(ElasticsearchUtils.TYPE_KEYWORD)));
-    l.add(groupRolesAnnotation);
-
-    if (forceString) {
-      Map<String, DynamicTemplate> stringProperties = new HashMap<>();
-      stringProperties.put(
-          "string_properties",
+    private static List<Map<String, DynamicTemplate>> createDynamicTemplate(
+        boolean nested, boolean forceString) {
+      List<Map<String, DynamicTemplate>> l = new ArrayList<>();
+      Map<String, DynamicTemplate> groupRolesContent = new HashMap<>();
+      groupRolesContent.put(
+          "group_roles_content",
           DynamicTemplate.of(
-              d -> d.pathMatch("*.properties.*").mapping(ElasticsearchUtils.TYPE_TEXT)));
-      l.add(stringProperties);
-    }
+              d ->
+                  d.pathMatch("groups.roles.*.contentId")
+                      .mapping(ElasticsearchUtils.TYPE_KEYWORD)));
+      l.add(groupRolesContent);
 
-    if (nested) {
-      Map<String, DynamicTemplate> groupRoles = new HashMap<>();
-      groupRoles.put(
-          "group_roles",
+      Map<String, DynamicTemplate> groupRolesAnnotation = new HashMap<>();
+      groupRolesAnnotation.put(
+          "group_roles_annotation",
           DynamicTemplate.of(
               d ->
                   d.pathMatch("groups.roles.*.annotationId")
                       .mapping(ElasticsearchUtils.TYPE_KEYWORD)));
-      l.add(groupRoles);
-    }
+      l.add(groupRolesAnnotation);
 
-    return l;
+      if (forceString) {
+        Map<String, DynamicTemplate> stringProperties = new HashMap<>();
+        stringProperties.put(
+            "string_properties",
+            DynamicTemplate.of(
+                d -> d.pathMatch("*.properties.*").mapping(ElasticsearchUtils.TYPE_TEXT)));
+        l.add(stringProperties);
+      }
+
+      if (nested) {
+        Map<String, DynamicTemplate> groupRoles = new HashMap<>();
+        groupRoles.put(
+            "group_roles",
+            DynamicTemplate.of(
+                d ->
+                    d.pathMatch("groups.roles.*.annotationId")
+                        .mapping(ElasticsearchUtils.TYPE_KEYWORD)));
+        l.add(groupRoles);
+      }
+
+      return l;
+    }
   }
 
   public static class Settings extends ElasticsearchSettings {

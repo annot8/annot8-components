@@ -63,21 +63,6 @@ public class PptExtractor
     }
 
     @Override
-    protected boolean isMetadataSupported() {
-      return true;
-    }
-
-    @Override
-    protected boolean isTextSupported() {
-      return true;
-    }
-
-    @Override
-    protected boolean isImagesSupported() {
-      return true;
-    }
-
-    @Override
     protected boolean isTablesSupported() {
       return false;
     }

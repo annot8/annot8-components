@@ -50,11 +50,6 @@ public class PlainTextExtractor
     }
 
     @Override
-    protected boolean isTextSupported() {
-      return true;
-    }
-
-    @Override
     protected boolean isImagesSupported() {
       return false;
     }
