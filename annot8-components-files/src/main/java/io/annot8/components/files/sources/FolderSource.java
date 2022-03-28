@@ -103,14 +103,16 @@ public class FolderSource
                   .filter(Files::isRegularFile)
                   .filter(this::acceptExtension)
                   .forEach(
-                      file -> {
-                        itemFactory.create(
-                            item,
-                            child -> {
-                              child.getProperties().set(PropertyKeys.PROPERTY_KEY_SOURCE, file);
-                              child.createContent(FileContent.class).withData(file.toFile()).save();
-                            });
-                      });
+                      file ->
+                          itemFactory.create(
+                              item,
+                              child -> {
+                                child.getProperties().set(PropertyKeys.PROPERTY_KEY_SOURCE, file);
+                                child
+                                    .createContent(FileContent.class)
+                                    .withData(file.toFile())
+                                    .save();
+                              }));
             } catch (Exception e) {
               log().error("Unable to read files in folder {}", p, e);
             }

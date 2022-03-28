@@ -20,8 +20,8 @@ public class OpenCVUtils {
     // Private constructor for utility class
   }
 
-  public static Scalar BLACK = new Scalar(0, 0, 0);
-  public static Scalar WHITE = new Scalar(255, 255, 255);
+  public static final Scalar BLACK = new Scalar(0, 0, 0);
+  public static final Scalar WHITE = new Scalar(255, 255, 255);
 
   public static RotatedRect padRotatedRect(RotatedRect orig, int padding) {
     return new RotatedRect(

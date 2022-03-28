@@ -18,6 +18,7 @@ import io.annot8.common.data.content.Row;
 import io.annot8.common.data.content.Table;
 import io.annot8.common.utils.java.ConversionUtils;
 import io.annot8.components.documents.data.ExtractionWithProperties;
+import io.annot8.components.documents.data.SimpleTable;
 import io.annot8.conventions.PropertyKeys;
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
@@ -29,9 +30,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.apache.pdfbox.cos.COSDictionary;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -105,26 +104,6 @@ public class PdfExtractor
           detectionAlgorithm = new NurminenDetectionAlgorithm();
           break;
       }
-    }
-
-    @Override
-    protected boolean isMetadataSupported() {
-      return true;
-    }
-
-    @Override
-    protected boolean isTextSupported() {
-      return true;
-    }
-
-    @Override
-    protected boolean isImagesSupported() {
-      return true;
-    }
-
-    @Override
-    protected boolean isTablesSupported() {
-      return true;
     }
 
     @Override
@@ -316,7 +295,7 @@ public class PdfExtractor
               properties.put("extractionMethod", table.getExtractionMethod());
 
               ExtractionWithProperties<Table> e =
-                  new ExtractionWithProperties<>(new PdfTable(table), properties);
+                  new ExtractionWithProperties<>(pdfTable(table), properties);
               t.add(e);
             }
           }
@@ -442,55 +421,29 @@ public class PdfExtractor
     DETERMINE
   }
 
-  public static class PdfTable implements Table {
-    private final List<Row> rows;
-    private final List<String> columnNames;
+  protected static Table pdfTable(technology.tabula.Table t) {
+    List<Row> rows = new ArrayList<>(t.getRowCount() - 1);
+    List<String> columnNames = Collections.emptyList();
 
-    protected PdfTable(technology.tabula.Table t) {
-      List<Row> tmpRows = new ArrayList<>(t.getRowCount() - 1);
+    List<List<Object>> objRows =
+        t.getRows().stream()
+            .map(
+                cells ->
+                    cells.stream()
+                        .map(RectangularTextContainer::getText)
+                        .map(ConversionUtils::parseString)
+                        .collect(Collectors.toList()))
+            .collect(Collectors.toList());
 
-      List<List<Object>> objRows =
-          t.getRows().stream()
-              .map(
-                  cells ->
-                      cells.stream()
-                          .map(RectangularTextContainer::getText)
-                          .map(ConversionUtils::parseString)
-                          .collect(Collectors.toList()))
-              .collect(Collectors.toList());
-
-      if (objRows.size() > 1) {
-        columnNames = objRows.remove(0).stream().map(Object::toString).collect(Collectors.toList());
-      } else {
-        columnNames = Collections.emptyList();
-      }
-
-      for (int i = 0; i < objRows.size(); i++) {
-        Row row = new DefaultRow(i, columnNames, objRows.get(i));
-        tmpRows.add(row);
-      }
-
-      this.rows = Collections.unmodifiableList(tmpRows);
+    if (objRows.size() > 1) {
+      columnNames = objRows.remove(0).stream().map(Object::toString).collect(Collectors.toList());
     }
 
-    @Override
-    public int getColumnCount() {
-      return columnNames.size();
+    for (int i = 0; i < objRows.size(); i++) {
+      Row row = new DefaultRow(i, columnNames, objRows.get(i));
+      rows.add(row);
     }
 
-    @Override
-    public int getRowCount() {
-      return rows.size();
-    }
-
-    @Override
-    public Optional<List<String>> getColumnNames() {
-      return Optional.of(columnNames);
-    }
-
-    @Override
-    public Stream<Row> getRows() {
-      return rows.stream();
-    }
+    return new SimpleTable(columnNames, rows);
   }
 }

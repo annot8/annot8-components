@@ -42,7 +42,8 @@ public class UnqualifiedDate
   }
 
   // Deep type hierarchy
-  @SuppressWarnings({"java:S110", "java:S5843"})
+  // TODO java:S5998 suggests regex could cause issues with large document
+  @SuppressWarnings({"java:S110", "java:S5843", "java:S5998"})
   public static class Processor extends AbstractRegexProcessor {
 
     private Boolean allowLowercase;

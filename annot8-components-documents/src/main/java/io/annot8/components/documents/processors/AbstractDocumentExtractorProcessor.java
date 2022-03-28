@@ -244,16 +244,24 @@ public abstract class AbstractDocumentExtractorProcessor<T, S extends DocumentEx
   // Abstract functions below here
 
   /** Returns true if this processor supports extracting metadata, and false otherwise */
-  protected abstract boolean isMetadataSupported();
+  protected boolean isMetadataSupported() {
+    return true;
+  }
 
   /** Returns true if this processor supports extracting text, and false otherwise */
-  protected abstract boolean isTextSupported();
+  protected boolean isTextSupported() {
+    return true;
+  }
 
   /** Returns true if this processor supports extracting images, and false otherwise */
-  protected abstract boolean isImagesSupported();
+  protected boolean isImagesSupported() {
+    return true;
+  }
 
   /** Returns true if this processor supports extracting tables, and false otherwise */
-  protected abstract boolean isTablesSupported();
+  protected boolean isTablesSupported() {
+    return true;
+  }
 
   /** Returns true if this processor should process the given file, and false otherwise */
   protected abstract boolean acceptFile(FileContent file);

@@ -98,26 +98,6 @@ public class DocumentExtractor
     }
 
     @Override
-    protected boolean isMetadataSupported() {
-      return true;
-    }
-
-    @Override
-    protected boolean isTextSupported() {
-      return true;
-    }
-
-    @Override
-    protected boolean isImagesSupported() {
-      return true;
-    }
-
-    @Override
-    protected boolean isTablesSupported() {
-      return true;
-    }
-
-    @Override
     protected boolean acceptFile(FileContent file) {
       DocumentType documentType = DocumentType.PLAIN_TEXT; // Accepts any document, so use it as our
       // default

@@ -18,6 +18,7 @@ import io.annot8.common.data.content.Row;
 import io.annot8.common.data.content.Table;
 import io.annot8.common.utils.java.ConversionUtils;
 import io.annot8.components.documents.data.ExtractionWithProperties;
+import io.annot8.components.documents.data.SimpleTable;
 import io.annot8.conventions.PropertyKeys;
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
@@ -37,9 +38,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import javax.imageio.ImageIO;
 import org.apache.poi.poifs.filesystem.FileMagic;
 import org.jsoup.Jsoup;
@@ -78,26 +77,6 @@ public class HtmlExtractor
                       ? HttpClient.Redirect.NORMAL
                       : HttpClient.Redirect.NEVER)
               .build();
-    }
-
-    @Override
-    protected boolean isMetadataSupported() {
-      return true;
-    }
-
-    @Override
-    protected boolean isTextSupported() {
-      return true;
-    }
-
-    @Override
-    protected boolean isImagesSupported() {
-      return true;
-    }
-
-    @Override
-    protected boolean isTablesSupported() {
-      return true;
     }
 
     @Override
@@ -359,64 +338,32 @@ public class HtmlExtractor
       String id = table.attr("id");
       if (id != null && !id.isBlank()) props.put(PropertyKeys.PROPERTY_KEY_IDENTIFIER, id);
 
-      return new ExtractionWithProperties<>(new HtmlTable(table), props);
+      return new ExtractionWithProperties<>(htmlTable(table), props);
     }
   }
 
-  public static class HtmlTable implements Table {
-    private final List<Row> rows;
-    private final List<String> columnNames;
+  protected static Table htmlTable(Element table) {
+    List<String> columnNames = Collections.emptyList();
 
-    protected HtmlTable(Element table) {
-      List<String> tmpComumnNames = Collections.emptyList();
-
-      Element headerRow = table.selectFirst("thead > tr");
-      if (headerRow != null) {
-        tmpComumnNames =
-            headerRow.getElementsByTag("th").stream()
-                .map(Element::text)
-                .collect(Collectors.toList());
-      }
-
-      List<Row> tmpRows = new ArrayList<>();
-      Elements bodyRows = table.select("tbody > tr");
-      for (int i = 0; i < bodyRows.size(); i++) {
-        // TODO: Handle column spans?
-        List<Object> data =
-            bodyRows.get(i).select("td, th").stream()
-                .map(Element::text)
-                .map(ConversionUtils::parseString)
-                .collect(Collectors.toList());
-        tmpRows.add(new DefaultRow(i, tmpComumnNames, data));
-      }
-
-      this.columnNames = Collections.unmodifiableList(tmpComumnNames);
-      this.rows = Collections.unmodifiableList(tmpRows);
+    Element headerRow = table.selectFirst("thead > tr");
+    if (headerRow != null) {
+      columnNames =
+          headerRow.getElementsByTag("th").stream().map(Element::text).collect(Collectors.toList());
     }
 
-    @Override
-    public int getColumnCount() {
-      if (columnNames.isEmpty()) {
-        return rows.stream().mapToInt(Row::getColumnCount).max().orElse(0);
-      } else {
-        return columnNames.size();
-      }
+    List<Row> rows = new ArrayList<>();
+    Elements bodyRows = table.select("tbody > tr");
+    for (int i = 0; i < bodyRows.size(); i++) {
+      // TODO: Handle column spans?
+      List<Object> data =
+          bodyRows.get(i).select("td, th").stream()
+              .map(Element::text)
+              .map(ConversionUtils::parseString)
+              .collect(Collectors.toList());
+      rows.add(new DefaultRow(i, columnNames, data));
     }
 
-    @Override
-    public int getRowCount() {
-      return rows.size();
-    }
-
-    @Override
-    public Optional<List<String>> getColumnNames() {
-      return Optional.of(columnNames);
-    }
-
-    @Override
-    public Stream<Row> getRows() {
-      return rows.stream();
-    }
+    return new SimpleTable(columnNames, rows);
   }
 
   public static class Settings extends DocumentExtractorSettings {

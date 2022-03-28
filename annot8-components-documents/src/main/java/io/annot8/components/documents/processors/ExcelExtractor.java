@@ -15,21 +15,27 @@ import io.annot8.common.components.AbstractProcessorDescriptor;
 import io.annot8.common.components.capabilities.SimpleCapabilities;
 import io.annot8.common.data.content.FileContent;
 import io.annot8.common.data.content.InputStreamContent;
+import io.annot8.common.data.content.Row;
 import io.annot8.common.data.content.Table;
 import io.annot8.common.data.content.TableContent;
-import io.annot8.components.documents.data.WorksheetTable;
+import io.annot8.components.documents.data.SimpleTable;
+import io.annot8.components.documents.data.WorksheetRow;
 import io.annot8.conventions.PropertyKeys;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.SheetVisibility;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.ss.util.CellReference;
 import org.javatuples.Pair;
 
 @ComponentName("Excel (XLS and XLSX) Extractor")
@@ -121,7 +127,7 @@ public class ExcelExtractor
 
     private void processSheet(
         Item item, Sheet sheet, int sheetIndex, boolean active, boolean visible, String parentId) {
-      Table table = new WorksheetTable(sheet, settings.isFirstRowHeader(), settings.getSkipRows());
+      Table table = worksheetTable(sheet, settings.isFirstRowHeader(), settings.getSkipRows());
 
       item.createContent(TableContent.class)
           .withData(table)
@@ -131,6 +137,60 @@ public class ExcelExtractor
           .withProperty("visible", visible)
           .withPropertyIfPresent(PropertyKeys.PROPERTY_KEY_PARENT, Optional.ofNullable(parentId))
           .save();
+    }
+
+    private Table worksheetTable(Sheet sheet, boolean firstRowHeader, int skipRows) {
+      Iterator<org.apache.poi.ss.usermodel.Row> rows = sheet.rowIterator();
+
+      int rowIndex = 0;
+
+      List<String> headerColumns;
+      for (int i = 0; i < skipRows; i++) {
+        if (rows.hasNext()) rows.next();
+      }
+
+      if (firstRowHeader && rows.hasNext()) {
+        org.apache.poi.ss.usermodel.Row header = rows.next();
+        rowIndex++;
+
+        headerColumns = new ArrayList<>(header.getLastCellNum());
+        for (int i = 0; i < header.getLastCellNum(); i++) {
+          Cell cell = header.getCell(i);
+          if (cell == null) {
+            headerColumns.add("");
+          } else {
+            headerColumns.add(cell.getStringCellValue());
+          }
+        }
+
+      } else {
+        headerColumns = new ArrayList<>();
+      }
+
+      List<Row> lRows = new ArrayList<>(sheet.getLastRowNum());
+
+      while (rows.hasNext()) {
+        WorksheetRow row = new WorksheetRow(rows.next(), rowIndex, headerColumns);
+        rowIndex++;
+
+        if (row.isEmpty()) continue;
+
+        lRows.add(row);
+      }
+
+      int columnCount = lRows.stream().mapToInt(Row::getColumnCount).max().orElse(-1);
+
+      if (headerColumns.isEmpty()) {
+        for (int i = 0; i < columnCount; i++) {
+          headerColumns.add("Column " + CellReference.convertNumToColString(i));
+        }
+      } else if (columnCount > headerColumns.size()) {
+        for (int i = headerColumns.size(); i < columnCount; i++) {
+          headerColumns.add("");
+        }
+      }
+
+      return new SimpleTable(headerColumns, lRows);
     }
   }
 

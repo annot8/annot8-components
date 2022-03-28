@@ -67,15 +67,14 @@ public class SpacyNER extends AbstractProcessorDescriptor<SpacyNER.Processor, Sp
               d ->
                   d.getEntities()
                       .forEach(
-                          e -> {
-                            content
-                                .getAnnotations()
-                                .create()
-                                .withBounds(new SpanBounds(e.getStartChar(), e.getEndChar()))
-                                .withType(toNerLabel(e.getLabel()))
-                                .withProperty(PropertyKeys.PROPERTY_KEY_LEMMA, e.getLemma())
-                                .save();
-                          }));
+                          e ->
+                              content
+                                  .getAnnotations()
+                                  .create()
+                                  .withBounds(new SpanBounds(e.getStartChar(), e.getEndChar()))
+                                  .withType(toNerLabel(e.getLabel()))
+                                  .withProperty(PropertyKeys.PROPERTY_KEY_LEMMA, e.getLemma())
+                                  .save()));
     }
   }
 }

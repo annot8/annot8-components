@@ -17,6 +17,7 @@ import io.annot8.common.data.content.Row;
 import io.annot8.common.data.content.Table;
 import io.annot8.common.utils.java.ConversionUtils;
 import io.annot8.components.documents.data.ExtractionWithProperties;
+import io.annot8.components.documents.data.SimpleTable;
 import io.annot8.conventions.PropertyKeys;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
@@ -28,9 +29,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import javax.imageio.ImageIO;
 import org.apache.poi.hpsf.DocumentSummaryInformation;
 import org.apache.poi.hpsf.SummaryInformation;
@@ -65,26 +64,6 @@ public class DocExtractor
     @Override
     public void reset() {
       cache.clear();
-    }
-
-    @Override
-    protected boolean isMetadataSupported() {
-      return true;
-    }
-
-    @Override
-    protected boolean isTextSupported() {
-      return true;
-    }
-
-    @Override
-    protected boolean isImagesSupported() {
-      return true;
-    }
-
-    @Override
-    protected boolean isTablesSupported() {
-      return true;
     }
 
     @Override
@@ -268,64 +247,38 @@ public class DocExtractor
       TableIterator tableIterator = new TableIterator(doc.getRange());
       while (tableIterator.hasNext()) {
         org.apache.poi.hwpf.usermodel.Table tbl = tableIterator.next();
-        ret.add(new ExtractionWithProperties<>(new DocTable(tbl)));
+        ret.add(new ExtractionWithProperties<>(docTable(tbl)));
       }
 
       return ret;
     }
   }
 
-  public static class DocTable implements Table {
-    private final List<Row> rows;
-    private final List<String> columnNames;
+  protected static Table docTable(org.apache.poi.hwpf.usermodel.Table t) {
 
-    protected DocTable(org.apache.poi.hwpf.usermodel.Table t) {
+    List<Row> rows = new ArrayList<>(t.numRows());
 
-      List<Row> tempRows = new ArrayList<>(t.numRows());
+    List<String> columnNames = Collections.emptyList();
+    for (int i = 0; i < t.numRows(); i++) {
+      TableRow r = t.getRow(i);
 
-      List<String> tempColumnNames = Collections.emptyList();
-      for (int i = 0; i < t.numRows(); i++) {
-        TableRow r = t.getRow(i);
-
-        List<Object> data = new ArrayList<>();
-        for (int j = 0; j < r.numCells(); j++) {
-          data.add(ConversionUtils.parseString(removeControlCharacters(r.getCell(j).text())));
-        }
-
-        if (tempColumnNames.isEmpty() && r.isTableHeader()) {
-          tempColumnNames = data.stream().map(Object::toString).collect(Collectors.toList());
-        } else {
-          Row row = new DefaultRow(i - 1, tempColumnNames, data);
-          tempRows.add(row);
-        }
+      List<Object> data = new ArrayList<>();
+      for (int j = 0; j < r.numCells(); j++) {
+        data.add(ConversionUtils.parseString(removeControlCharacters(r.getCell(j).text())));
       }
 
-      this.rows = Collections.unmodifiableList(tempRows);
-      this.columnNames = Collections.unmodifiableList(tempColumnNames);
+      if (columnNames.isEmpty() && r.isTableHeader()) {
+        columnNames = data.stream().map(Object::toString).collect(Collectors.toList());
+      } else {
+        Row row = new DefaultRow(i - 1, columnNames, data);
+        rows.add(row);
+      }
     }
 
-    @Override
-    public int getColumnCount() {
-      return columnNames.size();
-    }
+    return new SimpleTable(columnNames, rows);
+  }
 
-    @Override
-    public int getRowCount() {
-      return rows.size();
-    }
-
-    @Override
-    public Optional<List<String>> getColumnNames() {
-      return Optional.of(columnNames);
-    }
-
-    @Override
-    public Stream<Row> getRows() {
-      return rows.stream();
-    }
-
-    private static String removeControlCharacters(String s) {
-      return s.replaceAll("[\u0000-\u001f]", "");
-    }
+  private static String removeControlCharacters(String s) {
+    return s.replaceAll("[\u0000-\u001f]", "");
   }
 }

@@ -17,6 +17,7 @@ import io.annot8.common.data.content.Row;
 import io.annot8.common.data.content.Table;
 import io.annot8.common.utils.java.ConversionUtils;
 import io.annot8.components.documents.data.ExtractionWithProperties;
+import io.annot8.components.documents.data.SimpleTable;
 import io.annot8.conventions.PropertyKeys;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
@@ -28,9 +29,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import javax.imageio.ImageIO;
 import org.apache.poi.ooxml.POIXMLProperties;
 import org.apache.poi.xwpf.extractor.XWPFWordExtractor;
@@ -65,26 +64,6 @@ public class DocxExtractor
     @Override
     public void reset() {
       cache.clear();
-    }
-
-    @Override
-    protected boolean isMetadataSupported() {
-      return true;
-    }
-
-    @Override
-    protected boolean isTextSupported() {
-      return true;
-    }
-
-    @Override
-    protected boolean isImagesSupported() {
-      return true;
-    }
-
-    @Override
-    protected boolean isTablesSupported() {
-      return true;
     }
 
     @Override
@@ -244,17 +223,12 @@ public class DocxExtractor
     }
 
     private static ExtractionWithProperties<Table> transformTable(XWPFTable table) {
-      return new ExtractionWithProperties<>(new DocxTable(table));
+      return new ExtractionWithProperties<>(docxTable(table));
     }
-  }
 
-  public static class DocxTable implements Table {
-    private final List<Row> rows;
-    private final List<String> columnNames;
-
-    protected DocxTable(XWPFTable t) {
-      List<Row> tmpRows = new ArrayList<>(t.getNumberOfRows() - 1);
-      List<String> tmpColumnNames = Collections.emptyList();
+    protected static Table docxTable(XWPFTable t) {
+      List<Row> rows = new ArrayList<>(t.getNumberOfRows() - 1);
+      List<String> columnNames = Collections.emptyList();
 
       for (int i = 0; i < t.getNumberOfRows(); i++) {
         XWPFTableRow r = t.getRow(i);
@@ -267,35 +241,14 @@ public class DocxExtractor
 
         if (i == 0) {
           // Assume header row if first row
-          tmpColumnNames = data.stream().map(Object::toString).collect(Collectors.toList());
+          columnNames = data.stream().map(Object::toString).collect(Collectors.toList());
         } else {
-          Row row = new DefaultRow(i - 1, tmpColumnNames, data);
-          tmpRows.add(row);
+          Row row = new DefaultRow(i - 1, columnNames, data);
+          rows.add(row);
         }
       }
 
-      this.rows = Collections.unmodifiableList(tmpRows);
-      this.columnNames = Collections.unmodifiableList(tmpColumnNames);
-    }
-
-    @Override
-    public int getColumnCount() {
-      return columnNames.size();
-    }
-
-    @Override
-    public int getRowCount() {
-      return rows.size();
-    }
-
-    @Override
-    public Optional<List<String>> getColumnNames() {
-      return Optional.of(columnNames);
-    }
-
-    @Override
-    public Stream<Row> getRows() {
-      return rows.stream();
+      return new SimpleTable(columnNames, rows);
     }
   }
 }
