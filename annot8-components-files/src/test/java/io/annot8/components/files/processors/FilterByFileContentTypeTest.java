@@ -20,6 +20,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 public class FilterByFileContentTypeTest {
+
   @Test
   public void testFilterMatch() {
     FilterByFileContentType.Settings s = new FilterByFileContentType.Settings();
@@ -73,10 +74,11 @@ public class FilterByFileContentTypeTest {
     Item item = new TestItem();
     item.createContent(FileContent.class).withData(f).save();
 
-    FilterByFileContentType.Processor p = new FilterByFileContentType.Processor(settings);
-    assertEquals(ProcessorResponse.ok(), p.process(item));
+    try (FilterByFileContentType.Processor p = new FilterByFileContentType.Processor(settings)) {
+      assertEquals(ProcessorResponse.ok(), p.process(item));
 
-    assertEquals(expected, item.getContents().count());
+      assertEquals(expected, item.getContents().count());
+    }
   }
 
   private void testInputStream(FilterByFileContentType.Settings settings, long expected) {
@@ -85,10 +87,11 @@ public class FilterByFileContentTypeTest {
         .withData(FilterByFileContentTypeTest.class.getResourceAsStream("testArchive.zip"))
         .save();
 
-    FilterByFileContentType.Processor p = new FilterByFileContentType.Processor(settings);
-    assertEquals(ProcessorResponse.ok(), p.process(item));
+    try (FilterByFileContentType.Processor p = new FilterByFileContentType.Processor(settings)) {
+      assertEquals(ProcessorResponse.ok(), p.process(item));
 
-    assertEquals(expected, item.getContents().count());
+      assertEquals(expected, item.getContents().count());
+    }
   }
 
   @Test
@@ -101,10 +104,11 @@ public class FilterByFileContentTypeTest {
     FilterByFileContentType.Settings s = new FilterByFileContentType.Settings();
     s.setFilterNullContentTypes(true);
 
-    FilterByFileContentType.Processor p = new FilterByFileContentType.Processor(s);
-    assertEquals(ProcessorResponse.ok(), p.process(item));
+    try (FilterByFileContentType.Processor p = new FilterByFileContentType.Processor(s)) {
+      assertEquals(ProcessorResponse.ok(), p.process(item));
 
-    assertEquals(0L, item.getContents().count());
+      assertEquals(0L, item.getContents().count());
+    }
   }
 
   @Test
@@ -119,10 +123,11 @@ public class FilterByFileContentTypeTest {
     FilterByFileContentType.Settings s = new FilterByFileContentType.Settings();
     s.setFilterNullContentTypes(true);
 
-    FilterByFileContentType.Processor p = new FilterByFileContentType.Processor(s);
-    assertEquals(ProcessorResponse.ok(), p.process(item));
+    try (FilterByFileContentType.Processor p = new FilterByFileContentType.Processor(s)) {
+      assertEquals(ProcessorResponse.ok(), p.process(item));
 
-    assertEquals(0L, item.getContents().count());
+      assertEquals(0L, item.getContents().count());
+    }
   }
 
   @Test

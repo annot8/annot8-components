@@ -22,6 +22,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 
 public class TablesToCSVTest {
+
   @Test
   public void test() throws IOException {
     Item item = new TestItem();
@@ -32,19 +33,23 @@ public class TablesToCSVTest {
     TablesToCSV.Settings s = new TablesToCSV.Settings();
     s.setOutputFolder(tempPath);
 
-    TablesToCSV.Processor p = new TablesToCSV.Processor(s);
-    assertEquals(ProcessorResponse.ok(), p.process(item));
+    try (TablesToCSV.Processor p = new TablesToCSV.Processor(s)) {
+      assertEquals(ProcessorResponse.ok(), p.process(item));
 
-    Path csvFile = tempPath.resolve(item.getId()).resolve(tc.getId() + ".csv");
-    assertTrue(csvFile.toFile().exists());
+      Path csvFile = tempPath.resolve(item.getId()).resolve(tc.getId() + ".csv");
+      assertTrue(csvFile.toFile().exists());
 
-    List<String> lines = Files.lines(csvFile).collect(Collectors.toList());
+      List<String> lines = Files.lines(csvFile).collect(Collectors.toList());
 
-    assertEquals("Name,Age,,Gender", lines.get(0));
-    assertEquals("Alice,31,Red,F", lines.get(1));
-    assertEquals("Bob,29", lines.get(2));
+      assertEquals("Name,Age,,Gender", lines.get(0));
+      assertEquals("Alice,31,Red,F", lines.get(1));
+      assertEquals("Bob,29", lines.get(2));
 
-    Files.walk(tempPath).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
+      Files.walk(tempPath)
+          .sorted(Comparator.reverseOrder())
+          .map(Path::toFile)
+          .forEach(File::delete);
+    }
   }
 
   public static class TestTable implements Table {

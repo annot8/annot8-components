@@ -61,6 +61,7 @@ import javax.imageio.ImageIO;
 import org.junit.jupiter.api.Test;
 
 public class FileSinkTest {
+
   @Test
   public void testGetItemPathNoSource() {
     TestItem item = new TestItem();
@@ -982,81 +983,82 @@ public class FileSinkTest {
     settings.setBasePaths(List.of(Path.of(tempFile.getParent())));
     settings.setCopyOriginalFile(true);
 
-    FileSink.Processor processor = new FileSink.Processor(settings);
-    processor.process(item);
+    try (FileSink.Processor processor = new FileSink.Processor(settings)) {
+      processor.process(item);
 
-    Path outputFolder = Path.of(tempRootDir.toString(), tempFile.getName());
+      Path outputFolder = Path.of(tempRootDir.toString(), tempFile.getName());
 
-    // Original file
-    assertTrue(outputFolder.resolve(tempFile.getName()).toFile().exists());
+      // Original file
+      assertTrue(outputFolder.resolve(tempFile.getName()).toFile().exists());
 
-    // Properties
-    assertTrue(outputFolder.resolve(settings.getPropertiesFilename()).toFile().exists());
+      // Properties
+      assertTrue(outputFolder.resolve(settings.getPropertiesFilename()).toFile().exists());
 
-    // Groups
-    assertTrue(outputFolder.resolve(settings.getPropertiesFilename()).toFile().exists());
+      // Groups
+      assertTrue(outputFolder.resolve(settings.getPropertiesFilename()).toFile().exists());
 
-    // Content
-    assertTrue(
-        outputFolder
-            .resolve(c1.getId())
-            .resolve(settings.getContentFilename() + ".txt")
-            .toFile()
-            .exists());
-    assertTrue(
-        outputFolder
-            .resolve(c2.getId())
-            .resolve(settings.getContentFilename() + ".jpg")
-            .toFile()
-            .exists());
+      // Content
+      assertTrue(
+          outputFolder
+              .resolve(c1.getId())
+              .resolve(settings.getContentFilename() + ".txt")
+              .toFile()
+              .exists());
+      assertTrue(
+          outputFolder
+              .resolve(c2.getId())
+              .resolve(settings.getContentFilename() + ".jpg")
+              .toFile()
+              .exists());
 
-    // Content Properties
-    assertTrue(
-        outputFolder
-            .resolve(c1.getId())
-            .resolve(settings.getPropertiesFilename())
-            .toFile()
-            .exists());
-    assertFalse(
-        outputFolder
-            .resolve(c2.getId())
-            .resolve(settings.getPropertiesFilename())
-            .toFile()
-            .exists());
+      // Content Properties
+      assertTrue(
+          outputFolder
+              .resolve(c1.getId())
+              .resolve(settings.getPropertiesFilename())
+              .toFile()
+              .exists());
+      assertFalse(
+          outputFolder
+              .resolve(c2.getId())
+              .resolve(settings.getPropertiesFilename())
+              .toFile()
+              .exists());
 
-    // Annotations
-    assertTrue(
-        outputFolder
-            .resolve(c1.getId())
-            .resolve(settings.getAnnotationsFilename())
-            .toFile()
-            .exists());
-    assertTrue(
-        outputFolder
-            .resolve(c2.getId())
-            .resolve(settings.getAnnotationsFilename())
-            .toFile()
-            .exists());
+      // Annotations
+      assertTrue(
+          outputFolder
+              .resolve(c1.getId())
+              .resolve(settings.getAnnotationsFilename())
+              .toFile()
+              .exists());
+      assertTrue(
+          outputFolder
+              .resolve(c2.getId())
+              .resolve(settings.getAnnotationsFilename())
+              .toFile()
+              .exists());
 
-    // Description
-    assertTrue(
-        outputFolder
-            .resolve(c1.getId())
-            .resolve(settings.getDescriptionFilename())
-            .toFile()
-            .exists());
-    assertFalse(
-        outputFolder
-            .resolve(c2.getId())
-            .resolve(settings.getDescriptionFilename())
-            .toFile()
-            .exists());
+      // Description
+      assertTrue(
+          outputFolder
+              .resolve(c1.getId())
+              .resolve(settings.getDescriptionFilename())
+              .toFile()
+              .exists());
+      assertFalse(
+          outputFolder
+              .resolve(c2.getId())
+              .resolve(settings.getDescriptionFilename())
+              .toFile()
+              .exists());
 
-    // Delete temp directory
-    Files.walk(tempRootDir)
-        .sorted(Comparator.reverseOrder())
-        .map(Path::toFile)
-        .forEach(File::delete);
+      // Delete temp directory
+      Files.walk(tempRootDir)
+          .sorted(Comparator.reverseOrder())
+          .map(Path::toFile)
+          .forEach(File::delete);
+    }
   }
 
   @Test
@@ -1086,51 +1088,52 @@ public class FileSinkTest {
     settings.setRootOutputFolder(tempRootDir);
     settings.setNestFolders(true);
 
-    FileSink.Processor processor = new FileSink.Processor(settings);
-    processor.process(item);
+    try (FileSink.Processor processor = new FileSink.Processor(settings)) {
+      processor.process(item);
 
-    Path outputFolder = Path.of(tempRootDir.toString(), item.getId());
+      Path outputFolder = Path.of(tempRootDir.toString(), item.getId());
 
-    // Content 1
-    assertTrue(
-        outputFolder
-            .resolve(c1.getId())
-            .resolve(settings.getContentFilename() + ".txt")
-            .toFile()
-            .exists());
+      // Content 1
+      assertTrue(
+          outputFolder
+              .resolve(c1.getId())
+              .resolve(settings.getContentFilename() + ".txt")
+              .toFile()
+              .exists());
 
-    // Content 2, nested under Content 1
-    assertTrue(
-        outputFolder
-            .resolve(c1.getId())
-            .resolve(c2.getId())
-            .resolve(settings.getContentFilename() + ".txt")
-            .toFile()
-            .exists());
+      // Content 2, nested under Content 1
+      assertTrue(
+          outputFolder
+              .resolve(c1.getId())
+              .resolve(c2.getId())
+              .resolve(settings.getContentFilename() + ".txt")
+              .toFile()
+              .exists());
 
-    // Content 3 and 4, nested under Content 1 and Content 2
-    assertTrue(
-        outputFolder
-            .resolve(c1.getId())
-            .resolve(c2.getId())
-            .resolve(c3.getId())
-            .resolve(settings.getContentFilename() + ".txt")
-            .toFile()
-            .exists());
+      // Content 3 and 4, nested under Content 1 and Content 2
+      assertTrue(
+          outputFolder
+              .resolve(c1.getId())
+              .resolve(c2.getId())
+              .resolve(c3.getId())
+              .resolve(settings.getContentFilename() + ".txt")
+              .toFile()
+              .exists());
 
-    assertTrue(
-        outputFolder
-            .resolve(c1.getId())
-            .resolve(c2.getId())
-            .resolve(c4.getId())
-            .resolve(settings.getContentFilename() + ".txt")
-            .toFile()
-            .exists());
+      assertTrue(
+          outputFolder
+              .resolve(c1.getId())
+              .resolve(c2.getId())
+              .resolve(c4.getId())
+              .resolve(settings.getContentFilename() + ".txt")
+              .toFile()
+              .exists());
 
-    // Delete temp directory
-    Files.walk(tempRootDir)
-        .sorted(Comparator.reverseOrder())
-        .map(Path::toFile)
-        .forEach(File::delete);
+      // Delete temp directory
+      Files.walk(tempRootDir)
+          .sorted(Comparator.reverseOrder())
+          .map(Path::toFile)
+          .forEach(File::delete);
+    }
   }
 }

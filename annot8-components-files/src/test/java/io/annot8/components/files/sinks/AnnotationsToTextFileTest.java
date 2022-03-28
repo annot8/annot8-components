@@ -39,17 +39,18 @@ public class AnnotationsToTextFileTest {
 
     assertTrue(s.validate());
 
-    AnnotationsToTextFile.Processor p = new AnnotationsToTextFile.Processor(s);
-    p.process(item);
+    try (AnnotationsToTextFile.Processor p = new AnnotationsToTextFile.Processor(s)) {
+      p.process(item);
 
-    List<String> output = Files.lines(path).collect(Collectors.toList());
-    assertEquals(6, output.size());
-    assertTrue(output.contains("A"));
-    assertTrue(output.contains("B"));
-    assertTrue(output.contains("C"));
-    assertTrue(output.contains("D"));
-    assertTrue(output.contains("E"));
-    assertTrue(output.contains("Z"));
+      List<String> output = Files.lines(path).collect(Collectors.toList());
+      assertEquals(6, output.size());
+      assertTrue(output.contains("A"));
+      assertTrue(output.contains("B"));
+      assertTrue(output.contains("C"));
+      assertTrue(output.contains("D"));
+      assertTrue(output.contains("E"));
+      assertTrue(output.contains("Z"));
+    }
   }
 
   @Test
@@ -68,17 +69,18 @@ public class AnnotationsToTextFileTest {
 
     assertTrue(s.validate());
 
-    AnnotationsToTextFile.Processor p = new AnnotationsToTextFile.Processor(s);
-    p.process(item);
+    try (AnnotationsToTextFile.Processor p = new AnnotationsToTextFile.Processor(s)) {
+      p.process(item);
 
-    List<String> output = Files.lines(path).collect(Collectors.toList());
-    assertEquals(8, output.size());
-    assertEquals(2, output.stream().filter(x -> x.equals("A")).count());
-    assertEquals(2, output.stream().filter(x -> x.equals("B")).count());
-    assertTrue(output.contains("C"));
-    assertTrue(output.contains("D"));
-    assertTrue(output.contains("E"));
-    assertTrue(output.contains("Z"));
+      List<String> output = Files.lines(path).collect(Collectors.toList());
+      assertEquals(8, output.size());
+      assertEquals(2, output.stream().filter(x -> x.equals("A")).count());
+      assertEquals(2, output.stream().filter(x -> x.equals("B")).count());
+      assertTrue(output.contains("C"));
+      assertTrue(output.contains("D"));
+      assertTrue(output.contains("E"));
+      assertTrue(output.contains("Z"));
+    }
   }
 
   @Test
@@ -97,16 +99,17 @@ public class AnnotationsToTextFileTest {
 
     assertTrue(s.validate());
 
-    AnnotationsToTextFile.Processor p = new AnnotationsToTextFile.Processor(s);
-    p.process(item);
+    try (AnnotationsToTextFile.Processor p = new AnnotationsToTextFile.Processor(s)) {
+      p.process(item);
 
-    List<String> output = Files.lines(path).collect(Collectors.toList());
-    assertEquals(5, output.size());
-    assertTrue(output.contains("A"));
-    assertTrue(output.contains("B"));
-    assertTrue(output.contains("C"));
-    assertTrue(output.contains("D"));
-    assertTrue(output.contains("E"));
+      List<String> output = Files.lines(path).collect(Collectors.toList());
+      assertEquals(5, output.size());
+      assertTrue(output.contains("A"));
+      assertTrue(output.contains("B"));
+      assertTrue(output.contains("C"));
+      assertTrue(output.contains("D"));
+      assertTrue(output.contains("E"));
+    }
   }
 
   @Test
@@ -125,19 +128,20 @@ public class AnnotationsToTextFileTest {
 
     assertTrue(s.validate());
 
-    AnnotationsToTextFile.Processor p = new AnnotationsToTextFile.Processor(s);
-    p.process(item);
+    try (AnnotationsToTextFile.Processor p = new AnnotationsToTextFile.Processor(s)) {
+      p.process(item);
 
-    List<String> output = Files.lines(path).collect(Collectors.toList());
-    assertEquals(8, output.size());
-    assertTrue(output.contains("A"));
-    assertTrue(output.contains("B"));
-    assertTrue(output.contains("C"));
-    assertTrue(output.contains("D"));
-    assertTrue(output.contains("E"));
-    assertTrue(output.contains("Z"));
-    assertTrue(output.contains("ABC"));
-    assertTrue(output.contains("BCD"));
+      List<String> output = Files.lines(path).collect(Collectors.toList());
+      assertEquals(8, output.size());
+      assertTrue(output.contains("A"));
+      assertTrue(output.contains("B"));
+      assertTrue(output.contains("C"));
+      assertTrue(output.contains("D"));
+      assertTrue(output.contains("E"));
+      assertTrue(output.contains("Z"));
+      assertTrue(output.contains("ABC"));
+      assertTrue(output.contains("BCD"));
+    }
   }
 
   private Item createItem() {

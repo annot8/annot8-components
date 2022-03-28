@@ -1,8 +1,11 @@
 /* Annot8 (annot8.io) - Licensed under Apache-2.0. */
 package io.annot8.components.files.processors;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
 
@@ -32,59 +35,61 @@ public class FileMetadataExtractorTest {
   public void testProcess() {
     Item item = Mockito.mock(Item.class);
     FileContent fileContent = getFileContent("testfilemetadata.txt");
-    AnnotationStore store = fileContent.getAnnotations();
 
     File file = fileContent.getData();
 
-    doAnswer(getStreamAnswer(fileContent)).when(item).getContents(eq(FileContent.class));
+    doAnswer(getStreamAnswer(fileContent)).when(item).getContents(FileContent.class);
 
-    Processor extractor = new FileMetadataExtractor.Processor();
+    try (Processor extractor = new FileMetadataExtractor.Processor()) {
 
-    ProcessorResponse processResponse = extractor.process(item);
+      ProcessorResponse processResponse = extractor.process(item);
 
-    assertEquals(Status.OK, processResponse.getStatus());
+      assertEquals(Status.OK, processResponse.getStatus());
 
-    List<Annotation> annotations =
-        fileContent.getAnnotations().getAll().collect(Collectors.toList());
-    assertEquals(file.getAbsolutePath(), getKeyValue(annotations, FileMetadataKeys.PATH));
-    assertEquals("txt", getKeyValue(annotations, FileMetadataKeys.EXTENSION));
-    assertFalse((boolean) getKeyValue(annotations, FileMetadataKeys.HIDDEN));
-    assertTrue((boolean) getKeyValue(annotations, FileMetadataKeys.REGULAR));
-    assertFalse((boolean) getKeyValue(annotations, FileMetadataKeys.SYM_LINK));
-    assertNotNull(getKeyValue(annotations, FileMetadataKeys.DATE_CREATED));
-    assertNotNull(getKeyValue(annotations, FileMetadataKeys.LAST_MODIFIED));
-    assertNotNull(getKeyValue(annotations, FileMetadataKeys.LAST_ACCESS_DATE));
-    assertEquals(60L, getKeyValue(annotations, FileMetadataKeys.FILE_SIZE));
-    assertNotNull(getKeyValue(annotations, FileMetadataKeys.OWNER));
-    assertFalse((boolean) getKeyValue(annotations, FileMetadataKeys.DIRECTORY));
-    annotations.forEach(
-        a -> assertEquals(FileMetadataExtractor.Processor.FILE_METADATA, a.getType()));
+      List<Annotation> annotations =
+          fileContent.getAnnotations().getAll().collect(Collectors.toList());
+      assertEquals(file.getAbsolutePath(), getKeyValue(annotations, FileMetadataKeys.PATH));
+      assertEquals("txt", getKeyValue(annotations, FileMetadataKeys.EXTENSION));
+      assertFalse((boolean) getKeyValue(annotations, FileMetadataKeys.HIDDEN));
+      assertTrue((boolean) getKeyValue(annotations, FileMetadataKeys.REGULAR));
+      assertFalse((boolean) getKeyValue(annotations, FileMetadataKeys.SYM_LINK));
+      assertNotNull(getKeyValue(annotations, FileMetadataKeys.DATE_CREATED));
+      assertNotNull(getKeyValue(annotations, FileMetadataKeys.LAST_MODIFIED));
+      assertNotNull(getKeyValue(annotations, FileMetadataKeys.LAST_ACCESS_DATE));
+      assertEquals(60L, getKeyValue(annotations, FileMetadataKeys.FILE_SIZE));
+      assertNotNull(getKeyValue(annotations, FileMetadataKeys.OWNER));
+      assertFalse((boolean) getKeyValue(annotations, FileMetadataKeys.DIRECTORY));
+      annotations.forEach(
+          a -> assertEquals(FileMetadataExtractor.Processor.FILE_METADATA, a.getType()));
+    }
   }
 
   @Test
   public void testProcessNoFileContent() {
     Item item = Mockito.mock(Item.class);
-    when(item.getContents(eq(FileContent.class))).thenReturn(Stream.empty());
+    when(item.getContents(FileContent.class)).thenReturn(Stream.empty());
 
-    Processor extractor = new FileMetadataExtractor.Processor();
-    ProcessorResponse processResponse = extractor.process(item);
+    try (Processor extractor = new FileMetadataExtractor.Processor()) {
+      ProcessorResponse processResponse = extractor.process(item);
 
-    assertEquals(Status.OK, processResponse.getStatus());
+      assertEquals(Status.OK, processResponse.getStatus());
+    }
   }
 
   @Test
   public void testProcessNoFileExtension() {
     Item item = Mockito.mock(Item.class);
     FileContent content = getFileContent("noExtension");
-    doAnswer(getStreamAnswer(content)).when(item).getContents(eq(FileContent.class));
-    Processor extractor = new FileMetadataExtractor.Processor();
-    ProcessorResponse response = extractor.process(item);
-    assertEquals(Status.OK, response.getStatus());
+    doAnswer(getStreamAnswer(content)).when(item).getContents(FileContent.class);
+    try (Processor extractor = new FileMetadataExtractor.Processor()) {
+      ProcessorResponse response = extractor.process(item);
+      assertEquals(Status.OK, response.getStatus());
 
-    List<Annotation> annotations = content.getAnnotations().getAll().collect(Collectors.toList());
-    for (Annotation annotation : annotations) {
-      if (annotation.getProperties().has(FileMetadataKeys.EXTENSION)) {
-        fail("No annotation with a file extension property is expected");
+      List<Annotation> annotations = content.getAnnotations().getAll().collect(Collectors.toList());
+      for (Annotation annotation : annotations) {
+        if (annotation.getProperties().has(FileMetadataKeys.EXTENSION)) {
+          fail("No annotation with a file extension property is expected");
+        }
       }
     }
   }
@@ -102,12 +107,13 @@ public class FileMetadataExtractorTest {
               }
             })
         .when(item)
-        .getContents(eq(FileContent.class));
+        .getContents(FileContent.class);
 
-    Processor extractor = new FileMetadataExtractor.Processor();
-    ProcessorResponse response = extractor.process(item);
+    try (Processor extractor = new FileMetadataExtractor.Processor()) {
+      ProcessorResponse response = extractor.process(item);
 
-    assertEquals(Status.ITEM_ERROR, response.getStatus());
+      assertEquals(Status.ITEM_ERROR, response.getStatus());
+    }
   }
 
   private FileContent getFileContent(String fileName) {
@@ -136,6 +142,7 @@ public class FileMetadataExtractorTest {
     return null;
   }
 
+  @SafeVarargs
   private <T> Answer<Stream<T>> getStreamAnswer(T... contents) {
     return new Answer<Stream<T>>() {
       @Override
