@@ -77,7 +77,7 @@ public class MongoSource implements SourceDescriptor<MongoSource.Source, MongoCo
     @Override
     public SourceResponse read(ItemFactory itemFactory) {
       if (cursor == null) {
-        cursor = getConnection().getCollection().find().iterator();
+        cursor = getConnection().<Document>getCollection().find().iterator();
         return SourceResponse.sourceError();
       }
 

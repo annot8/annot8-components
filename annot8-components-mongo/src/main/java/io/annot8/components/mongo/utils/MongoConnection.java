@@ -12,7 +12,7 @@ public interface MongoConnection {
     return getCollection().withDocumentClass(clazz);
   }
 
-  MongoCollection<?> getCollection();
+  <D> MongoCollection<D> getCollection();
 
   void disconnect();
 }

@@ -18,8 +18,8 @@ import io.annot8.common.components.capabilities.SimpleCapabilities;
 import io.annot8.components.mongo.data.AnnotationDto;
 import io.annot8.components.mongo.data.ContentDto;
 import io.annot8.components.mongo.data.ItemDto;
-import io.annot8.components.mongo.resources.MongoConnection;
 import io.annot8.components.mongo.resources.MongoConnectionSettings;
+import io.annot8.components.mongo.utils.MongoConnection;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -67,6 +67,7 @@ public class NestedItemSink
         .build();
   }
 
+  @SuppressWarnings({"rawtypes", "unchecked"})
   public static class Processor extends AbstractMongoSink {
 
     private MongoCollection<Document> itemCollection;

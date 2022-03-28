@@ -19,8 +19,8 @@ import io.annot8.common.components.capabilities.SimpleCapabilities;
 import io.annot8.components.mongo.data.AnnotationDto;
 import io.annot8.components.mongo.data.ContentDto;
 import io.annot8.components.mongo.data.ItemDto;
-import io.annot8.components.mongo.resources.MongoConnection;
 import io.annot8.components.mongo.resources.MongoConnectionSettings;
+import io.annot8.components.mongo.utils.MongoConnection;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -143,10 +143,12 @@ public class FlatMongoSink
       }
     }
 
+    @SuppressWarnings("rawtypes")
     private Stream<AnnotationDto> getAnnotations(Content content, Item item) {
       return content.getAnnotations().getAll().map(a -> getAnnotation(a, content, item));
     }
 
+    @SuppressWarnings({"unchecked", "rawtypes"})
     private AnnotationDto getAnnotation(Annotation annotation, Content content, Item item) {
       Object data = null;
       Optional optionalData = annotation.getBounds().getData(content, Object.class);

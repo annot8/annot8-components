@@ -13,8 +13,8 @@ import io.annot8.common.data.content.Text;
 
 public abstract class AbstractSinkTest {
 
-  protected Content addContent(Item item, String desc, String data) {
-    Content content = null;
+  protected Content<String> addContent(Item item, String desc, String data) {
+    Content<String> content = null;
     try {
       content = item.createContent(Text.class).withDescription(desc).withData(data).save();
     } catch (UnsupportedContentException | IncompleteException e) {
@@ -23,7 +23,7 @@ public abstract class AbstractSinkTest {
     return content;
   }
 
-  protected Annotation addAnnotation(Content content, String type, int begin, int end) {
+  protected Annotation addAnnotation(Content<?> content, String type, int begin, int end) {
     Annotation annotation = null;
     try {
       annotation =
