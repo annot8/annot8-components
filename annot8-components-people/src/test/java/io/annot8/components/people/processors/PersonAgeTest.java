@@ -44,18 +44,19 @@ public class PersonAgeTest {
         .withType(AnnotationTypes.ANNOTATION_TYPE_PERSON)
         .save();
 
-    PersonAge.Processor p = new PersonAge.Processor();
+    try (PersonAge.Processor p = new PersonAge.Processor()) {
 
-    p.process(text);
+      p.process(text);
 
-    List<Annotation> annotations = text.getAnnotations().getAll().collect(Collectors.toList());
-    assertEquals(1, annotations.size());
+      List<Annotation> annotations = text.getAnnotations().getAll().collect(Collectors.toList());
+      assertEquals(1, annotations.size());
 
-    Annotation a = annotations.get(0);
-    assertEquals(AnnotationTypes.ANNOTATION_TYPE_PERSON, a.getType());
-    assertEquals(
-        new SpanBounds(expectedPersonBegin, expectedPersonEnd),
-        a.getBounds(SpanBounds.class).orElse(null));
-    assertEquals(expectedAge, a.getProperties().get(PropertyKeys.PROPERTY_KEY_AGE).orElse(null));
+      Annotation a = annotations.get(0);
+      assertEquals(AnnotationTypes.ANNOTATION_TYPE_PERSON, a.getType());
+      assertEquals(
+          new SpanBounds(expectedPersonBegin, expectedPersonEnd),
+          a.getBounds(SpanBounds.class).orElse(null));
+      assertEquals(expectedAge, a.getProperties().get(PropertyKeys.PROPERTY_KEY_AGE).orElse(null));
+    }
   }
 }
