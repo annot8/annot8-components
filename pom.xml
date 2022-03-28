@@ -98,6 +98,9 @@
 
     <!-- Sonar -->
     <sonar.coverage.exclusions>**/org/openapi/spacy/**</sonar.coverage.exclusions>
+    <sonar.issue.ignore.multicriteria>e1</sonar.issue.ignore.multicriteria>
+    <sonar.issue.ignore.multicriteria.e1.ruleKey>java:S5786</sonar.issue.ignore.multicriteria.e1.ruleKey>
+    <sonar.issue.ignore.multicriteria.e1.resourceKey>**/*.java</sonar.issue.ignore.multicriteria.e1.resourceKey>
   </properties>
 
   <dependencies>
