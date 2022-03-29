@@ -56,7 +56,8 @@ public class GeoBoundary extends AbstractProcessorDescriptor<GeoBoundary.Process
           content
               .getAnnotations()
               .getByBoundsAndType(SpanBounds.class, AnnotationTypes.ANNOTATION_TYPE_COORDINATE)
-              .sorted(Comparator.comparing(a -> a.getBounds(SpanBounds.class).get().getBegin()))
+              .sorted(
+                  Comparator.comparing(a -> a.getBounds(SpanBounds.class).orElseThrow().getBegin()))
               .collect(Collectors.toList());
 
       if (coordinates.size() < 2) return;
@@ -69,8 +70,8 @@ public class GeoBoundary extends AbstractProcessorDescriptor<GeoBoundary.Process
         stack.add(aCurr);
         Annotation a2 = coordinates.get(i);
 
-        SpanBounds s1 = aCurr.getBounds(SpanBounds.class).get();
-        SpanBounds s2 = a2.getBounds(SpanBounds.class).get();
+        SpanBounds s1 = aCurr.getBounds(SpanBounds.class).orElseThrow();
+        SpanBounds s2 = a2.getBounds(SpanBounds.class).orElseThrow();
 
         boolean addToLocation = false;
 
