@@ -5,6 +5,7 @@ import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
 import io.annot8.api.components.annotations.ComponentName;
 import io.annot8.api.context.Context;
+import io.annot8.api.exceptions.BadConfigurationException;
 import io.annot8.api.settings.Description;
 import io.annot8.common.components.AbstractProcessorDescriptor;
 import java.net.MalformedURLException;
@@ -19,7 +20,7 @@ public class RemoteEasyOCR
 
   @Override
   public Capabilities capabilities() {
-    return Processor.capabilities();
+    return AbstractEasyOCRProcessor.capabilities();
   }
 
   @Override
@@ -31,11 +32,12 @@ public class RemoteEasyOCR
 
     private final Settings settings;
 
-    public Processor() {
-      this(Settings.builder().withLang("en").build());
+    public Processor(Settings settings) {
+      this(settings, 3, 500);
     }
 
-    public Processor(Settings settings) {
+    public Processor(Settings settings, int delay, int retries) {
+      super(delay, retries);
       this.settings = settings;
       startEasyOCR();
     }
@@ -46,24 +48,11 @@ public class RemoteEasyOCR
         try {
           log().info("Initializing EasyOCR server at {}", settings.getUrl());
 
-          int count = 0;
-          while (true) {
-            try {
-              initializeEasyOCR(
-                  new InitSettings(settings.getLang(), settings.isDownload(), settings.isGpu()));
-              break;
-            } catch (Exception e) {
-              if (++count == 30) {
-                throw new RuntimeException("Error starting Easy OCR", e);
-              }
-              Thread.sleep(1000);
-            }
-          }
-        } catch (InterruptedException ie) {
-          Thread.currentThread().interrupt();
-        } catch (Exception e) {
+          tryInitializeEasyOCR(
+              new InitSettings(settings.getLang(), settings.isDownload(), settings.isGpu()));
+        } catch (BadConfigurationException e) {
           log().error("Easy-OCR start error", e);
-          close();
+          throw e;
         }
       } else {
         log().debug("Not initializing EasyOCR server at {}", settings.getUrl());
@@ -74,7 +63,7 @@ public class RemoteEasyOCR
       try {
         return new URL(new URL(settings.getUrl()), string).toString();
       } catch (MalformedURLException e) {
-        throw new RuntimeException(e);
+        throw new BadConfigurationException("Supplied URL invalid", e);
       }
     }
   }

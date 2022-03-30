@@ -5,6 +5,7 @@ import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
 import io.annot8.api.components.annotations.ComponentName;
 import io.annot8.api.context.Context;
+import io.annot8.api.exceptions.BadConfigurationException;
 import io.annot8.api.settings.Description;
 import io.annot8.common.components.AbstractProcessorDescriptor;
 import java.io.BufferedReader;
@@ -64,13 +65,13 @@ public class LocalEasyOCR
     try {
       Files.write(Path.of("./ocr.py"), OCR_PY.getBytes(), StandardOpenOption.CREATE);
     } catch (Exception e) {
-      throw new RuntimeException(e);
+      throw new BadConfigurationException("Unable to write ocr code", e);
     }
   }
 
   @Override
   public Capabilities capabilities() {
-    return Processor.capabilities();
+    return AbstractEasyOCRProcessor.capabilities();
   }
 
   @Override
@@ -84,17 +85,13 @@ public class LocalEasyOCR
     private final Settings settings;
     private Process process;
 
-    public Processor() {
-      this(Settings.builder().withLang("en").build());
-    }
-
     public Processor(Settings settings) {
       this.settings = settings;
       pool = Executors.newSingleThreadExecutor();
       startEasyOCR();
     }
 
-    @SuppressWarnings("java:S1141")
+    @SuppressWarnings({"java:S1141", "java:S4036"})
     private void startEasyOCR() {
       try {
         log().info("Creating EasyOCR server on port {}", settings.getPort());
@@ -115,21 +112,8 @@ public class LocalEasyOCR
             new ProcessReadTask(
                 process.getInputStream(), l -> log().debug("EasyOCR-Server: {}", l)));
 
-        int count = 0;
-        while (true) {
-          try {
-            initializeEasyOCR(
-                new InitSettings(settings.getLang(), settings.isDownload(), settings.isGpu()));
-            break;
-          } catch (Exception e) {
-            if (++count == 30) {
-              throw new RuntimeException("Error starting Easy OCR", e);
-            }
-            Thread.sleep(1000);
-          }
-        }
-      } catch (InterruptedException ie) {
-        Thread.currentThread().interrupt();
+        tryInitializeEasyOCR(
+            new InitSettings(settings.getLang(), settings.isDownload(), settings.isGpu()));
       } catch (Exception e) {
         log().error("Easy-OCR start error", e);
         close();
@@ -140,7 +124,7 @@ public class LocalEasyOCR
       try {
         return new URL("http", "127.0.0.1", settings.getPort(), string).toString();
       } catch (MalformedURLException e) {
-        throw new RuntimeException(e);
+        throw new BadConfigurationException("Supplied port invalid", e);
       }
     }
 

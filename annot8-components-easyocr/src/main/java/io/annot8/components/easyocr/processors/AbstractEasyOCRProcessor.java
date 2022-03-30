@@ -6,6 +6,8 @@ import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.responses.ProcessorResponse;
 import io.annot8.api.data.Content;
 import io.annot8.api.data.Item;
+import io.annot8.api.exceptions.BadConfigurationException;
+import io.annot8.api.exceptions.ProcessingException;
 import io.annot8.common.components.AbstractProcessor;
 import io.annot8.common.components.capabilities.SimpleCapabilities;
 import io.annot8.common.data.content.FileContent;
@@ -38,6 +40,9 @@ public abstract class AbstractEasyOCRProcessor extends AbstractProcessor {
   private final ObjectMapper objectMapper;
   private final HttpClient httpClient;
 
+  private final int delay;
+  private final int retries;
+
   public static Capabilities capabilities() {
     return new SimpleCapabilities.Builder()
         .withProcessesContent(FileContent.class)
@@ -47,20 +52,51 @@ public abstract class AbstractEasyOCRProcessor extends AbstractProcessor {
   }
 
   protected AbstractEasyOCRProcessor() {
+    this(1000, 10);
+  }
+
+  protected AbstractEasyOCRProcessor(int delay, int retries) {
+    this.delay = delay;
+    this.retries = retries;
     objectMapper = new ObjectMapper();
     httpClient = HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1).build();
   }
 
   protected abstract String getUrl(String string);
 
-  protected void initializeEasyOCR(InitSettings initSettings) throws IOException {
-    HttpResponse<String> response = postJSON(getUrl("/init"), initSettings);
-    if (response.statusCode() != 200) {
-      throw new IOException("Failed to initialise EasyOCR server {}" + response.body());
-    } else {
-      if (log().isInfoEnabled()) {
-        log().info("Easy-OCR initialized: {}", response.statusCode());
+  protected void tryInitializeEasyOCR(InitSettings initSettings) {
+    try {
+      int count = 0;
+      while (true) {
+        if (initializeEasyOCR(initSettings)) {
+          break;
+        } else {
+          if (++count == retries) {
+            throw new BadConfigurationException("Error initializing Easy OCR");
+          }
+          Thread.sleep(delay);
+        }
       }
+    } catch (InterruptedException ie) {
+      Thread.currentThread().interrupt();
+      throw new BadConfigurationException("Error Initializing Easy OCR", ie);
+    }
+  }
+
+  protected boolean initializeEasyOCR(InitSettings initSettings) {
+    try {
+      HttpResponse<String> response = postJSON(getUrl("/init"), initSettings);
+      if (response.statusCode() != 200) {
+        throw new IOException("Failed to initialise EasyOCR server {}" + response.body());
+      } else {
+        if (log().isInfoEnabled()) {
+          log().info("Easy-OCR initialized: {}", response.statusCode());
+        }
+        return true;
+      }
+    } catch (IOException e) {
+      log().debug("Error attempting to initialize EasyOCR", e);
+      return false;
     }
   }
 
@@ -77,7 +113,7 @@ public abstract class AbstractEasyOCRProcessor extends AbstractProcessor {
       return httpClient.send(request, BodyHandlers.ofString());
     } catch (InterruptedException ie) {
       Thread.currentThread().interrupt();
-      throw new RuntimeException(ie);
+      throw new IOException(ie);
     }
   }
 
@@ -122,30 +158,37 @@ public abstract class AbstractEasyOCRProcessor extends AbstractProcessor {
     return exceptions.isEmpty() ? ProcessorResponse.ok() : ProcessorResponse.itemError(exceptions);
   }
 
-  private String processContent(String id, BodyPublisher publisher, String boundary)
-      throws Exception {
-    HttpRequest request =
-        HttpRequest.newBuilder(URI.create(getUrl("/ocr")))
-            .timeout(Duration.ofMinutes(2))
-            .header("Content-Type", "multipart/form-data;boundary=" + boundary)
-            .POST(publisher)
-            .build();
-    HttpResponse<String> response = httpClient.send(request, BodyHandlers.ofString());
+  private String processContent(String id, BodyPublisher publisher, String boundary) {
+    try {
+      HttpRequest request =
+          HttpRequest.newBuilder(URI.create(getUrl("/ocr")))
+              .timeout(Duration.ofMinutes(2))
+              .header("Content-Type", "multipart/form-data;boundary=" + boundary)
+              .POST(publisher)
+              .build();
+      HttpResponse<String> response = httpClient.send(request, BodyHandlers.ofString());
 
-    if (response.statusCode() != 200) {
-      throw new Exception(
-          String.format(
-              "Failed to run OCR on %s: %s - %s", id, response.statusCode(), response.body()));
+      if (response.statusCode() != 200) {
+        throw new ProcessingException(
+            String.format(
+                "Failed to run OCR on %s: %s - %s", id, response.statusCode(), response.body()));
+      }
+
+      return response.body();
+    } catch (InterruptedException ie) {
+      Thread.currentThread().interrupt();
+      throw new ProcessingException(String.format("Failed to run OCR on %s", id), ie);
+    } catch (IOException ioe) {
+      throw new ProcessingException(String.format("Failed to run OCR on %s", id), ioe);
     }
-
-    return response.body();
   }
 
+  @SuppressWarnings("java:S2245")
   private String newBoundary() {
     return new BigInteger(256, new Random()).toString();
   }
 
-  private void processFile(Item item, FileContent c) throws Exception {
+  private void processFile(Item item, FileContent c) throws IOException {
     log().debug("Running EasyOCR on {}", c.getId());
 
     String boundary = newBoundary();
@@ -154,7 +197,7 @@ public abstract class AbstractEasyOCRProcessor extends AbstractProcessor {
     createTextContent(item, ocr, c);
   }
 
-  private void processImage(Item item, Image c) throws Exception {
+  private void processImage(Item item, Image c) throws IOException {
     log().debug("Running EasyOCR on {}", c.getId());
 
     String boundary = newBoundary();
