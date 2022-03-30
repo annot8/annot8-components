@@ -178,7 +178,7 @@ public abstract class AbstractEasyOCRProcessor extends AbstractProcessor {
     byte[] data = baos.toByteArray();
     String mimeType = "image/png";
 
-    return bodyPublisher("orc.png", mimeType, data, boundary);
+    return bodyPublisher(image.getId() + "-ocr.png", mimeType, data, boundary);
   }
 
   private static BodyPublisher bodyPublisher(

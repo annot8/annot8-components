@@ -42,27 +42,31 @@ public class RemoteEasyOCR
 
     @SuppressWarnings("java:S1141")
     private void startEasyOCR() {
-      try {
-        log().info("Initializing EasyOCR server at {}", settings.getUrl());
+      if (settings.isInitialize()) {
+        try {
+          log().info("Initializing EasyOCR server at {}", settings.getUrl());
 
-        int count = 0;
-        while (true) {
-          try {
-            initializeEasyOCR(
-                new InitSettings(settings.getLang(), settings.isDownload(), settings.isGpu()));
-            break;
-          } catch (Exception e) {
-            if (++count == 30) {
-              throw new RuntimeException("Error starting Easy OCR", e);
+          int count = 0;
+          while (true) {
+            try {
+              initializeEasyOCR(
+                  new InitSettings(settings.getLang(), settings.isDownload(), settings.isGpu()));
+              break;
+            } catch (Exception e) {
+              if (++count == 30) {
+                throw new RuntimeException("Error starting Easy OCR", e);
+              }
+              Thread.sleep(1000);
             }
-            Thread.sleep(1000);
           }
+        } catch (InterruptedException ie) {
+          Thread.currentThread().interrupt();
+        } catch (Exception e) {
+          log().error("Easy-OCR start error", e);
+          close();
         }
-      } catch (InterruptedException ie) {
-        Thread.currentThread().interrupt();
-      } catch (Exception e) {
-        log().error("Easy-OCR start error", e);
-        close();
+      } else {
+        log().debug("Not initializing EasyOCR server at {}", settings.getUrl());
       }
     }
 
