@@ -4,6 +4,7 @@ package io.annot8.components.easyocr.processors;
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
 import io.annot8.api.components.annotations.ComponentName;
+import io.annot8.api.components.annotations.SettingsClass;
 import io.annot8.api.context.Context;
 import io.annot8.api.exceptions.BadConfigurationException;
 import io.annot8.api.settings.Description;
@@ -15,6 +16,7 @@ import java.util.List;
 
 @ComponentName("Remote EasyOCR")
 @ComponentDescription("Perform OCR using a remote EasyOCR Server")
+@SettingsClass(RemoteEasyOCR.Settings.class)
 public class RemoteEasyOCR
     extends AbstractProcessorDescriptor<RemoteEasyOCR.Processor, RemoteEasyOCR.Settings> {
 
@@ -101,7 +103,7 @@ public class RemoteEasyOCR
     }
 
     @Description(
-        "Set true to initialize the remote server, other size we assume already initialized")
+        "Set true to initialize the remote server, otherwise we assume already initialized")
     public boolean isInitialize() {
       return initialize;
     }
@@ -119,7 +121,7 @@ public class RemoteEasyOCR
       this.download = download;
     }
 
-    @Description("Set true to use allow language models to be downloaded")
+    @Description("Set true to use GPU")
     public boolean isGpu() {
       return gpu;
     }

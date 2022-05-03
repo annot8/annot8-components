@@ -4,6 +4,7 @@ package io.annot8.components.easyocr.processors;
 import io.annot8.api.capabilities.Capabilities;
 import io.annot8.api.components.annotations.ComponentDescription;
 import io.annot8.api.components.annotations.ComponentName;
+import io.annot8.api.components.annotations.SettingsClass;
 import io.annot8.api.context.Context;
 import io.annot8.api.exceptions.BadConfigurationException;
 import io.annot8.api.settings.Description;
@@ -25,9 +26,11 @@ import java.util.function.Consumer;
 
 @ComponentName("Local EasyOCR")
 @ComponentDescription("Perform OCR using the locally installed EasyOCR library")
+@SettingsClass(LocalEasyOCR.Settings.class)
 public class LocalEasyOCR
     extends AbstractProcessorDescriptor<LocalEasyOCR.Processor, LocalEasyOCR.Settings> {
 
+  // Coppied from annot8-components-easyocr/server/ocr.py - whitespace is important in py.
   // @formatter:off
   private static final String OCR_PY =
       String.join(
@@ -44,16 +47,14 @@ public class LocalEasyOCR
           "",
           "app = FastAPI()",
           "",
-          "",
           "reader = easyocr.Reader([\"en\"], download_enabled=False, gpu=False)",
-          "",
           "",
           "@app.post(\"/init\")",
           "def init(config: Config):",
           "    langs = config.langs.split(\",\")",
           "    global reader",
           "    reader = easyocr.Reader(langs, download_enabled=config.download, gpu=config.gpu)",
-          "    ",
+          "",
           "@app.post(\"/ocr\")",
           "def index(file: bytes = File(...)):",
           "    results = reader.readtext(file, detail=0, paragraph=True, y_ths = -0.01, x_ths = 10.0)",
@@ -183,7 +184,7 @@ public class LocalEasyOCR
       this.download = download;
     }
 
-    @Description("Set true to use allow language models to be downloaded")
+    @Description("Set true to use GPU")
     public boolean isGpu() {
       return gpu;
     }

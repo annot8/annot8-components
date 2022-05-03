@@ -3,10 +3,6 @@ package io.annot8.components.easyocr.processors;
 
 public class InitSettings {
 
-  public static final boolean DEFAULT_DOWNLOAD = false;
-  public static final boolean DEFAULT_GPU = false;
-  public static final String DEFAULT_LANGS = "en";
-
   private final boolean download;
   private final boolean gpu;
   private final String langs;

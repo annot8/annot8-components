@@ -1,6 +1,6 @@
 # Annot8 EasyOCR
 
-This module provides an [EasyOCR](https://www.jaided.ai/easyocr/ base annot8 processor.
+This module provides an [EasyOCR](https://www.jaided.ai/easyocr/) base annot8 processor.
 It processes **Images** and produces new **Text** content.
 
 # Requirements
@@ -52,7 +52,7 @@ docker run -p 8000:8000 -v <path to models>:/root/.EasyOCR/model/ annot8-easyocr
 Two integration test suites are provided for testing the EasyOCR server but disabled by default.
 To run these, remove the `@Disabled` from the relevent test class.
 
-For the `LocalEasyOCRTest` the requirements must be insalled locally in order to run the server.
+For the `LocalEasyOCRTest` the requirements must be installed locally in order to run the server.
 
 > Note these are installed in the annot8 project [devcontainer](https://github.com/annot8/devcontainer).
 
