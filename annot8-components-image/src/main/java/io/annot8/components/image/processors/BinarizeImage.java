@@ -239,9 +239,10 @@ public class BinarizeImage
 
     private static final boolean DEFAULT_DISCARD = true;
     private static final boolean DEFAULT_COPY = true;
+    private static final Method DEFAULT_METHOD = Method.OTSU;
     private boolean discardOriginal = DEFAULT_DISCARD;
     private boolean copyProperties = DEFAULT_COPY;
-    private Method method = Method.OTSU;
+    private Method method = DEFAULT_METHOD;
 
     @Override
     public boolean validate() {
@@ -261,7 +262,7 @@ public class BinarizeImage
       this.method = method;
     }
 
-    @Description("Set the scaling method to be used")
+    @Description("Set the method to be used, defaults to OTSU")
     public Method getMethod() {
       return method;
     }
@@ -277,7 +278,7 @@ public class BinarizeImage
 
     public static class Builder {
       private boolean discardOriginal = DEFAULT_DISCARD;
-      private Method method = Method.LUMINOSITY;
+      private Method method = DEFAULT_METHOD;
       private boolean copyProperties = DEFAULT_COPY;
 
       public Builder withDiscardOriginal(boolean discardOriginal) {
