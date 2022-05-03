@@ -12,7 +12,7 @@ public class PrintSummarySettings extends PrintSettings {
     return this;
   }
 
-  @Description("How often to report progress, set to 0 to disable")
+  @Description("Report progress every 'n' items. Set to 0 to disable")
   public int getReportProgress() {
     return reportProgress;
   }
