@@ -177,6 +177,7 @@
           <parameters>true</parameters>
         </configuration>
       </plugin>
+
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>nexus-staging-maven-plugin</artifactId>
@@ -498,6 +499,7 @@
     <module>annot8-components-cyber</module>
     <module>annot8-components-db</module>
     <module>annot8-components-documents</module>
+    <module>annot8-components-easyocr</module>
     <module>annot8-components-elasticsearch</module>
     <module>annot8-components-files</module>
     <module>annot8-components-financial</module>
