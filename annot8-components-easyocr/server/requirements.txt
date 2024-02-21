@@ -1,4 +1,4 @@
 easyocr==1.4.1
-fastapi==0.75.0
+fastapi==0.109.1
 uvicorn==0.17.6
 python-multipart==0.0.5
